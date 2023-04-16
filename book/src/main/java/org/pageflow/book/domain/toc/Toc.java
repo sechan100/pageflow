@@ -1,5 +1,6 @@
 package org.pageflow.book.domain.toc;
 
+import com.google.common.base.Preconditions;
 import lombok.Getter;
 import org.pageflow.book.application.dto.node.TocDto;
 import org.pageflow.book.domain.book.entity.Book;
@@ -9,6 +10,7 @@ import org.pageflow.book.domain.toc.entity.TocNode;
 import org.pageflow.book.domain.toc.entity.TocSection;
 
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -17,95 +19,51 @@ import java.util.stream.Collectors;
 @Getter
 public class Toc {
   private final Book book;
-  private final Collection<TocNode> allNodes;
-  private final Map<UUID, TocNode> nodeMap;
-  private final UUID rootFolderId;
-  private final boolean isEditableToc;
+  private final TocFolder rootFolder;
 
-  public Toc(Book book, Collection<TocNode> allNodes, boolean isEditableToc) {
+  public Toc(Book book, TocFolder rootFolder) {
+    Preconditions.checkArgument(rootFolder.isRootFolder());
     this.book = book;
-    this.allNodes = Collections.unmodifiableCollection(allNodes);
-    // nodeMap 만들기 =======================================
-    Map<UUID, TocNode> map = new HashMap<>();
-    TocNode root = null;
-    for(TocNode node : allNodes) {
-      map.put(node.getId(), node);
-      if(node.isRootFolder()) {
-        if(root != null) {
-          throw new IllegalStateException("Root Folder가 2개 이상 존재합니다.");
-        }
-        root = node;
-      }
-    }
-    if(root == null) {
-      throw new IllegalStateException("Root Folder가 없습니다.");
-    }
-    // =========================================================
-    this.nodeMap = Collections.unmodifiableMap(map);
-    this.rootFolderId = root.getId();
-    this.isEditableToc = isEditableToc;
-  }
-
-  public TreeNode buildTree() {
-    Map<UUID, TreeNode> treeNodeMap = allNodes.stream().collect(Collectors.toMap(
-      node -> node.getId(),
-      node -> new TreeNode(node)
-    ));
-    for(TreeNode n : treeNodeMap.values()) {
-      UUID parentId = n.getParentId();
-      if(parentId == null) { // root folder인 경우
-        continue;
-      }
-      TreeNode parent = treeNodeMap.get(parentId);
-      parent.addChildAccordingToOv(n);
-    }
-
-    return treeNodeMap.get(rootFolderId);
-  }
-
-  public TocDto buildTreeDto() {
-    // TreeNode -> Dto로 변환
-    TreeNode rootTreeNode = buildTree();
-    List<TocDto.Node> rootChildren = rootTreeNode.getChildren().stream()
-      .map(this::_projectRecursive)
-      .toList();
-
-    TocFolder rootFolder = (TocFolder) nodeMap.get(rootFolderId);
-    TocDto.Folder rootDto = new TocDto.Folder(rootFolder, rootChildren);
-    return new TocDto(book.getId(), rootDto);
+    this.rootFolder = rootFolder;
   }
 
   public TocNode get(UUID nodeId) {
-    TocNode node = nodeMap.get(nodeId);
-    if(node == null) {
-      throw new IllegalStateException("ID가 " + nodeId + "인 노드를 찾을 수 없습니다");
-    }
-    return node;
+    return _findNodeRecursive(rootFolder, nodeId);
+  }
+
+  public void forEachNode(Consumer<TocNode> consumer) {
+    forEachNodeRecursive(rootFolder, consumer);
   }
 
   public boolean isEditableToc() {
-    return isEditableToc;
+    return rootFolder.isEditable();
   }
 
   public boolean isReadOnlyToc() {
-    return !isEditableToc;
+    return rootFolder.isReadOnly();
   }
 
-  public TocFolder getRootFolder() {
-    return (TocFolder) get(rootFolderId);
-  }
-
-  private TocDto.Node _projectRecursive(TreeNode p) {
-    // Folder
-    if(p.getType() == TocNodeType.FOLDER) {
-      List<TocDto.Node> children = p.getChildren().stream()
-        .map(c -> _projectRecursive(c))
-        .toList();
-      return new TocDto.Folder((TocFolder) p.getTocNode(), children);
+  private static TocNode _findNodeRecursive(TocNode node, UUID targetId) {
+    if(node.getId().equals(targetId)) {
+      return node;
     }
-    // Section
-    else {
-      return new TocDto.Section((TocSection) p.getTocNode());
+    if(node instanceof TocFolder folder) {
+      for(TocNode child : folder.getChildren()) {
+        TocNode found = _findNodeRecursive(child, targetId);
+        if(found != null) {
+          return found;
+        }
+      }
+    }
+    return null;
+  }
+
+  private static void forEachNodeRecursive(TocNode node, Consumer<TocNode> consumer) {
+    consumer.accept(node);
+    if(node instanceof TocFolder folder) {
+      for(TocNode child : folder.getChildren()) {
+        forEachNodeRecursive(child, consumer);
+      }
     }
   }
 }

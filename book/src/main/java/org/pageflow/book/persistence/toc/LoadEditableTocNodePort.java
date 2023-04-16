@@ -2,6 +2,7 @@ package org.pageflow.book.persistence.toc;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.pageflow.book.application.BookCode;
 import org.pageflow.book.domain.book.entity.Book;
 import org.pageflow.book.domain.toc.entity.TocFolder;
 import org.pageflow.book.domain.toc.entity.TocNode;
@@ -32,7 +33,7 @@ public class LoadEditableTocNodePort {
         return Result.of(CommonCode.DATA_NOT_FOUND);
       }
       if(!node.isEditable()) {
-        return Result.of(CommonCode.DATA_NOT_FOUND, "해당 노드는 편집할 수 없습니다.");
+        return Result.of(BookCode.CAN_EDIT_BOOK, "해당 노드는 편집할 수 없습니다.");
       }
       return Result.SUCCESS(node);
     });
@@ -45,7 +46,7 @@ public class LoadEditableTocNodePort {
         return Result.of(CommonCode.DATA_NOT_FOUND);
       }
       if(!node.isEditable()) {
-        return Result.of(CommonCode.DATA_NOT_FOUND, "해당 노드는 편집할 수 없습니다.");
+        return Result.of(BookCode.CAN_EDIT_BOOK, "해당 노드는 편집할 수 없습니다.");
       }
       return Result.SUCCESS(node);
     });
@@ -58,7 +59,7 @@ public class LoadEditableTocNodePort {
         return Result.of(CommonCode.DATA_NOT_FOUND);
       }
       if(!node.isEditable()) {
-        return Result.of(CommonCode.DATA_NOT_FOUND, "해당 노드는 편집할 수 없습니다.");
+        return Result.of(BookCode.CAN_EDIT_BOOK, "해당 노드는 편집할 수 없습니다.");
       }
       return Result.SUCCESS(node);
     });

@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Value;
 import lombok.experimental.FieldDefaults;
+import org.pageflow.book.domain.toc.Toc;
 import org.pageflow.book.domain.toc.constants.TocNodeType;
 import org.pageflow.book.domain.toc.entity.TocFolder;
 import org.pageflow.book.domain.toc.entity.TocNode;
@@ -16,6 +17,13 @@ import java.util.UUID;
 public class TocDto {
   UUID bookId;
   Folder root;
+
+  public static TocDto from(Toc toc) {
+    return new TocDto(
+      toc.getBook().getId(),
+      new Folder(toc.getRootFolder())
+    );
+  }
 
   @Getter
   @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
@@ -36,9 +44,19 @@ public class TocDto {
   public static class Folder extends Node {
     List<Node> children;
 
-    public Folder(TocFolder folder, List<TocDto.Node> children) {
+    public Folder(TocFolder folder) {
       super(folder);
-      this.children = children;
+      this.children = folder.getChildren().stream()
+        .map(child -> {
+          if(child instanceof TocFolder childAsFolder) {
+            return new Folder(childAsFolder);
+          } else if(child instanceof TocSection childAsSection) {
+            return new Section(childAsSection);
+          } else {
+            throw new IllegalStateException("Unknown child type: " + child.getClass());
+          }
+        })
+        .toList();
     }
   }
 

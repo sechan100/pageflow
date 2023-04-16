@@ -9,7 +9,7 @@ import org.pageflow.book.application.dto.book.BookDto;
 import org.pageflow.book.application.dto.node.SectionDto;
 import org.pageflow.book.domain.book.entity.Book;
 import org.pageflow.book.domain.toc.Toc;
-import org.pageflow.book.domain.toc.TreeNode;
+import org.pageflow.book.domain.toc.entity.TocFolder;
 import org.pageflow.book.domain.toc.entity.TocNode;
 import org.pageflow.book.persistence.BookPersistencePort;
 import org.pageflow.book.persistence.toc.LoadEditableTocNodePort;
@@ -63,12 +63,10 @@ public class BookStatusTest {
 
     // 모든 노드들이 editable인지 확인
     Toc originalToc = tocPersistencePort.loadEditableToc(bookEn);
-    for(TocNode n : originalToc.getAllNodes()) {
-      Assertions.assertTrue(n.isEditable());
-    }
+    originalToc.forEachNode(n -> Assertions.assertTrue(n.isEditable()));
 
     // 섹션 4.1의 제목을 변경하여 editable node일 때 수정이 가능한지 확인
-    TocNode section4_1 = originalToc.buildTree().getChildren().get(3).getChildren().get(0).getTocNode();
+    TocNode section4_1 = ((TocFolder) originalToc.getRootFolder().getChildren().get(3)).getChildren().get(0);
     NodeIdentifier section4_1Identifier = new NodeIdentifier(uid, bookId, section4_1.getId());
     Result<SectionDto> changeSectionTitleRes = editTocUseCase.changeSectionTitle(
       section4_1Identifier,
@@ -82,9 +80,7 @@ public class BookStatusTest {
 
     // 출판 후 모든 node가 readOnlyToc로 변경되었는지 확인
     Toc publishedToc = tocPersistencePort.loadReadonlyToc(bookEn);
-    for(TocNode n : publishedToc.getAllNodes()) {
-      Assertions.assertFalse(n.isEditable());
-    }
+    publishedToc.forEachNode(n -> Assertions.assertFalse(n.isEditable()));
 
     // 출판 후 섹션 4.1의 제목을 변경하여 readOnly node일 때 수정이 불가능한지 확인
     Result<SectionDto> changeSectionTitleRes2 = editTocUseCase.changeSectionTitle(
@@ -122,8 +118,8 @@ public class BookStatusTest {
 
     // 출판 후 editableToc가 복제되었는지 확인
     Book bookEntity = bookPersistencePort.findById(bookId).get();
-    TreeNode rtRoot = tocPersistencePort.loadReadonlyToc(bookEntity).buildTree();
-    TreeNode etRoot = tocPersistencePort.loadEditableToc(bookEntity).buildTree();
+    TocFolder rtRoot = tocPersistencePort.loadReadonlyToc(bookEntity).getRootFolder();
+    TocFolder etRoot = tocPersistencePort.loadEditableToc(bookEntity).getRootFolder();
     tocUtils.assertSameHierarchyRecusive(rtRoot, etRoot, (readOnly, editable) -> {
       // 복제된 id는 같으면 안됨.
       Assertions.assertNotEquals(readOnly.getId(), editable.getId());
@@ -167,9 +163,7 @@ public class BookStatusTest {
     // 개정 후 모든 node가 readOnlyToc로 변경되었는지 확인
     Book bookEntity = bookPersistencePort.findById(bookId).get();
     Toc publishedToc = tocPersistencePort.loadReadonlyToc(bookEntity);
-    for(TocNode n : publishedToc.getAllNodes()) {
-      Assertions.assertFalse(n.isEditable());
-    }
+    publishedToc.forEachNode(n -> Assertions.assertFalse(n.isEditable()));
 
     // editable toc를 조회하면 예외발생
     Assertions.assertThrows(Exception.class, () -> tocPersistencePort.loadEditableToc(bookEntity));
@@ -208,9 +202,7 @@ public class BookStatusTest {
     // 병합 후 모든 node가 readOnlyToc로 변경되었는지 확인
     Book bookEntity = bookPersistencePort.findById(bookId).get();
     Toc publishedToc = tocPersistencePort.loadReadonlyToc(bookEntity);
-    for(TocNode n : publishedToc.getAllNodes()) {
-      Assertions.assertFalse(n.isEditable());
-    }
+    publishedToc.forEachNode(n -> Assertions.assertFalse(n.isEditable()));
 
     // editable toc를 조회하면 예외발생
     Assertions.assertThrows(Exception.class, () -> tocPersistencePort.loadEditableToc(bookEntity));
@@ -252,10 +244,10 @@ public class BookStatusTest {
 
     // 병합 후 모든 node가 readOnlyToc로 변경되었는지 확인 + 맨 처음 만든 node들과 일치하는지
     Toc publishedToc = tocPersistencePort.loadReadonlyToc(bookEntity);
-    for(TocNode n : publishedToc.getAllNodes()) {
+    publishedToc.forEachNode(n -> {
       Assertions.assertFalse(n.isEditable());
       Assertions.assertEquals(n, originalToc.get(n.getId()));
-    }
+    });
 
     // editable toc를 조회하면 예외발생
     Assertions.assertThrows(Exception.class, () -> tocPersistencePort.loadEditableToc(bookEntity));

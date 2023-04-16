@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.pageflow.book.application.dto.author.AuthorProfileDto;
 import org.pageflow.book.application.dto.book.PublishedBookDto;
 import org.pageflow.book.application.dto.node.SectionContentDto;
+import org.pageflow.book.application.dto.node.TocDto;
 import org.pageflow.book.domain.book.BookAccessGranter;
 import org.pageflow.book.domain.book.constants.BookAccess;
 import org.pageflow.book.domain.book.entity.Book;
@@ -53,10 +54,10 @@ public class ReadBookUseCase {
     int totalCharCount = sectionContentPersistencePort.sumCharCountByBookId(bookId);
 
     return Result.SUCCESS(
-      new PublishedBookDto(book, authorProfileDto, toc.buildTreeDto(), totalCharCount)
+      new PublishedBookDto(book, authorProfileDto, TocDto.from(toc), totalCharCount)
     );
   }
-
+  
   public Result<SectionContentDto> readSectionContent(UID uid, UUID bookId, UUID sectionId) {
     Book book = bookPersistencePort.findById(bookId).get();
     // 권한 검사 =====

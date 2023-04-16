@@ -5,16 +5,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pageflow.book.domain.book.entity.Book;
 import org.pageflow.book.domain.toc.Toc;
-import org.pageflow.book.domain.toc.TreeNode;
+import org.pageflow.book.domain.toc.constants.TocNodeConfig;
+import org.pageflow.book.domain.toc.constants.TocNodeType;
 import org.pageflow.book.domain.toc.entity.TocFolder;
 import org.pageflow.book.domain.toc.entity.TocNode;
 import org.pageflow.book.domain.toc.entity.TocSection;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.Optional;
 
 /**
  * @author : sechan
@@ -24,40 +23,28 @@ import java.util.List;
 @Transactional
 @RequiredArgsConstructor
 public class TocPersistencePort {
-  private final TocNodePersistencePort tocNodePersistencePort;
+  private final TocFolderPersistencePort tocFolderPersistencePort;
 
   public boolean existsEditableToc(Book book) {
-    int count = tocNodePersistencePort.countByBookIdAndParentNodeIdAndIsEditable(book.getId(), null, true);
-    if(count > 1) {
-      throw new IllegalStateException("editableToc root node가 2개 이상 존재합니다. bookId: " + book.getId());
-    }
-    return count == 1;
+    Optional<TocFolder> rootFolderOpt = tocFolderPersistencePort.findRootFolder(book.getId(), true, TocNodeConfig.ROOT_FOLDER_TITLE);
+    return rootFolderOpt.isPresent();
   }
 
   public boolean existsReadOnlyToc(Book book) {
-    int count = tocNodePersistencePort.countByBookIdAndParentNodeIdAndIsEditable(book.getId(), null, false);
-    if(count > 1) {
-      throw new IllegalStateException("readOnlyToc root node가 2개 이상 존재합니다. bookId: " + book.getId());
-    }
-    return count == 1;
+    Optional<TocFolder> rootFolderOpt = tocFolderPersistencePort.findRootFolder(book.getId(), false, TocNodeConfig.ROOT_FOLDER_TITLE);
+    return rootFolderOpt.isPresent();
   }
 
   public Toc loadEditableToc(Book book) {
     boolean isEditable = true;
-    List<TocNode> allNode = tocNodePersistencePort.findAllByBookIdAndIsEditable(book.getId(), isEditable);
-    if(allNode.isEmpty()) {
-      throw new IllegalStateException("책에 editable toc가 존재하지 않습니다. bookId: " + book.getId());
-    }
-    return new Toc(book, allNode, isEditable);
+    TocFolder rootFolder = tocFolderPersistencePort.findRootFolder(book.getId(), isEditable, TocNodeConfig.ROOT_FOLDER_TITLE).get();
+    return new Toc(book, rootFolder);
   }
 
   public Toc loadReadonlyToc(Book book) {
     boolean isEditable = false;
-    List<TocNode> allNode = tocNodePersistencePort.findAllByBookIdAndIsEditable(book.getId(), isEditable);
-    if(allNode.isEmpty()) {
-      throw new IllegalStateException("책에 readOnly toc가 존재하지 않습니다. bookId: " + book.getId());
-    }
-    return new Toc(book, allNode, isEditable);
+    TocFolder rootFolder = tocFolderPersistencePort.findRootFolder(book.getId(), isEditable, TocNodeConfig.ROOT_FOLDER_TITLE).get();
+    return new Toc(book, rootFolder);
   }
 
   /**
@@ -73,21 +60,13 @@ public class TocPersistencePort {
   public Toc copyReadonlyTocToEditableToc(Toc sourceToc) {
     Preconditions.checkArgument(sourceToc.isReadOnlyToc());
 
-    TreeNode rootTreeNode = sourceToc.buildTree();
-    Collection<TocNode> copiedNodes = new ArrayList<>(30);
-    TocFolder copiedRoot = tocNodePersistencePort.save(
-      TocFolder.copyFromReadOnlyToEditable((TocFolder) rootTreeNode.getTocNode(), null)
-    );
-    copiedNodes.add(copiedRoot);
-    for(TreeNode child : rootTreeNode.getChildren()) {
-      _copyNodeRecursive(child, copiedRoot, copiedNodes);
+    TocFolder originalRootFolder = sourceToc.getRootFolder();
+    TocFolder copiedRootFolder = TocFolder.copyFromReadOnlyToEditable(originalRootFolder);
+    copiedRootFolder = tocFolderPersistencePort.save(copiedRootFolder);
+    for(TocNode rootChild : originalRootFolder.getChildren()) {
+      _copyNodeRecursive(rootChild, copiedRootFolder);
     }
-
-    return new Toc(
-      sourceToc.getBook(),
-      copiedNodes,
-      true
-    );
+    return new Toc(sourceToc.getBook(), copiedRootFolder);
   }
 
   /**
@@ -111,38 +90,29 @@ public class TocPersistencePort {
   }
 
   public void deleteToc(Toc toc) {
-    tocNodePersistencePort.delete(toc.getRootFolder());
+    tocFolderPersistencePort.delete(toc.getRootFolder());
   }
 
   private Toc _makeTocOf(Toc toc, boolean isEditable) {
     Preconditions.checkArgument(
       toc.isEditableToc() != isEditable,
-      """
-        Toc의 상태가 이미 %s입니다
-        """.formatted(isEditable ? "editable" : "readOnly")
+      String.format("Toc의 상태가 이미 %s입니다", isEditable ? "editable" : "readOnly")
     );
-    Collection<TocNode> allNodes = toc.getAllNodes();
-    for(TocNode node : allNodes) {
-      node.setEditable(isEditable);
-    }
-    return new Toc(
-      toc.getBook(),
-      allNodes,
-      isEditable
-    );
+    toc.forEachNode(n -> n.setEditable(isEditable));
+    return toc;
   }
 
-  private void _copyNodeRecursive(TreeNode node, TocFolder parentNode, Collection<TocNode> copiedNodes) {
-    TocNode copiedNode = switch(node.getType()) {
-      case FOLDER -> TocFolder.copyFromReadOnlyToEditable((TocFolder) node.getTocNode(), parentNode);
-      case SECTION -> TocSection.copyFromReadOnlyToEditable((TocSection) node.getTocNode(), parentNode);
+  private void _copyNodeRecursive(TocNode target, TocFolder copiedParent) {
+    TocNodeType type = TocNodeType.from(target);
+    TocNode copiedTocNode = switch(type) {
+      case FOLDER -> TocFolder.copyFromReadOnlyToEditable((TocFolder) target);
+      case SECTION -> TocSection.copyFromReadOnlyToEditable((TocSection) target);
     };
-    copiedNode = tocNodePersistencePort.save(copiedNode);
-    copiedNodes.add(copiedNode);
+    copiedParent.addChildLast(copiedTocNode);
 
-    if(copiedNode instanceof TocFolder copiedFolder) {
-      for(TreeNode child : node.getChildren()) {
-        _copyNodeRecursive(child, copiedFolder, copiedNodes);
+    if(target instanceof TocFolder targetAsFolder) {
+      for(TocNode child : targetAsFolder.getChildren()) {
+        _copyNodeRecursive(child, (TocFolder) copiedTocNode);
       }
     }
   }

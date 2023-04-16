@@ -11,10 +11,12 @@ import org.pageflow.book.domain.book.BookDescriptionHtmlContent;
 import org.pageflow.book.domain.book.BookTitle;
 import org.pageflow.book.domain.book.constants.BookAccess;
 import org.pageflow.book.domain.book.entity.Book;
+import org.pageflow.book.domain.toc.constants.TocNodeConfig;
 import org.pageflow.book.domain.toc.entity.TocFolder;
 import org.pageflow.book.domain.toc.entity.TocNode;
 import org.pageflow.book.persistence.BookPersistencePort;
 import org.pageflow.book.persistence.LoadAuthorPort;
+import org.pageflow.book.persistence.toc.TocFolderPersistencePort;
 import org.pageflow.book.persistence.toc.TocNodePersistencePort;
 import org.pageflow.common.property.ApplicationProperties;
 import org.pageflow.common.result.Result;
@@ -30,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -46,7 +49,7 @@ public class BookUseCase {
   private final FileService fileService;
 
   private final BookPersistencePort bookPersistencePort;
-  private final TocNodePersistencePort tocNodePersistencePort;
+  private final TocFolderPersistencePort tocFolderPersistencePort;
 
 
   /**
@@ -75,7 +78,7 @@ public class BookUseCase {
     Book savedBook = bookPersistencePort.save(book);
     // root folder
     TocFolder rootFolder = TocFolder.createRootFolder(savedBook);
-    tocNodePersistencePort.save(rootFolder);
+    tocFolderPersistencePort.save(rootFolder);
 
     return Result.SUCCESS(new BookDto(book));
   }
@@ -194,10 +197,10 @@ public class BookUseCase {
     }
 
     // 책 삭제 ===========================
-    List<TocNode> nodes = tocNodePersistencePort.findAllByBookId(bookId);
-    for(TocNode node : nodes) {
-      tocNodePersistencePort.delete(node);
-    }
+    Optional<TocFolder> editableFolder = tocFolderPersistencePort.findRootFolder(bookId, true, TocNodeConfig.ROOT_FOLDER_TITLE);
+    editableFolder.ifPresent(tocFolderPersistencePort::delete);
+    Optional<TocFolder> readOnlyFolder = tocFolderPersistencePort.findRootFolder(bookId, false, TocNodeConfig.ROOT_FOLDER_TITLE);
+    readOnlyFolder.ifPresent(tocFolderPersistencePort::delete);
     bookPersistencePort.delete(book);
     return Result.SUCCESS();
   }

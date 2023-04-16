@@ -1,5 +1,6 @@
 package org.pageflow.test.module.book.utils;
 
+import java.util.UUID;
 import java.util.function.Consumer;
 
 /**

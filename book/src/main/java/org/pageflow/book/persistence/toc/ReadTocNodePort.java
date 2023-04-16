@@ -19,7 +19,6 @@ import java.util.UUID;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class ReadTocNodePort {
-  private final TocNodePersistencePort tocNodePersistencePort;
   private final TocSectionPersistencePort tocSectionPersistencePort;
 
   public Optional<TocSection> readSection(Book book, UUID sectionId) {

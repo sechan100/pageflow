@@ -11,8 +11,6 @@ import java.util.UUID;
  */
 public interface TocNodePersistencePort extends JpaRepository<TocNode, UUID> {
 
-  List<TocNode> findAllByBookIdAndIsEditable(UUID bookId, boolean isEditable);
-
   List<TocNode> findAllByBookId(UUID bookId);
 
   int countByBookIdAndParentNodeIdAndIsEditable(UUID bookId, UUID parentNodeId, boolean isEditable);

@@ -62,11 +62,10 @@ public class ParentFolder {
   /**
    * @param destIndex
    * @param target
-   * @param toc
    * @return
    * @code TOC_HIERARCHY_ERROR: 자기 자신에게 이동, root folder 이동, 계층 구조 파괴, destIndex가 올바르지 않은 경우, 이미 parent에 target이 속한 경우 등
    */
-  public Result reparent(int destIndex, TocNode target, Toc toc) {
+  public Result reparent(int destIndex, TocNode target) {
     // 자기 자신에게 이동 검사
     Result checkMoveToSelfResult = _checkMoveToSelf(target);
     if(checkMoveToSelfResult.isFailure()) return checkMoveToSelfResult;
@@ -82,7 +81,7 @@ public class ParentFolder {
     // 계층 구조 파괴 검사
     if(target instanceof TocFolder targetAsFolder) {
       // this에서 출발해서 조상중에 targetFolder가 있는지 검증한다.
-      if(_isAncestorOf(targetAsFolder, folder, toc.getNodeMap())) {
+      if(_isAncestorOf(targetAsFolder, folder)) {
         return Result.of(BookCode.TOC_HIERARCHY_ERROR, "toc의 계층 구조를 파괴하는 이동입니다.");
       }
     }
@@ -233,17 +232,16 @@ public class ParentFolder {
    *
    * @throws IllegalStateException ancestor가 folder가 아닌 경우
    */
-  private static boolean _isAncestorOf(TocFolder ancestor, TocNode descendant, Map<UUID, TocNode> nodeMap) {
+  private static boolean _isAncestorOf(TocFolder ancestor, TocNode descendant) {
     if(descendant.isRootFolder()) {
       return false;
     }
-    assert descendant.getParentNodeOrNull() != null;
-    UUID parentId = descendant.getParentNodeOrNull().getId();
-    if(parentId.equals(ancestor.getId())) {
+    TocFolder actualDescendantParent = descendant.getParentNodeOrNull();
+    assert actualDescendantParent != null;
+    if(actualDescendantParent.equals(ancestor)) {
       return true;
     } else {
-      return _isAncestorOf(ancestor, nodeMap.get(parentId), nodeMap
-      );
+      return _isAncestorOf(ancestor, actualDescendantParent);
     }
   }
 

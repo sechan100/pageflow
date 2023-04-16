@@ -30,7 +30,6 @@ public class TocFolder extends TocNode {
   @OneToMany(
     fetch = FetchType.LAZY,
     cascade = CascadeType.ALL,
-    orphanRemoval = true,
     mappedBy = "parentNode"
   )
   private final List<TocNode> children = new ArrayList<>(5);
@@ -68,19 +67,20 @@ public class TocFolder extends TocNode {
     );
   }
 
-  public static TocFolder copyFromReadOnlyToEditable(TocFolder readOnlyFolder, @Nullable TocFolder parentNode) {
+  public static TocFolder copyFromReadOnlyToEditable(TocFolder readOnlyFolder) {
     Preconditions.checkArgument(readOnlyFolder.isReadOnly());
     return new TocFolder(
       UUID.randomUUID(),
       readOnlyFolder.getBook(),
       readOnlyFolder.getTitle(),
-      parentNode,
+      null,
       true,
       readOnlyFolder.getOv()
     );
   }
 
   public void addChild(int index, TocNode child) {
+    Preconditions.checkState(this.isEditable());
     Preconditions.checkState(child.getParentNodeOrNull() == null);
     Preconditions.checkState(!children.contains(child));
 
@@ -88,7 +88,12 @@ public class TocFolder extends TocNode {
     child.setParentNode(this);
   }
 
+  public void addChildLast(TocNode child) {
+    addChild(children.size(), child);
+  }
+
   public void removeChild(TocNode child) {
+    Preconditions.checkState(this.isEditable());
     Preconditions.checkState(children.contains(child));
     children.remove(child);
     child.setParentNode(null);

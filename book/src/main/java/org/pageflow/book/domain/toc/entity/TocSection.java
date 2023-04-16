@@ -25,10 +25,9 @@ public class TocSection extends TocNode {
   @Getter
   @OneToOne(
     fetch = FetchType.LAZY,
-    cascade = CascadeType.ALL,
-    orphanRemoval = true
+    cascade = CascadeType.ALL
   )
-  @JoinColumn(name = "content_id", updatable = false) // SINGLE_TABLE 전략이기 때문에, 'nullable = false'로 하면 안됨
+  @JoinColumn(name = "content_id") // SINGLE_TABLE 전략이기 때문에, 'nullable = false'로 하면 안됨
   private SectionContent content;
 
   private TocSection(
@@ -56,14 +55,14 @@ public class TocSection extends TocNode {
     );
   }
 
-  public static TocSection copyFromReadOnlyToEditable(TocSection readOnlySection, @Nullable TocFolder parentNode) {
+  public static TocSection copyFromReadOnlyToEditable(TocSection readOnlySection) {
     Preconditions.checkArgument(readOnlySection.isReadOnly());
 
     return new TocSection(
       UUID.randomUUID(),
       readOnlySection.getBook(),
       readOnlySection.getTitle(),
-      parentNode,
+      null,
       true,
       readOnlySection.getOv(),
       SectionContent.copy(readOnlySection.getContent())

@@ -18,7 +18,6 @@ import org.pageflow.book.domain.toc.entity.TocNode;
 import org.pageflow.book.domain.toc.entity.TocSection;
 import org.pageflow.book.persistence.BookPersistencePort;
 import org.pageflow.book.persistence.toc.LoadEditableTocNodePort;
-import org.pageflow.book.persistence.toc.TocNodePersistencePort;
 import org.pageflow.book.persistence.toc.TocPersistencePort;
 import org.pageflow.book.usecase.cmd.CreateFolderCmd;
 import org.pageflow.book.usecase.cmd.CreateSectionCmd;
@@ -43,7 +42,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class EditTocUseCase {
   private final BookPersistencePort bookPersistencePort;
-  private final TocNodePersistencePort nodePersistencePort;
   private final TocPersistencePort tocPersistencePort;
   private final LoadEditableTocNodePort loadEditableTocNodePort;
   private final FileService fileService;
@@ -84,8 +82,7 @@ public class EditTocUseCase {
     }
     // Reparent
     else {
-      Toc toc = tocPersistencePort.loadEditableToc(book);
-      return folder.reparent(cmd.getDestIndex(), target, toc);
+      return folder.reparent(cmd.getDestIndex(), target);
     }
   }
 
@@ -98,7 +95,7 @@ public class EditTocUseCase {
       return grant;
     }
     Toc toc = tocPersistencePort.loadEditableToc(book);
-    return Result.SUCCESS(toc.buildTreeDto());
+    return Result.SUCCESS(TocDto.from(toc));
   }
 
   // ==================================================
@@ -176,15 +173,16 @@ public class EditTocUseCase {
     if(nodeRes.isFailure()) {
       return nodeRes;
     }
-    TocNode folder = nodeRes.get();
+    TocNode target = nodeRes.get();
     // 노드 삭제 ==================================================
-    if(folder.isRootFolder()) {
+    if(target.isRootFolder()) {
       return Result.of(
         BookCode.TOC_HIERARCHY_ERROR,
-        "root folder node는 삭제할 수 없습니다."
+        "root folder는 삭제할 수 없습니다."
       );
     }
-    nodePersistencePort.delete(folder);
+    TocFolder parent = target.getParentNodeOrNull();
+    parent.removeChild(target);
     return Result.SUCCESS();
   }
 
@@ -267,21 +265,22 @@ public class EditTocUseCase {
     if(!(nodeRes.get() instanceof TocSection)) {
       throw new IllegalArgumentException("해당 노드는 섹션이 아닙니다.");
     }
-    TocSection section = (TocSection) nodeRes.get();
-    if(section.isRootFolder()) {
+    TocSection target = (TocSection) nodeRes.get();
+    if(target.isRootFolder()) {
       return Result.of(
         BookCode.TOC_HIERARCHY_ERROR,
         "root folder node는 삭제할 수 없습니다."
       );
     }
     // 첨부파일 삭제
-    String contentId = section.getContent().getId().toString();
+    String contentId = target.getContent().getId().toString();
     Result contentAttachedFileDeletionResult = fileService.deleteAll(contentId, FileType.BOOK_NODE_CONTENT_ATTACHMENT_IMAGE);
     if(contentAttachedFileDeletionResult.isFailure()) {
       return contentAttachedFileDeletionResult;
     }
     // 노드 삭제
-    nodePersistencePort.delete(section);
+    TocFolder parent = target.getParentNodeOrNull();
+    parent.removeChild(target);
     return Result.SUCCESS();
   }
 

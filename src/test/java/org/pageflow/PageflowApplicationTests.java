@@ -1,4 +1,4 @@
-package org.pageflow.pageflow;
+package org.pageflow;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

@@ -1,4 +1,4 @@
-package org.pageflow.pageflow;
+package org.pageflow;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

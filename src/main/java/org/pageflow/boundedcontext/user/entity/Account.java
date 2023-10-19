@@ -7,9 +7,7 @@ import org.pageflow.base.entity.BaseEntity;
 @Entity
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
 public class Account extends BaseEntity {
     
     private String provider;
@@ -19,10 +17,12 @@ public class Account extends BaseEntity {
     
     private String password;
     
+    private String email;
+    
     private String role;
     
     /**
-     * ORM에서 참조가 꼬이는 것을 막기위해서 일단은 반드시 Account 엔티티를 통해서만 참조하는 것으로 한다.
+     * ORM 상에서의 일관된 참조 관계를 위해서, 막기위해서 일단은 반드시 Account 엔티티를 통해서만 참조하는 것으로 한다.
      */
     @MapsId
     @OneToOne(

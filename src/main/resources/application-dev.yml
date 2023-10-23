@@ -1,5 +1,5 @@
 server:
-  port: 80
+  port: 8888
 
 spring:
   config:
@@ -60,3 +60,6 @@ spring:
 custom:
   site:
     base-url: 'http://localhost:${server.port}'
+    login-form-url: '/login'
+  email:
+    email-verify-sender: verify@pageflow.org

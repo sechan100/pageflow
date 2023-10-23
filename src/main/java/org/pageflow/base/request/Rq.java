@@ -7,10 +7,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.pageflow.boundedcontext.user.entity.Account;
-import org.pageflow.boundedcontext.user.model.dto.PrincipalContext;
-import org.pageflow.boundedcontext.user.model.dto.UserSession;
-import org.pageflow.boundedcontext.user.service.AccountService;
+import org.pageflow.domain.user.entity.Account;
+import org.pageflow.domain.user.model.dto.PrincipalContext;
+import org.pageflow.domain.user.model.dto.UserSession;
+import org.pageflow.domain.user.service.AccountService;
 import org.springframework.context.ApplicationContext;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -60,9 +60,7 @@ public class Rq {
             
             // OAuth를 이용해서 신규로 가입하는 사용자인 경우
             if(nickname == null){
-                
                 this.userSession = UserSession.anonymousUserSession();
-                
                 
             // OAuth를 통한 로그인인 경우
             } else {

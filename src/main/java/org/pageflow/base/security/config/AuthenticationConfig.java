@@ -1,6 +1,7 @@
 package org.pageflow.base.security.config;
 
 
+import org.pageflow.base.security.filter.InsufficientAuthenticationProcessingFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -10,8 +11,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 @Configuration
 public class AuthenticationConfig {
     
+    
     @Bean
-    public DaoAuthenticationProvider authenticationProvider(UserDetailsService userDetailsService) {
+    public DaoAuthenticationProvider daoAuthenticationProvider(UserDetailsService userDetailsService) {
         
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
         provider.setUserDetailsService(userDetailsService);
@@ -25,5 +27,11 @@ public class AuthenticationConfig {
         
         return provider;
     }
+    
+    @Bean
+    InsufficientAuthenticationProcessingFilter insufficientAuthenticationProcessingFilter(){
+        return new InsufficientAuthenticationProcessingFilter();
+    }
+    
     
 }

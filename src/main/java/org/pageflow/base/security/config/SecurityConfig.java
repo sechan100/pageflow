@@ -1,8 +1,8 @@
 package org.pageflow.base.security.config;
 
 import lombok.RequiredArgsConstructor;
-import org.pageflow.boundedcontext.user.service.CustomOAuth2UserService;
-import org.pageflow.boundedcontext.user.service.CustomUserDetailsService;
+import org.pageflow.base.security.filter.InsufficientAuthenticationProcessingFilter;
+import org.pageflow.domain.user.service.CustomOAuth2UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -13,6 +13,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @EnableWebSecurity
 @Configuration
@@ -20,16 +21,16 @@ import org.springframework.security.web.SecurityFilterChain;
 @RequiredArgsConstructor
 public class SecurityConfig {
     
+    private final AuthenticationProvider daoAuthenticationProvider;
     private final CustomOAuth2UserService customOAuth2UserService;
-    private final CustomUserDetailsService customUserDetailsService;
-    private final AuthenticationProvider CustomDaoAuthenticationProvider;
+    private final InsufficientAuthenticationProcessingFilter insufficientAuthenticationProcessingFilter;
     
     
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/login", "/signup", "/verify/email", "/error*").permitAll()
+                        .requestMatchers("/", "/login", "/signup*", "/verify/email", "/error*").permitAll()
                         .anyRequest().authenticated()
                 )
                 
@@ -38,13 +39,17 @@ public class SecurityConfig {
                 )
                 
                 .oauth2Login(oauth2 -> oauth2
+                        .loginPage("/login")
                         .userInfoEndpoint(userInfo -> userInfo
                                 .userService(customOAuth2UserService)
                         )
-                        .loginPage("/login")
                 )
                 
+                .authenticationProvider(daoAuthenticationProvider)
+                
                 .csrf(AbstractHttpConfigurer::disable)
+                
+                .addFilterAfter(insufficientAuthenticationProcessingFilter, UsernamePasswordAuthenticationFilter.class)
                 
                 .logout(logout -> logout
                         .logoutUrl("/logout")

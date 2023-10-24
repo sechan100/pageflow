@@ -6,7 +6,7 @@ import org.pageflow.base.request.Rq;
 import org.pageflow.domain.user.constants.Role;
 import org.pageflow.domain.user.entity.Account;
 import org.pageflow.domain.user.entity.AwaitingEmailVerificationRequest;
-import org.pageflow.domain.user.model.dto.AccountDetailsRegisterForm;
+import org.pageflow.domain.user.model.dto.AdditionalSignupAccountDto;
 import org.pageflow.domain.user.model.dto.PrincipalContext;
 import org.pageflow.domain.user.model.oauth.GoogleOwner;
 import org.pageflow.domain.user.model.oauth.NaverOwner;
@@ -41,12 +41,13 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         
         // social login provider 별로 인증객체를 분리하여 처리
         ResourceOwner proviverUser = providerUser(oAuth2User, clientRegistration);
-        AccountDetailsRegisterForm registerForm = new AccountDetailsRegisterForm(proviverUser);
+        AdditionalSignupAccountDto registerForm = new AdditionalSignupAccountDto(proviverUser);
         
         
         // 기존 회원정보 존재 -> 회원정보를 업데이트 후, 로그인 진행
         if(accountService.existsByUsername(registerForm.getUsername())){
-            Account refrashedAccount = accountService.updateAccountDto(registerForm);
+            accountService.updateAccount(registerForm);
+            Account refrashedAccount = accountService.findByUsernameWithProfile(registerForm.getUsername());
             return new PrincipalContext(refrashedAccount);
             
         // 회원정보 없음(신규) -> 기본 Account 정보가 포함된 AccountDetilasRegisterForm을 redis에 저장하고 리다이렉트

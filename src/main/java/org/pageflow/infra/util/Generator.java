@@ -4,7 +4,7 @@ import java.security.SecureRandom;
 
 public class Generator {
     
-    private SecureRandom secureRandom = new SecureRandom();
+    private final SecureRandom secureRandom = new SecureRandom();
     
     
     public int generateRandomNumber() {

@@ -3,8 +3,6 @@ package org.pageflow.base.security.handler;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.pageflow.base.request.Rq;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.core.AuthenticationException;
@@ -16,13 +14,11 @@ import java.io.IOException;
 @Component
 public class CustomAuthenticationEntryPoint extends LoginUrlAuthenticationEntryPoint {
     
-    public CustomAuthenticationEntryPoint(@Value("${custom.site.login-form-url}") String loginFormUrl, @Autowired Rq rq) {
+    public CustomAuthenticationEntryPoint(@Value("${custom.site.login-form-url}") String loginFormUrl) {
         super(loginFormUrl);
         this.loginFormUrl = loginFormUrl;
-        this.rq = rq;
     }
     
-    private final Rq rq;
     private final String loginFormUrl;
     
     @Override

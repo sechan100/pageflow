@@ -6,9 +6,9 @@ import lombok.RequiredArgsConstructor;
 import org.pageflow.base.request.Rq;
 import org.pageflow.base.validator.AccountDtoValidator;
 import org.pageflow.domain.user.entity.AwaitingEmailVerificationRequest;
-import org.pageflow.domain.user.model.dto.AccountDetailsRegisterForm;
+import org.pageflow.domain.user.model.dto.AdditionalSignupAccountDto;
 import org.pageflow.domain.user.model.dto.AccountDto;
-import org.pageflow.domain.user.model.dto.VerifyRequestRegisterForm;
+import org.pageflow.domain.user.model.dto.BasicSignupAccountDto;
 import org.pageflow.domain.user.service.AccountService;
 import org.pageflow.domain.user.service.AwaitingVerificationEmailService;
 import org.pageflow.infra.util.Ut;
@@ -46,7 +46,7 @@ public class SignupController {
             awaitingEmailVerificationRequest.setVerified(true);
             
             // 2단계 회원가입 폼
-            AccountDetailsRegisterForm form = new AccountDetailsRegisterForm(awaitingEmailVerificationRequest);
+            AdditionalSignupAccountDto form = new AdditionalSignupAccountDto(awaitingEmailVerificationRequest);
             model.addAttribute("registerForm", form);
             
             return "/user/account/verified_signup";
@@ -63,7 +63,7 @@ public class SignupController {
      * @return
      */
     @PostMapping("/verify/email")
-    public String verifyEmail(@Valid VerifyRequestRegisterForm form, Model model) {
+    public String verifyEmail(@Valid BasicSignupAccountDto form, Model model) {
         
         // 기존에 이메일 인증 요청을 보낸 기록이 있는지 확인
         boolean isExistInCache = awaitingEmailVerifyingFormService.existsById(form.getEmail());
@@ -102,7 +102,7 @@ public class SignupController {
     
     @PostMapping("/signup")
     @ResponseBody
-    public String signup(@Valid AccountDetailsRegisterForm form){
+    public String signup(@Valid AdditionalSignupAccountDto form){
         
         // 캐쉬에서 인증된 이메일 정보 가져오기
         AwaitingEmailVerificationRequest awaitingEmailVerificationRequest = awaitingEmailVerifyingFormService.findById(form.getEmail());

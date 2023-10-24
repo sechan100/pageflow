@@ -8,8 +8,8 @@ import org.pageflow.base.constants.CustomProperties;
 import org.pageflow.domain.user.constants.Role;
 import org.pageflow.domain.user.entity.Account;
 import org.pageflow.domain.user.entity.Profile;
-import org.pageflow.domain.user.model.dto.AccountDetailsRegisterForm;
 import org.pageflow.domain.user.model.dto.AccountDto;
+import org.pageflow.domain.user.model.dto.AdditionalSignupAccountDto;
 import org.pageflow.domain.user.repository.AccountRepository;
 import org.pageflow.domain.user.repository.AwaitingVerificationEmailRepository;
 import org.pageflow.infra.email.EmailRequest;
@@ -35,7 +35,7 @@ public class AccountService {
     
     
     // OAuth2를 이용하여 받아온 사용자 정보를 Account 엔티티 형태로 converting하여 일반적인 회원가입시에 사용하는 register 메소드로 DB저장을 위임
-    public void register(@Valid AccountDetailsRegisterForm form) {
+    public void register(@Valid AdditionalSignupAccountDto form) {
         
             Profile profile = Profile.builder()
                     .nickname(form.getNickname())
@@ -57,15 +57,12 @@ public class AccountService {
     
     
     @Transactional
-    public Account updateAccountDto(AccountDto registerForm) {
-            
-            Account account = accountRepository.findByUsername(registerForm.getUsername());
-            account.setUsername(registerForm.getUsername());
-            account.setPassword(passwordEncoder.encode(registerForm.getPassword()));
-            account.setProvider(registerForm.getProvider());
-            account.setEmail(registerForm.getEmail());
-            
-            return accountRepository.save(account);
+    public void updateAccount(AccountDto accountDto) {
+            Account account = accountRepository.findByUsername(accountDto.getUsername());
+            account.setUsername(accountDto.getUsername());
+            account.setPassword(passwordEncoder.encode(accountDto.getPassword()));
+            account.setProvider(accountDto.getProvider());
+            account.setEmail(accountDto.getEmail());
     }
     
     /**
@@ -99,6 +96,10 @@ public class AccountService {
     
     public Account findByUsername(String username) {
         return accountRepository.findByUsername(username);
+    }
+    
+    public Account findByUsernameWithProfile(String username) {
+        return accountRepository.findByUsernameWithProfile(username);
     }
     
     public boolean existsByUsername(String username) {

@@ -4,7 +4,7 @@ package org.pageflow.base.validator;
 import lombok.RequiredArgsConstructor;
 import org.pageflow.domain.user.constants.UserSignupPolicy;
 import org.pageflow.domain.user.model.dto.AccountDto;
-import org.pageflow.domain.user.model.dto.VerifyRequestRegisterForm;
+import org.pageflow.domain.user.model.dto.BasicSignupAccountDto;
 import org.pageflow.domain.user.repository.AccountRepository;
 import org.springframework.lang.NonNull;
 import org.springframework.validation.Errors;
@@ -45,8 +45,8 @@ public class AccountDtoValidator implements Validator {
         }
         
         // VerifyRequestRegisterForm타입인 경우, passwordConfirm 일치검사
-        if(account instanceof VerifyRequestRegisterForm verifyRequestRegisterForm) {
-            if(!verifyRequestRegisterForm.getPassword().equals(verifyRequestRegisterForm.getPasswordConfirm())) {
+        if(account instanceof BasicSignupAccountDto basicSignupAccountDto) {
+            if(!basicSignupAccountDto.getPassword().equals(basicSignupAccountDto.getPasswordConfirm())) {
                 errors.rejectValue("passwordConfirm", "passwordConfirm", UserSignupPolicy.ViolationType.INVALID_PASSWORD_CONFIRM);
             }
         }

@@ -8,12 +8,12 @@ import org.pageflow.domain.user.constants.ProviderType;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class VerifyRequestRegisterForm extends DefaultAccountDto {
+public class BasicSignupAccountDto extends DefaultAccountDto {
     
     @NotEmpty(message = "비밀번호 확인을 입력해주세요.")
     private String passwordConfirm;
     
-    public VerifyRequestRegisterForm() {
+    public BasicSignupAccountDto() {
         super.provider = ProviderType.NATIVE;
     }
     

@@ -21,7 +21,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public PrincipalContext loadUserByUsername(String username) {
         
-        Account account = accountRepository.findByUsername(username);
+        Account account = accountRepository.findByUsernameWithProfile(username);
         
         // username not found check
         if(account == null) {

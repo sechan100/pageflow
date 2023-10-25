@@ -12,6 +12,7 @@ import org.pageflow.domain.user.model.dto.PrincipalContext;
 import org.pageflow.domain.user.model.dto.UserSession;
 import org.pageflow.domain.user.service.AccountService;
 import org.springframework.context.ApplicationContext;
+import org.springframework.lang.Nullable;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -135,14 +136,18 @@ public class Rq {
         return alert(alertType, msg, null);
     }
     
-    public String getAlertStorageRedirectUri(AlertType alertType, String msg, String redirectUri) {
+    /**
+     * @param alertType
+     * @param msg
+     * @param redirectUri nullable: redirectUri가 null이면 history.back()
+     */
+    public String getAlertStorageRedirectUri(AlertType alertType, String msg, @Nullable String redirectUri) {
         msg = URLEncoder.encode(msg, StandardCharsets.UTF_8);
         if(redirectUri != null){
             return "/common/alertStorage?msg=" + msg + "&alertType=" + alertType.toString().toLowerCase() + "&redirectUri=" + redirectUri;
         } else {
-            throw new IllegalArgumentException("getAlertStorageRedirectUri의 인자인 redirectUri가 null입니다.");
+            return "/common/alertStorage?msg=" + msg + "&alertType=" + alertType.toString().toLowerCase();
         }
-        
     }
     
     /**

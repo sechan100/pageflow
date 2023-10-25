@@ -18,7 +18,7 @@ public class AlertStorageRedirectController {
      * 이쪽으로 리다이렉트하고, 이 메소드의 응답 페이지에서 다시한번 이동.. 총 3번에 걸쳐 이동한다.
      */
     @GetMapping("/common/alertStorage")
-    public String alertStorageRedirect(@RequestParam("alertType") String alertTypeString, @RequestParam String msg, @RequestParam String redirectUri) {
+    public String alertStorageRedirect(@RequestParam("alertType") String alertTypeString, @RequestParam String msg, @RequestParam(required = false) String redirectUri) {
         AlertType alertType = switch(alertTypeString) {
             case "success" -> AlertType.SUCCESS;
             case "warning" -> AlertType.WARNING;
@@ -27,6 +27,10 @@ public class AlertStorageRedirectController {
             default -> AlertType.INFO; // info OR other
         };
         
-        return rq.alert(alertType, msg, redirectUri);
+        if(redirectUri != null){
+            return rq.alert(alertType, msg, redirectUri);
+        } else {
+            return rq.alert(alertType, msg);
+        }
     }
 }

@@ -43,8 +43,7 @@ public class SignupController {
         * 이메일 인증 완료시 2단계 회원가입 페이지가 응답
         * */
         if(code != null && email != null){
-            AwaitingEmailVerificationRequest awaitingEmailVerificationRequest = awaitingEmailVerifyingFormService.findById(email);
-            awaitingEmailVerificationRequest.setVerified(true);
+            AwaitingEmailVerificationRequest awaitingEmailVerificationRequest = awaitingEmailVerifyingFormService.verify(email);
             
             // 2단계 회원가입 폼
             AdditionalSignupAccountDto form = new AdditionalSignupAccountDto(awaitingEmailVerificationRequest);
@@ -110,7 +109,8 @@ public class SignupController {
         
         // 요청 받은 폼과 캐쉬에서 가져온 정보 대치
         if(!cachedSignupRequest.getEmail().equals(form.getEmail()) || !awaitingEmailVerificationRequest.isVerified()){
-            throw new IllegalArgumentException("인증 정보가 일치하지 않습니다.");
+            throw new IllegalArgumentException(String.format("인증 정보가 일치하지 않습니다. 이메일 불일치인 경우 다음을 확인[기준: %s / 요청: %s] 인증되지 않은 경우 다음을 확인[isVerified: %b]", cachedSignupRequest.getEmail(), form.getEmail(), awaitingEmailVerificationRequest.isVerified())
+            );
         }
         
         accountService.register(form);

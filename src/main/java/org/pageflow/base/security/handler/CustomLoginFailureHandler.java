@@ -3,7 +3,9 @@ package org.pageflow.base.security.handler;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Value;
+import org.pageflow.base.constants.CustomProperties;
+import org.pageflow.base.request.AlertType;
+import org.pageflow.base.request.Rq;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -15,26 +17,31 @@ import java.io.IOException;
 @Component
 public class CustomLoginFailureHandler implements AuthenticationFailureHandler {
     
-    @Value("${custom.site.login-form-uri}")
-    private String loginFormUrl;
+    public CustomLoginFailureHandler(CustomProperties customProperties, Rq rq) {
+        this.customProperties = customProperties;
+        this.rq = rq;
+    }
+    
+    private final CustomProperties customProperties;
+    private final Rq rq;
     
     
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
         
-        String queryString;
-        
         // UsernameNotFoundException
         if(exception instanceof UsernameNotFoundException) {
             
-            queryString = "?error=username";
-            response.sendRedirect(loginFormUrl + queryString);
+            response.sendRedirect(
+                    rq.getAlertStorageRedirectUri(AlertType.ERROR, "존재하지 않는 아이디입니다.", null)
+            );
             
         // BadCredentialsException
         } else if(exception instanceof BadCredentialsException) {
             
-            queryString = "?error=password";
-            response.sendRedirect(loginFormUrl + queryString);
+            response.sendRedirect(
+                    rq.getAlertStorageRedirectUri(AlertType.ERROR, "비밀번호가 일치하지 않습니다.", null)
+            );
             
         }
         

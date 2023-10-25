@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.pageflow.domain.user.entity.AwaitingEmailVerificationRequest;
 import org.pageflow.domain.user.repository.AwaitingVerificationEmailRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -12,8 +13,8 @@ public class AwaitingVerificationEmailService {
     
     private final AwaitingVerificationEmailRepository emailCacheRepository;
     
-    public void save(AwaitingEmailVerificationRequest awaitingVerificationEmail) {
-        emailCacheRepository.save(awaitingVerificationEmail);
+    public AwaitingEmailVerificationRequest save(AwaitingEmailVerificationRequest awaitingVerificationEmail) {
+        return emailCacheRepository.save(awaitingVerificationEmail);
     }
     
     public boolean existsById(String email) {
@@ -26,5 +27,12 @@ public class AwaitingVerificationEmailService {
     
     public void delete(String email) {
         emailCacheRepository.deleteById(email);
+    }
+    
+    @Transactional
+    public AwaitingEmailVerificationRequest verify(String email) {
+        AwaitingEmailVerificationRequest awaitingEmailVerificationRequest = findById(email);
+        awaitingEmailVerificationRequest.setVerified(true);
+        return save(awaitingEmailVerificationRequest);
     }
 }

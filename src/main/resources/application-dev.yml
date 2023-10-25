@@ -60,6 +60,6 @@ spring:
 custom:
   site:
     base-url: 'http://localhost:${server.port}'
-    login-form-url: '/login'
+    login-form-uri: '/login'
   email:
     email-verify-sender: verify@pageflow.org

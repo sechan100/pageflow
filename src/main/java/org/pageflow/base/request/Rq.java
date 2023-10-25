@@ -19,8 +19,13 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
 
 @Component
@@ -37,10 +42,12 @@ public class Rq {
     private final AccountService accountService;
     
     
-    public Rq(HttpServletRequest req, HttpServletResponse resp, HttpSession session, ApplicationContext context, AccountService accountService) {
-        this.request = req;
-        this.response = resp;
-        this.session = session;
+    public Rq(ApplicationContext context, AccountService accountService) {
+        
+        ServletRequestAttributes sessionAttributes = ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes()));
+        this.request = sessionAttributes.getRequest();
+        this.response = sessionAttributes.getResponse();
+        this.session = request.getSession();
         this.context = context;
         this.accountService = accountService;
         
@@ -102,15 +109,15 @@ public class Rq {
     }
     
     /**
-     * alert 메시지를 띄우고 redirectUrl로 이동
+     * alert 메시지를 띄우고 redirectUri로 이동
      * @param msg : alert에 띄울 메시지
      * @return flowAlert.js로 이동
      */
-    public String alert(AlertType alertType, String msg, String redirectUrl){
+    public String alert(AlertType alertType, String msg, String redirectUri){
         request.setAttribute("msg", msg);
         request.setAttribute("alertType", alertType.toString().toLowerCase());
-        if(redirectUrl != null){
-            request.setAttribute("redirectUrl", redirectUrl);
+        if(redirectUri != null){
+            request.setAttribute("redirectUri", redirectUri);
         }
         if(alertType == AlertType.ERROR || alertType == AlertType.WARNING){
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -126,6 +133,16 @@ public class Rq {
      */
     public String alert(AlertType alertType, String msg){
         return alert(alertType, msg, null);
+    }
+    
+    public String getAlertStorageRedirectUri(AlertType alertType, String msg, String redirectUri) {
+        msg = URLEncoder.encode(msg, StandardCharsets.UTF_8);
+        if(redirectUri != null){
+            return "/common/alertStorage?msg=" + msg + "&alertType=" + alertType.toString().toLowerCase() + "&redirectUri=" + redirectUri;
+        } else {
+            throw new IllegalArgumentException("getAlertStorageRedirectUri의 인자인 redirectUri가 null입니다.");
+        }
+        
     }
     
     /**

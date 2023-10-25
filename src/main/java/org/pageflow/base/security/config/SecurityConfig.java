@@ -25,6 +25,7 @@ public class SecurityConfig {
     private final AuthenticationProvider daoAuthenticationProvider;
     private final CustomOAuth2UserService customOAuth2UserService;
     private final CustomProperties customProperties;
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
     private final InsufficientAuthenticationProcessingFilter insufficientAuthenticationProcessingFilter;
     
     
@@ -32,7 +33,7 @@ public class SecurityConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/login", "/signup*", "/verify/email", "/error*", "/ee").permitAll()
+                        .requestMatchers("/", "/login", "/signup*", "/verify/email", "/error*", "/common/alertStorage*").permitAll()
                         .anyRequest().authenticated()
                 )
                 
@@ -59,7 +60,7 @@ public class SecurityConfig {
                 )
         
                 .exceptionHandling(exception -> exception
-                        .authenticationEntryPoint(new CustomAuthenticationEntryPoint(customProperties.getSite().getLoginFormUrl()))
+                        .authenticationEntryPoint(customAuthenticationEntryPoint)
                 );
         
         

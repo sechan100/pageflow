@@ -1,4 +1,4 @@
-package org.pageflow.domain.home;
+package org.pageflow.domain.common;
 
 import lombok.RequiredArgsConstructor;
 import org.pageflow.base.request.AlertType;

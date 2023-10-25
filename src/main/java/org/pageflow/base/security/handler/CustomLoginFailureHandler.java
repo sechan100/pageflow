@@ -15,7 +15,7 @@ import java.io.IOException;
 @Component
 public class CustomLoginFailureHandler implements AuthenticationFailureHandler {
     
-    @Value("${custom.site.login-form-url}")
+    @Value("${custom.site.login-form-uri}")
     private String loginFormUrl;
     
     

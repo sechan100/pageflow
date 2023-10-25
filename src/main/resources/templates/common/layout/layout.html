@@ -19,15 +19,17 @@
     <!--  tailwind  -->
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <!--  flowbite  -->
+    <!--  flowbite css  -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.8.1/flowbite.min.css" rel="stylesheet" />
+
+    <!--  flowAlert.js  -->
+    <script th:src="@{/js/flowAlert.js}"></script>
 </head>
 
-<body class="bg-gray-50 relative" th:with="user = ${@rq.userSession}">
+<body class="bg-gray-50" th:with="user = ${@rq.userSession}">
 
-    <!--  flowbite  -->
+    <!--  flowbite js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.8.1/flowbite.min.js"></script>
-
 
     <nav class="bg-white fixed w-full z-40 top-0 left-0 border-b border-gray-200">
 
@@ -42,7 +44,7 @@
 
                 <!--로그인, 회원가입-->
                 <a th:href="@{/login}" th:unless="${user.login}">
-                    <button type="button" class="text-gray-900 bg-gradient-to-r from-red-200 via-red-300 to-yellow-200 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-red-100 dark:focus:ring-red-400 font-medium rounded-xl text-xs px-5 py-2.5 text-center mr-2 mb-2">
+                    <button type="button" class="text-gray-900 bg-gradient-to-r from-red-200 via-red-300 to-yellow-200 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-red-100 font-medium rounded-xl text-xs px-5 py-2.5 text-center mr-2 mb-2">
                         SIGN IN
                     </button>
                 </a>
@@ -130,7 +132,18 @@
         </div>
     </nav>
 
+    <div id="alert-container" class="sm:w-1/4 w-full z-50 fixed bottom-5 right-5 flex flex-col-reverse"></div>
+
     <main layout:fragment="main" class="mt-20"></main>
+
+    <script th:inline="javascript">
+        flowAlert("인포 짱", 'info');
+        flowAlert("인포 짱", 'error');
+        flowAlert("인포 짱", 'warning');
+        flowAlert("인포 짱", 'success');
+        flowAlert("인포 짱", 'neutral');
+
+    </script>
 </body>
 </html>
 

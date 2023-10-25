@@ -1,0 +1,19 @@
+<script th:inline="javascript">
+    /*<![CDATA[*/
+
+    const msg = /*[[${msg}]]*/ null;
+    const alertType = /*[[${alertType}]]*/ 'info';
+    const redirectUrl = /*[[${redirectUrl}]]*/ null;
+
+    if (msg.trim().length > 0) {
+        localStorage.setItem("alertStorageKey", alertType + ":" + msg);
+    }
+
+    if(redirectUrl != null && redirectUrl.trim().length > 0) {
+        window.location.href=redirectUrl;
+    } else {
+        history.back();
+    }
+
+    /*]]>*/
+</script>

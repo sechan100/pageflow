@@ -137,11 +137,18 @@
     <main layout:fragment="main" class="mt-20"></main>
 
     <script th:inline="javascript">
-        flowAlert("인포 짱", 'info');
-        flowAlert("인포 짱", 'error');
-        flowAlert("인포 짱", 'warning');
-        flowAlert("인포 짱", 'success');
-        flowAlert("인포 짱", 'neutral');
+        /*<![CDATA[*/
+        const alertStorageKey = "alertStorageKey";
+        const alertStorage = localStorage.getItem(alertStorageKey);
+
+        if (alertStorage != null) {
+            const alertType = alertStorage.split(":")[0];
+            const msg = alertStorage.split(":")[1];
+
+            flowAlert(alertType, msg);
+            localStorage.removeItem(alertStorageKey);
+        }
+        /*]]>*/
 
     </script>
 </body>

@@ -13,12 +13,12 @@ function dismissAlert(flowAlertId){
 
 let alertIdCounter = 1;
 
-function flowAlert(msg, type) {
+function flowAlert(alertType, msg) {
 
     let color, bgColor, borderColor;
     const currentAlertId = alertIdCounter;
 
-    switch(type) {
+    switch(alertType) {
         case 'error': // red
             color = 'text-red-800';
             bgColor = 'bg-red-50';

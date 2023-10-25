@@ -118,6 +118,6 @@ public class SignupController {
         // 캐쉬 레코드 삭제
         awaitingEmailVerifyingFormService.delete(form.getEmail());
         
-        return rq.alert("회원가입이 완료되었습니다.", "/login");
+        return "redirect:/login";
     }
 }

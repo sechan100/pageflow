@@ -101,13 +101,31 @@ public class Rq {
         return null;
     }
     
-    public String alert(String msg, String redirectUrl){
-        return "<script>alert('" + msg + "'); location.href='" + redirectUrl + "';</script>";
+    /**
+     * alert 메시지를 띄우고 redirectUrl로 이동
+     * @param msg : alert에 띄울 메시지
+     * @return flowAlert.js로 이동
+     */
+    public String alert(AlertType alertType, String msg, String redirectUrl){
+        request.setAttribute("msg", msg);
+        request.setAttribute("alertType", alertType.toString().toLowerCase());
+        if(redirectUrl != null){
+            request.setAttribute("redirectUrl", redirectUrl);
+        }
+        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        
+        return "/common/alertStorage";
     }
     
-    public String historyBack(String msg){
-        return "<script>alert('" + msg + "'); history.back();</script>";
+    /**
+     * alert 메시지를 띄우고 history.back()
+     * @param msg : alert에 띄울 메시지
+     * @return flowAlert.js로 이동
+     */
+    public String alert(AlertType alertType, String msg){
+        return alert(alertType, msg, null);
     }
+    
     
     public void redirect(String redirectUrl) {
         try{

@@ -112,7 +112,9 @@ public class Rq {
         if(redirectUrl != null){
             request.setAttribute("redirectUrl", redirectUrl);
         }
-        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        if(alertType == AlertType.ERROR || alertType == AlertType.WARNING){
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        }
         
         return "/common/alertStorage";
     }
@@ -126,6 +128,17 @@ public class Rq {
         return alert(alertType, msg, null);
     }
     
+    /**
+     * 일반적인 페이지 렌더링 후 응답하는 컨트롤러에서, alert 메세지를 띄울 수 있음.
+     * @param alertType
+     * @param msg
+     */
+    public void setAlert(AlertType alertType, String msg){
+        request.setAttribute("oncePerRequestAlert", alertType + ":" + msg);
+        if(alertType == AlertType.ERROR || alertType == AlertType.WARNING){
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        }
+    }
     
     public void redirect(String redirectUrl) {
         try{

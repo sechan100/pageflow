@@ -15,14 +15,9 @@
 
 
                 <!--로그인 페이지 안내 문구: 그냥 들어왔을 때-->
-                <div th:unless="${#strings.equals(param.error, 'anonymous')}" class="text-center text-lg font-bold leading-tight tracking-tight text-gray-900 md:text-xl">
+                <div class="text-center text-lg font-bold leading-tight tracking-tight text-gray-900 md:text-xl">
                     Sign in SSEG
                 </div>
-
-                <!--로그인 페이지 안내 문구: 인증이 필요한 곳으로 먼저 접근후 튕겼을 때-->
-                <h1 th:if="${#strings.equals(param.error, 'anonymous')}" class="text-xl font-bold leading-tight tracking-tight text-red-400 md:text-2xl">
-                    로그인 후 이용해주세요
-                </h1>
 
                 <!-- 로그인 form-->
                 <form class="space-y-4 md:space-y-6" action="#" th:action="@{/login}" method="POST" onsubmit="LoginForm__submit(this); return false;">

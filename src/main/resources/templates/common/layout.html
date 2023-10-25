@@ -138,18 +138,31 @@
 
     <script th:inline="javascript">
         /*<![CDATA[*/
-        const alertStorageKey = "alertStorageKey";
-        const alertStorage = localStorage.getItem(alertStorageKey);
+        $(window).on('pageshow', () => {
 
-        if (alertStorage != null) {
-            const alertType = alertStorage.split(":")[0];
-            const msg = alertStorage.split(":")[1];
+            // alert storage(redirect or history back)
+            const alertStorageKey = "alertStorageKey";
+            const alertStorage = localStorage.getItem(alertStorageKey);
 
-            flowAlert(alertType, msg);
-            localStorage.removeItem(alertStorageKey);
-        }
+            if (alertStorage != null) {
+                const alertType = alertStorage.split(":")[0];
+                const msg = alertStorage.split(":")[1];
+
+                flowAlert(alertType, msg);
+                localStorage.removeItem(alertStorageKey);
+            }
+
+            // once per request alert
+            const oncePerRequestAlert = /*[[${oncePerRequestAlert}]]*/ null;
+
+            if (oncePerRequestAlert != null) {
+                const alertType = oncePerRequestAlert.split(":")[0];
+                const msg = oncePerRequestAlert.split(":")[1];
+
+                flowAlert(alertType, msg);
+            }
+        });
         /*]]>*/
-
     </script>
 </body>
 </html>

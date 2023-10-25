@@ -3,6 +3,7 @@ package org.pageflow.domain.user.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.pageflow.base.request.AlertType;
 import org.pageflow.base.request.Rq;
 import org.pageflow.base.validator.AccountDtoValidator;
 import org.pageflow.domain.user.entity.AwaitingEmailVerificationRequest;
@@ -101,7 +102,6 @@ public class SignupController {
     
     
     @PostMapping("/signup")
-    @ResponseBody
     public String signup(@Valid AdditionalSignupAccountDto form){
         
         // 캐쉬에서 인증된 이메일 정보 가져오기
@@ -118,6 +118,6 @@ public class SignupController {
         // 캐쉬 레코드 삭제
         awaitingEmailVerifyingFormService.delete(form.getEmail());
         
-        return "redirect:/login";
+        return rq.alert(AlertType.SUCCESS, "회원가입이 완료되었습니다.", "/login");
     }
 }

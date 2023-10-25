@@ -19,6 +19,7 @@ public class CustomProperties {
     @Getter @Setter
     public static class Site {
         private String baseUrl;
+        private String loginFormUrl;
     }
     
     @Getter @Setter

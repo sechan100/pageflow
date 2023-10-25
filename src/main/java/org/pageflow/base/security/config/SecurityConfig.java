@@ -1,12 +1,13 @@
 package org.pageflow.base.security.config;
 
 import lombok.RequiredArgsConstructor;
+import org.pageflow.base.constants.CustomProperties;
 import org.pageflow.base.security.filter.InsufficientAuthenticationProcessingFilter;
+import org.pageflow.base.security.handler.CustomAuthenticationEntryPoint;
 import org.pageflow.domain.user.service.CustomOAuth2UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -23,6 +24,7 @@ public class SecurityConfig {
     
     private final AuthenticationProvider daoAuthenticationProvider;
     private final CustomOAuth2UserService customOAuth2UserService;
+    private final CustomProperties customProperties;
     private final InsufficientAuthenticationProcessingFilter insufficientAuthenticationProcessingFilter;
     
     
@@ -56,7 +58,9 @@ public class SecurityConfig {
                         .logoutSuccessUrl("/").permitAll()
                 )
         
-                .exceptionHandling(Customizer.withDefaults());
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(new CustomAuthenticationEntryPoint(customProperties.getSite().getLoginFormUrl()))
+                );
         
         
         return http.build();

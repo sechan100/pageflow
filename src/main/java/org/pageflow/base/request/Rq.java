@@ -137,8 +137,8 @@ public class Rq {
     }
     
     /**
-     * @param alertType
-     * @param msg
+     * @param alertType : alertType
+     * @param msg : alert에 띄울 메시지
      * @param redirectUri nullable: redirectUri가 null이면 history.back()
      */
     public String getAlertStorageRedirectUri(AlertType alertType, String msg, @Nullable String redirectUri) {
@@ -152,8 +152,8 @@ public class Rq {
     
     /**
      * 일반적인 페이지 렌더링 후 응답하는 컨트롤러에서, alert 메세지를 띄울 수 있음.
-     * @param alertType
-     * @param msg
+     * @param alertType : alertType
+     * @param msg : alert에 띄울 메시지
      */
     public void setAlert(AlertType alertType, String msg){
         request.setAttribute("oncePerRequestAlert", alertType + ":" + msg);

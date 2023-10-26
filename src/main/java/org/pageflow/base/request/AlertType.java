@@ -5,5 +5,5 @@ public enum AlertType {
     WARNING,
     ERROR,
     SUCCESS,
-    NEUTRAL;
+    NEUTRAL
 }

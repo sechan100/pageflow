@@ -58,9 +58,9 @@ public class SignupController {
     
     /**
      * 이메일 인증용 메일 전송 요청
-     * @param form
-     * @param model
-     * @return
+     * @param form 기본 회원가입 폼
+     * @param model 뷰모델
+     * @return 이메일 인증 대기 페이지
      */
     @PostMapping("/verify/email")
     public String verifyEmail(@Valid BasicSignupAccountDto form, Model model) {

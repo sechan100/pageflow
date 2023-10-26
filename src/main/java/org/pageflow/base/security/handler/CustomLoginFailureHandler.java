@@ -3,6 +3,7 @@ package org.pageflow.base.security.handler;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.pageflow.base.constants.CustomProperties;
 import org.pageflow.base.request.AlertType;
 import org.pageflow.base.request.Rq;
@@ -15,12 +16,8 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 
 @Component
+@RequiredArgsConstructor
 public class CustomLoginFailureHandler implements AuthenticationFailureHandler {
-    
-    public CustomLoginFailureHandler(CustomProperties customProperties, Rq rq) {
-        this.customProperties = customProperties;
-        this.rq = rq;
-    }
     
     private final CustomProperties customProperties;
     private final Rq rq;

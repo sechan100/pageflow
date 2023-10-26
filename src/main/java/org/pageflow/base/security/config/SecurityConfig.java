@@ -3,10 +3,7 @@ package org.pageflow.base.security.config;
 import lombok.RequiredArgsConstructor;
 import org.pageflow.base.constants.CustomProperties;
 import org.pageflow.base.security.filter.InsufficientAuthenticationProcessingFilter;
-import org.pageflow.base.security.handler.CustomAuthenticationEntryPoint;
-import org.pageflow.base.security.handler.FormLoginAuthenticationSuccessHandler;
-import org.pageflow.base.security.handler.CustomLoginFailureHandler;
-import org.pageflow.base.security.handler.OAuth2AuthenticationSuccessHandler;
+import org.pageflow.base.security.handler.*;
 import org.pageflow.domain.user.service.CustomOAuth2UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,6 +29,7 @@ public class SecurityConfig {
     private final CustomLoginFailureHandler customLoginFailureHandler;
     private final FormLoginAuthenticationSuccessHandler formLoginAuthenticationSuccessHandler;
     private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
+    private final CustomLogoutSuccessHandler customLogoutSuccessHandler;
     private final InsufficientAuthenticationProcessingFilter insufficientAuthenticationProcessingFilter;
     
     
@@ -65,7 +63,7 @@ public class SecurityConfig {
                 
                 .logout(logout -> logout
                         .logoutUrl("/logout")
-                        .logoutSuccessUrl("/").permitAll()
+                        .logoutSuccessHandler(customLogoutSuccessHandler)
                 )
         
                 .exceptionHandling(exception -> exception

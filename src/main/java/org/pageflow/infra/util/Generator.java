@@ -1,18 +1,22 @@
 package org.pageflow.infra.util;
 
+import org.pageflow.domain.book.entity.Book;
+import org.pageflow.domain.book.repository.BookRepository;
+
 import java.security.SecureRandom;
+
 
 public class Generator {
     
     private final SecureRandom secureRandom = new SecureRandom();
-    
-    
+
+
     public int generateRandomNumber() {
         java.util.Random random = new java.util.Random();
         return 111111 + random.nextInt(888889);  // 999999 - 111111 = 888888, 그리고 1을 더해서 범위를 888889로 조정
     }
     
-    
+
     public String generateRandomString() {
         
         String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_.!~*";

@@ -1,0 +1,22 @@
+<html lang="en" layout:decorate="~{/common/layout.html}" xmlns:layout="" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Book</title>
+</head>
+<main layout:fragment="main">
+    <table>
+        <thead>
+        <tr>
+            <th>제목</th>
+            <th>작성일시</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="book : ${books}">
+            <td th:text="${book.subject}"></td>
+            <td th:text="${book.createDate}"></td>
+        </tr>
+        </tbody>
+    </table>
+
+</main>
+</html>

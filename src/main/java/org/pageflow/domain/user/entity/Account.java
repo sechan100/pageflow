@@ -3,6 +3,9 @@ package org.pageflow.domain.user.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.pageflow.base.entity.BaseEntity;
+import org.pageflow.domain.book.entity.Book;
+
+import java.util.List;
 
 @Entity
 @Getter
@@ -32,5 +35,7 @@ public class Account extends BaseEntity {
             cascade = CascadeType.ALL
     )
     private Profile profile;
-    
+
+    @OneToMany(mappedBy = "account", cascade = CascadeType.REMOVE)
+    private List<Book> books;
 }

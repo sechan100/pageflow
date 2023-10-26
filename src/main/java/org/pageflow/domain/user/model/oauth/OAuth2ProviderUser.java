@@ -38,6 +38,11 @@ public abstract class OAuth2ProviderUser implements ResourceOwner {
     }
     
     @Override
+    public String getUsername() {
+        return getId();
+    }
+    
+    @Override
     public List<? extends GrantedAuthority> getAuthorities() {
         return oAuth2User.getAuthorities().stream()
                 .map(authority -> new SimpleGrantedAuthority(authority.getAuthority()))

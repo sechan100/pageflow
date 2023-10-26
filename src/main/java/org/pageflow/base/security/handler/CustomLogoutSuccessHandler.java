@@ -26,7 +26,7 @@ public class CustomLogoutSuccessHandler implements LogoutSuccessHandler {
             redirectStrategy.sendRedirect(
                     request,
                     response,
-                    rq.getAlertStorageRedirectUri(AlertType.INFO, "로그아웃 되었습니다.", "/")
+                    rq.getAlertStorageRedirectUri(AlertType.NEUTRAL, "로그아웃 되었습니다.", "/login")
             );
     }
 }

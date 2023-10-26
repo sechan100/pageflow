@@ -49,6 +49,13 @@ spring:
             authorization-grant-type: authorization_code
             redirect-uri: '${custom.site.base-url}/login/oauth2/code/google'
 
+          github:
+            scope: user:email, read:user
+            client-name: github
+            authorization-grant-type: authorization_code
+            redirect-uri: '${custom.site.base-url}/login/oauth2/code/github'
+
+
         provider:
           naver:
             authorization-uri: https://nid.naver.com/oauth2.0/authorize

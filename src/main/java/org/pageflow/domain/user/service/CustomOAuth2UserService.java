@@ -8,6 +8,7 @@ import org.pageflow.domain.user.entity.Account;
 import org.pageflow.domain.user.entity.AwaitingEmailVerificationRequest;
 import org.pageflow.domain.user.model.dto.AdditionalSignupAccountDto;
 import org.pageflow.domain.user.model.dto.PrincipalContext;
+import org.pageflow.domain.user.model.oauth.GithubOwner;
 import org.pageflow.domain.user.model.oauth.GoogleOwner;
 import org.pageflow.domain.user.model.oauth.NaverOwner;
 import org.pageflow.domain.user.model.oauth.ResourceOwner;
@@ -70,6 +71,9 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
             
         } else if (registrationId.equals("google")) {
             return new GoogleOwner(oAuth2User, clientRegistration);
+            
+        } else if (registrationId.equals("github")) {
+            return new GithubOwner(oAuth2User, clientRegistration);
             
         } else {
             /* 하지만 DefaultOAuth2UserService의 loadUser 메서드에서

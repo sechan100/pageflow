@@ -13,11 +13,6 @@ public class NaverOwner extends OAuth2ProviderUser {
     
     @Override
     public String getId() {
-        return (String) getAttributes().get("id");
-    }
-    
-    @Override
-    public String getUsername() {
-        return (String) getAttributes().get("email");
+        return getProvider() + "-" + ((String)getAttributes().get("id"));
     }
 }

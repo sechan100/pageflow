@@ -1,9 +1,9 @@
-<html lang="en" layout:decorate="~{/common/layout.html}" xmlns:layout="http://www.w3.org/1999/xhtml"
+<html lang="en" layout:decorate="~{/book/book_form_layout.html}" xmlns:layout="http://www.w3.org/1999/xhtml"
       xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
     <title>login</title>
 </head>
-<main layout:fragment="main">
+<main layout:fragment="main" class="ml-[300px]">
     <h5 class="my-3 border-bottom pb-2">책등록</h5>
     <form th:action="@{/book/create}" th:object="${bookForm}" method="post" enctype="multipart/form-data">
         <div class="alert alert-danger" role="alert" th:if="${#fields.hasAnyErrors()}">
@@ -18,12 +18,12 @@
             <input type="file" th:field="*{file}" class="form-control">
         </div>
 <!--         챕터 지정 폼 (chapter_form) 이동 버튼-->
-        <h5 class="my-3 border-bottom pb-2">책 작성</h5>
-        <span class="block mb-2">
-            <a href="/chapter/create" class="btn btn-secondary my-2">챕터 등록</a>
-        </span>
+<!--        <h5 class="my-3 border-bottom pb-2">책 작성</h5>-->
+<!--        <span class="block mb-2">-->
+<!--            <a href="/chapter/create" class="btn btn-secondary my-2">챕터 등록</a>-->
+<!--        </span>-->
 
-        <input type="submit" value="저장하기" class="btn btn-primary my-2">
+        <input type="submit" value="등록하기" class="btn btn-primary my-2">
     </form>
 
 </main>

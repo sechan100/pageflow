@@ -41,3 +41,11 @@ tasks.named('test') {
 tasks.register('flushRedis', Exec) {
 	commandLine 'redis-cli', 'flushall'
 }
+
+tasks.register('restartRedisServerOnWindow', Exec) {
+	println 'Stopping Redis Server...'
+	commandLine 'cmd', '/c', 'taskkill', '/F', '/IM', 'redis-server.exe'
+	println 'Redis Server stopped.'
+	println 'Starting Redis Server...'
+	commandLine 'cmd', '/c', 'start', '/B', 'C:\\Users\\SBS\\Redis-x64-3.0.504\\redis-server.exe'
+}

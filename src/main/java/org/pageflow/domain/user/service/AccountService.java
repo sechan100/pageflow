@@ -14,11 +14,16 @@ import org.pageflow.domain.user.repository.AccountRepository;
 import org.pageflow.domain.user.repository.AwaitingVerificationEmailRepository;
 import org.pageflow.infra.email.EmailRequest;
 import org.pageflow.infra.email.EmailSender;
+import org.pageflow.infra.file.constants.FileMetadataType;
+import org.pageflow.infra.file.entity.FileMetadata;
+import org.pageflow.infra.file.repository.FileMetadataRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +32,7 @@ public class AccountService {
     @Getter
     private final AccountRepository accountRepository;
     private final AwaitingVerificationEmailRepository emailCacheRepository;
+    private final FileMetadataRepository fileMetadataRepository;
     private final PasswordEncoder passwordEncoder;
     private final TemplateEngine templateEngine;
     private final EmailSender emailSender;
@@ -55,7 +61,9 @@ public class AccountService {
     }
     
     
-    
+    /**
+     * Profile은 같이 업데이트 하지 않음
+     */
     @Transactional
     public void updateAccount(AccountDto accountDto) {
             Account account = accountRepository.findByUsername(accountDto.getUsername());
@@ -94,12 +102,8 @@ public class AccountService {
     // *********     JPA Repository service      **********
     // ****************************************************
     
-    public Account findByUsername(String username) {
-        return accountRepository.findByUsername(username);
-    }
-    
     public Account findByUsernameWithProfile(String username) {
-        return accountRepository.findByUsernameWithProfile(username);
+        return setProfileImgUrl(accountRepository.findByUsernameWithProfile(username));
     }
     
     public boolean existsByUsername(String username) {
@@ -108,5 +112,36 @@ public class AccountService {
     
     public boolean existsByEmailAndProvider(String email, String provider) {
         return accountRepository.existsByEmailAndProvider(email, provider);
+    }
+    
+    
+    /**
+     * Account의 Profile 엔티티의 Transient인 프로필 이미지 URL 필드를 초기화 후 반환
+     * @param account DB에서 가져온 Account 엔티티
+     * @return 프로필 이미지 URL이 추가된 Account 엔티티
+     */
+    private Account setProfileImgUrl(Account account) {
+        Profile profile = account.getProfile();
+        List<FileMetadata> profileImgFileMetadatas = fileMetadataRepository
+                .findAllByOwnerIdAndOwnerEntityTypeAndFileMetadataType(
+                        profile.getId(), Profile.class.getSimpleName(), FileMetadataType.PROFILE_IMG
+                );
+        
+        String profileImgUrl;
+        
+        if(profileImgFileMetadatas.isEmpty()) {
+            profileImgUrl = "/img/default_profile_img.png";
+        } else {
+            FileMetadata profileImgFileMetadata = profileImgFileMetadatas.get(0);
+            profileImgUrl =
+                customProperties.getFiles().getImg().getBaseUrl()   // {baseUrl}
+                + profileImgFileMetadata.getPathPrefix()            // {y}/{m}/{d}/
+                + profileImgFileMetadata.getManagedFilename();      // {UUID}.{ext}
+        }
+        
+        
+        profile.setProfileImgUrl(profileImgUrl);
+        
+        return account;
     }
 }

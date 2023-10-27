@@ -4,5 +4,9 @@
 </head>
 <main layout:fragment="main">
  애플리케이션
+    <form action="/file/upload" method="post" enctype="multipart/form-data">
+        <input type="file" name="profileImg">
+        <input type="submit" value="업로드"/>
+    </form>
 </main>
 </html>

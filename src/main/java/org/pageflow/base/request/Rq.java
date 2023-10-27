@@ -171,6 +171,6 @@ public class Rq {
     }
     
     public Account getAccount() {
-        return accountService.findByUsername(userSession.getUsername());
+        return accountService.findByUsernameWithProfile(userSession.getUsername());
     }
 }

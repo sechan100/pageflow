@@ -1,30 +1,41 @@
 package org.pageflow.base.constants;
 
-import lombok.Getter;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-@Getter @Setter
+@Data
 @ConfigurationProperties(prefix = "custom")
 public class CustomProperties {
     
     private final Site site = new Site();
     private final Email email = new Email();
+    private final Files files = new Files();
     
     
-    @Getter @Setter
+    @Data
     public static class Site {
         private String baseUrl;
         private String loginFormUri;
     }
     
-    @Getter @Setter
+    @Data
     public static class Email {
         private String emailVerifySender;
     }
     
+    @Data
+    public static class Files {
+        
+        private final Img img = new Img();
+        
+        @Data
+        public static class Img {
+            private String baseUrl;
+            private String directory;
+        }
+    }
 }

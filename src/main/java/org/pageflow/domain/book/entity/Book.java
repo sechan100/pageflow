@@ -8,6 +8,7 @@ import lombok.*;
 import org.pageflow.base.entity.BaseEntity;
 import org.pageflow.domain.user.entity.Account;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -20,9 +21,11 @@ public class Book extends BaseEntity {
 
     private String title;
 
-    @OneToMany(mappedBy = "book", cascade = CascadeType.REMOVE)
-    private List<Page> pages;
+    private String imgUrl;
 
     @ManyToOne
-    private Account account;
+    private Account author;
+
+    @OneToMany(mappedBy = "book", cascade = CascadeType.REMOVE)
+    private List<Chapter> chapters;
 }

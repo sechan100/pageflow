@@ -1,22 +1,19 @@
-<html lang="en" layout:decorate="~{/common/layout.html}" xmlns:layout="" xmlns:th="http://www.w3.org/1999/xhtml">
+<html lang="en" layout:decorate="~{/common/layout.html}" xmlns:th="http://www.w3.org/1999/xhtml" xmlns:layout="">
 <head>
     <title>Book</title>
 </head>
 <main layout:fragment="main">
-    <table>
-        <thead>
-        <tr>
-            <th>제목</th>
-            <th>작성일시</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="book : ${books}">
-            <td th:text="${book.subject}"></td>
-            <td th:text="${book.createDate}"></td>
-        </tr>
-        </tbody>
-    </table>
-
+    <div class="grid grid-cols-4 gap-4">
+        <!-- th:each 구문을 한 번만 사용하여 books 배열을 반복 -->
+        <div th:each="book : ${books}">
+            <a th:href="@{/book/detail/{id}(id=${book.id})}">
+                <img th:src="@{${book.imgUrl}}" alt="Book Image">
+                <h2 th:text="${book.title}"></h2>
+            </a>
+            <p th:text="${book.createDate}"></p>
+        </div>
+    </div>
+    <a th:href="@{/book/create}" class="btn btn-primary">질문 등록하기</a>
 </main>
+
 </html>

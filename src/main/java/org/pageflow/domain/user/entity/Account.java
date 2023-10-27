@@ -36,6 +36,6 @@ public class Account extends BaseEntity {
     )
     private Profile profile;
 
-    @OneToMany(mappedBy = "account", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "author", cascade = CascadeType.REMOVE)
     private List<Book> books;
 }

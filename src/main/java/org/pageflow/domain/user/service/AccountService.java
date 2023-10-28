@@ -133,10 +133,16 @@ public class AccountService {
             profileImgUrl = "/img/default_profile_img.png";
         } else {
             FileMetadata profileImgFileMetadata = profileImgFileMetadatas.get(0);
+            
+            String baseUrl = customProperties.getFiles().getImg().getBaseUrl();
+            if(!baseUrl.endsWith("/")) {
+                baseUrl += "/";
+            }
+            
             profileImgUrl =
-                customProperties.getFiles().getImg().getBaseUrl()   // {baseUrl}
-                + profileImgFileMetadata.getPathPrefix()            // {y}/{m}/{d}/
-                + profileImgFileMetadata.getManagedFilename();      // {UUID}.{ext}
+                  baseUrl                                       // {baseUrl}/
+                + profileImgFileMetadata.getPathPrefix()        // {y}/{m}/{d}/
+                + profileImgFileMetadata.getManagedFilename();  // {UUID}.{ext}
         }
         
         

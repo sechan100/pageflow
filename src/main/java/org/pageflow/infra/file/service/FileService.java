@@ -26,7 +26,7 @@ public class FileService {
     private final AccountService accountService;
     private final FileMetadataRepository fileRepository;
     
-    public <E extends BaseEntity> FileMetadata uploadFile(MultipartFile fileToUpload, E ownerEntity) {
+    public <E extends BaseEntity> FileMetadata uploadFile(MultipartFile fileToUpload, E ownerEntity, FileMetadataType fileMetadataType) {
         
         String uploadDirectoryPath = customProperties.getFiles().getImg().getDirectory();
         if(!uploadDirectoryPath.endsWith("/")) {
@@ -45,17 +45,14 @@ public class FileService {
         // DB에 파일 저장 정보 기록
         FileMetadata fileMetadata = FileMetadata.builder()
                 // {uploadDirectory}/{y}/{m}/{d}/{UUID}.{ext}
-                .fullPath(
-                        uploadDirectoryPath // {uploadDirectory}/
-                        + pathPrefix        // {y}/{m}/{d}/
-                        + UUIDfilename      // {UUID}.{ext}
-                )
+                .uploadDirectory(uploadDirectoryPath) // {uploadDirectory}/
                 .managedFilename(UUIDfilename)  // {UUID}.{ext}
                 .originalFilename(originalFilename) // {originalFilename}.{ext}
                 .ownerEntityType(ownerEntity.getClass().getSimpleName()) // ex) Profile
                 .ownerId(ownerEntity.getId())
                 .originalExtension(extension)
                 .size(fileToUpload.getSize())
+                .fileMetadataType(fileMetadataType)
                 .pathPrefix(pathPrefix) // {y}/{m}/{d}/
                 .build();
         fileRepository.save(fileMetadata);
@@ -66,13 +63,14 @@ public class FileService {
             boolean mkdirSuccess = uploadDirectoryFile.mkdirs();
         }
         
+        String uploadDirectoryFullPath = uploadDirectoryPath + pathPrefix + UUIDfilename;
         
         // 파일 저장
-        File fileToStore = new File(fileMetadata.getFullPath());
+        File fileToStore = new File(uploadDirectoryFullPath);
         try {
             fileToUpload.transferTo(fileToStore);
         } catch (IOException e) {
-            log.info("'{}' 파일 저장 중 오류가 발생했습니다.", fileMetadata.getFullPath());
+            log.info("'{}' 파일 저장 중 오류가 발생했습니다.", fileMetadata.getUploadDirectory());
         }
         
         return fileMetadata;

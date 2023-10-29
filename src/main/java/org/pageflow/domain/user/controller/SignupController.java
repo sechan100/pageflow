@@ -93,13 +93,11 @@ public class SignupController {
             accountService.sendEmailVerifyingEmail(form.getEmail(), authCode);
             
             // redis 캐쉬에 회원가입 정보 임시저장
-            awaitingEmailVerifyingFormService.save(new AwaitingEmailVerificationRequest(form, authCode));
+            awaitingEmailVerifyingFormService.save(new AwaitingEmailVerificationRequest(form, authCode, false));
         }
         
         return "/user/account/email_verification_waiting";
     }
-    
-    
     @PostMapping("/signup")
     public String additionalSignup(@Valid @ModelAttribute AdditionalSignupAccountDto additionalSignupAccountDto){
         
@@ -107,6 +105,8 @@ public class SignupController {
         AwaitingEmailVerificationRequest awaitingEmailVerificationRequest = awaitingEmailVerifyingFormService.findById(additionalSignupAccountDto.getEmail());
         AccountDto cachedSignupRequest = awaitingEmailVerificationRequest.getAccountDto();
         
+    
+    
         // 요청 받은 폼과 캐쉬에서 가져온 정보 대치
         if(!cachedSignupRequest.getEmail().equals(additionalSignupAccountDto.getEmail()) || !awaitingEmailVerificationRequest.isVerified()){
             throw new IllegalArgumentException(String.format("인증 정보가 일치하지 않습니다. 이메일 불일치인 경우 다음을 확인[기준: %s / 요청: %s] 인증되지 않은 경우 다음을 확인[isVerified: %b]", cachedSignupRequest.getEmail(), additionalSignupAccountDto.getEmail(), awaitingEmailVerificationRequest.isVerified())

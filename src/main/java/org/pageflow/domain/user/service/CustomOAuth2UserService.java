@@ -7,6 +7,7 @@ import org.pageflow.domain.user.constants.Role;
 import org.pageflow.domain.user.entity.Account;
 import org.pageflow.domain.user.entity.AwaitingEmailVerificationRequest;
 import org.pageflow.domain.user.model.dto.BasicSignupAccountDto;
+import org.pageflow.domain.user.model.dto.OAuth2AdditionalProfileData;
 import org.pageflow.domain.user.model.dto.PrincipalContext;
 import org.pageflow.domain.user.model.oauth.GithubOwner;
 import org.pageflow.domain.user.model.oauth.GoogleOwner;
@@ -42,20 +43,31 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         
         // social login provider 별로 인증객체를 분리하여 처리
         ResourceOwner resourceOwner = convertToResourceOwnerImpl(oAuth2User, clientRegistration);
-        BasicSignupAccountDto basicSignupAccountDto = new BasicSignupAccountDto(resourceOwner);
-        
         
         // 기존 회원정보 존재 -> 회원정보를 업데이트 후, 로그인 진행
-        if(accountService.existsByUsername(basicSignupAccountDto.getUsername())){
-            accountService.updateAccount(basicSignupAccountDto);
-            Account refrashedAccount = accountService.findByUsernameWithProfile(basicSignupAccountDto.getUsername());
+        if(accountService.existsByUsername(resourceOwner.getUsername())){
+            accountService.updateAccount(resourceOwner);
+            Account refrashedAccount = accountService.findByUsernameWithProfile(resourceOwner.getUsername());
             return new PrincipalContext(refrashedAccount);
             
         // 회원정보 없음(신규) -> 기본 Account 정보가 포함된 AccountDetilasRegisterForm을 redis에 저장하고 리다이렉트
         } else {
             String authenticationCode = Ut.generator.generateRandomString();
-            emailCacheService.save(new AwaitingEmailVerificationRequest(basicSignupAccountDto, authenticationCode, true));
-            rq.redirect("/signup?code=" + authenticationCode + "&email=" + basicSignupAccountDto.getEmail());
+            emailCacheService.save(
+                    AwaitingEmailVerificationRequest.builder()
+                            .email(resourceOwner.getEmail())
+                            .accountDto(new BasicSignupAccountDto(resourceOwner))
+                            .oAuth2AdditionalProfileData(
+                                    OAuth2AdditionalProfileData.builder()
+                                            .profileImgUrl(resourceOwner.getProfileImgUrl())
+                                            .nickname(resourceOwner.getNickname())
+                                            .build()
+                            )
+                            .authenticationCode(authenticationCode)
+                            .isVerified(true)
+                            .build()
+            );
+            rq.redirect("/signup?code=" + authenticationCode + "&email=" + resourceOwner.getEmail());
             return new PrincipalContext(Account.builder().username("anonymous").password("anonymous").role(Role.ANONYMOUS).build());
         }
     }

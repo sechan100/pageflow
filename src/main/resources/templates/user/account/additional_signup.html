@@ -30,6 +30,9 @@
           <input type="hidden" th:field="*{password}" />
 
           <!--profile image-->
+          <img src="#" th:src="*{profileImgUrl}" alt="">
+          <input type="hidden" th:field="*{profileImgUrl}" />
+
           <div>
             <label for="profileImg" class="block mb-2 text-sm font-medium text-gray-900">프로필 사진</label>
             <input type="file" th:field="*{profileImg}" id="profileImg" class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5" >

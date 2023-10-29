@@ -31,11 +31,18 @@ public class AdditionalSignupAccountDto extends DefaultAccountDto {
         super.email = form.getEmail();
         super.provider = form.getProvider();
     }
+    
     public AdditionalSignupAccountDto(AwaitingEmailVerificationRequest form){
         super.email = form.getEmail();
         super.username = form.getAccountDto().getUsername();
         super.password = form.getAccountDto().getPassword();
         super.provider = form.getAccountDto().getProvider();
+        
+        // OAuth2를 통한 회원가입인 경우, 추가적인 프로필 정보의 기본 베이스가 존재.
+        if(!provider.equals(ProviderType.NATIVE)){
+            profileImgUrl = form.getOAuth2AdditionalProfileData().getProfileImgUrl();
+            nickname = form.getOAuth2AdditionalProfileData().getNickname();
+        }
     }
     
 }

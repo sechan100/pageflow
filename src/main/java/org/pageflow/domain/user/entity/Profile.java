@@ -15,7 +15,6 @@ public class Profile extends BaseEntity {
     
     private String nickname;
     
-    @Transient
     private String profileImgUrl;
     
 }

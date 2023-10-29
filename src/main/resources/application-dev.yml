@@ -38,7 +38,6 @@ spring:
         registration:
 
           naver:
-            scope: profile,email
             client-name: naver
             authorization-grant-type: authorization_code
             redirect-uri: '${custom.site.base-url}/login/oauth2/code/naver'

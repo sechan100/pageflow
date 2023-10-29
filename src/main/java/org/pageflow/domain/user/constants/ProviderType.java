@@ -2,7 +2,7 @@ package org.pageflow.domain.user.constants;
 
 public class ProviderType {
     
-    public static final String NATIVE = "sseg";
+    public static final String NATIVE = "pageflow";
     public static final String GOOGLE = "google";
     public static final String KAKAO = "kakao";
     public static final String NAVER = "naver";

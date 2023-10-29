@@ -49,10 +49,10 @@ public class SignupController {
             AdditionalSignupAccountDto form = new AdditionalSignupAccountDto(awaitingEmailVerificationRequest);
             model.addAttribute("registerForm", form);
             
-            return "/user/account/verified_signup";
+            return "/user/account/additional_signup";
         }
         
-        return "/user/account/signup";
+        return "/user/account/basic_signup";
     }
     
     
@@ -101,22 +101,22 @@ public class SignupController {
     
     
     @PostMapping("/signup")
-    public String signup(@Valid AdditionalSignupAccountDto form){
+    public String additionalSignup(@Valid @ModelAttribute AdditionalSignupAccountDto additionalSignupAccountDto){
         
         // 캐쉬에서 인증된 이메일 정보 가져오기
-        AwaitingEmailVerificationRequest awaitingEmailVerificationRequest = awaitingEmailVerifyingFormService.findById(form.getEmail());
-        AccountDto cachedSignupRequest = awaitingEmailVerificationRequest.getAccount();
+        AwaitingEmailVerificationRequest awaitingEmailVerificationRequest = awaitingEmailVerifyingFormService.findById(additionalSignupAccountDto.getEmail());
+        AccountDto cachedSignupRequest = awaitingEmailVerificationRequest.getAccountDto();
         
         // 요청 받은 폼과 캐쉬에서 가져온 정보 대치
-        if(!cachedSignupRequest.getEmail().equals(form.getEmail()) || !awaitingEmailVerificationRequest.isVerified()){
-            throw new IllegalArgumentException(String.format("인증 정보가 일치하지 않습니다. 이메일 불일치인 경우 다음을 확인[기준: %s / 요청: %s] 인증되지 않은 경우 다음을 확인[isVerified: %b]", cachedSignupRequest.getEmail(), form.getEmail(), awaitingEmailVerificationRequest.isVerified())
+        if(!cachedSignupRequest.getEmail().equals(additionalSignupAccountDto.getEmail()) || !awaitingEmailVerificationRequest.isVerified()){
+            throw new IllegalArgumentException(String.format("인증 정보가 일치하지 않습니다. 이메일 불일치인 경우 다음을 확인[기준: %s / 요청: %s] 인증되지 않은 경우 다음을 확인[isVerified: %b]", cachedSignupRequest.getEmail(), additionalSignupAccountDto.getEmail(), awaitingEmailVerificationRequest.isVerified())
             );
         }
         
-        accountService.register(form);
+        accountService.register(additionalSignupAccountDto);
         
         // 캐쉬 레코드 삭제
-        awaitingEmailVerifyingFormService.delete(form.getEmail());
+        awaitingEmailVerifyingFormService.delete(additionalSignupAccountDto.getEmail());
         
         return rq.alert(AlertType.SUCCESS, "회원가입이 완료되었습니다.", "/login");
     }

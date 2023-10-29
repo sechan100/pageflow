@@ -19,7 +19,7 @@ public class AwaitingEmailVerificationRequest {
     
     private String authenticationCode;
     
-    private AccountDto account;
+    private AccountDto accountDto;
     
     private boolean isVerified = false;
     
@@ -28,10 +28,10 @@ public class AwaitingEmailVerificationRequest {
         this(form, authenticationCode, false);
     }
     
-    public AwaitingEmailVerificationRequest(AccountDto form, String authenticationCode, boolean isVerified){
-        this.email = form.getEmail();
+    public AwaitingEmailVerificationRequest(AccountDto accountDto, String authenticationCode, boolean isVerified){
+        this.email = accountDto.getEmail();
         this.authenticationCode = authenticationCode;
-        this.account = form;
+        this.accountDto = accountDto;
         this.isVerified = isVerified;
     }
     

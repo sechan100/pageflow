@@ -1,10 +1,8 @@
 package org.pageflow.infra.file.service;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pageflow.base.constants.CustomProperties;
 import org.pageflow.base.entity.BaseEntity;
-import org.pageflow.domain.user.service.AccountService;
 import org.pageflow.infra.file.constants.FileMetadataType;
 import org.pageflow.infra.file.entity.FileMetadata;
 import org.pageflow.infra.file.repository.FileMetadataRepository;
@@ -18,27 +16,34 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class FileService {
     
     private final CustomProperties customProperties;
-    private final AccountService accountService;
     private final FileMetadataRepository fileRepository;
+    private String uploadDirectoryPath;
     
-    public <E extends BaseEntity> FileMetadata uploadFile(MultipartFile fileToUpload, E ownerEntity, FileMetadataType fileMetadataType) {
+    
+    public FileService(CustomProperties customProperties, FileMetadataRepository fileRepository) {
+        this.customProperties = customProperties;
+        this.fileRepository = fileRepository;
         
         String uploadDirectoryPath = customProperties.getFiles().getImg().getDirectory();
         if(!uploadDirectoryPath.endsWith("/")) {
             uploadDirectoryPath += "/";
         }
+        this.uploadDirectoryPath = uploadDirectoryPath;
+    }
+    
+    public <E extends BaseEntity> FileMetadata uploadFile(MultipartFile fileToUpload, E ownerEntity, FileMetadataType fileMetadataType) {
+        
         String pathPrefix = getDailyPathPrefix();
         String originalFilename = fileToUpload.getOriginalFilename();
         if(originalFilename == null) {
             throw new IllegalArgumentException("올바르지 않은 파일명입니다.");
         }
         String extension = extractExtension(originalFilename);
-        String UUIDfilename = UUID.randomUUID().toString() + "." + extension;
+        String UUIDfilename = UUID.randomUUID() + "." + extension;
         
         
         
@@ -93,7 +98,6 @@ public class FileService {
         }
     }
     
-    
     /**
      * @return {y}/{m}/{d}/
      */
@@ -102,4 +106,15 @@ public class FileService {
         return now.getYear() + "/" + now.getMonthValue() + "/" + now.getDayOfMonth() + "/";
     }
     
+    
+    public String getImgUri(FileMetadata fileMetadata) {
+        String imgResourcePathPrefix = customProperties.getFiles().getImg().getBaseUrl();
+        if(!imgResourcePathPrefix.endsWith("/")) {
+            imgResourcePathPrefix += "/";
+        }
+        
+        return  imgResourcePathPrefix +
+                fileMetadata.getPathPrefix() +
+                fileMetadata.getManagedFilename();
+    }
 }

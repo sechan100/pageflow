@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.pageflow.base.request.AlertType;
 import org.pageflow.base.request.Rq;
 import org.pageflow.base.validator.AccountDtoValidator;
+import org.pageflow.domain.user.constants.ProviderType;
 import org.pageflow.domain.user.entity.AwaitingEmailVerificationRequest;
 import org.pageflow.domain.user.model.dto.AdditionalSignupAccountDto;
 import org.pageflow.domain.user.model.dto.AccountDto;
@@ -64,6 +65,9 @@ public class SignupController {
      */
     @PostMapping("/verify/email")
     public String verifyEmail(@Valid BasicSignupAccountDto form, Model model) {
+        
+        // ProviderType.NATIVE으로 고정 설정
+        form.setProvider(ProviderType.NATIVE);
         
         // 기존에 이메일 인증 요청을 보낸 기록이 있는지 확인
         boolean isExistInCache = awaitingEmailVerifyingFormService.existsById(form.getEmail());

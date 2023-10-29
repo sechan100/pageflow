@@ -67,15 +67,15 @@ public class AccountService {
         String profileImgUrl = form.getProfileImgUrl();
         
         // 프로필 사진 이미지 파일을 등록한 경우
-        if(!profileImg.isEmpty() && profileImgUrl == null){
+        if(!profileImg.isEmpty() && profileImgUrl.isEmpty()){
             setProfileImg(profileImg, savedAccount);
             
         // 프로필 사진의 URL을 등록한 경우
-        } else if(profileImg.isEmpty() && profileImgUrl != null){
+        } else if(profileImg.isEmpty() && !profileImgUrl.isEmpty()){
             setProfileImg(profileImgUrl, savedAccount);
             
         // 둘 다 등록한 경우 -> 파일로 등록한 사진이 우선순위
-        } else if(!profileImg.isEmpty() && profileImgUrl != null){
+        } else if(!profileImg.isEmpty() && !profileImgUrl.isEmpty()){
             setProfileImg(profileImg, savedAccount);
             
         // 프로필 사진을 등록하지 않은 경우

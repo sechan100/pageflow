@@ -13,7 +13,7 @@ public class NaverOwner extends DefaultResourceOwner {
     
     @Override
     public String getId() {
-        return getProvider() + "-" + ((String)getAttributes().get("id"));
+        return getProvider() + "-" + getAttributes().get("id");
     }
     
     @Override

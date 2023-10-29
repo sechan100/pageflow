@@ -12,7 +12,7 @@ public class GithubOwner extends DefaultResourceOwner {
     
     @Override
     public String getId() {
-        return getProvider() + "-" + String.valueOf(getAttributes().get("id"));
+        return getProvider() + "-" + getAttributes().get("id");
     }
     
     @Override

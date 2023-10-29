@@ -12,7 +12,7 @@ public class GoogleOwner extends DefaultResourceOwner {
     
     @Override
     public String getId() {
-        return getProvider() + "-" + ((String)getAttributes().get("sub"));
+        return getProvider() + "-" + getAttributes().get("sub");
     }
     
     @Override

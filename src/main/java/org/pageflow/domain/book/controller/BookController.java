@@ -36,23 +36,26 @@ public class BookController {
         model.addAttribute("kw", kw);
         return "/book/book_list";
     }
+    
     @GetMapping("/book/create")
     public String createBook(BookForm bookForm) {
       return "/book/book_form";
     }
+    
     @PostMapping("/book/create")
     public String createBook(@Valid BookForm bookForm, BindingResult bindingResult, @RequestParam("file") MultipartFile file, Principal principal) throws IOException {
         if(bindingResult.hasErrors() || file.isEmpty()) {
             return "/book/book_form";
         }
-        Account author = this.accountService.getUser(principal.getName());
+        Account author = this.accountService.findByUsernameWithProfile(principal.getName());
         this.bookService.create(bookForm.getTitle(), bookForm.getFile(), author);
         return "redirect:/book/list";
     }
+    
     @GetMapping("/book/vote/{id}")
     public String bookVote(Principal principal, @PathVariable("id") Long id) {
         Book book = this.bookService.getBook(id).orElseThrow();
-        Account user = this.accountService.getUser(principal.getName());
+        Account user = this.accountService.findByUsernameWithProfile(principal.getName());
         this.bookService.vote(book, user);
         return "redirect:/book/list";
     }

@@ -151,10 +151,6 @@ public class AccountService {
     // *********     JPA Repository service      **********
     // ****************************************************
 
-    public Account getUser(String username) {
-        Account user = this.accountRepository.findByUsername(username);
-        return user;
-    }
     public Account findByUsernameWithProfile(String username) {
         return accountRepository.findByUsernameWithProfile(username);
     }

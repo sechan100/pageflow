@@ -1,21 +1,18 @@
-<html lang="en" layout:decorate="~{/book/book_form_layout.html}" xmlns:layout="http://www.w3.org/1999/xhtml"
-      xmlns:th="http://www.w3.org/1999/xhtml">
+<html lang="en" layout:decorate="~{/common/layout.html}">
 <head>
-    <title>login</title>
+    <title>write</title>
 </head>
 <main layout:fragment="main">
+
     <h5 class="my-3 border-bottom pb-2">책등록</h5>
-    <form th:action="@{/book/create}" th:object="${bookForm}" method="post" enctype="multipart/form-data">
-        <div class="alert alert-danger" role="alert" th:if="${#fields.hasAnyErrors()}">
-            <div th:each="err : ${#fields.allErrors()}" th:text="${err}" />
-        </div>
+    <form th:action="@{/book/create}" method="post" enctype="multipart/form-data">
         <div class="mb-3">
             <label for="title" class="form-label">제목</label>
-            <input type="text" th:field="*{title}" class="form-control">
+            <input type="text" id="title" class="form-control">
         </div>
         <div class="mb-3">
             <label for="file" class="form-label">이미지</label>
-            <input type="file" th:field="*{file}" class="form-control">
+            <input type="file" id="file" class="form-control">
         </div>
 <!--         챕터 지정 폼 (chapter_form) 이동 버튼-->
 <!--        <h5 class="my-3 border-bottom pb-2">책 작성</h5>-->

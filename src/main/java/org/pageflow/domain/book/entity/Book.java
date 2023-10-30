@@ -18,12 +18,12 @@ public class Book extends BaseEntity {
 
     private String title;
 
-    private String imgUrl;
+    private String coverImgUrl;
 
     @ManyToOne
     private Account author;
 
-    @OneToMany(mappedBy = "book", cascade = CascadeType.REMOVE)
+    @OneToMany(cascade = CascadeType.REMOVE)
     private List<Chapter> chapters;
 
     @ManyToMany

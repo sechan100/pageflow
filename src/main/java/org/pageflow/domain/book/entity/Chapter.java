@@ -16,6 +16,6 @@ public class Chapter extends BaseEntity {
 
     private String chaptitle;
 
-    @OneToMany(mappedBy = "chapter", cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL)
     private List<Page> pages;
 }

@@ -6,6 +6,7 @@
     <div class="row my-3">
         <div class="col-6">
             <div class="input-group">
+                <label for="search_kw" class="hidden">search keyWord</label>
                 <input type="text" id="search_kw" class="form-control" th:value="${kw}">
                 <button class="btn btn-outline-secondary" type="button" id="btn_search">찾기</button>
             </div>
@@ -15,7 +16,7 @@
         <!-- th:each 구문을 한 번만 사용하여 books 배열을 반복 -->
         <div th:each="book, loop : ${paging}">
             <a th:href="@{/book/detail/{id}(id=${book.id})}">
-                <img th:src="@{${book.imgUrl}}" alt="Book Image">
+                <img src="#" th:src="@{${book.coverImgUrl}}" alt="Book Image">
                 <h2 th:text="${book.title}"></h2>
             </a>
             <a href="javascript:void(0);" class="recommend btn btn-sm btn-outline-secondary"

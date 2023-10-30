@@ -13,8 +13,13 @@ import java.util.Map;
 public interface ResourceOwner extends AccountDto {
     
     String getId();
-    List<? extends GrantedAuthority> getAuthorities();
-    Map<String, Object> getAttributes();
     
+    String getProfileImgUrl();
+    
+    String getNickname();
+    
+    List<? extends GrantedAuthority> getAuthorities();
+    
+    Map<String, Object> getAttributes();
     
 }

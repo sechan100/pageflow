@@ -17,14 +17,19 @@ import org.pageflow.infra.email.EmailSender;
 import org.pageflow.infra.file.constants.FileMetadataType;
 import org.pageflow.infra.file.entity.FileMetadata;
 import org.pageflow.infra.file.repository.FileMetadataRepository;
+import org.pageflow.infra.file.service.FileService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
 import java.util.List;
 
+/**
+ *
+ */
 @Service
 @RequiredArgsConstructor
 public class AccountService {
@@ -36,28 +41,47 @@ public class AccountService {
     private final PasswordEncoder passwordEncoder;
     private final TemplateEngine templateEngine;
     private final EmailSender emailSender;
+    private final FileService fileService;
     private final CustomProperties customProperties;
     
     
-    
-    // OAuth2를 이용하여 받아온 사용자 정보를 Account 엔티티 형태로 converting하여 일반적인 회원가입시에 사용하는 register 메소드로 DB저장을 위임
     public void register(@Valid AdditionalSignupAccountDto form) {
         
-            Profile profile = Profile.builder()
-                    .nickname(form.getNickname())
-                    .build();
+        Profile profile = Profile.builder()
+                .nickname(form.getNickname())
+                .build();
+    
+    
+        Account account = Account.builder()
+                .provider(form.getProvider())
+                .email(form.getEmail())
+                .username(form.getUsername())
+                .password(passwordEncoder.encode(form.getPassword()))
+                .profile(profile)
+                .role(Role.USER)
+                .build();
         
+        Account savedAccount = accountRepository.save(account);
         
-            Account account = Account.builder()
-                    .provider(form.getProvider())
-                    .email(form.getEmail())
-                    .username(form.getUsername())
-                    .password(passwordEncoder.encode(form.getPassword()))
-                    .profile(profile)
-                    .role(Role.USER)
-                    .build();
+        MultipartFile profileImg = form.getProfileImg();
+        String profileImgUrl = form.getProfileImgUrl();
+        
+        // 프로필 사진 이미지 파일을 등록한 경우
+        if(!profileImg.isEmpty() && profileImgUrl.isEmpty()){
+            setProfileImg(profileImg, savedAccount);
             
-            accountRepository.save(account);
+        // 프로필 사진의 URL을 등록한 경우
+        } else if(profileImg.isEmpty() && !profileImgUrl.isEmpty()){
+            setProfileImg(profileImgUrl, savedAccount);
+            
+        // 둘 다 등록한 경우 -> 파일로 등록한 사진이 우선순위
+        } else if(!profileImg.isEmpty() && !profileImgUrl.isEmpty()){
+            setProfileImg(profileImg, savedAccount);
+            
+        // 프로필 사진을 등록하지 않은 경우
+        } else {
+            setProfileImg("/img/default_profile_img.png", savedAccount);
+        }
     }
     
     
@@ -95,7 +119,32 @@ public class AccountService {
     }
     
     
+    /**
+     * 프로필 사진 설정
+     * 프로필 사진을 FileMetadata와 함께 저장하고 uri를 반환
+     */
+    @Transactional
+    public String setProfileImg(MultipartFile profileImg, Account account) {
+        
+        // 기존 파일 삭제하는 로직 추가 필요
+        FileMetadata profileImgMetadata = fileService.uploadFile(profileImg, account.getProfile(), FileMetadataType.PROFILE_IMG);
+        String imgUri =  fileService.getImgUri(profileImgMetadata);
+        account.getProfile().setProfileImgUrl(imgUri);
+        accountRepository.save(account);
+        return imgUri;
+    }
     
+    /**
+     * 프로필 사진 설정
+     * 프로필 사진 URl을 받고, 해당 URL을 Profile 엔티티에 저장
+     */
+    @Transactional
+    public String setProfileImg(String profileImgUrl, Account account) {
+        
+        account.getProfile().setProfileImgUrl(profileImgUrl);
+        accountRepository.save(account);
+        return profileImgUrl;
+    }
     
     
     // ****************************************************
@@ -103,7 +152,7 @@ public class AccountService {
     // ****************************************************
     
     public Account findByUsernameWithProfile(String username) {
-        return setProfileImgUrl(accountRepository.findByUsernameWithProfile(username));
+        return accountRepository.findByUsernameWithProfile(username);
     }
     
     public boolean existsByUsername(String username) {
@@ -120,6 +169,7 @@ public class AccountService {
      * @param account DB에서 가져온 Account 엔티티
      * @return 프로필 이미지 URL이 추가된 Account 엔티티
      */
+    @Deprecated
     private Account setProfileImgUrl(Account account) {
         Profile profile = account.getProfile();
         List<FileMetadata> profileImgFileMetadatas = fileMetadataRepository
@@ -133,10 +183,16 @@ public class AccountService {
             profileImgUrl = "/img/default_profile_img.png";
         } else {
             FileMetadata profileImgFileMetadata = profileImgFileMetadatas.get(0);
+            
+            String baseUrl = customProperties.getFiles().getImg().getBaseUrl();
+            if(!baseUrl.endsWith("/")) {
+                baseUrl += "/";
+            }
+            
             profileImgUrl =
-                customProperties.getFiles().getImg().getBaseUrl()   // {baseUrl}
-                + profileImgFileMetadata.getPathPrefix()            // {y}/{m}/{d}/
-                + profileImgFileMetadata.getManagedFilename();      // {UUID}.{ext}
+                  baseUrl                                       // {baseUrl}/
+                + profileImgFileMetadata.getPathPrefix()        // {y}/{m}/{d}/
+                + profileImgFileMetadata.getManagedFilename();  // {UUID}.{ext}
         }
         
         

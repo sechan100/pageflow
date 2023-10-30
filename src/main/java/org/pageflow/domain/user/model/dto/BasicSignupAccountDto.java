@@ -17,4 +17,11 @@ public class BasicSignupAccountDto extends DefaultAccountDto {
         super.provider = ProviderType.NATIVE;
     }
     
+    
+    public BasicSignupAccountDto(AccountDto accountDto) {
+        super.username = accountDto.getUsername();
+        super.password = accountDto.getPassword();
+        super.email = accountDto.getEmail();
+        super.provider = accountDto.getProvider();
+    }
 }

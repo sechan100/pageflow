@@ -22,12 +22,21 @@
             계정 세부정보를 입력하고 회원가입을 완료해주세요.
         </span>
 
-        <form id="registerForm" th:action="@{/signup}" th:object="${registerForm}" method="post" class="space-y-4 md:space-y-6">
+        <form id="registerForm" th:action="@{/signup}" enctype="multipart/form-data" th:object="${registerForm}" method="post" class="space-y-4 md:space-y-6">
 
           <!-- 소셜 로그인 타입 & username & password -->
           <input type="hidden" th:field="*{provider}" />
           <input type="hidden" th:field="*{username}" />
           <input type="hidden" th:field="*{password}" />
+
+          <!--profile image-->
+          <img src="#" th:src="*{profileImgUrl}" alt="">
+          <input type="hidden" th:field="*{profileImgUrl}" />
+
+          <div>
+            <label for="profileImg" class="block mb-2 text-sm font-medium text-gray-900">프로필 사진</label>
+            <input type="file" th:field="*{profileImg}" id="profileImg" class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5" >
+          </div>
 
           <!--email-->
           <div>

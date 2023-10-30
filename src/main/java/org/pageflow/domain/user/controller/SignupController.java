@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.pageflow.base.request.AlertType;
 import org.pageflow.base.request.Rq;
 import org.pageflow.base.validator.AccountDtoValidator;
+import org.pageflow.domain.user.constants.ProviderType;
 import org.pageflow.domain.user.entity.AwaitingEmailVerificationRequest;
 import org.pageflow.domain.user.model.dto.AdditionalSignupAccountDto;
 import org.pageflow.domain.user.model.dto.AccountDto;
@@ -49,10 +50,10 @@ public class SignupController {
             AdditionalSignupAccountDto form = new AdditionalSignupAccountDto(awaitingEmailVerificationRequest);
             model.addAttribute("registerForm", form);
             
-            return "/user/account/verified_signup";
+            return "/user/account/additional_signup";
         }
         
-        return "/user/account/signup";
+        return "/user/account/basic_signup";
     }
     
     
@@ -64,6 +65,9 @@ public class SignupController {
      */
     @PostMapping("/verify/email")
     public String verifyEmail(@Valid BasicSignupAccountDto form, Model model) {
+        
+        // ProviderType.NATIVE으로 고정 설정
+        form.setProvider(ProviderType.NATIVE);
         
         // 기존에 이메일 인증 요청을 보낸 기록이 있는지 확인
         boolean isExistInCache = awaitingEmailVerifyingFormService.existsById(form.getEmail());
@@ -93,30 +97,30 @@ public class SignupController {
             accountService.sendEmailVerifyingEmail(form.getEmail(), authCode);
             
             // redis 캐쉬에 회원가입 정보 임시저장
-            awaitingEmailVerifyingFormService.save(new AwaitingEmailVerificationRequest(form, authCode));
+            awaitingEmailVerifyingFormService.save(new AwaitingEmailVerificationRequest(form, authCode, false));
         }
         
         return "/user/account/email_verification_waiting";
     }
-    
-    
     @PostMapping("/signup")
-    public String signup(@Valid AdditionalSignupAccountDto form){
+    public String additionalSignup(@Valid @ModelAttribute AdditionalSignupAccountDto additionalSignupAccountDto){
         
         // 캐쉬에서 인증된 이메일 정보 가져오기
-        AwaitingEmailVerificationRequest awaitingEmailVerificationRequest = awaitingEmailVerifyingFormService.findById(form.getEmail());
-        AccountDto cachedSignupRequest = awaitingEmailVerificationRequest.getAccount();
+        AwaitingEmailVerificationRequest awaitingEmailVerificationRequest = awaitingEmailVerifyingFormService.findById(additionalSignupAccountDto.getEmail());
+        AccountDto cachedSignupRequest = awaitingEmailVerificationRequest.getAccountDto();
         
+    
+    
         // 요청 받은 폼과 캐쉬에서 가져온 정보 대치
-        if(!cachedSignupRequest.getEmail().equals(form.getEmail()) || !awaitingEmailVerificationRequest.isVerified()){
-            throw new IllegalArgumentException(String.format("인증 정보가 일치하지 않습니다. 이메일 불일치인 경우 다음을 확인[기준: %s / 요청: %s] 인증되지 않은 경우 다음을 확인[isVerified: %b]", cachedSignupRequest.getEmail(), form.getEmail(), awaitingEmailVerificationRequest.isVerified())
+        if(!cachedSignupRequest.getEmail().equals(additionalSignupAccountDto.getEmail()) || !awaitingEmailVerificationRequest.isVerified()){
+            throw new IllegalArgumentException(String.format("인증 정보가 일치하지 않습니다. 이메일 불일치인 경우 다음을 확인[기준: %s / 요청: %s] 인증되지 않은 경우 다음을 확인[isVerified: %b]", cachedSignupRequest.getEmail(), additionalSignupAccountDto.getEmail(), awaitingEmailVerificationRequest.isVerified())
             );
         }
         
-        accountService.register(form);
+        accountService.register(additionalSignupAccountDto);
         
         // 캐쉬 레코드 삭제
-        awaitingEmailVerifyingFormService.delete(form.getEmail());
+        awaitingEmailVerifyingFormService.delete(additionalSignupAccountDto.getEmail());
         
         return rq.alert(AlertType.SUCCESS, "회원가입이 완료되었습니다.", "/login");
     }

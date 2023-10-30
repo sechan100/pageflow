@@ -81,6 +81,26 @@ public class FileService {
         return fileMetadata;
     }
     
+    /**
+     * @param filePath /{y}/{m}/{d}/{UUID}.{ext}
+     * @return 파일 삭제 성공 여부
+     */
+    public boolean deleteFile(String filePath) {
+        File file = new File(filePath);
+        boolean deleteSuccess = file.delete();
+        String pathPrefix = filePath.substring(0, filePath.lastIndexOf("/") + 1);
+        String managedFilename = filePath.substring(filePath.lastIndexOf("/") + 1);
+        
+        if(deleteSuccess){
+            fileRepository.findByPathPrefixAndManagedFilename(pathPrefix, managedFilename)
+                    .ifPresent(fileRepository::delete);
+            return true;
+        } else {
+            log.info("'{}' 삭제할 파일의 경로를 찾을 수 없습니다.", filePath);
+            return false;
+        }
+    }
+    
     public List<FileMetadata> getFileMetadatas(BaseEntity ownerEntity, FileMetadataType fileMetadataType) {
         return fileRepository.findAllByOwnerIdAndOwnerEntityTypeAndFileMetadataType(
                 ownerEntity.getId(),

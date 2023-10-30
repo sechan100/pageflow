@@ -18,14 +18,14 @@ spring:
     port: 6379
 
   datasource:
-    username: root
-    password:
+    username: sbsst
+    password: sbs123414
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/pageflow
 
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     properties:
       hibernate:
         show_sql: true
@@ -72,4 +72,4 @@ custom:
   files:
     img:
       base-url: /files/img
-      directory: /Users/sechan/local/uploads/img/
+      directory: C:/Users/sechan/local/uploads/img/

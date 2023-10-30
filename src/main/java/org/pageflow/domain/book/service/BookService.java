@@ -16,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -86,6 +87,10 @@ public Page<Book> getList(int page, String kw) {
     public void vote(Book book, Account siteUser) {
         book.getVoter().add(siteUser);
         this.bookRepository.save(book);
+    }
+    @Transactional
+    public int updateView(Long id) {
+        return this.bookRepository.updateView(id);
     }
 //    @Transactional
 //    public Book createBookWithChaptersAndPages(Book book, List<Chapter> chapters, List<Page> pages) {

@@ -28,4 +28,7 @@ public class Book extends BaseEntity {
 
     @ManyToMany
     Set<Account> voter;
+
+    @Column(columnDefinition = "integer default 0", nullable = false) //조회 수 기본값 0, null 불가 처리
+    private int view;
 }

@@ -3,7 +3,7 @@
 <head>
     <title>login</title>
 </head>
-<main layout:fragment="main" class="ml-[300px]">
+<main layout:fragment="main">
     <h5 class="my-3 border-bottom pb-2">책등록</h5>
     <form th:action="@{/book/create}" th:object="${bookForm}" method="post" enctype="multipart/form-data">
         <div class="alert alert-danger" role="alert" th:if="${#fields.hasAnyErrors()}">

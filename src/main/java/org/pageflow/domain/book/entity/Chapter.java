@@ -13,9 +13,6 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)//접근 수준. 상속관계에 있는 클래스에서만 생성자에 접근 가능
 public class Chapter extends BaseEntity {
-    @ManyToOne
-    @JoinColumn(name = "book_id")
-    private Book book;
 
     private String chaptitle;
 

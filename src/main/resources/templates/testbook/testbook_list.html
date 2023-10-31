@@ -1,0 +1,115 @@
+<html lang="en" layout:decorate="~{/common/test_layout.html}" xmlns:th="http://www.w3.org/1999/xhtml" xmlns:layout="">
+<head>
+    <title>TestBook</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
+</head>
+</head>
+<main layout:fragment="main">
+    <div class="row my-3">
+        <div class="col-6">
+            <div class="input-group">
+                <input type="text" id="search_kw" class="form-control" th:value="${kw}">
+                <button class="btn btn-outline-secondary" type="button" id="btn_search">찾기</button>
+            </div>
+        </div>
+    </div>
+    <div class="container mx-auto" style="min-height: 101vh;">
+        <div class="grid grid-cols-4 gap-4">
+            <!-- Thymeleaf loop to iterate over the questions -->
+            <div th:each="testBook : ${paging}">
+                <div class="card border rounded p-4">
+                    <h2 class="text-xl font-bold" th:text="${testBook.title}"></h2>
+                    <p th:text="${testBook.createDate}"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 페이징처리 시작 -->
+    <!--    <div th:if="${!paging.isEmpty()}">-->
+    <!--        <ul class="pagination justify-content-center">-->
+    <!--            <li class="page-item" th:classappend="${!paging.hasPrevious} ? 'disabled'">-->
+    <!--                <a class="page-link"-->
+    <!--                   href="javascript:void(0)" th:data-page="${paging.number-1}">-->
+    <!--                    <span>이전</span>-->
+    <!--                </a>-->
+    <!--            </li>-->
+    <!--            <li th:each="page: ${#numbers.sequence(0, paging.totalPages-1)}"-->
+    <!--                th:if="${page >= paging.number-3 and page <= paging.number+3}"-->
+    <!--                th:classappend="${page == paging.number} ? 'active'"-->
+    <!--                class="page-item">-->
+    <!--                <a th:text="${page}" class="page-link" href="javascript:void(0)" th:data-page="${page}"></a>-->
+    <!--            </li>-->
+    <!--            <li class="page-item" th:classappend="${!paging.hasNext} ? 'disabled'">-->
+    <!--                <a class="page-link" href="javascript:void(0)" th:data-page="${paging.number+1}">-->
+    <!--                    <span>다음</span>-->
+    <!--                </a>-->
+    <!--            </li>-->
+    <!--        </ul>-->
+    <!--    </div>-->
+    <!-- 페이징처리 끝 -->
+    <form th:action="@{/testbook/list}" method="get" id="searchForm">
+        <input type="hidden" id="kw" name="kw" th:value="${kw}">
+        <input type="hidden" id="page" name="page" th:value="${paging.number}">
+    </form>
+    <a th:href="@{/testbook/create}" class="btn btn-primary">질문 등록하기</a>
+
+    <script type='text/javascript'>
+        let currentPage = 0;
+        let isLoading = false;
+        let reachedEnd = false;
+
+window.addEventListener('scroll', function() {
+  console.log('Scroll event triggered');
+    if (isLoading || reachedEnd) return;
+
+    if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
+      console.log('Reached bottom');  // 이 로그를 통해 페이지 하단 도달 확인
+        isLoading = true;
+        currentPage++;
+        fetchMoreTestBooks(currentPage);
+    }
+});
+
+function fetchMoreTestBooks(page) {
+    fetch(`/api/testbook/list?page=${page}&kw=${document.getElementById('search_kw').value}`)
+        .then(response => response.json())
+        .then(data => {
+            isLoading = false;
+            if (data.length === 0) {
+                reachedEnd = true;
+                return;
+            }
+            appendTestBooksToDOM(data);
+        });
+}
+
+function appendTestBooksToDOM(data) {
+    const testBookContainer = document.querySelector('.grid.grid-cols-4.gap-4');
+    data.forEach(testBook => {
+        const testBookElement = `
+            <div class="card border rounded p-4">
+                <h2 class="text-xl font-bold">${testBook.title}</h2>
+                <p>${testBook.createDate}</p>
+            </div>
+        `;
+        testBookContainer.innerHTML += testBookElement;
+    });
+}
+
+const btn_search = document.getElementById("btn_search");
+btn_search.addEventListener('click', function() {
+    document.getElementById('kw').value = document.getElementById('search_kw').value;
+    document.getElementById('page').value = 0;  // 검색버튼을 클릭할 경우 0페이지부터 조회한다.
+    document.getElementById('searchForm').submit();
+});
+        const recommend_elements = document.getElementsByClassName("recommend");
+         Array.from(recommend_elements).forEach(function(element) {
+             element.addEventListener('click', function() {
+                 if(confirm("정말로 추천하시겠습니까?")) {
+                     location.href = this.dataset.uri;
+                 };
+             });
+         });
+    </script>
+</main>
+</html>

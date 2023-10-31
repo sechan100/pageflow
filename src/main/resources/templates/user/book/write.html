@@ -24,6 +24,7 @@
 
     <!--  flowAlert.js  -->
     <script th:src="@{/js/flowAlert.js}"></script>
+
     <title>write</title>
 </head>
 
@@ -32,17 +33,9 @@
 <!--  flowbite js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.8.1/flowbite.min.js"></script>
 
-<!-- react -->
-<th:block th:with="prop_types = ${@environment.activeProfiles}">
-    <th:block th:if="${#arrays.contains(prop_types, 'dev')}">
-        <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
-        <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
-    </th:block>
-    <th:block th:if="${#arrays.contains(prop_types, 'prod')}">
-        <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
-        <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
-    </th:block>
-</th:block>
+
+<!-- react dependencies -->
+<script th:src="@{/react/dist/pageOutlineBundle.js}"></script>
 
 <div id="alert-container" class="sm:w-1/4 w-full z-50 fixed bottom-5 right-5 flex flex-col-reverse"></div>
 
@@ -56,7 +49,7 @@
 
     <aside id="page-outline-sidebar" class="fixed top-0 left-0 z-40 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0" aria-label="Sidenav">
         <div class="overflow-y-auto py-5 px-3 h-full bg-white border-r border-gray-200 dark:bg-gray-800 dark:border-gray-700">
-            <ul class="space-y-2">
+            <ul id="page-outline-sidebar-list" class="space-y-2">
                 <li>
                     <a href="#" class="flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
                         <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 20">
@@ -65,11 +58,14 @@
                         <span class="ml-3 text-lg">My book</span>
                     </a>
                 </li>
+
                 <li>
-                    <button type="button" class="flex items-center p-2 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700" aria-controls="dropdown-pages" data-collapse-toggle="dropdown-pages">
-                        <svg aria-hidden="true" class="flex-shrink-0 w-6 h-6 text-gray-400 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"></path></svg>
+                    <button type="button" class="flex items-center p-1 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700" aria-controls="dropdown-pages" data-collapse-toggle="dropdown-pages">
+                        <svg class="w-4 h-4 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 12">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M1 1h14M1 6h14M1 11h7"/>
+                        </svg>
                         <span class="flex-1 ml-3 text-left whitespace-nowrap">Pages</span>
-                        <svg aria-hidden="true" class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
                     </button>
                     <ul id="dropdown-pages" class="hidden py-2 space-y-2">
                         <li>
@@ -83,6 +79,13 @@
                         </li>
                     </ul>
                 </li>
+
+                <li>
+                    <a href="#" class="flex p-1 items-center pl-6 w-full text-white text-sm font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-700">Settings</a>
+                </li>
+
+                <div id="outline-dnd-area"></div>
+
             </ul>
         </div>
     </aside>
@@ -117,6 +120,7 @@
             flowAlert(alertType, msg);
         }
     });
+
     /*]]>*/
 </script>
 </body>

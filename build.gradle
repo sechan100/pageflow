@@ -55,3 +55,10 @@ tasks.register('compileJSX', Exec) {
 	commandLine 'npx', 'babel', 'src', '--out-dir', './out', '--presets', 'react-app/prod'
 }
 
+tasks.register('bundlingReact', Exec) {
+	workingDir = file('src/main/resources/static')
+	commandLine 'npx', 'webpack', '--config', 'webpack.config.js'
+}
+
+
+

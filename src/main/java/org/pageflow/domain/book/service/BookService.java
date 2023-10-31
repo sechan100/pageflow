@@ -55,10 +55,8 @@ public class BookService {
         };
     }
 
-public Page<Book> getList(int page, String kw) {
-    List<Sort.Order> sorts = new ArrayList<>();
-    sorts.add(Sort.Order.desc("createDate"));
-    Pageable pageable = PageRequest.of(page, 10, Sort.by(sorts));
+public Page<Book> getList(int page, String kw, String sortOption) {
+    Pageable pageable = PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, sortOption));
     Specification<Book> spec = search(kw);
     return this.bookRepository.findAll(spec, pageable);
 }
@@ -84,9 +82,12 @@ public Page<Book> getList(int page, String kw) {
         return bookRepository.save(savedBook);
     }
 
+    @Transactional
     public void vote(Book book, Account siteUser) {
-        book.getVoter().add(siteUser);
+        book.getVoters().add(siteUser);
+        int updatedVoterCount = book.getVoters().size();
         this.bookRepository.save(book);
+        this.bookRepository.updateVoterCount(book.getId(), updatedVoterCount);
     }
     @Transactional
     public int updateView(Long id) {

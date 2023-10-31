@@ -27,8 +27,21 @@ public class Book extends BaseEntity {
     private List<Chapter> chapters;
 
     @ManyToMany
-    Set<Account> voter;
+    Set<Account> voters;
 
     @Column(columnDefinition = "integer default 0", nullable = false) //조회 수 기본값 0, null 불가 처리
     private int view;
+
+    @Column(columnDefinition = "integer default 0", nullable = false)
+    private int voterCount; // 추천 수를 저장
+
+    public void addVoter(Account voter) {
+        this.voters.add(voter);
+        this.voterCount = this.voters.size(); // 추천할 때마다 업데이트
+    }
+
+    public void removeVoter(Account voter) {
+        this.voters.remove(voter);
+        this.voterCount = this.voters.size(); // 추천 취소할 때마다 업데이트
+    }
 }

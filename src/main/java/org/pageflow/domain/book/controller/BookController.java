@@ -32,10 +32,12 @@ public class BookController {
 
     @GetMapping("/book/list")
     public String list(Model model, @RequestParam(value = "page", defaultValue = "0") int page,
-                       @RequestParam(value = "kw", defaultValue = "") String kw) {
-        Page<Book> paging = this.bookService.getList(page, kw);
+                       @RequestParam(value = "kw", defaultValue = "") String kw,
+                       @RequestParam(value = "sort", defaultValue = "createDate") String sortOption) {
+        Page<Book> paging = this.bookService.getList(page, kw, sortOption);
         model.addAttribute("paging",paging);
         model.addAttribute("kw", kw);
+        model.addAttribute("sort", sortOption);
         return "/book/book_list";
     }
 
@@ -53,6 +55,7 @@ public class BookController {
         this.bookService.create(bookForm.getTitle(), bookForm.getFile(), author);
         return "redirect:/book/list";
     }
+
     @GetMapping("/book/vote/{id}")
     public String bookVote(Principal principal, @PathVariable("id") Long id) {
         Book book = this.bookService.getBook(id).orElseThrow();
@@ -112,17 +115,5 @@ public class BookController {
         }
 
         return "/book/book_detail";
-    }
-        Account author = this.accountService.findByUsernameWithProfile(principal.getName());
-        this.bookService.create(bookForm.getTitle(), bookForm.getFile(), author);
-        return "redirect:/book/list";
-    }
-
-    @GetMapping("/book/vote/{id}")
-    public String bookVote(Principal principal, @PathVariable("id") Long id) {
-        Book book = this.bookService.getBook(id).orElseThrow();
-        Account user = this.accountService.findByUsernameWithProfile(principal.getName());
-        this.bookService.vote(book, user);
-        return "redirect:/book/list";
     }
 }

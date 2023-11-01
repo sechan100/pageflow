@@ -2,7 +2,6 @@ package org.pageflow.domain.book.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.pageflow.base.entity.BaseEntity;
 import org.pageflow.domain.book.entity.Book;
 import org.pageflow.domain.book.form.BookForm;
 import org.pageflow.domain.book.service.BookService;
@@ -20,7 +19,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
-
 
 import java.io.IOException;
 import java.security.Principal;
@@ -81,6 +79,17 @@ public class BookController {
         }
         this.bookService.modify(book, bookForm.getTitle(), bookForm.getFile());
         return String.format("redirect:/book/detail/%s", id);
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/book/delete/{id}")
+    public String bookDelete(Principal principal, @PathVariable("id") Long id) {
+        Book book = this.bookService.getBook(id).orElseThrow();
+        if (!book.getAuthor().getUsername().equals(principal.getName())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "삭제권한이 없습니다.");
+        }
+        this.bookService.delete(book);
+        return "redirect:/book/list";
     }
 
     @GetMapping(value = "/book/detail/{id}")

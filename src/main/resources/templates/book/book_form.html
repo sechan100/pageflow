@@ -9,14 +9,14 @@
         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
         <div class="alert alert-danger" role="alert" th:if="${#fields.hasAnyErrors()}">
             <div th:each="err : ${#fields.allErrors()}" th:text="${err}" />
-        </div>
+        </div>6
         <div class="mb-3">
             <label for="title" class="form-label">제목</label>
-            <input type="text"  th:field="*{title}" class="form-control">
+            <input type="text"  id="title" th:field="*{title}" class="form-control">
         </div>
         <div class="mb-3">
             <label for="file" class="form-label">이미지</label>
-            <input type="file"  th:field="*{file}" class="form-control">
+            <input type="file" id="file" th:field="*{file}" class="form-control">
         </div>
         <input type="submit" value="등록하기" class="btn btn-primary my-2">
 

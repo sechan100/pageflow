@@ -96,6 +96,10 @@ public Page<Book> getList(int page, String kw) {
         this.bookRepository.save(book);
     }
 
+    public void delete(Book book){
+        this.bookRepository.delete(book);
+    }
+
 //    public Book getBook(Integer id){
 //
 //        Optional<Book> book = this.bookRepository.findById(id);

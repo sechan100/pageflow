@@ -14,7 +14,7 @@
     <div class="grid grid-cols-4 gap-4 ">
         <!-- th:each 구문을 한 번만 사용하여 books 배열을 반복 -->
         <div th:each="book, loop : ${paging}">
-            <a th:href="@{/book/detail/{id}(id=${book.id})}">
+            <a th:href="@{|/book/detail/${book.id}|}">
                 <img th:src="@{${book.imgUrl}}" alt="Book Image">
                 <h2 th:text="${book.title}"></h2>
             </a>

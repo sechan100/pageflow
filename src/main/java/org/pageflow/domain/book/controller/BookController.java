@@ -51,6 +51,11 @@ public class BookController {
         this.bookService.create(bookForm.getTitle(), bookForm.getFile(), author);
         return "redirect:/book/list";
     }
+
+    @GetMapping(value = "/book/detail/{id}")
+    public String bookDetail(Model model, @PathVariable("id") Integer id){
+        return "/book/book_detail";
+    }
     
     @GetMapping("/book/vote/{id}")
     public String bookVote(Principal principal, @PathVariable("id") Long id) {

@@ -28,4 +28,5 @@ public class Book extends BaseEntity {
 
     @ManyToMany
     Set<Account> voter;
+
 }

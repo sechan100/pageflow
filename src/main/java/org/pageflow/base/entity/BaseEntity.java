@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 
 @MappedSuperclass
 @Getter
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
 @ToString

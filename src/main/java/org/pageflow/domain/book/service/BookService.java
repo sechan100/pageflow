@@ -2,7 +2,6 @@ package org.pageflow.domain.book.service;
 
 import jakarta.persistence.criteria.*;
 import lombok.RequiredArgsConstructor;
-import org.pageflow.domain.book.DataNotFoundException;
 import org.pageflow.domain.book.entity.Book;
 import org.pageflow.domain.book.repository.BookRepository;
 import org.pageflow.domain.book.repository.ChapterRepository;
@@ -20,10 +19,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.zip.DataFormatException;
 
 
 @Service
@@ -90,16 +89,23 @@ public Page<Book> getList(int page, String kw) {
         this.bookRepository.save(book);
     }
 
-    public Book getBook(Integer id){
-
-        Optional<Book> book = this.bookRepository.findById(id);
-        if(book.isPresent()){
-            return book.get();
-        } else {
-            throw new DataNotFoundException("book not found");
-        }
-
+    public void modify(Book book, String title, MultipartFile imgUrl) {
+        book.setTitle(title);
+        book.setImgUrl(book.getImgUrl());
+        book.setModifyDate(LocalDateTime.now());
+        this.bookRepository.save(book);
     }
+
+//    public Book getBook(Integer id){
+//
+//        Optional<Book> book = this.bookRepository.findById(id);
+//        if(book.isPresent()){
+//            return book.get();
+//        } else {
+//            throw new DataNotFoundException("book not found");
+//        }
+//
+//    }
 //    @Transactional
 //    public Book createBookWithChaptersAndPages(Book book, List<Chapter> chapters, List<Page> pages) {
 //

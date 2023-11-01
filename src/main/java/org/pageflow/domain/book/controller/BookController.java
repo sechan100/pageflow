@@ -13,10 +13,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -64,7 +61,7 @@ public class BookController {
         bookForm.setTitle(book.getTitle());
         bookForm.setFile(bookForm.getFile());
         return "/book/book_form";
-    }
+    } // 수정 get
 
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/book/modify/{id}")
@@ -79,7 +76,7 @@ public class BookController {
         }
         this.bookService.modify(book, bookForm.getTitle(), bookForm.getFile());
         return String.format("redirect:/book/detail/%s", id);
-    }
+    } // 수정 post
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/book/delete/{id}")
@@ -90,20 +87,28 @@ public class BookController {
         }
         this.bookService.delete(book);
         return "redirect:/book/list";
-    }
+    } // 삭제
 
     @GetMapping(value = "/book/detail/{id}")
     public String bookDetail(Model model, @PathVariable("id") Long id){
         Book book = this.bookService.getBook(id).orElseThrow();
         model.addAttribute("book", book);
         return "/book/book_detail";
-    }
+    } // 상세페이지
     
     @GetMapping("/book/vote/{id}")
     public String bookVote(Principal principal, @PathVariable("id") Long id) {
         Book book = this.bookService.getBook(id).orElseThrow();
         Account user = this.accountService.findByUsernameWithProfile(principal.getName());
         this.bookService.vote(book, user);
+        return "redirect:/book/list";
+    }
+
+    @DeleteMapping("/book/vote/{id}")
+    public String deletelVote(Principal principal, @PathVariable("id") Long id) {
+        Book book = this.bookService.getBook(id).orElseThrow();
+        Account user = this.accountService.findByUsernameWithProfile(principal.getName());
+        this.bookService.deletelVote(book, user);
         return "redirect:/book/list";
     }
 }

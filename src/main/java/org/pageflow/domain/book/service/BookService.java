@@ -94,10 +94,17 @@ public Page<Book> getList(int page, String kw) {
         book.setImgUrl(book.getImgUrl());
         book.setModifyDate(LocalDateTime.now());
         this.bookRepository.save(book);
-    }
+    } // 수정
 
+    // 삭제
     public void delete(Book book){
         this.bookRepository.delete(book);
+    }
+
+    // 추천 취소
+    public void deletelVote(Book book, Account user) {
+        book.getVoter().remove(user);
+        this.bookRepository.save(book);
     }
 
 //    public Book getBook(Integer id){

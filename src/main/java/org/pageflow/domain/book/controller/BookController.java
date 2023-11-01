@@ -54,6 +54,8 @@ public class BookController {
 
     @GetMapping(value = "/book/detail/{id}")
     public String bookDetail(Model model, @PathVariable("id") Integer id){
+        Book book = this.bookService.getBook(id);
+        model.addAttribute("book", book);
         return "/book/book_detail";
     }
     

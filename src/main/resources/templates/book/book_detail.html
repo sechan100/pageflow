@@ -4,7 +4,16 @@
 </head>
 <main layout:fragment="main">
 
-    디테일
+    <div th:text="${book.id}"></div>
+    <h1 th:text="${book.title}"></h1>
+    <p th:text="${book.author.profile.nickname}"></p>
+    <p th:text="${book.createDate}"></p>
+    <img th:src="@{${book.imgUrl}}" alt="Book Image">
+    <a href="javascript:void(0);" class="recommend btn btn-sm btn-outline-secondary"
+       th:data-uri="@{|/book/vote/${book.id}|}" onclick="confirmRecommend(this)">
+        추천
+        <span class="badge rounded-pill bg-success" id="recommend-count" th:text="${#lists.size(book.voter)}"></span>
+    </a>
 
 </main>
 </html>

@@ -24,6 +24,13 @@
 
     <!--  flowAlert.js  -->
     <script th:src="@{/js/flowAlert.js}"></script>
+
+    <!-- toastr  js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.js"></script>
+
+    <!-- toastr  css -->
+    <link href="https://jhs512.github.io/toastr/toastr.css" rel="stylesheet">
+
 </head>
 
 <body class="bg-gray-50" th:with="user = ${@rq.userSession}">

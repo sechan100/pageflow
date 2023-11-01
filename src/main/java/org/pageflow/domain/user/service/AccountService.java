@@ -154,7 +154,10 @@ public class AccountService {
     public Account findByUsernameWithProfile(String username) {
         return accountRepository.findByUsernameWithProfile(username);
     }
-    
+
+    public Account findByUsername(String username) {
+        return accountRepository.findByUsername(username);
+    }
     public boolean existsByUsername(String username) {
         return accountRepository.existsByUsername(username);
     }

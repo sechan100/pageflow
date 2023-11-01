@@ -19,6 +19,7 @@
             <div th:each="testBook : ${paging}">
                 <div class="card border rounded p-4">
                     <h2 class="text-xl font-bold" th:text="${testBook.title}"></h2>
+                    <p th:text="${testBook.author.username}"></p>
                     <p th:text="${testBook.createDate}"></p>
                 </div>
             </div>

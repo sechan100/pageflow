@@ -2,6 +2,8 @@ package org.pageflow.domain.testbook;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.pageflow.domain.user.entity.Account;
+import org.pageflow.domain.user.service.AccountService;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,12 +14,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.security.Principal;
 import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
 public class TestBookController {
     private final TestBookService testBookService;
+    private final AccountService accountService;
+
     @GetMapping("/testbook/list")
     public String list(Model model, @RequestParam(value = "page", defaultValue = "0") int page,
                        @RequestParam(value = "kw", defaultValue = "") String kw) {
@@ -39,11 +44,12 @@ public class TestBookController {
         return "/testBook/testBook_form";
     }
     @PostMapping("/testbook/create")
-    public String testBookCreate(@Valid TestBookForm testBookForm, BindingResult bindingResult) {
+    public String testBookCreate(@Valid TestBookForm testBookForm, BindingResult bindingResult, Principal principal) {
         if(bindingResult.hasErrors()) {
             return "/testbook/testbook_form";
         }
-        this.testBookService.create(testBookForm.getTitle(), testBookForm.getContent());
+        Account user = this.accountService.findByUsername(principal.getName());
+//        this.testBookService.create(testBookForm.getTitle(), testBookForm.getContent(),user);
         return "redirect:/testbook/list";
     }
 }

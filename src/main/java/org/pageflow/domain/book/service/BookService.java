@@ -4,16 +4,12 @@ import jakarta.persistence.criteria.*;
 import lombok.RequiredArgsConstructor;
 import org.pageflow.domain.book.entity.Book;
 import org.pageflow.domain.book.repository.BookRepository;
-import org.pageflow.domain.book.repository.ChapterRepository;
-import org.pageflow.domain.book.repository.PageRepository;
+import org.pageflow.domain.testbook.TestBook;
 import org.pageflow.domain.user.entity.Account;
 import org.pageflow.infra.file.constants.FileMetadataType;
 import org.pageflow.infra.file.entity.FileMetadata;
 import org.pageflow.infra.file.service.FileService;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,8 +27,6 @@ import java.util.Optional;
 public class BookService {
 
     private final BookRepository bookRepository;
-    private final ChapterRepository chapterRepository;
-    private final PageRepository pageRepository;
     private final FileService fileService;
 
     private Specification<Book> search(String kw) {
@@ -54,10 +48,8 @@ public class BookService {
         };
     }
 
-public Page<Book> getList(int page, String kw) {
-    List<Sort.Order> sorts = new ArrayList<>();
-    sorts.add(Sort.Order.desc("createDate"));
-    Pageable pageable = PageRequest.of(page, 10, Sort.by(sorts));
+public Slice<Book> getList(int page, String kw, String sortOption) {
+    Pageable pageable = PageRequest.of(page, 16, Sort.by(Sort.Direction.DESC, sortOption));
     Specification<Book> spec = search(kw);
     return this.bookRepository.findAll(spec, pageable);
 }
@@ -77,14 +69,14 @@ public Page<Book> getList(int page, String kw) {
 
         FileMetadata bookCoverFileMetadata = fileService.uploadFile(file, savedBook, FileMetadataType.BOOK_COVER);
         String imgUri = fileService.getImgUri(bookCoverFileMetadata);
-        savedBook.setImgUrl(imgUri);
+        savedBook.setCoverImgUrl(imgUri);
 
 
         return bookRepository.save(savedBook);
     }
 
     public void vote(Book book, Account siteUser) {
-        book.getVoter().add(siteUser);
+        book.getVoters().add(siteUser);
         this.bookRepository.save(book);
     }
 //    @Transactional

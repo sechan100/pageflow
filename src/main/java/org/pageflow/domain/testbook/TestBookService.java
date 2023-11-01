@@ -1,17 +1,21 @@
 package org.pageflow.domain.testbook;
 
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.*;
 import lombok.RequiredArgsConstructor;
+import org.pageflow.domain.book.entity.Book;
+import org.pageflow.domain.user.entity.Account;
+import org.pageflow.infra.file.constants.FileMetadataType;
+import org.pageflow.infra.file.entity.FileMetadata;
+import org.pageflow.infra.file.service.FileService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +23,7 @@ import java.util.List;
 @Service
 public class TestBookService {
     private final TestBookRepository testBookRepository;
+    private final FileService fileService;
 
     private Specification<TestBook> search(String kw) {
         return new Specification<>() {
@@ -26,8 +31,11 @@ public class TestBookService {
             @Override
             public Predicate toPredicate(Root<TestBook> q, CriteriaQuery<?> query, CriteriaBuilder cb) {
                 query.distinct(true);
+                Join<TestBook, Account> u1 = q.join("author", JoinType.LEFT);
+
                 return cb.or(cb.like(q.get("title"), "%" + kw + "%"),
-                        cb.like(q.get("content"), "%" + kw + "%"));
+                        cb.like(q.get("content"), "%" + kw + "%"),
+                        cb.like(u1.get("username"), "%" + kw + "%"));
             }
         };
     }
@@ -39,11 +47,17 @@ public class TestBookService {
         return this.testBookRepository.findAll(spec, pageable);
     }
 
-    public void create(String title, String content) {
-        TestBook q = new TestBook();
-        q.setTitle(title);
-        q.setContent(content);
-        q.setCreateDate(LocalDateTime.now());
-        this.testBookRepository.save(q);
-    }
+//    public void create(String title, MultipartFile file, String content, Account author)  throws IOException {
+//      TestBook testBook = TestBook
+//              .builder()
+//              .title(title)
+//              .content(content)
+//              .author(author)
+//              .build();
+//       TestBook saveBook = testBookRepository.save(testBook);
+//
+//        FileMetadata bookCoverFileMetadata = fileService.uploadFile(file, saveBook, FileMetadataType.TESTBOOK_COVER);
+//        String imgUri = fileService.getImgUri(bookCoverFileMetadata);
+//        saveBook.setCoverImgUrl(imgUri);
+//    }
 }

@@ -23,6 +23,7 @@ dependencies {
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'com.mysql:mysql-connector-j'
 	annotationProcessor 'org.projectlombok:lombok'
+	implementation 'org.slf4j:slf4j-api:2.0.9'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
@@ -49,3 +50,16 @@ tasks.register('restartRedisServerOnWindow', Exec) {
 	println 'Starting Redis Server...'
 	commandLine 'cmd', '/c', 'start', '/B', 'C:\\Users\\SBS\\Redis-x64-3.0.504\\redis-server.exe'
 }
+
+tasks.register('compileJSX', Exec) {
+	workingDir = file('src/main/resources/static/react')
+	commandLine 'npx', 'babel', 'src', '--out-dir', './out', '--presets', 'react-app/prod'
+}
+
+tasks.register('bundlingReact', Exec) {
+	workingDir = file('src/main/resources/static')
+	commandLine 'npx', 'webpack', '--config', 'webpack.config.js'
+}
+
+
+

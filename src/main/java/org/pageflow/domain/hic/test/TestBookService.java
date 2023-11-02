@@ -21,7 +21,7 @@ public class TestBookService {
     public List<TestBook> getTestList(){
         List<TestBook> testBooks = new ArrayList<>();
 
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 1; i++) {
             TestBook testBook = TestBook
                     .builder()
                     .title("Title " + i)
@@ -58,7 +58,7 @@ public class TestBookService {
     }
     // 책 추천
 
-    public void deletelVote(TestBook testBook, Account user) {
+    public void deleteVote(TestBook testBook, Account user) {
         testBook.getVoter().remove(user);
         this.testBookRepository.save(testBook);
     }

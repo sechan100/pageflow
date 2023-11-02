@@ -6,7 +6,6 @@ import org.pageflow.domain.user.entity.Account;
 import org.pageflow.domain.user.repository.AccountRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -52,16 +51,14 @@ public class TestBookController {
     public String testBookVote(Principal principal, @PathVariable("id") Integer id) {
         TestBook testBook = this.testBookService.getTestBook(id);
         Account user = this.accountService.findByUsernameWithProfile(principal.getName());
-        this.testBookService.vote(testBook, user);
+        if (!testBook.getVoter().contains(user)) {
+            this.testBookService.vote(testBook, user);
+        } else {
+            this.testBookService.deleteVote(testBook, user);
+        }
         return "redirect:/testBook/detail/{id}";
     }
-    // 책 추천
+    // 책 추천 및 추천 취소
 
-    @DeleteMapping("/vote/{id}")
-    public String testBookDeleteVote(Principal principal, @PathVariable("id") Integer id) {
-        TestBook testBook = this.testBookService.getTestBook(id);
-        Account user = this.accountService.findByUsernameWithProfile(principal.getName());
-        this.testBookService.deletelVote(testBook, user);
-        return "redirect:/book/list";
-    }
+
 }

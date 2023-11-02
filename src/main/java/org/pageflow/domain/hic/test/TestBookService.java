@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.pageflow.domain.book.DataNotFoundException;
 import org.pageflow.domain.user.entity.Account;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +17,7 @@ public class TestBookService {
 
     private final TestBookRepository testBookRepository;
 
+    @Transactional
     public List<TestBook> getTestList(){
         List<TestBook> testBooks = new ArrayList<>();
 
@@ -31,8 +33,8 @@ public class TestBookService {
         // 데이터베이스에 저장
         testBookRepository.saveAll(testBooks);
 
-        return this.testBookRepository.findAll();
-    }
+        return testBooks;
+    } // 데이터가 없을 때만 생성 > book데이터 안정화되면 리포지터리에 저장하는 코드 변경 해야함
     // 임시데이터 생성 후 저장
 
     public TestBook getTestBook(Integer id) {

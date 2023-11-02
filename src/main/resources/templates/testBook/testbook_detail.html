@@ -33,27 +33,6 @@ Array.from(recommend_elements).forEach(function(element) {
     });
 });
 
-        const cancelRecommendButton = document.getElementById("cancelRecommendButton");
-cancelRecommendButton.addEventListener('click', function() {
-    if (confirm("정말로 추천을 취소하시겠습니까?")) {
-        const voteCount = document.getElementById("voteCount");
-        const currentVoteCount = Number(voteCount.innerText);
-
-        fetch(this.dataset.uri, {
-            method: 'DELETE'
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.updated) {
-                voteCount.innerText = currentVoteCount - 1;
-            }
-        })
-        .catch((error) => {
-            console.error('Error:', error);
-        });
-    }
-});
-
     </script>
 </main>
 </body>

@@ -1,0 +1,60 @@
+<html lang="en" layout:decorate="~{/common/layout.html}" xmlns:th="http://www.w3.org/1999/xhtml" xmlns:layout="">
+<head>
+    <title>Book</title>
+</head>
+<body>
+<main layout:fragment="main">
+    <p th:text="${testBook.title}"></p>
+    <div>
+        <a href="javascript:void(0);" th:data-uri="@{|/testBook/delete/${testBook.id}|}"
+           class="delete btn btn-sm btn-outline-secondary" sec:authorize="isAuthenticated()"
+           th:text="삭제"></a>
+        <a href="javascript:void(0);" class="recommend btn btn-sm btn-outline-secondary"
+           th:data-uri="@{|/testBook/vote/${testBook.id}|}">
+            추천
+            <span class="badge rounded-pill bg-success" th:text="${#lists.size(testBook.voter)}"></span>
+        </a>
+    </div>
+
+    <script type='text/javascript'>
+        const delete_elements = document.getElementsByClassName("delete");
+        Array.from(delete_elements).forEach(function(element) {
+            element.addEventListener('click', function() {
+                if(confirm("정말로 삭제하시겠습니까?")) {
+                    location.href = this.dataset.uri;
+                };
+            });
+        });
+
+        const recommend_elements = document.getElementsByClassName("recommend");
+Array.from(recommend_elements).forEach(function(element) {
+    element.addEventListener('click', function() {
+            location.href = this.dataset.uri;
+    });
+});
+
+        const cancelRecommendButton = document.getElementById("cancelRecommendButton");
+cancelRecommendButton.addEventListener('click', function() {
+    if (confirm("정말로 추천을 취소하시겠습니까?")) {
+        const voteCount = document.getElementById("voteCount");
+        const currentVoteCount = Number(voteCount.innerText);
+
+        fetch(this.dataset.uri, {
+            method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.updated) {
+                voteCount.innerText = currentVoteCount - 1;
+            }
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+    }
+});
+
+    </script>
+</main>
+</body>
+</html>

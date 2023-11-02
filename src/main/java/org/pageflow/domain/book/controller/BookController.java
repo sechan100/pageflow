@@ -54,7 +54,7 @@ public class BookController {
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/book/modify/{id}")
     public String bookModify(BookForm bookForm, @PathVariable("id") Long id, Principal principal) {
-        Book book = this.bookService.getBook(id).orElseThrow();
+        Book book = this.bookService.getBook(id);
         if(!book.getAuthor().getUsername().equals(principal.getName())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정권한이 없습니다.");
         }
@@ -70,7 +70,7 @@ public class BookController {
         if (bindingResult.hasErrors()) {
             return "/book/book_form";
         }
-        Book book = this.bookService.getBook(id).orElseThrow();
+        Book book = this.bookService.getBook(id);
         if (!book.getAuthor().getUsername().equals(principal.getName())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정권한이 없습니다.");
         }
@@ -81,7 +81,7 @@ public class BookController {
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/book/delete/{id}")
     public String bookDelete(Principal principal, @PathVariable("id") Long id) {
-        Book book = this.bookService.getBook(id).orElseThrow();
+        Book book = this.bookService.getBook(id);
         if (!book.getAuthor().getUsername().equals(principal.getName())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "삭제권한이 없습니다.");
         }
@@ -91,14 +91,14 @@ public class BookController {
 
     @GetMapping(value = "/book/detail/{id}")
     public String bookDetail(Model model, @PathVariable("id") Long id){
-        Book book = this.bookService.getBook(id).orElseThrow();
+        Book book = this.bookService.getBook(id);
         model.addAttribute("book", book);
         return "/book/book_detail";
     } // 상세페이지
     
     @GetMapping("/book/vote/{id}")
     public String bookVote(Principal principal, @PathVariable("id") Long id) {
-        Book book = this.bookService.getBook(id).orElseThrow();
+        Book book = this.bookService.getBook(id);
         Account user = this.accountService.findByUsernameWithProfile(principal.getName());
         this.bookService.vote(book, user);
         return "redirect:/book/list";
@@ -106,9 +106,10 @@ public class BookController {
 
     @DeleteMapping("/book/vote/{id}")
     public String deletelVote(Principal principal, @PathVariable("id") Long id) {
-        Book book = this.bookService.getBook(id).orElseThrow();
+        Book book = this.bookService.getBook(id);
         Account user = this.accountService.findByUsernameWithProfile(principal.getName());
         this.bookService.deletelVote(book, user);
         return "redirect:/book/list";
     }
+
 }

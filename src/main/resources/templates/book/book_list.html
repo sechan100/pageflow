@@ -2,12 +2,13 @@
 <head>
     <title>Book</title>
 </head>
+<body>
 <main layout:fragment="main">
     <div class="row my-3">
         <div class="col-6">
             <div class="input-group">
                 <input type="text" id="search_kw" class="form-control" th:value="${kw}">
-                <button class="btn btn-outline-secondary" type="button" id="btn_search">찾기</button>
+                <button class="btn btn-outline-secondary" type="button" id="btn_search">바보</button>
             </div>
         </div>
     </div>
@@ -56,6 +57,7 @@
     </form>
     <a th:href="@{/book/create}" class="btn btn-primary">질문 등록하기</a>
 
+
     <script type='text/javascript'>
         const page_elements = document.getElementsByClassName("page-link");
 Array.from(page_elements).forEach(function(element) {
@@ -80,4 +82,5 @@ btn_search.addEventListener('click', function() {
          });
     </script>
 </main>
+</body>
 </html>

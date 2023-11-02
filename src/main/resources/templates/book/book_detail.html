@@ -3,12 +3,11 @@
     <title>Book</title>
 </head>
 <main layout:fragment="main">
-
-    <div th:text="${book.id}"></div>
-    <h1 th:text="${book.title}"></h1>
-    <p th:text="${book.author.profile.nickname}"></p>
+    <div th:text="${books.id}"></div>
+    <h1 th:text="${books.title}"></h1>
+    <p th:text="${books.authorNickname}"></p>
     <p th:text="${#temporals.format(book.createDate, 'yyyy-MM-dd HH:mm')}"></p>
-    <img th:src="@{${book.imgUrl}}" alt="Book Image">
+    <img th:src="${books.imgUrl}" alt="Book Image">
     <a href="javascript:void(0);" class="recommend btn btn-sm btn-outline-secondary"
        th:data-uri="@{|/book/vote/${book.id}|}" >
         추천

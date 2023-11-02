@@ -1,24 +1,21 @@
 package org.pageflow.domain.hic.test;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.pageflow.base.entity.BaseEntity;
+import org.pageflow.domain.comment.entity.Comment;
 import org.pageflow.domain.user.entity.Account;
 
+import java.util.List;
 import java.util.Set;
 
 @Entity
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class TestBook {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class TestBook extends BaseEntity {
 
     private String title;
 
@@ -27,4 +24,7 @@ public class TestBook {
 
     @ManyToOne
     private Account author;
+
+    @OneToMany(mappedBy = "testBook", cascade = CascadeType.REMOVE)
+    private List<Comment> commentList;
 }

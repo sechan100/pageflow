@@ -14,6 +14,18 @@
             추천
             <span class="badge rounded-pill bg-success" th:text="${#lists.size(testBook.voter)}"></span>
         </a>
+
+        <h5 th:text="|${#lists.size(testBook.commentList)}개의 댓글이 있습니다.|"></h5>
+        <div>
+            <ul>
+                <li th:each="comment : ${testBook.commentList}" th:text="${comment.content}"></li>
+            </ul>
+        </div>
+
+        <form th:action="@{|/comment/create/${testBook.id}|}" method="post">
+            <textarea name="content" id="content" rows="15"></textarea>
+            <input type="submit" value="댓글">
+        </form>
     </div>
 
     <script type='text/javascript'>

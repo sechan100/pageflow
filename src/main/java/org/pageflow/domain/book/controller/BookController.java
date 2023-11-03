@@ -46,15 +46,6 @@ public class BookController {
                                                   @RequestParam(value = "kw", defaultValue = "") String kw,
                                                   @RequestParam(value = "sortOption", defaultValue = "createDate") String sortOption) {
         Slice<Book> paging = this.bookService.getList(page, kw, sortOption);
-        // Log 메시지 출력
-        logger.info("Received a request for book list");
-        logger.info("Paging Content: {}", paging.getContent());
-        logger.info("Paging has content: {}", paging.hasContent());
-//        if (!paging.hasContent()) {
-//            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-//        }
-        logger.info("Keyword: {}", kw);
-        logger.info("Sort Option: {}", sortOption);
         return paging.getContent();
     }
 

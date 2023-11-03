@@ -7,7 +7,7 @@ import org.pageflow.base.entity.BaseEntity;
 import org.pageflow.infra.file.constants.FileMetadataType;
 
 @Entity
-@SuperBuilder
+@SuperBuilder //상속구조에서 사용. 기반 클래스의 필드까지 포함하는 빌더 생성
 @Builder
 @Getter
 @AllArgsConstructor
@@ -16,7 +16,7 @@ import org.pageflow.infra.file.constants.FileMetadataType;
         name = "file_metadata",
         indexes = @Index(name = "idx_file_metadata_owner_and_file_metadata_type", columnList = "owner_id, owner_entity_type, file_metadata_type")
 )
-public class FileMetadata extends BaseEntity {
+public class FileMetadata extends BaseEntity { //메타데이터 저장.
     
     @Column(name = "owner_id")
     private Long ownerId;

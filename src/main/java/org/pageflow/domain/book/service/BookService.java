@@ -94,6 +94,12 @@ public Page<Book> getList(int page, String kw) {
         book.getVoter().add(siteUser);
         this.bookRepository.save(book);
     }
+    // 추천
+    public void deletelVote(Book book, Account user) {
+        book.getVoter().remove(user);
+        this.bookRepository.save(book);
+    }
+    // 추천 취소
 
     public void modify(Book book, String title, MultipartFile imgUrl) {
         book.setTitle(title);
@@ -102,16 +108,12 @@ public Page<Book> getList(int page, String kw) {
         this.bookRepository.save(book);
     } // 수정
 
-    // 삭제
     public void delete(Book book){
         this.bookRepository.delete(book);
     }
+    // 삭제
 
-    // 추천 취소
-    public void deletelVote(Book book, Account user) {
-        book.getVoter().remove(user);
-        this.bookRepository.save(book);
-    }
+
 
 
 //    @Transactional

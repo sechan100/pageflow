@@ -3,30 +3,21 @@
     <title>Book</title>
 </head>
 <main layout:fragment="main">
-    <div th:text="${books.id}"></div>
-    <h1 th:text="${books.title}"></h1>
-    <p th:text="${books.authorNickname}"></p>
+    <p th:text="${book.id}"></p>
+    <img th:src="@{${book.imgUrl}}" alt="Book Image">
+    <h2 th:text="${book.title}"></h2>
+    <p th:text="${book.author.profile.nickname}"></p>
     <p th:text="${#temporals.format(book.createDate, 'yyyy-MM-dd HH:mm')}"></p>
-    <img th:src="${books.imgUrl}" alt="Book Image">
-    <a href="javascript:void(0);" class="recommend btn btn-sm btn-outline-secondary"
-       th:data-uri="@{|/book/vote/${book.id}|}" >
+    <a href="javascript:void(0);" class="recommend "
+       th:data-uri="@{|/book/vote/${book.id}|}">
         추천
-        <span class="badge rounded-pill bg-success" id="recommend-count" th:text="${#lists.size(book.voter)}"></span>
+        <span class="badge rounded-pill bg-success" th:text="${#lists.size(book.voter)}"></span>
     </a>
-<!-- 조건문 수정버튼   -->
-<!--    <div>-->
-<!--        <a th:href="@{|/book/modify/${book.id}|}"-->
-<!--           sec:authorize="isAuthenticated()"-->
-<!--               th:if="${book.author != null and #authentication.getPrincipal().getUsername() == book.author.username}"-->
-<!--           th:text="수정"></a>-->
-<!--    </div>-->
     <div>
-        <a th:href="@{|/book/modify/${book.id}|}" th:data-uri="@{|/book/delete/${book.id}|}" th:text="수정"></a>
-<!--        <a href="javascript:void(0);" th:data-uri="@{|/book/delete/${book.id}|}"-->
-<!--           class="delete btn btn-sm btn-outline-secondary" sec:authorize="isAuthenticated()"-->
-<!--           th:if="${book.author != null and #authentication.getPrincipal().getUsername() == book.author.username}"-->
-<!--           th:text="삭제"></a>-->
-        <a href="javascript:void(0);" th:data-uri="@{|/book/delete/${book.id}|}" class="delete btn btn-sm btn-outline-secondary"  th:text="삭제"></a>
+        <a th:href="@{|/book/modify/${book.id}|}" th:data-uri="@{|/book/modify/${book.id}|}" th:text="수정"
+           sec:authorize="isAuthenticated()"></a>
+        <a href="javascript:void(0);" class="delete" th:data-uri="@{|/book/delete/${book.id}|}"   th:text="삭제"
+           sec:authorize="isAuthenticated()"></a>
     </div>
 
 
@@ -44,9 +35,7 @@
         const recommend_elements = document.getElementsByClassName("recommend");
 Array.from(recommend_elements).forEach(function(element) {
     element.addEventListener('click', function() {
-        if(confirm("정말로 추천하시겠습니까?")) {
             location.href = this.dataset.uri;
-        };
     });
 });
     </script>

@@ -51,6 +51,13 @@ public class BookController {
         return "redirect:/book/list";
     }
 
+    @GetMapping(value = "/book/detail/{id}")
+    public String bookDetail(Model model, @PathVariable("id") Long id){
+        Book book = this.bookService.getBook(id);
+        model.addAttribute("book", book);
+        return "/book/book_detail";
+    } // 상세페이지
+
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/book/modify/{id}")
     public String bookModify(BookForm bookForm, @PathVariable("id") Long id, Principal principal) {
@@ -89,27 +96,16 @@ public class BookController {
         return "redirect:/book/list";
     } // 삭제
 
-    @GetMapping(value = "/book/detail/{id}")
-    public String bookDetail(Model model, @PathVariable("id") Long id){
-        Book book = this.bookService.getBook(id);
-        model.addAttribute("book", book);
-        return "/book/book_detail";
-    } // 상세페이지
-    
     @GetMapping("/book/vote/{id}")
-    public String bookVote(Principal principal, @PathVariable("id") Long id) {
-        Book book = this.bookService.getBook(id);
-        Account user = this.accountService.findByUsernameWithProfile(principal.getName());
-        this.bookService.vote(book, user);
-        return "redirect:/book/list";
-    }
-
-    @DeleteMapping("/book/vote/{id}")
     public String deletelVote(Principal principal, @PathVariable("id") Long id) {
         Book book = this.bookService.getBook(id);
         Account user = this.accountService.findByUsernameWithProfile(principal.getName());
-        this.bookService.deletelVote(book, user);
-        return "redirect:/book/list";
-    }
+        if(!book.getVoter().contains(user)){
+            this.bookService.vote(book, user);
+        } else {
+            this.bookService.deletelVote(book, user);
+        }
+      return String.format("redirect:/book/detail/%s", id);
+    } //추천 및 추천취소
 
 }

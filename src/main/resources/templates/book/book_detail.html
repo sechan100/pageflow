@@ -14,7 +14,7 @@
         <span class="badge rounded-pill bg-success" th:text="${#lists.size(book.voter)}"></span>
     </a>
     <div>
-        <a th:href="@{|/book/modify/${book.id}|}" th:data-uri="@{|/book/modify/${book.id}|}" th:text="수정"
+        <a th:href="@{|/book/modify/${book.id}|}" th:text="수정"
            sec:authorize="isAuthenticated()"></a>
         <a href="javascript:void(0);" class="delete" th:data-uri="@{|/book/delete/${book.id}|}"   th:text="삭제"
            sec:authorize="isAuthenticated()"></a>

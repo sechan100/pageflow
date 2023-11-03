@@ -3,9 +3,10 @@
 <head>
     <title>책 작성</title>
 </head>
+<body>
 <main layout:fragment="main">
     <h5 class="my-3 border-bottom pb-2">책등록</h5>
-    <form th:action="@{/book/create}" th:object="${bookForm}" method="post" enctype="multipart/form-data">
+    <form  th:object="${bookForm}" method="post" enctype="multipart/form-data">
         <div class="alert alert-danger" role="alert" th:if="${#fields.hasAnyErrors()}">
             <div th:each="err : ${#fields.allErrors()}" th:text="${err}" />
         </div>6
@@ -26,6 +27,6 @@
         <!--        </span>-->
 
     </form>
-
 </main>
+</body>
 </html>

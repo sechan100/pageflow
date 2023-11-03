@@ -20,7 +20,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -101,11 +100,16 @@ public Page<Book> getList(int page, String kw) {
     }
     // 추천 취소
 
-    public void modify(Book book, String title, MultipartFile imgUrl) {
+    public Book modify(Book book, String title, MultipartFile file, Account author) throws IOException {
+
         book.setTitle(title);
-        book.setImgUrl(book.getImgUrl());
-        book.setModifyDate(LocalDateTime.now());
-        this.bookRepository.save(book);
+        book.setAuthor(author);
+
+        FileMetadata bookCoverFileMetadata = fileService.uploadFile(file, book, FileMetadataType.BOOK_COVER);
+        String imgUri = fileService.getImgUri(bookCoverFileMetadata);
+        book.setImgUrl(imgUri);
+
+        return bookRepository.save(book);
     } // 수정
 
     public void delete(Book book){

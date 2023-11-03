@@ -72,18 +72,23 @@ public class BookController {
 
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/book/modify/{id}")
-    public String questionModify(@Valid BookForm bookForm, BindingResult bindingResult,
-                                 Principal principal, @PathVariable("id") Long id) {
-        if (bindingResult.hasErrors()) {
+    public String bookModify(@Valid BookForm bookForm, BindingResult bindingResult,
+                                 Principal principal, @PathVariable("id") Long id, @RequestParam("file") MultipartFile file) throws IOException {
+        if (bindingResult.hasErrors() || file.isEmpty()) {
             return "/book/book_form";
         }
+
         Book book = this.bookService.getBook(id);
+        Account author = this.accountService.findByUsernameWithProfile(principal.getName());
         if (!book.getAuthor().getUsername().equals(principal.getName())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정권한이 없습니다.");
         }
-        this.bookService.modify(book, bookForm.getTitle(), bookForm.getFile());
-        return String.format("redirect:/book/detail/%s", id);
+        Book modifiedBook = this.bookService.modify(book,bookForm.getTitle(), file, author);
+        return "redirect:/book/list";
+
     } // 수정 post
+
+
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/book/delete/{id}")

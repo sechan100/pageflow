@@ -72,14 +72,14 @@ btn_search.addEventListener('click', function() {
     document.getElementById('page').value = 0;  // 검색버튼을 클릭할 경우 0페이지부터 조회한다.
     document.getElementById('searchForm').submit();
 });
-        const recommend_elements = document.getElementsByClassName("recommend");
-         Array.from(recommend_elements).forEach(function(element) {
-             element.addEventListener('click', function() {
-                 if(confirm("정말로 추천하시겠습니까?")) {
-                     location.href = this.dataset.uri;
-                 };
-             });
-         });
+
+         const recommend_elements = document.getElementsByClassName("recommend");
+Array.from(recommend_elements).forEach(function(element) {
+    element.addEventListener('click', function() {
+            location.href = this.dataset.uri;
+    });
+});
+        // 추천
     </script>
 </main>
 </body>

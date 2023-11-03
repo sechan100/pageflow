@@ -102,7 +102,7 @@ public class BookController {
     } // 삭제
 
     @GetMapping("/book/vote/{id}")
-    public String deletelVote(Principal principal, @PathVariable("id") Long id) {
+    public String vote(Principal principal, @PathVariable("id") Long id) {
         Book book = this.bookService.getBook(id);
         Account user = this.accountService.findByUsernameWithProfile(principal.getName());
         if(!book.getVoter().contains(user)){

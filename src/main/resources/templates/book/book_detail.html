@@ -31,6 +31,11 @@
         <textarea name="content" id="content" rows="15"></textarea>
         <input type="submit" value="답변등록">
     </form>
+    <div class="my-3">
+        <a th:href="@{|/comment/modify/${book.id}|}"
+           sec:authorize="isAuthenticated()"
+           th:text="수정"></a>
+    </div>
 
 
 <!--  삭제 js  -->

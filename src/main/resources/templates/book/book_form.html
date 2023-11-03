@@ -9,7 +9,7 @@
     <form  th:object="${bookForm}" method="post" enctype="multipart/form-data">
         <div class="alert alert-danger" role="alert" th:if="${#fields.hasAnyErrors()}">
             <div th:each="err : ${#fields.allErrors()}" th:text="${err}" />
-        </div>6
+        </div>
         <div class="mb-3">
             <label for="title" class="form-label">제목</label>
             <input type="text"  id="title" th:field="*{title}" class="form-control">

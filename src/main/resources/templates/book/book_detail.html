@@ -20,6 +20,18 @@
            sec:authorize="isAuthenticated()"></a>
     </div>
 
+    <h5 th:text="|${#lists.size(book.commentList)}개의 답변이 있습니다.|"></h5>
+    <div>
+        <ul>
+            <li th:each="comment : ${book.commentList}" th:text="${comment.content}"></li>
+        </ul>
+    </div>
+
+    <form th:action="@{|/comment/create/${book.id}|}" method="post">
+        <textarea name="content" id="content" rows="15"></textarea>
+        <input type="submit" value="답변등록">
+    </form>
+
 
 <!--  삭제 js  -->
     <script type='text/javascript'>

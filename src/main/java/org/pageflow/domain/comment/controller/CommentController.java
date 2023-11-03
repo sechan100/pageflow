@@ -27,7 +27,7 @@ public class CommentController {
     private final BookService bookService;
 
     @PostMapping("/create/{id}")
-    public String createTestBook(Model model, @PathVariable("id") Long id, @Valid CommentForm commentForm, BindingResult bindingResult,
+    public String create(Model model, @PathVariable("id") Long id, @Valid CommentForm commentForm, BindingResult bindingResult,
                                   Principal principal) {
         Book book = this.bookService.getBook(id);
         Account author = this.accountService.findByUsernameWithProfile(principal.getName());
@@ -36,7 +36,7 @@ public class CommentController {
             return "/book_detail";
         }
         this.commentService.create(book, commentForm.getContent(), author);
-        return String.format("redirect:/testBook/detail/%s", id);
+        return String.format("redirect:/book/detail/%s", id);
     }
 
 }

@@ -3,6 +3,7 @@ package org.pageflow.domain.book.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.pageflow.base.entity.BaseEntity;
+import org.pageflow.domain.comment.entity.Comment;
 import org.pageflow.domain.user.entity.Account;
 
 import java.util.List;
@@ -28,5 +29,8 @@ public class Book extends BaseEntity {
 
     @ManyToMany
     Set<Account> voter;
+
+    @OneToMany(mappedBy = "book", cascade = CascadeType.REMOVE)
+    private List<Comment> commentList;
 
 }

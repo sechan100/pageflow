@@ -4,8 +4,6 @@ import jakarta.persistence.criteria.*;
 import lombok.RequiredArgsConstructor;
 import org.pageflow.domain.book.entity.Book;
 import org.pageflow.domain.book.repository.BookRepository;
-import org.pageflow.domain.book.repository.ChapterRepository;
-import org.pageflow.domain.book.repository.PageRepository;
 import org.pageflow.domain.user.entity.Account;
 import org.pageflow.infra.file.constants.FileMetadataType;
 import org.pageflow.infra.file.entity.FileMetadata;
@@ -31,8 +29,6 @@ import java.util.Optional;
 public class BookService {
 
     private final BookRepository bookRepository;
-    private final ChapterRepository chapterRepository;
-    private final PageRepository pageRepository;
     private final FileService fileService;
 
     private Specification<Book> search(String kw) {
@@ -77,7 +73,7 @@ public Page<Book> getList(int page, String kw) {
 
         FileMetadata bookCoverFileMetadata = fileService.uploadFile(file, savedBook, FileMetadataType.BOOK_COVER);
         String imgUri = fileService.getImgUri(bookCoverFileMetadata);
-        savedBook.setImgUrl(imgUri);
+        savedBook.setCoverImgUrl(imgUri);
 
 
         return bookRepository.save(savedBook);

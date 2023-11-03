@@ -28,22 +28,22 @@ public class BookController {
     private final BookService bookService;
     private final AccountService accountService;
 
-    @GetMapping("/book/list")
-    public String list(Model model, @RequestParam(value = "page", defaultValue = "0") int page,
+    @GetMapping("/book")
+    public String bookMain(Model model, @RequestParam(value = "page", defaultValue = "0") int page,
                        @RequestParam(value = "kw", defaultValue = "") String kw) {
         Page<Book> paging = this.bookService.getList(page, kw);
         model.addAttribute("paging",paging);
         model.addAttribute("kw", kw);
-        return "/book/book_list";
+        return "/user/book/cards";
     }
     
-    @GetMapping("/book/create")
-    public String createBook(BookForm bookForm) {
-      return "/book/book_form";
+    @GetMapping("/book/write")
+    public String bookWriteForm() {
+      return "/user/book/write";
     }
     
-    @PostMapping("/book/create")
-    public String createBook(@Valid BookForm bookForm, BindingResult bindingResult, @RequestParam("file") MultipartFile file, Principal principal) throws IOException {
+    @PostMapping("/book/write")
+    public String writeBook(@Valid BookForm bookForm, BindingResult bindingResult, @RequestParam("file") MultipartFile file, Principal principal) throws IOException {
         if(bindingResult.hasErrors() || file.isEmpty()) {
             return "/book/book_form";
         }

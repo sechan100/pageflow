@@ -68,7 +68,7 @@ public Page<Book> getList(int page, String kw) {
         if (book.isPresent()) {
             return book.get();
         } else {
-            throw new DataNotFoundException("question not found");
+            throw new DataNotFoundException("book not found");
         }
     }
 

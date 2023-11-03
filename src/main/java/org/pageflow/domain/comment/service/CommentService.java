@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
+
 @Service
 @RequiredArgsConstructor
 public class CommentService {
@@ -32,13 +33,30 @@ public class CommentService {
         if (comment.isPresent()) {
             return comment.get();
         } else {
-            throw new DataNotFoundException("answer not found");
-        }
+            throw new DataNotFoundException("comment not found");
+        } // 댓글 조회
     }
 
     public void modify(Comment comment, String content) {
         comment.setContent(content);
         comment.setModifyDate(LocalDateTime.now());
         this.commentRepository.save(comment);
+    } // 댓글 수정
+
+    public void delete(Comment comment){
+        this.commentRepository.delete(comment);
+    } //댓글 삭제
+
+    public void vote(Comment comment, Account user) {
+        comment.getVoter().add(user);
+        this.commentRepository.save(comment);
     }
+    // 추천
+    public void deletelVote(Comment comment, Account user) {
+        comment.getVoter().remove(user);
+        this.commentRepository.save(comment);
+    }
+
+
+
 }

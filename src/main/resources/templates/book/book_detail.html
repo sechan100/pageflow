@@ -20,22 +20,30 @@
            sec:authorize="isAuthenticated()"></a>
     </div>
 
-    <h5 th:text="|${#lists.size(book.commentList)}개의 답변이 있습니다.|"></h5>
+    <h5 th:text="|${#lists.size(book.commentList)}개|"></h5>
     <div>
         <ul>
             <li th:each="comment : ${book.commentList}" th:text="${comment.content}"></li>
         </ul>
+        <div >
+            <a href="javascript:void(0);" class="recommend"
+                th:data-uri="@{|/comment/vote/${comment.id}|}" th:text="추천">
+                <span class="badge rounded-pill bg-success" th:text="${#lists.size(comment.voter)}"></span>
+            </a>
+            <a th:href="@{|/comment/modify/${comment.id}|}"
+               sec:authorize="isAuthenticated()"
+               th:text="수정"></a>
+            <a href="javascript:void(0);" th:data-uri="@{|/comment/delete/${comment.id}|}"
+               class="delete " sec:authorize="isAuthenticated()"
+               th:text="삭제"></a>
+        </div>
     </div>
 
     <form th:action="@{|/comment/create/${book.id}|}" method="post">
         <textarea name="content" id="content" rows="15"></textarea>
         <input type="submit" value="답변등록">
     </form>
-    <div class="my-3">
-        <a th:href="@{|/comment/modify/${book.id}|}"
-           sec:authorize="isAuthenticated()"
-           th:text="수정"></a>
-    </div>
+
 
 
     <!--  삭제 js  -->

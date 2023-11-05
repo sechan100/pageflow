@@ -11,7 +11,7 @@ import org.pageflow.base.entity.BaseEntity;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"chapter_id", "order_num"}))
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"chapter_id", "orderNum"}))
 public class Page extends BaseEntity {
     
     @ManyToOne

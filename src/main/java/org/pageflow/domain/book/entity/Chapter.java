@@ -15,7 +15,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)//접근 수준. 상속관계에 있는 클래스에서만 생성자에 접근 가능
-@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"book_id", "order_num"}))
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"book_id", "orderNum"}))
 public class Chapter extends BaseEntity {
     
     @ManyToOne

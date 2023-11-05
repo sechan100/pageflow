@@ -40,4 +40,4 @@ out/
 ### security ###
 src/main/resources/application-prod.yml
 src/main/resources/application-secret.yml
-src/main/resources/static/node_modules/**
+src/main/react/**/node_modules/

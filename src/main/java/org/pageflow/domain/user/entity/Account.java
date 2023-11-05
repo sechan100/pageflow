@@ -29,7 +29,7 @@ public class Account extends BaseEntity {
      */
     @OneToOne(
             optional = false,
-            fetch = FetchType.LAZY,
+            fetch = FetchType.EAGER,
             cascade = CascadeType.ALL
     )
     private Profile profile;

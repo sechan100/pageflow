@@ -2,30 +2,25 @@ package org.pageflow.domain.book.service;
 
 import jakarta.persistence.criteria.*;
 import lombok.RequiredArgsConstructor;
+import org.pageflow.domain.book.constants.BookFetchType;
 import org.pageflow.domain.book.entity.Book;
+import org.pageflow.domain.book.entity.Chapter;
+import org.pageflow.domain.book.entity.Page;
 import org.pageflow.domain.book.repository.BookRepository;
 import org.pageflow.domain.user.entity.Account;
-import org.pageflow.infra.file.constants.FileMetadataType;
-import org.pageflow.infra.file.entity.FileMetadata;
 import org.pageflow.infra.file.service.FileService;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 
 @Service
 @RequiredArgsConstructor
-// final 필드들 매개변수로 받는 생성자 자동 생성
-// spring에서 편의로 생성자가 딱 하나 일때는 @Auto 안 붙여도 자동으로 붙여줌
 public class BookService {
 
     private final BookRepository bookRepository;
@@ -50,55 +45,70 @@ public class BookService {
         };
     }
 
-public Page<Book> getList(int page, String kw) {
-    List<Sort.Order> sorts = new ArrayList<>();
-    sorts.add(Sort.Order.desc("createDate"));
-    Pageable pageable = PageRequest.of(page, 10, Sort.by(sorts));
-    Specification<Book> spec = search(kw);
-    return this.bookRepository.findAll(spec, pageable);
-}
-
-    public Optional<Book> getBook(Long id) {
-        return this.bookRepository.findById(id);
+    public org.springframework.data.domain.Page<Book> getList(int page, String kw) {
+        List<Sort.Order> sorts = new ArrayList<>();
+        sorts.add(Sort.Order.desc("createDate"));
+        Pageable pageable = PageRequest.of(page, 10, Sort.by(sorts));
+        Specification<Book> spec = search(kw);
+        return this.bookRepository.findAll(spec, pageable);
     }
-    public Book create(String title, MultipartFile file, Account author) throws IOException {
 
-        Book book = Book
-                .builder()
-                .title(title)
+    
+    
+    /**
+     * @return 새로운 책 객체를 반환한다. 작성이 되지 않은 책과, 하나씩의 기본 챕터와 페이지를 가진다.
+     */
+    public Book createNewBook(Account author) {
+        
+        String defaultCoverImgUrl = "https://library.kbu.ac.kr/libeka/fileview/3025aced-3e0a-4266-86ed-a1894eb759b3.JPG";
+        
+        Book book = Book.builder()
+                .title("제목을 입력해주세요")
+                .chapters(new ArrayList<>())
+                .isPublished(false)
+                .coverImgUrl(defaultCoverImgUrl)
                 .author(author)
                 .build();
-
-        Book savedBook = bookRepository.save(book);
-
-        FileMetadata bookCoverFileMetadata = fileService.uploadFile(file, savedBook, FileMetadataType.BOOK_COVER);
-        String imgUri = fileService.getImgUri(bookCoverFileMetadata);
-        savedBook.setCoverImgUrl(imgUri);
-
-
-        return bookRepository.save(savedBook);
+        
+        Chapter defaultChapter = Chapter.builder()
+                .title("제목을 입력해주세요")
+                .pages(new ArrayList<>())
+                .book(book)
+                .build();
+        
+        Page defaultPage = Page.builder()
+                .title("제목을 입력해주세요")
+                .content("내용을 입력해주세요")
+                .chapter(defaultChapter)
+                .build();
+        
+        defaultChapter.getPages().add(defaultPage); // 챕터에 페이지 추가
+        book.getChapters().add(defaultChapter); // 책에 챕터 추가
+        
+        return save(book); // 위의 컬렉션 추가로 영속전이가 발생, Book, Chapter, Page가 모두 영속되고 영속된 Book이 반환된다.
     }
-
-    public void vote(Book book, Account siteUser) {
-        book.getVoter().add(siteUser);
-        this.bookRepository.save(book);
+    
+    
+    /* ###########################
+     * JPA Repository Method Spec
+     * ###########################
+     */
+    
+    
+    public Book save(Book book) {
+        return bookRepository.save(book);
     }
-//    @Transactional
-//    public Book createBookWithChaptersAndPages(Book book, List<Chapter> chapters, List<Page> pages) {
-//
-//        Book savedBooks = bookRepository.save(book);
-//
-//        for(Chapter chapter : chapters) {
-//            chapter.setBook(savedBooks);
-//            Chapter savedChapter = chapterRepository.save(chapter);
-//
-//            for(Page page : pages) {
-//                if(page.getChapter() == chapter) {
-//                    page.setChapter(savedChapter);
-//                    pageRepository.save(page);
-//                }
-//            }
-//        }
-//        return savedBooks;
-//    }
+    
+    /**
+     * @param id 책 아이디
+     * @param fetchType 가져올 데이터의 범위를 설정. 예를 들어 CHAPTER로 설정할 경우, chapters 배열까지만 가져온다. chapter들의 pages 배열은 null을 가진다.
+     * @return
+     */
+    public Book findWithScopeById(Long id, BookFetchType fetchType) {
+        return switch(fetchType) {
+            case CHAPTER -> bookRepository.findScopeChapterById(id);
+            case PAGE -> bookRepository.findScopePageById(id);
+            default -> bookRepository.findScopeBookById(id);
+        };
+    }
 }

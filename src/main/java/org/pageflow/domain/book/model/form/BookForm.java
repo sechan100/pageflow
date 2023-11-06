@@ -1,4 +1,4 @@
-package org.pageflow.domain.book.form;
+package org.pageflow.domain.book.model.form;
 
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;

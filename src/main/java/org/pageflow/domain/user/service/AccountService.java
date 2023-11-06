@@ -25,8 +25,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
-import java.util.List;
-
 /**
  *
  */
@@ -163,41 +161,4 @@ public class AccountService {
         return accountRepository.existsByEmailAndProvider(email, provider);
     }
     
-    
-    /**
-     * Account의 Profile 엔티티의 Transient인 프로필 이미지 URL 필드를 초기화 후 반환
-     * @param account DB에서 가져온 Account 엔티티
-     * @return 프로필 이미지 URL이 추가된 Account 엔티티
-     */
-    @Deprecated
-    private Account setProfileImgUrl(Account account) {
-        Profile profile = account.getProfile();
-        List<FileMetadata> profileImgFileMetadatas = fileMetadataRepository
-                .findAllByOwnerIdAndOwnerEntityTypeAndFileMetadataType(
-                        profile.getId(), Profile.class.getSimpleName(), FileMetadataType.PROFILE_IMG
-                );
-        
-        String profileImgUrl;
-        
-        if(profileImgFileMetadatas.isEmpty()) {
-            profileImgUrl = "/img/default_profile_img.png";
-        } else {
-            FileMetadata profileImgFileMetadata = profileImgFileMetadatas.get(0);
-            
-            String baseUrl = customProperties.getFiles().getImg().getBaseUrl();
-            if(!baseUrl.endsWith("/")) {
-                baseUrl += "/";
-            }
-            
-            profileImgUrl =
-                  baseUrl                                       // {baseUrl}/
-                + profileImgFileMetadata.getPathPrefix()        // {y}/{m}/{d}/
-                + profileImgFileMetadata.getManagedFilename();  // {UUID}.{ext}
-        }
-        
-        
-        profile.setProfileImgUrl(profileImgUrl);
-        
-        return account;
-    }
 }

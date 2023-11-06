@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import lombok.*;
+import org.hibernate.annotations.DynamicUpdate;
 import org.pageflow.base.entity.BaseEntity;
 @Entity
 @Getter
@@ -12,9 +13,10 @@ import org.pageflow.base.entity.BaseEntity;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"chapter_id", "orderNum"}))
+@DynamicUpdate
 public class Page extends BaseEntity {
     
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnore // 양방향 객체 참조로 인한 직렬화 무한루프에 빠지는 것을 막는다.
     private Chapter chapter;
     

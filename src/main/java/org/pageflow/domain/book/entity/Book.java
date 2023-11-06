@@ -3,16 +3,16 @@ package org.pageflow.domain.book.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.pageflow.base.entity.BaseEntity;
-import org.pageflow.domain.user.entity.Account;
+import org.pageflow.domain.user.entity.Profile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Getter
 @Setter
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED) //접근 수준. 상속관계에 있는 클래스에서만 생성자에 접근 가능
 public class Book extends BaseEntity {
     
@@ -21,9 +21,9 @@ public class Book extends BaseEntity {
     private String coverImgUrl;
     
     @ManyToOne(fetch = FetchType.LAZY)
-    private Account author;
+    private Profile author;
     
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true, mappedBy = "book")
+    @OneToMany(fetch = FetchType.LAZY, orphanRemoval = true, mappedBy = "book")
     private List<Chapter> chapters = new ArrayList<>();
     
     /**
@@ -34,4 +34,17 @@ public class Book extends BaseEntity {
     private boolean isPublished;
     
     
+    
+    
+    
+    
+    // AllArgsConstructor: chapters 값을 초기화하기위해서 하드코딩
+    public Book(String title, String coverImgUrl, Profile author, List<Chapter> chapters, boolean isPublished) {
+        super();
+        this.title = title;
+        this.coverImgUrl = coverImgUrl;
+        this.author = author;
+        this.chapters = Objects.requireNonNullElseGet(chapters, ArrayList::new);
+        this.isPublished = isPublished;
+    }
 }

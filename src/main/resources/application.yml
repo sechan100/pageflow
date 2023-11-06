@@ -4,9 +4,6 @@ spring:
     include:
       - secret
 
-  jackson:
-    default-property-inclusion: non_null
-
   output:
     ansi:
       enabled: always

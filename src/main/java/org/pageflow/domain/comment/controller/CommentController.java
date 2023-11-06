@@ -35,7 +35,7 @@ public class CommentController {
     public String create(Model model, @PathVariable("id") Long id, @Valid CommentForm commentForm,
                          BindingResult bindingResult, Principal principal) {
         Book book = this.bookService.getBook(id);
-        Account author = this.accountService.findByUsernameWithProfile(principal.getName());
+        Account author = this.accountService.findFetchJoinProfileByUsername(principal.getName());
         if (bindingResult.hasErrors()) {
             model.addAttribute("book", book);
             return "/book_detail";
@@ -84,7 +84,7 @@ public class CommentController {
     @GetMapping("/vote/{id}")
     public String vote(Principal principal, @PathVariable("id") Long id) {
         Comment comment = this.commentService.getComment(id);
-        Account user = this.accountService.findByUsernameWithProfile(principal.getName());
+        Account user = this.accountService.findFetchJoinProfileByUsername(principal.getName());
         if(!comment.getVoter().contains(user)){
             this.commentService.vote(comment, user);
         } else {

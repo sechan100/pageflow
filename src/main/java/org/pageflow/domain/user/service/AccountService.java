@@ -150,9 +150,9 @@ public class AccountService {
     // ****************************************************
     // *********     JPA Repository service      **********
     // ****************************************************
-
-    public Account findByUsernameWithProfile(String username) {
-        return accountRepository.findByUsernameWithProfile(username);
+    
+    public Account findFetchJoinProfileByUsername(String username) {
+        return accountRepository.findFetchJoinProfileByUsername(username);
     }
     
     public boolean existsByUsername(String username) {

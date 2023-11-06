@@ -44,6 +44,7 @@ tasks.register('flushRedis', Exec) {
 	commandLine 'redis-cli', 'flushall'
 }
 
+// 윈도우 용: redis 서버 프로세스 재시작
 tasks.register('restartRedisServerOnWindow', Exec) {
 	println 'Stopping Redis Server...'
 	commandLine 'cmd', '/c', 'taskkill', '/F', '/IM', 'redis-server.exe'
@@ -53,3 +54,23 @@ tasks.register('restartRedisServerOnWindow', Exec) {
 	println '##### Started Redis Server #####'
 //	commandLine 'cmd', '/c', 'start', '/B', 'C:\\Users\\SBS\\Redis-x64-3.0.504\\redis-server.exe'
 }
+
+
+tasks.register('buildReact_bookWrite', Exec) {
+	workingDir = file('src/main/react/book_write')
+
+	if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
+		commandLine "npm.cmd", "run", "build"
+	} else {
+		commandLine "npm", "run", "build"
+	}
+}
+
+tasks.register('copyReact_bookWrite', Copy) {
+	dependsOn "buildReact_bookWrite"
+	from file("src/main/react/book_write/build")
+	into file('src/main/resources/static/react/build')
+}
+
+
+

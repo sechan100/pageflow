@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,27 +29,23 @@ public class BookController {
     private final BookService bookService;
     private final AccountService accountService;
 
-    @GetMapping("/book/list")
+    @GetMapping("/book")
     public String list(Model model, @RequestParam(value = "page", defaultValue = "0") int page,
                        @RequestParam(value = "kw", defaultValue = "") String kw) {
         Page<Book> paging = this.bookService.getList(page, kw);
         model.addAttribute("paging",paging);
         model.addAttribute("kw", kw);
-        return "/book/book_list";
+        return "/user/book/cards";
     }
-    
-    @GetMapping("/book/create")
-    public String createBook(BookForm bookForm) {
-      return "/book/book_form";
-    }
+
     
     @PostMapping("/book/create")
     public String createBook(@Valid BookForm bookForm, BindingResult bindingResult, @RequestParam("file") MultipartFile file, Principal principal) throws IOException {
         if(bindingResult.hasErrors() || file.isEmpty()) {
             return "/book/book_form";
         }
-        Account author = this.accountService.findByUsernameWithProfile(principal.getName());
-        this.bookService.create(bookForm.getTitle(), bookForm.getFile(), author);
+        Account author = this.accountService.findFetchJoinProfileByUsername(principal.getName());
+//        this.bookService.create(bookForm.getTitle(), bookForm.getFile(), author);
         return "redirect:/book/list";
     }
 
@@ -79,12 +77,12 @@ public class BookController {
         }
 
         Book book = this.bookService.getBook(id);
-        Account author = this.accountService.findByUsernameWithProfile(principal.getName());
+        Account author = this.accountService.findFetchJoinProfileByUsername(principal.getName());
         if (!book.getAuthor().getUsername().equals(principal.getName())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정권한이 없습니다.");
         }
         Book modifiedBook = this.bookService.modify(book,bookForm.getTitle(), file, author);
-        return "redirect:/book/list";
+        return "redirect:/book";
 
     } // 수정 post
 
@@ -98,19 +96,8 @@ public class BookController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "삭제권한이 없습니다.");
         }
         this.bookService.delete(book);
-        return "redirect:/book/list";
+        return "redirect:/book";
     } // 삭제
 
-    @GetMapping("/book/vote/{id}")
-    public String vote(Principal principal, @PathVariable("id") Long id) {
-        Book book = this.bookService.getBook(id);
-        Account user = this.accountService.findByUsernameWithProfile(principal.getName());
-        if(!book.getVoter().contains(user)){
-            this.bookService.vote(book, user);
-        } else {
-            this.bookService.deletelVote(book, user);
-        }
-      return String.format("redirect:/book/detail/%s", id);
-    } //추천 및 추천취소
 
 }

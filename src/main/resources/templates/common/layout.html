@@ -18,6 +18,8 @@
 
     <!--  tailwind  -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 데이지 UI -->
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@3.7.7/dist/full.css" rel="stylesheet" type="text/css" />
 
     <!--  flowbite css  -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.8.1/flowbite.min.css" rel="stylesheet" />
@@ -35,7 +37,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.8.1/flowbite.min.js"></script>
 </head>
 
-<body class="bg-gray-50" th:with="user = ${@rq.userSession}">
+<body class="bg-white" th:with="user = ${@rq.userSession}">
 
 
     <nav class="bg-white fixed w-full z-40 top-0 left-0 border-b border-gray-200">

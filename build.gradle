@@ -11,6 +11,10 @@ java {
 	sourceCompatibility = '17'
 }
 
+compileJava {
+	options.compilerArgs << '-parameters'
+}
+
 repositories {
 	mavenCentral()
 }
@@ -56,7 +60,7 @@ tasks.register('restartRedisServerOnWindow', Exec) {
 }
 
 
-tasks.register('buildReact_bookWrite', Exec) {
+tasks.register('buildReactBookWrite', Exec) {
 	workingDir = file('src/main/react/book_write')
 
 	if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
@@ -66,10 +70,15 @@ tasks.register('buildReact_bookWrite', Exec) {
 	}
 }
 
-tasks.register('copyReact_bookWrite', Copy) {
-	dependsOn "buildReact_bookWrite"
+tasks.register('cleanBookWriteBuildDir', Delete) {
+	dependsOn "buildReactBookWrite"
+	delete file('src/main/resources/static/react/build/book_write')
+}
+
+tasks.register('copyReactBookWriteBuildDir', Copy) {
+	dependsOn "cleanBookWriteBuildDir"
 	from file("src/main/react/book_write/build")
-	into file('src/main/resources/static/react/build')
+	into file('src/main/resources/static/react/build/book_write')
 }
 
 

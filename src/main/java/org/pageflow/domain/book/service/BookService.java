@@ -3,10 +3,11 @@ package org.pageflow.domain.book.service;
 import jakarta.persistence.criteria.*;
 import lombok.RequiredArgsConstructor;
 import org.pageflow.domain.book.DataNotFoundException;
+import org.pageflow.base.entity.BaseEntity;
 import org.pageflow.domain.book.entity.Book;
-import org.pageflow.domain.book.entity.Chapter;
-import org.pageflow.domain.book.entity.Page;
+import org.pageflow.domain.book.model.outline.*;
 import org.pageflow.domain.book.repository.BookRepository;
+import org.pageflow.domain.book.repository.PageRepository;
 import org.pageflow.domain.user.entity.Account;
 import org.pageflow.infra.file.constants.FileMetadataType;
 import org.pageflow.infra.file.entity.FileMetadata;
@@ -15,31 +16,35 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.io.Serial;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Service
 @RequiredArgsConstructor
-// final 필드들 매개변수로 받는 생성자 자동 생성
-// spring에서 편의로 생성자가 딱 하나 일때는 @Auto 안 붙여도 자동으로 붙여줌
 public class BookService {
 
     private final BookRepository bookRepository;
-//    private final ChapterRepository chapterRepository;
-//    private final PageRepository pageRepository;
+    private final PageRepository pageRepository;
     private final FileService fileService;
 
     private Specification<Book> search(String kw) {
         return new Specification<>() {
+            @Serial
             private static final long serialVersionUID = 1L;
+
             @Override
-            public Predicate toPredicate(Root<Book> b, CriteriaQuery<?> query, CriteriaBuilder cb) {
+            public Predicate toPredicate(@NonNull Root<Book> b, @NonNull CriteriaQuery<?> query, @NonNull CriteriaBuilder cb) {
                 // b - 기준을 의미하는 Book 앤티티의 객체(책 제목 검색)
 
                 query.distinct(true); //중복 제거
@@ -62,60 +67,69 @@ public class BookService {
         return this.bookRepository.findAll(spec, pageable);
     }
 
-    public Book getBook(Long id) {
-        Optional<Book> book = this.bookRepository.findById(id);
-        if (book.isPresent()) {
-            return book.get();
-        } else {
-            throw new DataNotFoundException("book not found");
-        }
+
+    @Transactional(readOnly = true)
+    public Outline getOutline(Long bookId) {
+
+        // Book 엔티티를 author만 fetch join으로 조회.
+        Book book = bookRepository.findBookWithAuthorAndChapterById(bookId);
+
+        List<PageSummaryWithChapterId> pageSummariesWithChapterId = pageRepository.findAllByChapterIdIn(
+                book.getChapters()
+                        .stream()
+                        .map(BaseEntity::getId)
+                        .collect(Collectors.toList())
+        );
+
+        // 페이지 요약을 챕터 ID 기준으로 그룹화
+        Map<Long, List<PageSummaryWithChapterId>> pageSummariesGroupedByChapter = pageSummariesWithChapterId.stream()
+                .collect(Collectors.groupingBy(PageSummaryWithChapterId::getChapterId));
+
+        // 각 챕터 ID 별로 OutlineChapter 객체 생성
+        List<ChapterSummary> chapterSummaries = pageSummariesGroupedByChapter.entrySet().stream()
+                .map(entry -> {
+                    Long chapterId = entry.getKey();
+                    List<PageSummaryWithChapterId> pageSummariesInChapter = entry.getValue();
+
+                    // 각 PageSummaryWithChapterId 객체로부터 PageSummary 객체 생성하고 페이지 ID에 따라 정렬
+                    List<PageSummary> pageSummaries = pageSummariesInChapter.stream()
+                            .map(PageSummary::new)  // PageSummaryWithChapterId -> PageSummary로 변환
+                            .sorted(Comparator.comparing(PageSummary::getOrderNum)) // orderNum에 따라 정렬
+                            .toList();
+
+                    return new ChapterSummary(
+                            book.getChapters().stream().filter( // 해당 chapterId를 가진 Chapter 객체를 찾아온다.
+                                    chapter -> Objects.equals(chapter.getId(), chapterId)
+                            ).findAny().orElseThrow(),
+                            pageSummaries // orderNum 오름차순으로 정렬된 PageSummary 리스트
+                    );
+
+                })
+                .sorted(Comparator.comparingInt(ChapterSummary::getOrderNum)) // 챕터 orderNum에 따라 정렬
+                .toList();
+
+        // Outline 구현체 제작 후 반환
+        return Outline.builder()
+                .id(book.getId())
+                .title(book.getTitle())
+                .author(book.getAuthor())
+                .coverImgUrl(book.getCoverImgUrl())
+                .published(book.isPublished())
+                .chapters(chapterSummaries)
+                .build();
     }
-
-
-    /**
-     * @return 새로운 책 객체를 반환한다. 작성이 되지 않은 책과, 하나씩의 기본 챕터와 페이지를 가진다.
-     */
-    public Book createNewBook(Account author) {
-
-        String defaultCoverImgUrl = "https://library.kbu.ac.kr/libeka/fileview/3025aced-3e0a-4266-86ed-a1894eb759b3.JPG";
-
-        Book book = Book.builder()
-                .title("제목을 입력해주세요")
-                .chapters(new ArrayList<>())
-                .isPublished(false)
-                .coverImgUrl(defaultCoverImgUrl)
-                .author(author)
-                .build();
-
-        Book savedBook = bookRepository.save(book);
-
-        Chapter defaultChapter = Chapter.builder()
-                .title("제목을 입력해주세요")
-                .pages(new ArrayList<>())
-                .book(book)
-                .build();
-
-        Page defaultPage = Page.builder()
-                .title("제목을 입력해주세요")
-                .content("내용을 입력해주세요")
-                .chapter(defaultChapter)
-                .build();
-
-        defaultChapter.getPages().add(defaultPage); // 챕터에 페이지 추가
-        book.getChapters().add(defaultChapter); // 책에 챕터 추가
-
-        return save(book); // 위의 컬렉션 추가로 영속전이가 발생, Book, Chapter, Page가 모두 영속되고 영속된 Book이 반환된다.
-    }
-
-
-    /* ###########################
-     * JPA Repository Method Spec
-     * ###########################
-     */
-
-
-    public Book save(Book book) {
+    
+    
+    public Book delegateSave(Book book) {
         return bookRepository.save(book);
+    }
+
+    public Book delegateFindBookWithAuthorById(Long id) {
+        return bookRepository.findBookWithAuthorById(id);
+    }
+
+    public Book delegateFindBookWithAuthorAndChapterById(Long id) {
+        return bookRepository.findBookWithAuthorAndChapterById(id);
     }
 
 
@@ -135,27 +149,4 @@ public class BookService {
     public void delete(Book book){
         this.bookRepository.delete(book);
     }
-    // 삭제
-
-
-
-
-//    @Transactional
-//    public Book createBookWithChaptersAndPages(Book book, List<Chapter> chapters, List<Page> pages) {
-//
-//        Book savedBooks = bookRepository.save(book);
-//
-//        for(Chapter chapter : chapters) {
-//            chapter.setBook(savedBooks);
-//            Chapter savedChapter = chapterRepository.save(chapter);
-//
-//            for(Page page : pages) {
-//                if(page.getChapter() == chapter) {
-//                    page.setChapter(savedChapter);
-//                    pageRepository.save(page);
-//                }
-//            }
-//        }
-//        return savedBooks;
-//    }
 }

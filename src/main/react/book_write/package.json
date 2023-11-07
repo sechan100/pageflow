@@ -21,7 +21,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "PUBLIC_URL=/react/build react-scripts build",
+    "build": "PUBLIC_URL=/react/build/book_write react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

@@ -38,22 +38,11 @@ public class BookController {
         return "/user/book/cards";
     }
 
-    
-    @PostMapping("/book/create")
-    public String createBook(@Valid BookForm bookForm, BindingResult bindingResult, @RequestParam("file") MultipartFile file, Principal principal) throws IOException {
-        if(bindingResult.hasErrors() || file.isEmpty()) {
-            return "/book/book_form";
-        }
-        Account author = this.accountService.findFetchJoinProfileByUsername(principal.getName());
-//        this.bookService.create(bookForm.getTitle(), bookForm.getFile(), author);
-        return "redirect:/book/list";
-    }
-
     @GetMapping(value = "/book/detail/{id}")
     public String bookDetail(Model model, @PathVariable("id") Long id){
         Book book = this.bookService.getBook(id);
         model.addAttribute("book", book);
-        return "/book/book_detail";
+        return "/user/book/book_detail";
     } // 상세페이지
 
     @PreAuthorize("isAuthenticated()")
@@ -65,7 +54,7 @@ public class BookController {
         }
         bookForm.setTitle(book.getTitle());
         bookForm.setFile(bookForm.getFile());
-        return "/book/book_form";
+        return "forward:/react/build/index.html\";";
     } // 수정 get
 
     @PreAuthorize("isAuthenticated()")
@@ -73,7 +62,7 @@ public class BookController {
     public String bookModify(@Valid BookForm bookForm, BindingResult bindingResult,
                                  Principal principal, @PathVariable("id") Long id, @RequestParam("file") MultipartFile file) throws IOException {
         if (bindingResult.hasErrors() || file.isEmpty()) {
-            return "/book/book_form";
+            return "forward:/react/build/index.html\";";
         }
 
         Book book = this.bookService.getBook(id);
@@ -82,7 +71,7 @@ public class BookController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정권한이 없습니다.");
         }
         Book modifiedBook = this.bookService.modify(book,bookForm.getTitle(), file, author);
-        return "redirect:/book";
+        return "redirect:/user/book/cards";
 
     } // 수정 post
 
@@ -96,7 +85,7 @@ public class BookController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "삭제권한이 없습니다.");
         }
         this.bookService.delete(book);
-        return "redirect:/book";
+        return "redirect:/user/book/cards";
     } // 삭제
 
 

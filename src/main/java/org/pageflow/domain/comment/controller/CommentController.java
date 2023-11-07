@@ -46,13 +46,15 @@ public class CommentController {
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/modify/{id}")
-    public String modify(CommentForm commentForm, @PathVariable("id") Long id, Principal principal) {
+    public String modify(Model model,CommentForm commentForm, @PathVariable("id") Long id, Principal principal) {
         Comment comment = this.commentService.getComment(id);
+        Book book = this.bookService.getBook(id);
         if (!comment.getAuthor().getUsername().equals(principal.getName())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정권한이 없습니다.");
         }
         commentForm.setContent(comment.getContent());
-        return "/comment/comment_form";
+        model.addAttribute("commentForm", commentForm);
+        return String.format("redirect:/book/detail/%s",book.getId());
     } // 수정 폼
 
     @PreAuthorize("isAuthenticated()")
@@ -60,7 +62,7 @@ public class CommentController {
     public String modify(@Valid CommentForm commentForm, BindingResult bindingResult,
                                @PathVariable("id") Long id, Principal principal) {
         if (bindingResult.hasErrors()) {
-            return "/comment/comment_form";
+            return String.format("redirect:/book/detail/%s", id);
         }
         Comment comment = this.commentService.getComment(id);
         if (!comment.getAuthor().getUsername().equals(principal.getName())) {

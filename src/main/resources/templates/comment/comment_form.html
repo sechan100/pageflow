@@ -1,19 +1,17 @@
-<html lang="en" layout:decorate="~{/book/book_form_layout.html}" xmlns:layout="http://www.w3.org/1999/xhtml"
+<html lang="en" layout:decorate="~{/user/book/book_detail.html}" xmlns:layout="http://www.w3.org/1999/xhtml"
       xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
     <title>상세페이지</title>
 </head>
 <body>
-<main layout:fragment="main">
-  <h5 >댓글 수정</h5>
-    <form th:object="${commentForm}" method="post">
-        <div th:replace="~{/comment/form_errors :: formErrorsFragment}"></div>
-        <div class="mb-3">
-            <label for="content" class="form-label">내용</label>
-            <textarea th:field="*{content}" class="form-control" rows="10"></textarea>
-        </div>
-        <input type="submit" value="저장하기" >
-    </form>
-</main>
+<div layout:fragment="commentForm">
+    <div class="form-control w-full h-2/5 relative" >
+        <form th:object="${commentForm}" method="post" class="absolute bottom-0 top-0 left-0 right-0">
+        <textarea name="content" id="content" type="text" placeholder="소중한 의견을 남겨주세요" class="input input-bordered w-full h-full">
+        </textarea>
+            <input class="input input-bordered  " type="submit" value="댓글등록" />
+        </form>
+    </div>
+</div>
 </body>
 </html>

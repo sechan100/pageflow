@@ -3,6 +3,7 @@ package org.pageflow.domain.book.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.pageflow.base.entity.BaseEntity;
+import org.pageflow.domain.comment.entity.Comment;
 import org.pageflow.domain.user.entity.Account;
 
 import java.util.ArrayList;
@@ -32,6 +33,9 @@ public class Book extends BaseEntity {
      * 책을 수정하기 위해서는 출판을 취소후, 수정후에 다시 출판 신청을 해야한다.
      */
     private boolean isPublished;
+
+    @OneToMany(mappedBy = "book", cascade = CascadeType.REMOVE)
+    private List<Comment> commentList;
 
 
 }

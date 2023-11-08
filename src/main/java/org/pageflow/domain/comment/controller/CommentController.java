@@ -10,17 +10,16 @@ import org.pageflow.domain.comment.service.CommentService;
 import org.pageflow.domain.user.entity.Account;
 import org.pageflow.domain.user.service.AccountService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
+import java.util.List;
 
 @RequiredArgsConstructor
 @Controller
@@ -31,24 +30,44 @@ public class CommentController {
     private final AccountService accountService;
     private final BookService bookService;
 
-    @PostMapping("/create/{id}")
-    public String create(Model model, @PathVariable("id") Long id, @Valid CommentForm commentForm,
-                         BindingResult bindingResult, Principal principal) {
-        Book book = this.bookService.getBook(id);
+//    @PostMapping("/create/{id}")
+//    public String create(Model model, @PathVariable("id") Long id, @Valid CommentForm commentForm,
+//                         BindingResult bindingResult, Principal principal) {
+//        Book book = this.bookService.delegateFindBookWithAuthorById(id);
+//        Account author = this.accountService.findFetchJoinProfileByUsername(principal.getName());
+//        if (bindingResult.hasErrors()) {
+//            model.addAttribute("book", book);
+//            return "/book_detail";
+//        }
+//        this.commentService.create(book, commentForm.getContent(),author);
+//        return String.format("redirect:/book/detail/%s", id);
+//    } //댓글 작성
+
+    @GetMapping("/create/{id}")
+    public ResponseEntity<List<Comment>> create(@RequestParam(value="content") String content, @PathVariable("id") Long id, Principal principal){
+        Book book = this.bookService.delegateFindBookWithAuthorById(id);
         Account author = this.accountService.findFetchJoinProfileByUsername(principal.getName());
-        if (bindingResult.hasErrors()) {
-            model.addAttribute("book", book);
-            return "/book_detail";
-        }
-        this.commentService.create(book, commentForm.getContent(),author);
-        return String.format("redirect:/book/detail/%s", id);
-    } //댓글 작성
+
+        this.commentService.create(book, content,author);
+        List<Comment> comment = this.commentService.findAll();
+
+        return ResponseEntity.ok().body(comment);
+
+    } // 댓글 작성
+
+    @GetMapping("/list/{id}")
+    public ResponseEntity<List<Comment>> list(){
+        List<Comment> comment = this.commentService.findAll();
+
+        return ResponseEntity.ok().body(comment);
+
+    } // 댓글 작성
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/modify/{id}")
     public String modify(Model model,CommentForm commentForm, @PathVariable("id") Long id, Principal principal) {
         Comment comment = this.commentService.getComment(id);
-        Book book = this.bookService.getBook(id);
+        Book book = this.bookService.delegateFindBookWithAuthorById(id);
         if (!comment.getAuthor().getUsername().equals(principal.getName())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정권한이 없습니다.");
         }

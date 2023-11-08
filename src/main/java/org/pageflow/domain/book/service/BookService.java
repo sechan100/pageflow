@@ -2,10 +2,12 @@ package org.pageflow.domain.book.service;
 
 import jakarta.persistence.criteria.*;
 import lombok.RequiredArgsConstructor;
-import org.pageflow.domain.book.DataNotFoundException;
 import org.pageflow.base.entity.BaseEntity;
 import org.pageflow.domain.book.entity.Book;
-import org.pageflow.domain.book.model.outline.*;
+import org.pageflow.domain.book.model.outline.ChapterSummary;
+import org.pageflow.domain.book.model.outline.Outline;
+import org.pageflow.domain.book.model.outline.PageSummary;
+import org.pageflow.domain.book.model.outline.PageSummaryWithChapterId;
 import org.pageflow.domain.book.repository.BookRepository;
 import org.pageflow.domain.book.repository.PageRepository;
 import org.pageflow.domain.user.entity.Account;
@@ -18,13 +20,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 import java.io.Serial;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -137,7 +136,7 @@ public class BookService {
     public Book modify(Book book, String title, MultipartFile file, Account author) throws IOException {
 
         book.setTitle(title);
-        book.setAuthor(author);
+        book.setAuthor(author.getProfile());
 
         FileMetadata bookCoverFileMetadata = fileService.uploadFile(file, book, FileMetadataType.BOOK_COVER);
         String imgUri = fileService.getImgUri(bookCoverFileMetadata);

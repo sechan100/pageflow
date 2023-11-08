@@ -62,4 +62,8 @@ public class CommentService {
     public List<Comment> findAll() {
         return this.commentRepository.findAll();
     }
+
+    public List<Comment> findAllByBookId(Long id) {
+        return this.commentRepository.findAllByBookId(id);
+    }
 }

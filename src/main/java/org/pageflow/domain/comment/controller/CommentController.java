@@ -43,25 +43,24 @@ public class CommentController {
 //        return String.format("redirect:/book/detail/%s", id);
 //    } //댓글 작성
 
-    @GetMapping("/create/{id}")
-    public ResponseEntity<List<Comment>> create(@RequestParam(value="content") String content, @PathVariable("id") Long id, Principal principal){
+    @PostMapping("/create/{id}")
+    public ResponseEntity<List<Comment>> create(@RequestParam(value="content") String content, @PathVariable("id") Long id, Principal principal) {
         Book book = this.bookService.delegateFindBookWithAuthorById(id);
         Account author = this.accountService.findFetchJoinProfileByUsername(principal.getName());
 
-        this.commentService.create(book, content,author);
-        List<Comment> comment = this.commentService.findAll();
+        this.commentService.create(book, content, author);
+        List<Comment> commentList = this.commentService.findAll();
 
-        return ResponseEntity.ok().body(comment);
-
+        return ResponseEntity.ok().body(commentList);
     } // 댓글 작성
 
     @GetMapping("/list/{id}")
-    public ResponseEntity<List<Comment>> list(){
-        List<Comment> comment = this.commentService.findAll();
+    public ResponseEntity<List<Comment>> list(@PathVariable("id") Long id) {
+        List<Comment> commentList = this.commentService.findAllByBookId(id);
 
-        return ResponseEntity.ok().body(comment);
+        return ResponseEntity.ok().body(commentList);
+    } // 댓글 리스트 조회
 
-    } // 댓글 작성
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/modify/{id}")

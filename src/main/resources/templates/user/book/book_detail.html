@@ -133,18 +133,18 @@ Array.from(recommend_elements).forEach(function(element) {
         function commentWrite_submitForm(form) {
             form.content.value = form.content.value.trim();
 
-            if (form.content.value.length == 0) {
+            if (form.content.value.length === 0) {
                 alert("댓글을 입력해주세요");
                 form.content.focus();
                 return;
             }
 
-            var bookId = [[${book.id}]];
+            var bookId = [[${book.id}]]; // bookId를 올바르게 가져오도록 수정
 
             $.ajax({
-                type: 'GET',
+                type: 'POST', // 요청 메서드를 POST로 변경
                 url: `/comment/create/${bookId}`,
-                data: 'content=' + form.content.value,
+                data: { content: form.content.value }, // 데이터 전달 방식 변경
                 success: function(comment) {
                     console.log("확인");
                     commentList(comment);
@@ -157,7 +157,7 @@ Array.from(recommend_elements).forEach(function(element) {
         }
 
         $(document).ready(function() {
-            var bookId = [[${book.id}]];
+            var bookId = [[${book.id}]]; // bookId를 올바르게 가져오도록 수정
 
             $.ajax({
                 type: 'GET',
@@ -169,31 +169,16 @@ Array.from(recommend_elements).forEach(function(element) {
                     console.error("error");
                 }
             });
-        })
+        });
 
         function commentList(comment) {
             var output = "";
 
-<!--            <div th:each="comment : ${book.commentList}">-->
-<!--                <div th:text="${comment.content}"></div>-->
-<!--                <div>-->
-<!--                    <a href="javascript:void(0);" class="recommend" th:text="추천"></a>-->
-<!--                    <a th:href="@{|/comment/detail/${comment.id}|}" class="edit"-->
-<!--                       sec:authorize="isAuthenticated()" th:text="수정"></a>-->
-<!--                    <a href="javascript:void(0);" th:data-uri="@{|/comment/delete/${comment.id}|}"-->
-<!--                       class="delete" sec:authorize="isAuthenticated()" th:text="삭제"></a>-->
-<!--                </div>-->
-<!--            </div>-->
-
-            for ( var i in comment) {
+            for (var i in comment) {
                 output += "<div>" + comment[i].content + "</div>";
-
-
-
-
-
             }
-                $("#comment_list").html(output);
+
+            $("#comment_list").html(output);
         }
     </script>
 

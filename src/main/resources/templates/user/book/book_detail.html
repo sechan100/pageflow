@@ -106,25 +106,7 @@
     </section>
 
 
-    <!--  삭제 js  -->
-    <script type='text/javascript'>
-        const delete_elements = document.getElementsByClassName("delete");
-        Array.from(delete_elements).forEach(function(element) {
-            element.addEventListener('click', function() {
-                if(confirm("정말로 삭제하시겠습니까?")) {
-                    location.href = this.dataset.uri;
-                };
-            });
-        });
 
-        const recommend_elements = document.getElementsByClassName("recommend");
-Array.from(recommend_elements).forEach(function(element) {
-    element.addEventListener('click', function() {
-            location.href = this.dataset.uri;
-    });
-});
-
-    </script>
 
     <!-- 댓글 작성  ajax-->
     <script>
@@ -176,11 +158,34 @@ Array.from(recommend_elements).forEach(function(element) {
 
             for (var i in comment) {
                 output += "<div>" + comment[i].content + "</div>";
+                output += "<div>";
+                output += `<a href="javascript:void(0);" class="recommend" onclick="recommendComment(${comment[i].id})">추천</a>`;
+                output += `<a href="javascript:void(0);" class="edit" onclick="editComment(${comment[i].id})">수정</a>`;
+                output += `<a href="javascript:void(0);" class="delete" onclick="deleteComment(${comment[i].id})">삭제</a>`;
+                output += "</div>";
             }
 
             $("#comment_list").html(output);
         }
+
+        const deleteComment = (commentId) => {
+            if (confirm("정말로 삭제하시겠습니까?")) {
+                $.ajax({
+                    type: 'GET',
+                    url: `/comment/delete/${commentId}`,
+                    success: function (comment) {
+                        console.log('삭제 완료');
+                        commentList(comment); // 댓글 목록 업데이트
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("error");
+                    }
+                });
+            }
+        };
     </script>
+
+
 
 </main>
 </body>

@@ -55,8 +55,8 @@ public class CommentController {
     } // 댓글 작성
 
     @GetMapping("/list/{id}")
-    public ResponseEntity<List<Comment>> list(@PathVariable("id") Long id) {
-        List<Comment> commentList = this.commentService.findAllByBookId(id);
+    public ResponseEntity<List<Comment>> list() {
+        List<Comment> commentList = this.commentService.findAll();
 
         return ResponseEntity.ok().body(commentList);
     } // 댓글 리스트 조회
@@ -92,13 +92,15 @@ public class CommentController {
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/delete/{id}")
-    public String commentDelete(Principal principal, @PathVariable("id") Long id) {
+    public ResponseEntity<List<Comment>> commentDelete(Principal principal, @PathVariable("id") Long id) {
         Comment comment = this.commentService.getComment(id);
         if (!comment.getAuthor().getUsername().equals(principal.getName())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "삭제권한이 없습니다.");
         }
+
         this.commentService.delete(comment);
-        return String.format("redirect:/book/detail/%s", comment.getBook().getId());
+        List<Comment> commentList = this.commentService.findAllByBookId(comment.getBook().getId());
+        return ResponseEntity.ok().body(commentList);
     } // 삭제
 
     @GetMapping("/vote/{id}")

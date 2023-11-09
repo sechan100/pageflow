@@ -7,29 +7,29 @@
 
 
 <main layout:fragment="main">
-    <section class="text-gray-600">
-        <div class=" py-1 flex flex-col">
-            <div class="w-4/6 h-full mx-auto">
-                <div class="flex flex-col sm:flex-row mt-10">
+    <section class="text-gray-600 h-full">
+        <div class=" py-1 w-9/12 m-auto">
+            <div class="h-5/6 mt-10 flex flex-col">
+                <div class="flex flex-col sm:flex-row  h-full  justify-center">
                     <!-- 좌측 레이아웃 시작 -->
-                    <div class="text-center sm:pr-8 sm:py-8 flex flex-col border ">
+                    <div class="text-center sm:pr-12 sm:py-10 flex flex-col  ">
                         <div class="w-full h-64 bg-gray-500 text-gray-400 ml-4">
-                            <img th:src="@{${book.coverImgUrl}}" alt="Book Image">
+                            <img th:src="@{${outline.coverImgUrl}}" alt="Book Image">
                         </div>
                         <div class="ml-4 flex flex-col items-center text-center justify-center w-full">
                             <h2 class="font-black title-font mt-4 text-gray-900 text-lg  w-full h-16"
                                 th:text="${book.title}"></h2>
                             <div class=" w-full">
-                                <span class="text-base mt-4 mr-4 border" th:text="${book.author.profile.nickname}"></span>
+                                <span class="text-base mt-4 mr-4 border" th:text="${outline.author.nickname}"></span>
                                 <i class="fa-solid fa-heart" style="color: #ff0000;"></i>
                                 <a href="javascript:void(0);" class="recommend ">
                                     추천
                                 </a>
                             </div>
                             <div>
-                                <a th:href="@{|/book/modify/${book.id}|}" th:text="수정"
+                                <a th:href="@{|/book/modify/${outline.id}|}" th:text="수정"
                                    sec:authorize="isAuthenticated()"></a>
-                                <a href="javascript:void(0);" class="delete" th:data-uri="@{|/book/delete/${book.id}|}"
+                                <a href="javascript:void(0);" class="delete" th:data-uri="@{|/outline/delete/${outline.id}|}"
                                    th:text="삭제"
                                    sec:authorize="isAuthenticated()"></a>
                             </div>
@@ -38,10 +38,10 @@
                     </div>
                     <!-- 좌측 레이아웃 끝 -->
                     <!-- 우측 레이아웃 시작 -->
-                    <div class="sm:w-2/3  sm:mt-0 sm:ml-2 text-center sm:text-left flex flex-col ">
+                    <div class="sm:w-2/3 sm:mt-0 sm:ml-2 text-center sm:text-left flex flex-col h-full ">
                         <!--      책 챕터 표기    -->
 
-                        <div class=" h-full rounded-lg" style="background-color : #e5e7eb;">
+                        <div class=" h-96 rounded-2xl  " style="background-color : #e5e7eb;">
 
                             <div>
                                 <ul class="menu menu-horizontal rounded-box justify-center ">
@@ -76,17 +76,19 @@
                         </div>
                         <!--          책 챕터 끝    -->
                         <!--  댓글 레이아웃 -->
-                        <div class="border border-red-200  h-full flex-col">
-                            <div id="comment_list" class="border"></div>
-
-                            <div class=" w-full justify-items-end">
-                                <div class="form-control">
-                                    <form class="flex border border-yellow-500"
-                                          onsubmit="commentWrite_submitForm(this); return false;">
-                                        <label for="content"></label>
-                                        <input name="content" id="content" type="text" placeholder="소중한 의견을 남겨주세요"
-                                               class="input input-bordered justify-start mr-1"/>
-                                        <input type="submit" class="input input-bordered justify-end" value="등록"/>
+                        <div class="h-96 flex flex-col relative rounded-2xl mt-10"  style="background-color : #e5e7eb;">
+                            <div id="comment_list" ></div>
+                            <div class="w-full absolute bottom-0 " >
+                                <div class="form-control flex">
+                                    <form class="flex " onsubmit="commentWrite_submitForm(this); return false;">
+                                        <div class="flex-1 mr-2">
+                                            <label for="content"></label>
+                                            <input name="content" id="content" type="text" placeholder="소중한 의견을 남겨주세요"
+                                                   class="input input-bordered px-6 w-full" />
+                                        </div>
+                                        <div class="w-1/5 pl-2">
+                                            <input type="submit" class="input input-bordered w-full"  value="등록" />
+                                        </div>
                                     </form>
                                 </div>
                             </div>

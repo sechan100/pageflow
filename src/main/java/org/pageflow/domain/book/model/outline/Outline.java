@@ -1,13 +1,17 @@
 package org.pageflow.domain.book.model.outline;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.pageflow.domain.user.entity.Profile;
 
 import java.util.List;
 
 @Data
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class Outline {
     
     private Long id;

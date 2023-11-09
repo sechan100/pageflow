@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.pageflow.domain.book.entity.Book;
 import org.pageflow.domain.book.model.form.BookForm;
+import org.pageflow.domain.book.model.outline.Outline;
 import org.pageflow.domain.book.service.BookService;
 import org.pageflow.domain.user.entity.Account;
 import org.pageflow.domain.user.service.AccountService;
@@ -41,8 +42,8 @@ public class BookController {
 
     @GetMapping(value = "/book/detail/{id}")
     public String bookDetail(Model model, @PathVariable("id") Long id){
-        Book book = this.bookService.delegateFindBookWithAuthorById(id);
-        model.addAttribute("book", book);
+        Outline outline = this.bookService.getOutline(id);
+        model.addAttribute("outline", outline);
         return "/user/book/book_detail";
     } // 상세페이지
 

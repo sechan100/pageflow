@@ -13,18 +13,20 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
-public class ChapterSummary {
+public class ChapterSummary implements Rearrangeable {
     
     private Long id;
     private String title;
-    private Integer orderNum;
+    private Integer sortPriority;
+    private Long ownerId; // book_id
     private List<PageSummary> pages;
     
     
     public ChapterSummary(Chapter chapter, List<PageSummary> pages) {
         this.id = chapter.getId();
         this.title = chapter.getTitle();
-        this.orderNum = chapter.getOrderNum();
+        this.sortPriority = chapter.getSortPriority();
+        this.ownerId = chapter.getBook().getId();
         this.pages = pages;
     }
     

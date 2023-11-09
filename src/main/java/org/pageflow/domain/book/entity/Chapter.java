@@ -16,7 +16,7 @@ import java.util.Objects;
 @Setter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)//접근 수준. 상속관계에 있는 클래스에서만 생성자에 접근 가능
-@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"book_id", "orderNum"}))
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"book_id", "sortPriority"}))
 @DynamicUpdate
 public class Chapter extends BaseEntity {
     
@@ -28,30 +28,37 @@ public class Chapter extends BaseEntity {
     
     @Min(1)
     @Column(nullable = false)
-    private Integer orderNum;
+    private Integer sortPriority;
     
     @OneToMany(fetch = FetchType.LAZY, orphanRemoval = true, mappedBy = "chapter")
     private List<Page> pages = new ArrayList<>();
     
     
-    
-    
     /**
-     * 설정한 orderNum이 없다면, 책의 챕터들의 제일 마지막 순서로 새로운 챕터의 순서를 자동으로 설정.
+     * sortPriority 자동 설정
+     * ex) 마지막 chapter의 sortPriority가 4710이라면, 새로운 chapter의 sortPriority는 5000으로 설정
      */
     @PrePersist
-    private void setOrderNum() {
-        if (this.orderNum == null) {
-            this.orderNum = this.book.getChapters().size() + 1;
+    private void autoSetSortPriority() {
+        if (this.sortPriority == null) {
+            
+            Integer lastChapterSortPriority = 1000;
+            
+            if(!this.book.getChapters().isEmpty()) {
+                lastChapterSortPriority = this.book.getChapters().get(this.book.getChapters().size() - 1).getSortPriority();
+                lastChapterSortPriority = Integer.parseInt(lastChapterSortPriority.toString().substring(0, 1)) * 1000 + 1000;
+            }
+            
+            this.sortPriority = lastChapterSortPriority;
         }
     }
     
     
     // AllArgsConstructor: Pages 값을 초기화하기위해서 하드코딩
-    public Chapter(Book book, String title, Integer orderNum, List<Page> pages) {
+    public Chapter(Book book, String title, Integer sortPriority, List<Page> pages) {
         this.book = book;
         this.title = title;
-        this.orderNum = orderNum;
+        this.sortPriority = sortPriority;
         this.pages = Objects.requireNonNullElseGet(pages, ArrayList::new);
     }
 }

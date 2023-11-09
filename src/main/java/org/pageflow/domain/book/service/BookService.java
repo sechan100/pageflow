@@ -41,7 +41,7 @@ public class BookService {
         return new Specification<>() {
             @Serial
             private static final long serialVersionUID = 1L;
-
+            
             @Override
             public Predicate toPredicate(@NonNull Root<Book> b, @NonNull CriteriaQuery<?> query, @NonNull CriteriaBuilder cb) {
                 // b - 기준을 의미하는 Book 앤티티의 객체(책 제목 검색)
@@ -58,6 +58,7 @@ public class BookService {
         };
     }
 
+
     public org.springframework.data.domain.Page<Book> getList(int page, String kw) {
         List<Sort.Order> sorts = new ArrayList<>();
         sorts.add(Sort.Order.desc("createDate"));
@@ -65,48 +66,48 @@ public class BookService {
         Specification<Book> spec = search(kw);
         return this.bookRepository.findAll(spec, pageable);
     }
-
-
+    
+    
     @Transactional(readOnly = true)
     public Outline getOutline(Long bookId) {
-
+        
         // Book 엔티티를 author만 fetch join으로 조회.
         Book book = bookRepository.findBookWithAuthorAndChapterById(bookId);
-
-        List<PageSummaryWithChapterId> pageSummariesWithChapterId = pageRepository.findAllByChapterIdIn(
+        
+        List<PageSummary> pageSummaries = pageRepository.findAllByChapterIdIn(
                 book.getChapters()
                         .stream()
                         .map(BaseEntity::getId)
                         .collect(Collectors.toList())
         );
-
+        
         // 페이지 요약을 챕터 ID 기준으로 그룹화
         Map<Long, List<PageSummaryWithChapterId>> pageSummariesGroupedByChapter = pageSummariesWithChapterId.stream()
                 .collect(Collectors.groupingBy(PageSummaryWithChapterId::getChapterId));
-
+        
         // 각 챕터 ID 별로 OutlineChapter 객체 생성
         List<ChapterSummary> chapterSummaries = pageSummariesGroupedByChapter.entrySet().stream()
                 .map(entry -> {
                     Long chapterId = entry.getKey();
                     List<PageSummaryWithChapterId> pageSummariesInChapter = entry.getValue();
-
+                    
                     // 각 PageSummaryWithChapterId 객체로부터 PageSummary 객체 생성하고 페이지 ID에 따라 정렬
                     List<PageSummary> pageSummaries = pageSummariesInChapter.stream()
                             .map(PageSummary::new)  // PageSummaryWithChapterId -> PageSummary로 변환
                             .sorted(Comparator.comparing(PageSummary::getOrderNum)) // orderNum에 따라 정렬
                             .toList();
-
+                    
                     return new ChapterSummary(
                             book.getChapters().stream().filter( // 해당 chapterId를 가진 Chapter 객체를 찾아온다.
                                     chapter -> Objects.equals(chapter.getId(), chapterId)
                             ).findAny().orElseThrow(),
-                            pageSummaries // orderNum 오름차순으로 정렬된 PageSummary 리스트
+                            pageSummariesInChapter // orderNum 오름차순으로 정렬된 PageSummary 리스트
                     );
-
+                    
                 })
-                .sorted(Comparator.comparingInt(ChapterSummary::getOrderNum)) // 챕터 orderNum에 따라 정렬
+//                .sorted(Comparator.comparingLong(ChapterSummary::getSortPriority)) // 챕터 orderNum에 따라 정렬
                 .toList();
-
+        
         // Outline 구현체 제작 후 반환
         return Outline.builder()
                 .id(book.getId())
@@ -123,9 +124,12 @@ public class BookService {
         return bookRepository.save(book);
     }
 
+
+
     public Book delegateFindBookWithAuthorById(Long id) {
         return bookRepository.findBookWithAuthorById(id);
     }
+
 
     public Book delegateFindBookWithAuthorAndChapterById(Long id) {
         return bookRepository.findBookWithAuthorAndChapterById(id);

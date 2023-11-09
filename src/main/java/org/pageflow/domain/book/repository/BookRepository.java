@@ -14,7 +14,7 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     
     
 
-    @EntityGraph(attributePaths = {"author", "author.account"}, type = EntityGraph.EntityGraphType.FETCH)
+    @EntityGraph(attributePaths = {"author"}, type = EntityGraph.EntityGraphType.FETCH)
     Book findBookWithAuthorById(Long id);
 
     @EntityGraph(attributePaths = {"author", "author.account", "chapters"}, type = EntityGraph.EntityGraphType.FETCH)

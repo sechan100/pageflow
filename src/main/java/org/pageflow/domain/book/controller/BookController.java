@@ -76,8 +76,6 @@ public class BookController {
 
     } // 수정 post
 
-
-
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/book/delete/{id}")
     public String bookDelete(Principal principal, @PathVariable("id") Long id) {
@@ -88,6 +86,5 @@ public class BookController {
         this.bookService.delete(book);
         return "redirect:/user/book/cards";
     } // 삭제
-
 
 }

@@ -3,6 +3,9 @@
     <title>Book</title>
 </head>
 <body>
+
+
+
 <main layout:fragment="main">
     <section class="text-gray-600">
         <div class=" py-1 flex flex-col">
@@ -17,7 +20,7 @@
                             <h2 class="font-black title-font mt-4 text-gray-900 text-lg  w-full h-16"
                                 th:text="${book.title}"></h2>
                             <div class=" w-full">
-                                <!--                                <span class="text-base mt-4 mr-4 border"th:text="${book.author.nickname}"></span>-->
+                                <span class="text-base mt-4 mr-4 border" th:text="${book.author.profile.nickname}"></span>
                                 <i class="fa-solid fa-heart" style="color: #ff0000;"></i>
                                 <a href="javascript:void(0);" class="recommend ">
                                     추천
@@ -74,17 +77,8 @@
                         <!--          책 챕터 끝    -->
                         <!--  댓글 레이아웃 -->
                         <div class="border border-red-200  h-full flex-col">
-                            <div id="comment_list"></div>
-<!--                            <div th:each="comment : ${book.commentList}">-->
-<!--                                <div th:text="${comment.content}"></div>-->
-<!--                                <div>-->
-<!--                                    <a href="javascript:void(0);" class="recommend" th:text="추천"></a>-->
-<!--                                    <a th:href="@{|/comment/detail/${comment.id}|}" class="edit"-->
-<!--                                       sec:authorize="isAuthenticated()" th:text="수정"></a>-->
-<!--                                    <a href="javascript:void(0);" th:data-uri="@{|/comment/delete/${comment.id}|}"-->
-<!--                                       class="delete" sec:authorize="isAuthenticated()" th:text="삭제"></a>-->
-<!--                                </div>-->
-<!--                            </div>-->
+                            <div id="comment_list" class="border"></div>
+
                             <div class=" w-full justify-items-end">
                                 <div class="form-control">
                                     <form class="flex border border-yellow-500"
@@ -107,8 +101,7 @@
 
 
 
-
-    <!-- 댓글 작성  ajax-->
+    <!-- 댓글 작성 ajax-->
     <script>
         let commentWrite_submitFormDone = false;
 
@@ -121,12 +114,12 @@
                 return;
             }
 
-            var bookId = [[${book.id}]]; // bookId를 올바르게 가져오도록 수정
+            var bookId = [[${book.id}]];
 
             $.ajax({
-                type: 'POST', // 요청 메서드를 POST로 변경
+                type: 'POST',
                 url: `/comment/create/${bookId}`,
-                data: { content: form.content.value }, // 데이터 전달 방식 변경
+                data: { content: form.content.value },
                 success: function(comment) {
                     console.log("확인");
                     commentList(comment);
@@ -139,7 +132,7 @@
         }
 
         $(document).ready(function() {
-            var bookId = [[${book.id}]]; // bookId를 올바르게 가져오도록 수정
+            var bookId = [[${book.id}]];
 
             $.ajax({
                 type: 'GET',
@@ -153,40 +146,75 @@
             });
         });
 
+    <!--댓글 목록 ajax-->
         function commentList(comment) {
             var output = "";
 
             for (var i in comment) {
-                output += "<div>" + comment[i].content + "</div>";
-                output += "<div>";
-                output += `<a href="javascript:void(0);" class="recommend" onclick="recommendComment(${comment[i].id})">추천</a>`;
-                output += `<a href="javascript:void(0);" class="edit" onclick="editComment(${comment[i].id})">수정</a>`;
-                output += `<a href="javascript:void(0);" class="delete" onclick="deleteComment(${comment[i].id})">삭제</a>`;
+                output += "<div class='comment-item'>";
+                output += "<p id='comment-" + comment[i].id + "'>" + comment[i].content + "</p>"; // 댓글을 텍스트로 표시
+                output += "<a href='javascript:void(0);' class='recommend' onclick='recommendComment(" + comment[i].id + ")'>추천</a>";
+                output += "<a href='javascript:void(0);' class='edit' onclick='editComment(" + comment[i].id + ")'>수정</a>";
+                output += "<a href='javascript:void(0);' class='delete' onclick='deleteComment(" + comment[i].id + ")'>삭제</a>";
                 output += "</div>";
             }
 
             $("#comment_list").html(output);
         }
 
+<!--댓글 삭제 ajax-->
         const deleteComment = (commentId) => {
-            if (confirm("정말로 삭제하시겠습니까?")) {
-                $.ajax({
-                    type: 'GET',
-                    url: `/comment/delete/${commentId}`,
-                    success: function (comment) {
-                        console.log('삭제 완료');
-                        commentList(comment); // 댓글 목록 업데이트
-                    },
-                    error: function (xhr, status, error) {
-                        console.error("error");
-                    }
-                });
+             if (confirm("정말로 삭제하시겠습니까?")) {
+                 $.ajax({
+                     type: 'GET',
+                     url: `/comment/delete/${commentId}`,
+                     success: function (comment) {
+                         console.log('삭제 완료');
+                         commentList(comment); // 댓글 목록 업데이트
+                     },
+                     error: function (xhr, status, error) {
+                         console.error("error");
+                     }
+                 });
+             }
+         };
+
+
+<!--     댓글 수정  ajax    -->
+        function editComment(commentId) {
+        var commentContent = $("#comment-" + commentId).text(); // 기존 댓글 내용 가져오기
+        var newContent = "<textarea> " + commentContent + "</textarea>"; // 수정할 내용을 입력받음
+
+        if (newContent !== null) { // 사용자가 취소하지 않은 경우
+            $("#comment-" + commentId).siblings().find("a").hide();
+            $("#comment-" + commentId).replaceWith("<textarea id='comment-" + commentId + "' style='width: 100%; resize: none;'>" + commentContent + "</textarea>");
+            $("#comment-" + commentId).siblings("button").hide();
+            $("#comment-" + commentId).after(`<button onclick="saveEdit(${commentId})">저장</button>`);
+            $("#comment-" + commentId).after(`<button onclick="cancelEdit(${commentId})">취소</button>`);
+        }
+    }
+
+    function saveEdit(commentId) {
+        var editedContent = $("#comment-" + commentId).val(); // 수정된 댓글 내용 가져오기
+        $.ajax({
+            type: 'POST',
+            url: `/comment/modify/${commentId}`,
+            data: { content: editedContent },
+            success: function (comment) {
+                console.log('수정 완료');
+                commentList(comment); // 댓글 목록 업데이트
+            },
+            error: function (xhr, status, error) {
+                console.error("error");
             }
-        };
+        });
+    }
+
+    function cancelEdit(commentId) {
+        var commentContent = $("#comment-" + commentId).text(); // 기존 댓글 내용 가져오기
+        $("#comment-" + commentId).replaceWith("<p id='comment-" + commentId + "'>" + commentContent + "</p>");
+    }
     </script>
-
-
-
 </main>
 </body>
 </html>

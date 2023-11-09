@@ -34,22 +34,17 @@ public class Chapter extends BaseEntity {
     private List<Page> pages = new ArrayList<>();
     
     
-    /**
-     * sortPriority 자동 설정
-     * ex) 마지막 chapter의 sortPriority가 4710이라면, 새로운 chapter의 sortPriority는 5000으로 설정
-     */
+    
     @PrePersist
     private void autoSetSortPriority() {
         if (this.sortPriority == null) {
+            List<Chapter> chapters = this.book.getChapters();
             
-            Integer lastChapterSortPriority = 1000;
+            int lastChapterSortPriority = !chapters.isEmpty() ? chapters.get(chapters.size() - 1).getSortPriority() : 0;
             
-            if(!this.book.getChapters().isEmpty()) {
-                lastChapterSortPriority = this.book.getChapters().get(this.book.getChapters().size() - 1).getSortPriority();
-                lastChapterSortPriority = Integer.parseInt(lastChapterSortPriority.toString().substring(0, 1)) * 1000 + 1000;
-            }
-            
-            this.sortPriority = lastChapterSortPriority;
+            // 새로운 sortPriority는 "(마지막sortPriority) + (10000)"
+            int newSortPriority = lastChapterSortPriority + 10000;
+            this.sortPriority = newSortPriority;
         }
     }
     

@@ -6,7 +6,9 @@ import org.hibernate.TransientPropertyValueException;
 import org.pageflow.domain.book.entity.Book;
 import org.pageflow.domain.book.entity.Chapter;
 import org.pageflow.domain.book.entity.Page;
+import org.pageflow.domain.book.model.outline.ChapterSummary;
 import org.pageflow.domain.book.model.outline.Outline;
+import org.pageflow.domain.book.model.outline.PageSummary;
 import org.pageflow.domain.book.model.request.BookUpdateRequest;
 import org.pageflow.domain.book.model.request.PageUpdateRequest;
 import org.pageflow.domain.book.model.request.RearrangeRequest;
@@ -16,7 +18,7 @@ import org.pageflow.domain.user.entity.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Objects;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +28,7 @@ public class BookWriteService {
     private final ChapterRepository chapterRepository;
     private final PageRepository pageRepository;
     private final BookService bookService;
+    private final SelectiveLISOptimizer selectiveLISOptimizer;
     
     /**
      * @return 새로운 책 객체를 반환한다. 작성이 되지 않은 책과, 하나씩의 기본 챕터와 페이지를 가진다.
@@ -198,12 +201,27 @@ public class BookWriteService {
     }
     
     
+    /**
+     * Selctive LIS 알고리즘을 통해서 오름차순이 파괴된 수열에서 필요한 항을 제해가면서 가장 긴 오름차순 배열을 추출해낼 수 있다.
+     * 이를 통해서 최소한의 엔트리 업데이트를 통해서도 오름차순 정렬을 유지할 수 있다.
+     * @param rearrangeRequest 재정렬 변경사항 dto
+     * @return update된 Outline
+     */
     @Transactional
-    public Outline delegateRearrange(RearrangeRequest request) {
+    public Outline delegateRearrange(Outline rearrangeRequest) {
         
-        if(Objects.equals(request.getType(), "page")){
-            updatePage(new PageUpdateRequest());
-        }
+        List<ChapterSummary> chapterSummaries = rearrangeRequest.getChapters();
+        
+        // 우선순위가 망가진 챕터들의 sortPriority 배열
+        List<Integer> staleSortPriorities = chapterSummaries.stream().map(ChapterSummary::getSortPriority).toList();
+        // Selective LIS 알고리즘을 적용하여 불연속적일 수 있는 항으로 이루어진 최장 오름차순 부분배열을 추출.
+        List<Integer> staleSortPriorityLIS = selectiveLISOptimizer.findSelectiveLIS(staleSortPriorities);
+        
+        
+        
+        
+        
+        List<PageSummary> pageSummaries = rearrangeRequest.getPages();
         
 
         

@@ -2,26 +2,32 @@ package org.pageflow.domain.book.model.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.pageflow.domain.book.entity.Page;
+import org.pageflow.domain.book.model.outline.PageSummary;
 
+
+@EqualsAndHashCode(callSuper = true)
 @Data
 @AllArgsConstructor
-public class PageUpdateRequest {
-    
-    private Long id;
+@NoArgsConstructor
+public class PageUpdateRequest extends RearrangeRequest {
     
     private String title;
-    
-    private Integer orderNum;
     
     private String content;
     
     
     
     public PageUpdateRequest(Page page){
-        this.id = page.getId();
+        super("page", page.getId(), page.getSortPriority());
         this.title = page.getTitle();
-        this.orderNum = page.getOrderNum();
         this.content = page.getContent();
+    }
+    
+    public PageUpdateRequest(PageSummary page){
+        super("page", page.getId(), page.getSortPriority());
+        this.title = page.getTitle();
     }
 }

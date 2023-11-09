@@ -12,7 +12,7 @@ import org.pageflow.base.entity.BaseEntity;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"chapter_id", "orderNum"}))
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"chapter_id", "sortPriority"}))
 @DynamicUpdate
 public class Page extends BaseEntity {
     
@@ -27,19 +27,28 @@ public class Page extends BaseEntity {
     
     @Min(1)
     @Column(nullable = false)
-    private Integer orderNum;
+    private Integer sortPriority;
     
     
     
     
     
     /**
-     * 설정한 orderNum이 없다면, 챕터의 페이지들의 제일 마지막 순서로 새로운 페이지의 순서를 자동으로 설정.
+     * sortPriority 자동 설정
+     * ex) 마지막 page의 sortPriority가 4710이라면, 새로운 page의 sortPriority는 5000으로 설정
      */
     @PrePersist
-    private void setOrderNum() {
-        if (this.orderNum == null) {
-            this.orderNum = this.chapter.getPages().size() + 1;
+    private void autoSetSortPriority() {
+        if (this.sortPriority == null) {
+            
+            Integer lastPageSortPriority = 1000;
+            
+            if(!this.chapter.getPages().isEmpty()) {
+                lastPageSortPriority =this.chapter.getPages().get(this.chapter.getPages().size() - 1).getSortPriority();
+                lastPageSortPriority = Integer.parseInt(lastPageSortPriority.toString().substring(0, 1)) * 1000 + 1000;
+            }
+            
+            this.sortPriority = lastPageSortPriority;
         }
     }
 }

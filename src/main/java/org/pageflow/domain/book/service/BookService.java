@@ -7,7 +7,6 @@ import org.pageflow.domain.book.entity.Book;
 import org.pageflow.domain.book.model.outline.ChapterSummary;
 import org.pageflow.domain.book.model.outline.Outline;
 import org.pageflow.domain.book.model.outline.PageSummary;
-import org.pageflow.domain.book.model.outline.PageSummaryWithChapterId;
 import org.pageflow.domain.book.repository.BookRepository;
 import org.pageflow.domain.book.repository.PageRepository;
 import org.pageflow.domain.user.entity.Account;
@@ -25,7 +24,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.Serial;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 
@@ -41,7 +43,7 @@ public class BookService {
         return new Specification<>() {
             @Serial
             private static final long serialVersionUID = 1L;
-            
+
             @Override
             public Predicate toPredicate(@NonNull Root<Book> b, @NonNull CriteriaQuery<?> query, @NonNull CriteriaBuilder cb) {
                 // b - 기준을 의미하는 Book 앤티티의 객체(책 제목 검색)
@@ -66,48 +68,42 @@ public class BookService {
         Specification<Book> spec = search(kw);
         return this.bookRepository.findAll(spec, pageable);
     }
-    
-    
+
+
     @Transactional(readOnly = true)
     public Outline getOutline(Long bookId) {
-        
+
         // Book 엔티티를 author만 fetch join으로 조회.
         Book book = bookRepository.findBookWithAuthorAndChapterById(bookId);
-        
+
         List<PageSummary> pageSummaries = pageRepository.findAllByChapterIdIn(
                 book.getChapters()
                         .stream()
                         .map(BaseEntity::getId)
-                        .collect(Collectors.toList())
+                        .toList()
         );
-        
+
         // 페이지 요약을 챕터 ID 기준으로 그룹화
-        Map<Long, List<PageSummaryWithChapterId>> pageSummariesGroupedByChapter = pageSummariesWithChapterId.stream()
-                .collect(Collectors.groupingBy(PageSummaryWithChapterId::getChapterId));
-        
+        Map<Long, List<PageSummary>> pageSummariesGroupedByChapter = pageSummaries.stream()
+                .collect(Collectors.groupingBy(PageSummary::getOwnerId));
+
         // 각 챕터 ID 별로 OutlineChapter 객체 생성
         List<ChapterSummary> chapterSummaries = pageSummariesGroupedByChapter.entrySet().stream()
                 .map(entry -> {
                     Long chapterId = entry.getKey();
-                    List<PageSummaryWithChapterId> pageSummariesInChapter = entry.getValue();
-                    
-                    // 각 PageSummaryWithChapterId 객체로부터 PageSummary 객체 생성하고 페이지 ID에 따라 정렬
-                    List<PageSummary> pageSummaries = pageSummariesInChapter.stream()
-                            .map(PageSummary::new)  // PageSummaryWithChapterId -> PageSummary로 변환
-                            .sorted(Comparator.comparing(PageSummary::getOrderNum)) // orderNum에 따라 정렬
-                            .toList();
-                    
+                    List<PageSummary> pageSummariesInChapter = entry.getValue();
+
                     return new ChapterSummary(
                             book.getChapters().stream().filter( // 해당 chapterId를 가진 Chapter 객체를 찾아온다.
                                     chapter -> Objects.equals(chapter.getId(), chapterId)
                             ).findAny().orElseThrow(),
                             pageSummariesInChapter // orderNum 오름차순으로 정렬된 PageSummary 리스트
                     );
-                    
+
                 })
 //                .sorted(Comparator.comparingLong(ChapterSummary::getSortPriority)) // 챕터 orderNum에 따라 정렬
                 .toList();
-        
+
         // Outline 구현체 제작 후 반환
         return Outline.builder()
                 .id(book.getId())
@@ -118,12 +114,11 @@ public class BookService {
                 .chapters(chapterSummaries)
                 .build();
     }
-    
-    
+
+
     public Book delegateSave(Book book) {
         return bookRepository.save(book);
     }
-
 
 
     public Book delegateFindBookWithAuthorById(Long id) {
@@ -134,8 +129,6 @@ public class BookService {
     public Book delegateFindBookWithAuthorAndChapterById(Long id) {
         return bookRepository.findBookWithAuthorAndChapterById(id);
     }
-
-
 
     public Book modify(Book book, String title, MultipartFile file, Account author) throws IOException {
 
@@ -152,4 +145,7 @@ public class BookService {
     public void delete(Book book){
         this.bookRepository.delete(book);
     }
+
 }
+
+

@@ -1,20 +1,25 @@
-<html lang="en" layout:decorate="~{/common/layout.html}" xmlns:th="http://www.w3.org/1999/xhtml" xmlns:layout="">
+<html lang="en" layout:decorate="~{/common/layout.html}" xmlns:th="http://www.w3.org/1999/xhtml" xmlns:layout="" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
 <head>
     <title>Book</title>
 </head>
+
 <body>
-
-
-
 <main layout:fragment="main">
     <section class="text-gray-600 h-full">
         <div class=" py-1 w-9/12 m-auto">
             <div class="h-5/6 mt-10 flex flex-col">
                 <div class="flex flex-col sm:flex-row  h-full  justify-center">
                     <!-- 좌측 레이아웃 시작 -->
-                    <div class="text-center sm:pr-12 sm:py-10 flex flex-col  ">
-                        <div class="w-full h-64 bg-gray-500 text-gray-400 ml-4">
-                            <img th:src="@{${outline.coverImgUrl}}" alt="Book Image">
+                    <div class="text-center  px-1 w-72 flex flex-col">
+                        <div class="h-3/6 w-full relative">
+                            <div class="w-42 absolute" style="z-index : -1 ; filter: blur(5px) ;">
+                                <img src="https://image.utoimage.com/preview/cp872722/2022/12/202212008462_500.jpg"
+                                     alt="배경이미지">
+                            </div>
+                            <div class="w-11/12 h-64 bg-gray-500 text-gray-400 px-1 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                                <img th:src="@{${outline.coverImgUrl}}" alt="Book Image">
+                            </div>
                         </div>
                         <div class="ml-4 flex flex-col items-center text-center justify-center w-full">
                             <h2 class="font-black title-font mt-4 text-gray-900 text-lg  w-full h-16"
@@ -29,8 +34,8 @@
                             <div>
                                 <a th:href="@{|/book/modify/${outline.id}|}" th:text="수정"
                                    sec:authorize="isAuthenticated()"></a>
-                                <a href="javascript:void(0);" class="delete" th:data-uri="@{|/outline/delete/${outline.id}|}"
-                                   th:text="삭제"
+                                <a href="javascript:void(0);" class="delete"
+                                   th:data-uri="@{|/outline/delete/${outline.id}|}" th:text="삭제"
                                    sec:authorize="isAuthenticated()"></a>
                             </div>
                             <button class="btn btn-success w-52 mt-10">뷰어</button>
@@ -76,18 +81,19 @@
                         </div>
                         <!--          책 챕터 끝    -->
                         <!--  댓글 레이아웃 -->
-                        <div class="h-96 flex flex-col relative rounded-2xl mt-10"  style="background-color : #e5e7eb;">
-                            <div id="comment_list" ></div>
-                            <div class="w-full absolute bottom-0 " >
+                        <div class="h-96 flex flex-col relative rounded-2xl mt-10 overflow-hidden"
+                             style="background-color : #e5e7eb;">
+                            <div id="comment_list" class="overfloew-auto h-5/6 border"></div>
+                            <div class="w-full absolute bottom-0 border">
                                 <div class="form-control flex">
                                     <form class="flex " onsubmit="commentWrite_submitForm(this); return false;">
-                                        <div class="flex-1 mr-2">
+                                        <div class="flex-1 px-2 py-1">
                                             <label for="content"></label>
                                             <input name="content" id="content" type="text" placeholder="소중한 의견을 남겨주세요"
-                                                   class="input input-bordered px-6 w-full" />
+                                                   class="input input-bordered px-6 w-full"/>
                                         </div>
-                                        <div class="w-1/5 pl-2">
-                                            <input type="submit" class="input input-bordered w-full"  value="등록" />
+                                        <div class="w-1/5 px-2 py-1">
+                                            <input type="submit" class="input input-bordered w-full" value="등록"/>
                                         </div>
                                     </form>
                                 </div>
@@ -100,8 +106,6 @@
             </div>
         </div>
     </section>
-
-
 
     <!-- 댓글 작성 ajax-->
     <script>

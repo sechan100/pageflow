@@ -19,21 +19,21 @@ import java.util.Objects;
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"book_id", "sortPriority"}))
 @DynamicUpdate
 public class Chapter extends BaseEntity {
-    
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnore // 양방향 객체 참조로 인한 직렬화 무한루프에 빠지는 것을 막는다.
     private Book book;
 
     private String title;
-    
+
     @Min(1)
     @Column(nullable = false)
     private Integer sortPriority;
-    
+
     @OneToMany(fetch = FetchType.LAZY, orphanRemoval = true, mappedBy = "chapter")
     private List<Page> pages = new ArrayList<>();
-    
-    
+
+
     /**
      * sortPriority 자동 설정
      * ex) 마지막 chapter의 sortPriority가 4710이라면, 새로운 chapter의 sortPriority는 5000으로 설정
@@ -41,19 +41,19 @@ public class Chapter extends BaseEntity {
     @PrePersist
     private void autoSetSortPriority() {
         if (this.sortPriority == null) {
-            
+
             Integer lastChapterSortPriority = 1000;
-            
+
             if(!this.book.getChapters().isEmpty()) {
                 lastChapterSortPriority = this.book.getChapters().get(this.book.getChapters().size() - 1).getSortPriority();
                 lastChapterSortPriority = Integer.parseInt(lastChapterSortPriority.toString().substring(0, 1)) * 1000 + 1000;
             }
-            
+
             this.sortPriority = lastChapterSortPriority;
         }
     }
-    
-    
+
+
     // AllArgsConstructor: Pages 값을 초기화하기위해서 하드코딩
     public Chapter(Book book, String title, Integer sortPriority, List<Page> pages) {
         this.book = book;

@@ -41,8 +41,8 @@ public class Page extends BaseEntity {
     private void autoSetSortPriority() {
         if (this.sortPriority == null) {
             String chapter_str = String.valueOf(this.chapter.getId());
-            // chapterId의 10의자리수 + 1의자리수  ex) 1523 -> 23
-            int chapterIdTensAndOnesPlace = Integer.parseInt(chapter_str.substring(chapter_str.length() - 2));
+            // chapterId의 10의자리수 + 1의자리수  ex) 1523 -> 23 / 5 -> 5
+            int chapterIdTensAndOnesPlace = Integer.parseInt(chapter_str.substring((chapter_str.length() > 1 ? chapter_str.length()-2 : 0)));
             
             List<Page> pages = this.chapter.getPages();
             

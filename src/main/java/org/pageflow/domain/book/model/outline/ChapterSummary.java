@@ -6,7 +6,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.pageflow.domain.book.entity.Chapter;
+import org.springframework.lang.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -22,12 +24,14 @@ public class ChapterSummary implements Rearrangeable {
     private List<PageSummary> pages;
     
     
-    public ChapterSummary(Chapter chapter, List<PageSummary> pages) {
+    public ChapterSummary(Chapter chapter, @Nullable List<PageSummary> pages) {
         this.id = chapter.getId();
         this.title = chapter.getTitle();
         this.sortPriority = chapter.getSortPriority();
         this.ownerId = chapter.getBook().getId();
-        this.pages = pages;
+        
+        // null인 pages가 들어오면 빈배열로 초기화
+        this.pages = pages != null ? pages : new ArrayList<>();
     }
     
 }

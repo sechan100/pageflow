@@ -9,6 +9,7 @@ import org.pageflow.domain.book.entity.Page;
 import org.pageflow.domain.book.model.outline.ChapterSummary;
 import org.pageflow.domain.book.model.outline.Outline;
 import org.pageflow.domain.book.model.outline.PageSummary;
+import org.pageflow.domain.book.model.outline.Rearrangeable;
 import org.pageflow.domain.book.model.request.BookUpdateRequest;
 import org.pageflow.domain.book.model.request.PageUpdateRequest;
 import org.pageflow.domain.book.model.request.RearrangeRequest;
@@ -18,7 +19,10 @@ import org.pageflow.domain.user.entity.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 @RequiredArgsConstructor
@@ -211,35 +215,127 @@ public class BookWriteService {
     public Outline delegateRearrange(Outline rearrangeRequest) {
         
         List<ChapterSummary> chapterSummaries = rearrangeRequest.getChapters();
+
+        // chapter sortPriority 업데이트
+        int updatedEntityChapter = allocateNewSortPriorityOptimally(chapterSummaries);
         
-        // 우선순위가 망가진 챕터들의 sortPriority 배열
-        List<Integer> staleSortPriorities = chapterSummaries.stream().map(ChapterSummary::getSortPriority).toList();
+        // page들의 sortPriority 업데이트
+        chapterSummaries.forEach(chapterSummary -> {
+            allocateNewOwnerChapterId(chapterSummary.getPages(), chapterSummary.getId());
+            allocateNewSortPriorityOptimally(chapterSummary.getPages());
+        });
+        chapterRepository.flush();
+        pageRepository.flush();
+        
+        return bookService.getOutline(rearrangeRequest.getId());
+    }
+    
+    
+    /**
+     * @param rearrangeables 재정렬이 필요한 Rearrangeable 리스트
+     * @return update된 엔티티의 개수.
+     */
+    @Transactional
+    private <T extends Rearrangeable> int allocateNewSortPriorityOptimally(List<T> rearrangeables){
+        
+        List<Integer> staleSortPriorities = rearrangeables.stream().map(Rearrangeable::getSortPriority).toList();
+        
         // Selective LIS 알고리즘을 적용하여 불연속적일 수 있는 항으로 이루어진 최장 오름차순 부분배열을 추출.
         List<Integer> staleSortPriorityLIS = selectiveLISOptimizer.findSelectiveLIS(staleSortPriorities);
         
+        if(staleSortPriorities.size() == staleSortPriorityLIS.size()) return 0;
         
+        List<Integer> newAscendingSortPriorityList = getNewAscendingSortPriorityList(staleSortPriorities, staleSortPriorityLIS);
         
+        AtomicInteger updatedEntityNum = new AtomicInteger();
+        for(int i = 0; i < rearrangeables.size(); i++){
+            Rearrangeable rearrangeable = rearrangeables.get(i);
+            
+            // outline에 적힌 sp와 newAscendingSortPriorityList에 적힌 값이 다르면 sortPriority 업데이트가 필요한 chapter임.
+            if(!rearrangeable.getSortPriority().equals(newAscendingSortPriorityList.get(i))){
+                
+                if(rearrangeable instanceof PageSummary stalePage){
+                    Page rearrangeableEntity = pageRepository.findById(stalePage.getId()).orElseThrow();
+                    rearrangeableEntity.setSortPriority(newAscendingSortPriorityList.get(i));
+                    
+                } else if(rearrangeable instanceof ChapterSummary staleChapter){
+                    Chapter rearrangeableEntity = chapterRepository.findById(staleChapter.getId()).orElseThrow();
+                    rearrangeableEntity.setSortPriority(newAscendingSortPriorityList.get(i));
+                }
+                
+                updatedEntityNum.getAndIncrement();
+            }
+        };
         
+        return updatedEntityNum.get();
+    }
+    
+    /**
+     * @param pageSummaries page 리스트
+     * @param ownerChapterId outline 상으로 페이지들이 소속된 chapter의 id
+     * @return owner chapter가 update된 page 엔티티의 개수
+     */
+    private int allocateNewOwnerChapterId(List<PageSummary> pageSummaries, Long ownerChapterId){
+        AtomicInteger updatedEntity = new AtomicInteger();
+        pageSummaries.forEach(pageSummary -> {
+            // PageSummary가 필드로 가지고있는 chapterId와 실제 배치되어있는 chapter의 id가 다른 경우
+            if(!Objects.equals(pageSummary.getOwnerId(), ownerChapterId)){
+                // Page의 ChapterId FK 업데이트
+                Page rearrangeableEntity = pageRepository.findById(pageSummary.getId()).orElseThrow();
+                rearrangeableEntity.setChapter(chapterRepository.findById(ownerChapterId).orElseThrow());
+                updatedEntity.getAndIncrement();
+            }
+        });
         
-        List<PageSummary> pageSummaries = rearrangeRequest.getPages();
-        
+        return updatedEntity.get();
+    }
+    
+    
+    /**
+     * @param staleSortPriorities 우선순위가 망가진 챕터들의 sortPriority 배열
+     * @param LIS Selective LIS 알고리즘을 적용하여 불연속적일 수 있는 항으로 이루어진 최장 오름차순 부분배열
+     * @return 새로운 sortPriority가 필요한 항들에 적절한 값들을 할당한 배열.
+     */
+    private List<Integer> getNewAscendingSortPriorityList(List<Integer> staleSortPriorities, List<Integer> LIS){
+            
+            List<Integer> newSortPriorityList = new ArrayList<>();
+            
+            int staleIdx = 0;
+            for(int i = 0; i < LIS.size(); i++){
+                Integer staleSortPriority = staleSortPriorities.get(staleIdx);
+                Integer LISValue = LIS.get(i);
+                
+                if(!staleSortPriority.equals(LISValue)){
+                    
+                    // 현재 LISValue가 staleSortPriorities의 어느 위치에 있는지를 찾는다.
+                    int LISValueOriginalIdx = staleSortPriorities.indexOf(LISValue);
+                    // 새로운 sp 할당이 필요한 항의 개수
+                    int needToAllocateNewSortPriorityNum = LISValueOriginalIdx - staleIdx;
+                    
+                    List<Integer> numbers = new ArrayList<>();
+                    int intervalStartingValue = !newSortPriorityList.isEmpty() ? newSortPriorityList.get(newSortPriorityList.size()-1) : 0;
+                    
+                    // 두 오름차순인 항 사이에 삽입될 새로운 sp들간의 간격 계산
+                    double interval = (double)(LISValue - intervalStartingValue) / (needToAllocateNewSortPriorityNum + 1);
+                    
+                    // n개의 항을 리스트에 추가
+                    for (int k = 1; k <= needToAllocateNewSortPriorityNum; k++) {
+                        newSortPriorityList.add((int) (intervalStartingValue + Math.round(k * interval)));
+                    }
+                    
+                    // LISValue를 리스트에 추가
+                    newSortPriorityList.add(LISValue);
+                    staleIdx = staleIdx + needToAllocateNewSortPriorityNum;
 
-        
-        return bookService.getOutline(request.getId());
+                } else {
+                    newSortPriorityList.add(staleSortPriority);
+                }
+                staleIdx++;
+            }
+            
+            
+            return newSortPriorityList;
     }
     
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 

@@ -4,6 +4,7 @@ import jakarta.persistence.criteria.*;
 import lombok.RequiredArgsConstructor;
 import org.pageflow.base.entity.BaseEntity;
 import org.pageflow.domain.book.entity.Book;
+import org.pageflow.domain.book.entity.Chapter;
 import org.pageflow.domain.book.model.outline.*;
 import org.pageflow.domain.book.repository.BookRepository;
 import org.pageflow.domain.book.repository.PageRepository;
@@ -74,11 +75,23 @@ public class BookService {
                         .toList()
         );
         
-        // 페이지 요약을 챕터 ID 기준으로 그룹화
+        // PageSummary를 chapterId를 기준으로 그룹화
         Map<Long, List<PageSummary>> pageSummariesGroupedByChapter = pageSummaries.stream()
                 .collect(Collectors.groupingBy(PageSummary::getOwnerId));
+        Set<Long> chapterIdSet = pageSummariesGroupedByChapter.keySet();
         
-        // 각 챕터 ID 별로 OutlineChapter 객체 생성
+        // Page가 없는 Chapter는 PageSummary로 조회되지 않으므로 따로 Chapter를 넣어줘야한다. 이를 위한 원본 chapter들의 id 리스트.
+        List<Long> chapterIdsFromBook = book.getChapters().stream().map(Chapter::getId).toList();
+        
+        // pageSummariesGroupedByChapter의 keySet에 없는 chapterId가 있다면, List<PageSummary>를 null로 가지고 Map에 추가.
+        chapterIdsFromBook.forEach(chapterId -> {
+            if(!chapterIdSet.contains(chapterId)) {
+                pageSummariesGroupedByChapter.put(chapterId, null);
+            }
+        });
+        
+        
+        // chapterId를 기준으로 그룹화된 map을 순회하여 각 ChapterSummary 객체를 생성
         List<ChapterSummary> chapterSummaries = pageSummariesGroupedByChapter.entrySet().stream()
                 .map(entry -> {
                     Long chapterId = entry.getKey();
@@ -92,7 +105,7 @@ public class BookService {
                     );
                     
                 })
-//                .sorted(Comparator.comparingLong(ChapterSummary::getSortPriority)) // 챕터 orderNum에 따라 정렬
+                .sorted(Comparator.comparingLong(ChapterSummary::getSortPriority)) // 챕터 sortPriority에 따라 정렬
                 .toList();
         
         // Outline 구현체 제작 후 반환

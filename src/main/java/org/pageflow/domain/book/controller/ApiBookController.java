@@ -36,8 +36,8 @@ public class ApiBookController {
     
     @PutMapping("/api/book/outline/rearrange/{bookId}")
     public Outline rearrangeOutlineItems(
-            @PathVariable("bookId") Long bookId, @RequestBody RearrangeRequest request) {
-        return bookWriteService.delegateRearrange(request);
+            @PathVariable("bookId") Long bookId, @RequestBody Outline rearrangeRequest) {
+        return bookWriteService.delegateRearrange(rearrangeRequest);
     }
     
     

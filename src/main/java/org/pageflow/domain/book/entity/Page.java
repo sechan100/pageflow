@@ -6,6 +6,9 @@ import jakarta.validation.constraints.Min;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 import org.pageflow.base.entity.BaseEntity;
+
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
@@ -30,25 +33,26 @@ public class Page extends BaseEntity {
     private Integer sortPriority;
     
     
-    
-    
-    
     /**
      * sortPriority 자동 설정
-     * ex) 마지막 page의 sortPriority가 4710이라면, 새로운 page의 sortPriority는 5000으로 설정
+     * chapterId의 마지막 2자리를 가중치로 더하는 이유는, 만약 다른 챕터에 있던 페이지가 다른 챕터로 이동했을 때, sortPriority가 겹치지 않도록 하기 위함.
      */
     @PrePersist
     private void autoSetSortPriority() {
         if (this.sortPriority == null) {
+            String chapter_str = String.valueOf(this.chapter.getId());
+            // chapterId의 10의자리수 + 1의자리수  ex) 1523 -> 23 / 5 -> 5
+            int chapterIdTensAndOnesPlace = Integer.parseInt(chapter_str.substring((chapter_str.length() > 1 ? chapter_str.length()-2 : 0)));
             
-            Integer lastPageSortPriority = 1000;
+            List<Page> pages = this.chapter.getPages();
             
-            if(!this.chapter.getPages().isEmpty()) {
-                lastPageSortPriority =this.chapter.getPages().get(this.chapter.getPages().size() - 1).getSortPriority();
-                lastPageSortPriority = Integer.parseInt(lastPageSortPriority.toString().substring(0, 1)) * 1000 + 1000;
-            }
+            // 마지막 페이지의 sortPriority OR 0
+            int lastChapterSortPriority = !pages.isEmpty() ? pages.get(pages.size() - 1).getSortPriority() : 0;
             
-            this.sortPriority = lastPageSortPriority;
+            // 새로운 sortPriority는 "(마지막sortPriority) + (10000) + (chapterId의 10의자리수 + 1의자리수)"
+            int newSortPriority = lastChapterSortPriority + 10000 + chapterIdTensAndOnesPlace;
+            
+            this.sortPriority = newSortPriority;
         }
     }
 }

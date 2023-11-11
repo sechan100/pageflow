@@ -5,7 +5,7 @@ import org.pageflow.domain.book.DataNotFoundException;
 import org.pageflow.domain.book.entity.Book;
 import org.pageflow.domain.comment.entity.Comment;
 import org.pageflow.domain.comment.repository.CommentRepository;
-import org.pageflow.domain.user.entity.Account;
+import org.pageflow.domain.user.entity.Profile;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -19,7 +19,7 @@ public class CommentService {
 
     private final CommentRepository commentRepository;
 
-    public void create(Book book, String content, Account author) {
+    public void create(Book book, String content, Profile author) {
         Comment comment = Comment
                 .builder()
                 .content(content)
@@ -44,19 +44,9 @@ public class CommentService {
         this.commentRepository.save(comment);
     } // 댓글 수정
 
-    public void delete(Comment comment){
+    public void delete(Comment comment) {
         this.commentRepository.delete(comment);
     } //댓글 삭제
-
-    public void vote(Comment comment, Account user) {
-        comment.getVoter().add(user);
-        this.commentRepository.save(comment);
-    }
-    // 추천
-    public void deletelVote(Comment comment, Account user) {
-        comment.getVoter().remove(user);
-        this.commentRepository.save(comment);
-    }
 
 
     public List<Comment> findAll() {

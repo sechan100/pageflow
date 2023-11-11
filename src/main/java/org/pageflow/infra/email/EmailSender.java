@@ -17,29 +17,28 @@ public class EmailSender {
     private final JavaMailSender javaMailSender;
 
 
-
     public void sendMail(EmailRequest request, String template) {
-        
+
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
-        
+
         try {
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, false, "UTF-8");
             mimeMessageHelper.setTo(request.getTo());
             mimeMessageHelper.setSubject(request.getSubject());
             mimeMessageHelper.setFrom(request.getFrom());
             mimeMessageHelper.setText(template, true);
-            
+
             // ### mail send ###
             javaMailSender.send(mimeMessageHelper.getMimeMessage());
             log.info("Success To Send Email!");
-            
-            
+
+
         } catch (MessagingException e) {
             log.info("Fail To Send Email!");
-            
+
         } catch (MailException e) {
             log.info("Fail To Send Email For Authentication!");
         }
     }
-    
+
 }

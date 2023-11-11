@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 public class LoginController {
-    
+
     /**
      * @return 로그인 페이지
      */
@@ -13,5 +13,5 @@ public class LoginController {
     public String loginPage() {
         return "/user/account/login";
     }
-    
+
 }

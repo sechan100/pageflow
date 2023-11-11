@@ -19,14 +19,14 @@ import java.time.LocalDateTime;
 @SuperBuilder
 @AllArgsConstructor
 public abstract class BaseEntity {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
     @CreatedDate
     private LocalDateTime createDate;
-    
+
     @LastModifiedDate
     private LocalDateTime modifyDate;
 

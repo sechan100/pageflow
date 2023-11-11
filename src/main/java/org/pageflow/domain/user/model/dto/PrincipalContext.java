@@ -12,22 +12,22 @@ import java.util.Map;
 
 @Getter
 public class PrincipalContext extends User implements OAuth2User {
-    
+
     protected UserSession userSession;
-    
+
     public PrincipalContext(Account account) {
         super(account.getUsername(), account.getPassword(), Role.getAuthorities(account.getRole()));
         this.userSession = new UserSession(account);
     }
-    
+
     @Override
     public Map<String, Object> getAttributes() {
         return null;
     }
-    
+
     @Override
     public String getName() {
         return null;
     }
-    
+
 }

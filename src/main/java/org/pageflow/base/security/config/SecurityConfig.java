@@ -20,7 +20,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-    
+
     private final AuthenticationProvider daoAuthenticationProvider;
     private final CustomOAuth2UserService customOAuth2UserService;
     private final CustomProperties customProperties;
@@ -30,8 +30,8 @@ public class SecurityConfig {
     private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
     private final CustomLogoutSuccessHandler customLogoutSuccessHandler;
     private final InsufficientAuthenticationProcessingFilter insufficientAuthenticationProcessingFilter;
-    
-    
+
+
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -40,13 +40,13 @@ public class SecurityConfig {
                         .requestMatchers("/css/**", "/js/**", "/img/**").permitAll()
                         .anyRequest().authenticated()
                 )
-                
+
                 .formLogin(form -> form
                         .loginPage("/login")
                         .failureHandler(customLoginFailureHandler)
                         .successHandler(formLoginAuthenticationSuccessHandler)
                 )
-                
+
                 .oauth2Login(oauth2 -> oauth2
                         .loginPage("/login")
                         .userInfoEndpoint(userInfo -> userInfo
@@ -54,25 +54,25 @@ public class SecurityConfig {
                         )
                         .successHandler(oAuth2AuthenticationSuccessHandler)
                 )
-                
+
                 .authenticationProvider(daoAuthenticationProvider)
-                
+
                 .csrf(AbstractHttpConfigurer::disable)
-                
+
                 .addFilterAfter(insufficientAuthenticationProcessingFilter, UsernamePasswordAuthenticationFilter.class)
-                
+
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessHandler(customLogoutSuccessHandler)
                 )
-        
+
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint(customAuthenticationEntryPoint)
                 );
-        
-        
+
+
         return http.build();
     }
- 
-    
+
+
 }

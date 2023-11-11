@@ -8,9 +8,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RearrangeRequest {
-    
+
     private String type;
     private Long id;
     private Integer sortPriority;
-    
+
 }

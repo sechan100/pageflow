@@ -3,14 +3,12 @@ package org.pageflow.domain.comment.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.ManyToMany;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
 import lombok.*;
 import org.pageflow.base.entity.BaseEntity;
 import org.pageflow.domain.book.entity.Book;
-import org.pageflow.domain.user.entity.Account;
-
-import java.util.Set;
+import org.pageflow.domain.user.entity.Profile;
 
 @Entity
 @Getter
@@ -23,14 +21,11 @@ public class Comment extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String content;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private Book book;
 
-    @ManyToOne
-    private Account author;
-
-    @ManyToMany
-    Set<Account> voter;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Profile author;
 
 
 }

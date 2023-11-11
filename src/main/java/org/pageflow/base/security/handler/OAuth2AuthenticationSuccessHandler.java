@@ -12,20 +12,20 @@ import java.io.IOException;
 
 @Component
 public class OAuth2AuthenticationSuccessHandler extends FormLoginAuthenticationSuccessHandler {
-    
+
     public OAuth2AuthenticationSuccessHandler(Rq rq) {
         super(rq);
     }
-    
+
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-        
-        if(authentication != null){
-            String userRole = ((PrincipalContext)authentication.getPrincipal()).getUserSession().getRole();
-            if(!userRole.equals("ROLE_ANONYMOUS")){
+
+        if (authentication != null) {
+            String userRole = ((PrincipalContext) authentication.getPrincipal()).getUserSession().getRole();
+            if (!userRole.equals("ROLE_ANONYMOUS")) {
                 super.onAuthenticationSuccess(request, response, authentication);
             }
         }
-        
+
     }
 }

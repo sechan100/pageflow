@@ -11,9 +11,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class EmailRequest {
-    
+
     private String from;
     private String to;
     private String subject;
-    
+
 }

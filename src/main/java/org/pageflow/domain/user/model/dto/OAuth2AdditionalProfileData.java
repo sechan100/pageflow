@@ -8,8 +8,8 @@ import lombok.Data;
 @AllArgsConstructor
 @Builder
 public class OAuth2AdditionalProfileData {
-    
+
     private String nickname;
     private String profileImgUrl;
-    
+
 }

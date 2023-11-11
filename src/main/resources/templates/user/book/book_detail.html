@@ -1,4 +1,5 @@
-<html lang="en" layout:decorate="~{/common/layout.html}" xmlns:th="http://www.w3.org/1999/xhtml" xmlns:layout="" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html lang="en" layout:decorate="~{/common/layout.html}" xmlns:th="http://www.w3.org/1999/xhtml" xmlns:layout=""
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head>
     <title>Book</title>
@@ -6,39 +7,45 @@
 
 <body>
 <main layout:fragment="main">
-    <section class="text-gray-600 h-full">
-        <div class=" py-1 w-9/12 m-auto">
-            <div class="h-5/6 mt-10 flex flex-col">
-                <div class="flex flex-col sm:flex-row  h-full  justify-center">
+    <section class="text-gray-600">
+        <div class="py-1 w-9/12 m-auto h-full">
+            <div class="mt-10 mb-10 flex flex-col">
+                <div class="flex flex-col sm:flex-row  h-screen justify-center ">
                     <!-- 좌측 레이아웃 시작 -->
-                    <div class="text-center  px-1 w-72 flex flex-col">
-                        <div class="h-3/6 w-full relative">
-                            <div class="w-42 absolute" style="z-index : -1 ; filter: blur(5px) ;">
-                                <img src="https://image.utoimage.com/preview/cp872722/2022/12/202212008462_500.jpg"
-                                     alt="배경이미지">
+                    <div class="h-full " style="width : 310px ;">
+                        <div class="w-full" style="height : 57% ;">
+                            <div class="px-1 flex flex-col ">
+                                <div class=" h-full w-full relative">
+                                    <div class="w-full rounded-t-lg" style="z-index : 0 ; filter: blur(4px) ;">
+                                        <img th:src="@{${outline.coverImgUrl}}" alt="Book Image">
+                                    </div>
+                                    <div class="w-9/12 absolute  top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+                                         style="z-index : 1;">
+                                        <img th:src="@{${outline.coverImgUrl}}" alt="Book Image">
+                                    </div>
+                                </div>
                             </div>
-                            <div class="w-11/12 h-64 bg-gray-500 text-gray-400 px-1 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                                <img th:src="@{${outline.coverImgUrl}}" alt="Book Image">
+                            <div class="h-full rounded-b-lg" style="background-color : #e5e7eb; ">
+                                <div class="flex flex-col items-center text-center justify-center w-full">
+                                    <h2 class="mt-8 font-black text-gray-900 text-2xl w-full"
+                                        th:text="${outline.title}"></h2>
+                                    <span class="font-semibold mt-8"
+                                          th:text="${outline.author.nickname}"></span>
+                                    <i class="fa-solid fa-heart mt-4" style="color: #ff0000;"></i>
+                                    <!--    종아요를 누를 시 색 변화 -->
+                                    <!--   <i class="fa-solid fa-heart mt-4" style="color: #ffffff;"></i>-->
+                                    <a href="javascript:void(0);" class="recommend ">
+                                    </a>
+                                    <div class="mt-4">
+                                        <a th:href="@{|/outline/modify/${outline.id}|}" th:text="수정"
+                                           sec:authorize="isAuthenticated()"></a>
+                                        <a href="javascript:void(0);" class="delete"
+                                           th:data-uri="@{|/outline/delete/${outline.id}|}" th:text="삭제"
+                                           sec:authorize="isAuthenticated()"></a>
+                                    </div>
+                                    <button class="btn btn-outline btn-accent w-52 mt-20">읽기</button>
+                                </div>
                             </div>
-                        </div>
-                        <div class="ml-4 flex flex-col items-center text-center justify-center w-full">
-                            <h2 class="font-black title-font mt-4 text-gray-900 text-lg  w-full h-16"
-                                th:text="${book.title}"></h2>
-                            <div class=" w-full">
-                                <span class="text-base mt-4 mr-4 border" th:text="${outline.author.nickname}"></span>
-                                <i class="fa-solid fa-heart" style="color: #ff0000;"></i>
-                                <a href="javascript:void(0);" class="recommend ">
-                                    추천
-                                </a>
-                            </div>
-                            <div>
-                                <a th:href="@{|/book/modify/${outline.id}|}" th:text="수정"
-                                   sec:authorize="isAuthenticated()"></a>
-                                <a href="javascript:void(0);" class="delete"
-                                   th:data-uri="@{|/outline/delete/${outline.id}|}" th:text="삭제"
-                                   sec:authorize="isAuthenticated()"></a>
-                            </div>
-                            <button class="btn btn-success w-52 mt-10">뷰어</button>
                         </div>
                     </div>
                     <!-- 좌측 레이아웃 끝 -->
@@ -46,7 +53,9 @@
                     <div class="sm:w-2/3 sm:mt-0 sm:ml-2 text-center sm:text-left flex flex-col h-full ">
                         <!--      책 챕터 표기    -->
 
-                        <div class=" h-96 rounded-2xl  " style="background-color : #e5e7eb;">
+                        <div class=" h-3/5 rounded-lg
+
+  " style="background-color : #e5e7eb;">
 
                             <div>
                                 <ul class="menu menu-horizontal rounded-box justify-center ">
@@ -66,14 +75,14 @@
                             <div class="flex flex-wrap -m-2">
                                 <div class="p-2 w-full">
                                     <div class="h-full flex items-center  p-4 rounded-lg">
-                                        <img th:src="@{${book.coverImgUrl}}"
+                                        <img th:src="@{${outline.coverImgUrl}}"
                                              class="w-16 h-16 bg-gray-100 object-cover object-center flex-shrink-0 mr-4"
                                              alt="Book Image">
                                         <div class="flex-grow">
                                             <h2 class="text-gray-900 title-font font-medium"
-                                                th:text="${book.title}"></h2>
-                                            <p class="text-gray-500"
-                                               th:text="${#temporals.format(book.createDate, 'yyyy-MM-dd')}">책 올린날짜</p>
+                                                th:text="${outline.title}"></h2>
+                                            <!--                                            <p class="text-gray-500"-->
+                                            <!--                                               th:text="${#temporals.format(book.createDate, 'yyyy-MM-dd')}">책 올린날짜</p>-->
                                         </div>
                                     </div>
                                 </div>
@@ -81,7 +90,9 @@
                         </div>
                         <!--          책 챕터 끝    -->
                         <!--  댓글 레이아웃 -->
-                        <div class="h-96 flex flex-col relative rounded-2xl mt-10 overflow-hidden"
+                        <div class="h-2/5 flex flex-col relative rounded-lg
+
+ mt-10 overflow-hidden"
                              style="background-color : #e5e7eb;">
                             <div id="comment_list" class="overfloew-auto h-5/6 border"></div>
                             <div class="w-full absolute bottom-0 border">
@@ -90,7 +101,7 @@
                                         <div class="flex-1 px-2 py-1">
                                             <label for="content"></label>
                                             <input name="content" id="content" type="text" placeholder="소중한 의견을 남겨주세요"
-                                                   class="input input-bordered px-6 w-full"/>
+                                                   class="input input-bordered px-6 w-full rounded-lg"/>
                                         </div>
                                         <div class="w-1/5 px-2 py-1">
                                             <input type="submit" class="input input-bordered w-full" value="등록"/>
@@ -120,11 +131,11 @@
                 return;
             }
 
-            var bookId = [[${book.id}]];
+            var outlineId = [[${outline.id}]];
 
             $.ajax({
                 type: 'POST',
-                url: `/comment/create/${bookId}`,
+                url: `/comment/create/${outlineId}`,
                 data: { content: form.content.value },
                 success: function(comment) {
                     console.log("확인");
@@ -138,11 +149,11 @@
         }
 
         $(document).ready(function() {
-            var bookId = [[${book.id}]];
+            var outlineId = [[${outline.id}]];
 
             $.ajax({
                 type: 'GET',
-                url: `/comment/list/${bookId}`,
+                url: `/comment/list/${outlineId}`,
                 success: function(comment) {
                     commentList(comment);
                 },
@@ -221,6 +232,8 @@
         $("#comment-" + commentId).replaceWith("<p id='comment-" + commentId + "'>" + commentContent + "</p>");
     }
     </script>
+
+
 </main>
 </body>
 </html>

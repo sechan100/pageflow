@@ -11,8 +11,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface BookRepository extends JpaRepository<Book, Long> {
 
     Page<Book> findAll(Specification<Book> spec, Pageable pageable);
-    
-    
+
 
     @EntityGraph(attributePaths = {"author"}, type = EntityGraph.EntityGraphType.FETCH)
     Book findBookWithAuthorById(Long id);

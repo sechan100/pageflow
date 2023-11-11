@@ -35,13 +35,13 @@ public class BookController {
     public String bookMain(Model model, @RequestParam(value = "page", defaultValue = "0") int page,
                            @RequestParam(value = "kw", defaultValue = "") String kw) {
         Page<Book> paging = this.bookService.getList(page, kw);
-        model.addAttribute("paging",paging);
+        model.addAttribute("paging", paging);
         model.addAttribute("kw", kw);
         return "/user/book/cards";
     }
 
     @GetMapping(value = "/book/detail/{id}")
-    public String bookDetail(Model model, @PathVariable("id") Long id){
+    public String bookDetail(Model model, @PathVariable("id") Long id) {
         Outline outline = this.bookService.getOutline(id);
         model.addAttribute("outline", outline);
         return "/user/book/book_detail";
@@ -51,7 +51,7 @@ public class BookController {
     @GetMapping("/book/modify/{id}")
     public String bookModify(BookForm bookForm, @PathVariable("id") Long id, Principal principal) {
         Book book = this.bookService.delegateFindBookWithAuthorById(id);
-        if(!book.getAuthor().getNickname().equals(principal.getName())) {
+        if (!book.getAuthor().getNickname().equals(principal.getName())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정권한이 없습니다.");
         }
         bookForm.setTitle(book.getTitle());
@@ -62,7 +62,7 @@ public class BookController {
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/book/modify/{id}")
     public String bookModify(@Valid BookForm bookForm, BindingResult bindingResult,
-                                 Principal principal, @PathVariable("id") Long id, @RequestParam("file") MultipartFile file) throws IOException {
+                             Principal principal, @PathVariable("id") Long id, @RequestParam("file") MultipartFile file) throws IOException {
         if (bindingResult.hasErrors() || file.isEmpty()) {
             return "forward:/react/build/index.html\";";
         }
@@ -72,7 +72,7 @@ public class BookController {
         if (!book.getAuthor().getNickname().equals(principal.getName())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정권한이 없습니다.");
         }
-        Book modifiedBook = this.bookService.modify(book,bookForm.getTitle(), file, author);
+        Book modifiedBook = this.bookService.modify(book, bookForm.getTitle(), file, author);
         return "redirect:/user/book/cards";
 
     } // 수정 post

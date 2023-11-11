@@ -6,6 +6,9 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 오름차순이 파괴된 수열에서 불연속적인 항을 선택할 수 있는 최장 오름차순 부분배열을 구하는 알고리즘
+ */
 @Service
 @RequiredArgsConstructor
 public class SelectiveLISOptimizer {

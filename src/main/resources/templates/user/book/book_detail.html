@@ -3,11 +3,53 @@
 
 <head>
     <title>Book</title>
+    <style>
+<!--   홈/ 정보 메뉴 스타일     -->
+            .chapter_btn {
+          padding: 15px 100px;
+          margin: 10px 4px;
+          color: red;
+          text-transform: uppercase;
+          position: relative;
+          text-decoration: none;
+          display: inline-block;
+        }
+
+        .chapter_btn::before {
+          content: "";
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          width: 100%;
+          height: 2px;
+          background: #6098ff;
+          display: block;
+          -webkit-transform-origin: right top;
+          -ms-transform-origin: right top;
+          transform-origin: right top;
+          -webkit-transform: scale(0, 1);
+          -ms-transform: scale(0, 1);
+          transform: scale(0, 1);
+          -webkit-transition: transform 0.4s cubic-bezier(1, 0, 0, 1);
+          transition: transform 0.4s cubic-bezier(1, 0, 0, 1);
+        }
+
+        .chapter_btn:hover::before {
+          -webkit-transform-origin: left top;
+          -ms-transform-origin: left top;
+          transform-origin: left top;
+          -webkit-transform: scale(1, 1);
+          -ms-transform: scale(1, 1);
+          transform: scale(1, 1);
+        }
+    </style>
 </head>
 
 <body>
+
 <main layout:fragment="main">
-    <section class="text-gray-600">
+
+    <section>
         <div class="py-1 w-9/12 m-auto h-full">
             <div class="mt-10 mb-10 flex flex-col">
                 <div class="flex flex-col sm:flex-row  h-screen justify-center ">
@@ -27,7 +69,7 @@
                             </div>
                             <div class="h-full rounded-b-lg" style="background-color : #e5e7eb; ">
                                 <div class="flex flex-col items-center text-center justify-center w-full">
-                                    <h2 class="mt-8 font-black text-gray-900 text-2xl w-full"
+                                    <h2 class="mt-8 font-black  text-2xl w-full"
                                         th:text="${outline.title}"></h2>
                                     <span class="font-semibold mt-8"
                                           th:text="${outline.author.nickname}"></span>
@@ -52,20 +94,17 @@
                     <!-- 우측 레이아웃 시작 -->
                     <div class="sm:w-2/3 sm:mt-0 sm:ml-2 text-center sm:text-left flex flex-col h-full ">
                         <!--      책 챕터 표기    -->
-
-                        <div class=" h-3/5 rounded-lg
-
-  " style="background-color : #e5e7eb;">
-
+                        <div class=" h-3/5 rounded-lg" style="background-color : #e5e7eb;">
                             <div>
-                                <ul class="menu menu-horizontal rounded-box justify-center ">
-                                    <li>
-                                        <a class="tooltip" data-tip="Home">
+                                <!--     홈/정보 메뉴    -->
+                                <ul class="flex justify-center  mt-5">
+                                    <li class="mr-10  p-4 rounded-lg chapter_btn">
+                                        <a  data-tip="Home">
                                             <p>홈</p>
                                         </a>
                                     </li>
-                                    <li>
-                                        <a class="tooltip" data-tip="Details">
+                                    <li class=" p-4 rounded-lg chapter_btn">
+                                        <a data-tip="Details">
                                             <p>정보</p>
                                         </a>
                                     </li>
@@ -74,15 +113,20 @@
                             <!--         책 챕터     -->
                             <div class="flex flex-wrap -m-2">
                                 <div class="p-2 w-full">
-                                    <div class="h-full flex items-center  p-4 rounded-lg">
-                                        <img th:src="@{${outline.coverImgUrl}}"
-                                             class="w-16 h-16 bg-gray-100 object-cover object-center flex-shrink-0 mr-4"
-                                             alt="Book Image">
+                                    <div class="h-full flex items-center  p-4 rounded-lg ">
                                         <div class="flex-grow">
-                                            <h2 class="text-gray-900 title-font font-medium"
-                                                th:text="${outline.title}"></h2>
-                                            <!--                                            <p class="text-gray-500"-->
-                                            <!--                                               th:text="${#temporals.format(book.createDate, 'yyyy-MM-dd')}">책 올린날짜</p>-->
+                                            <ul>
+                                                <li th:each=" chapters : ${outline.chapters}" class="flex mb-2">
+                                                    <img th:src="@{${outline.coverImgUrl}}"
+                                                         class="w-16 h-20 object-cover object-center flex-shrink-0 mr-4 rounded-lg"
+                                                         alt="Book Image">
+                                                    <div class="w-full py-3">
+                                                        <h1 class=" text-base " th:text="${chapters.title}"></h1>
+                                                        <!--      작성 날짜 데아터 표기 해야함    -->
+                                                        <span>책 작성 날짜</span>
+                                                    </div>
+                                                </li>
+                                            </ul>
                                         </div>
                                     </div>
                                 </div>
@@ -90,9 +134,7 @@
                         </div>
                         <!--          책 챕터 끝    -->
                         <!--  댓글 레이아웃 -->
-                        <div class="h-2/5 flex flex-col relative rounded-lg
-
- mt-10 overflow-hidden"
+                        <div class="h-2/5 flex flex-col relative rounded-lg mt-10 overflow-hidden"
                              style="background-color : #e5e7eb;">
                             <div id="comment_list" class="overfloew-auto h-5/6 border"></div>
                             <div class="w-full absolute bottom-0 border">

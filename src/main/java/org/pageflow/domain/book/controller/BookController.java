@@ -44,6 +44,7 @@ public class BookController {
     public String bookDetail(Model model, @PathVariable("id") Long id) {
         Outline outline = this.bookService.getOutline(id);
         model.addAttribute("outline", outline);
+        model.addAttribute("chapters", outline.getChapters());
         return "/user/book/book_detail";
     } // 상세페이지
 

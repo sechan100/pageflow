@@ -51,32 +51,28 @@ public class BookWriteService {
                 .build();
         
         // 책 먼저 영속
-        Book persistedBook = bookService.delegateSave(newBook);
+        Book persistedBook = bookService.repoSave(newBook);
         
         // 기본 챕터와 기본 페이지 생성
-        Book persistedBookWithDefaultChapterAndDefualtPage = createBlankChapter(persistedBook);
+        Chapter defaultChapterWithDefaultPages = createBlankChapter(persistedBook);
+
         
-        Book book11 = createBlankChapter(persistedBookWithDefaultChapterAndDefualtPage);
-        Book b111 = createBlankChapter(book11);
-        b111.getChapters().set(0, createBlankPage(b111.getChapters().get(0)));
-        b111.getChapters().set(0, createBlankPage(b111.getChapters().get(0)));
-        b111.getChapters().set(0, createBlankPage(b111.getChapters().get(0)));
-        b111.getChapters().set(1, createBlankPage(b111.getChapters().get(1)));
-        b111.getChapters().set(1, createBlankPage(b111.getChapters().get(1)));
-        
-        return persistedBookWithDefaultChapterAndDefualtPage;
+        return persistedBook;
     }
     
     
     /**
-     * 새로운 기본 챕터와 기본 페이지를 생성하여 영속후 반환한다.
-     * @param ownerBook 새로운 챕터가 소속될 책
-     * @return 새로운 챕터가 추가된 책
+     * 매개받은 책의 소속으로 제일 뒤에 새로운 챕터를 생성한다.
+     * 추가로, 매개로 받은 Book 엔티티의 Chapters 컬렉션의 참조를 통해서 생성된 Chapter를 추가한다.
+     * (영속성 컨텍스트의 1차 캐시를 초기화할 필요없이 바로 객체 참조를 통해서 새로 생성된 Chapter를 사용가능하다.)
      *
-     * @throws TransientPropertyValueException 소속될 책이 영속 상태가 아닌경우 발생
+     * @param ownerBook 새로운 Chapter를 생성할 Book
+     * @return 새로 생성된 Chapter
+     *
+     * @throws TransientPropertyValueException 소속될 챕터가 영속 상태가 아닌경우 발생
      */
     @Transactional
-    public Book createBlankChapter(Book ownerBook) throws TransientPropertyValueException {
+    public Chapter createBlankChapter(Book ownerBook) throws TransientPropertyValueException {
         
         if(ownerBook.getId() == null){
             throw new IllegalArgumentException("챕터를 생성할 책이 지정되지 않았습니다.");
@@ -92,12 +88,12 @@ public class BookWriteService {
             Chapter persistedChapter = chapterRepository.save(defaultChapter);
             
             // 챕터에 기본 페이지 추가
-            Chapter persistedChapterWithDefaultPage = createBlankPage(persistedChapter);
+            Page defaultPage = createBlankPage(persistedChapter);
             
             // 책에 생성된 챕터추가
-            ownerBook.getChapters().add(persistedChapterWithDefaultPage);
+            ownerBook.getChapters().add(persistedChapter);
             
-            return ownerBook;
+            return persistedChapter;
             
         } catch(TransientPropertyValueException e) {
             log.error("영속상태가 아닌 Book:'{}'(id={})에 새로운 챕터를 생성할 수 없습니다.", ownerBook.getTitle(), ownerBook.getId());
@@ -108,13 +104,16 @@ public class BookWriteService {
     
     /**
      * 매개받은 챕터의 소속으로 제일 뒤에 새로운 페이지를 생성한다.
+     * 추가로, 매개로 받은 Chapter 엔티티의 Pages 컬렉션의 참조를 통해서 생성된 페이지를 추가한다.
+     * (영속성 컨텍스트의 1차 캐시를 초기화할 필요없이 바로 객체 참조를 통해서 새로 생성된 Page를 사용가능하다.)
+     *
      * @param ownerChapter 새로운 페이지를 생성할 챕터
-     * @return 새로운 페이지가 추가된 챕터
+     * @return 새로 생성된 Page
      *
      * @throws TransientPropertyValueException 소속될 챕터가 영속 상태가 아닌경우 발생
      */
     @Transactional
-    public Chapter createBlankPage(Chapter ownerChapter) throws TransientPropertyValueException {
+    public Page createBlankPage(Chapter ownerChapter) throws TransientPropertyValueException {
         
         Page newDefaultPage = Page.builder()
                 .chapter(ownerChapter)
@@ -129,7 +128,7 @@ public class BookWriteService {
             // 챕터에 페이지 추가
             ownerChapter.getPages().add(persistedPage);
             
-            return ownerChapter;
+            return persistedPage;
             
         } catch(TransientPropertyValueException e) {
             log.error("영속상태가 아닌 Chapter:'{}'(id={})에 새로운 페이지를 생성할 수 없습니다.", ownerChapter.getTitle(), ownerChapter.getId());
@@ -149,13 +148,13 @@ public class BookWriteService {
             throw new IllegalArgumentException("업데이트의 대상인 Book 엔티티를 특정할 수 없습니다.");
         }
         
-        Book staleBook = bookService.delegateFindBookWithAuthorById(updateRequest.getId());
+        Book staleBook = bookService.repoFindBookWithAuthorById(updateRequest.getId());
         staleBook.setTitle(updateRequest.getTitle());
         staleBook.setCoverImgUrl(updateRequest.getCoverImgUrl());
         staleBook.setPublished(updateRequest.isPublished());
         
         // 데이터 커밋
-        Book updatedBook = bookService.delegateSave(staleBook);
+        Book updatedBook = bookService.repoSave(staleBook);
         
         return updatedBook;
     }

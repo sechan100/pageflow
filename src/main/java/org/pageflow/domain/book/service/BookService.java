@@ -120,17 +120,20 @@ public class BookService {
     }
     
     
-    public Book delegateSave(Book book) {
+    
+    public Book repoSave(Book book) {
         return bookRepository.save(book);
     }
     
+    public Book repoFindById(Long id) {
+        return bookRepository.findById(id).orElseThrow();
+    }
     
-    public Book delegateFindBookWithAuthorById(Long id) {
+    public Book repoFindBookWithAuthorById(Long id) {
         return bookRepository.findBookWithAuthorById(id);
     }
     
-    
-    public Book delegateFindBookWithAuthorAndChapterById(Long id) {
+    public Book repoFindBookWithAuthorAndChapterById(Long id) {
         return bookRepository.findBookWithAuthorAndChapterById(id);
     }
 }

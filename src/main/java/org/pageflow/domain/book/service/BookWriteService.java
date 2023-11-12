@@ -264,7 +264,7 @@ public class BookWriteService {
                 
                 updatedEntityNum.getAndIncrement();
             }
-        };
+        }
         
         return updatedEntityNum.get();
     }
@@ -300,37 +300,37 @@ public class BookWriteService {
             List<Integer> newSortPriorityList = new ArrayList<>();
             
             int staleIdx = 0;
-            for(int i = 0; i < LIS.size(); i++){
-                Integer staleSortPriority = staleSortPriorities.get(staleIdx);
-                Integer LISValue = LIS.get(i);
+            for(Integer li : LIS) {
+            Integer staleSortPriority = staleSortPriorities.get(staleIdx);
+            Integer LISValue = li;
+            
+            if(!staleSortPriority.equals(LISValue)) {
                 
-                if(!staleSortPriority.equals(LISValue)){
-                    
-                    // 현재 LISValue가 staleSortPriorities의 어느 위치에 있는지를 찾는다.
-                    int LISValueOriginalIdx = staleSortPriorities.indexOf(LISValue);
-                    // 새로운 sp 할당이 필요한 항의 개수
-                    int needToAllocateNewSortPriorityNum = LISValueOriginalIdx - staleIdx;
-                    
-                    List<Integer> numbers = new ArrayList<>();
-                    int intervalStartingValue = !newSortPriorityList.isEmpty() ? newSortPriorityList.get(newSortPriorityList.size()-1) : 0;
-                    
-                    // 두 오름차순인 항 사이에 삽입될 새로운 sp들간의 간격 계산
-                    double interval = (double)(LISValue - intervalStartingValue) / (needToAllocateNewSortPriorityNum + 1);
-                    
-                    // n개의 항을 리스트에 추가
-                    for (int k = 1; k <= needToAllocateNewSortPriorityNum; k++) {
-                        newSortPriorityList.add((int) (intervalStartingValue + Math.round(k * interval)));
-                    }
-                    
-                    // LISValue를 리스트에 추가
-                    newSortPriorityList.add(LISValue);
-                    staleIdx = staleIdx + needToAllocateNewSortPriorityNum;
-
-                } else {
-                    newSortPriorityList.add(staleSortPriority);
+                // 현재 LISValue가 staleSortPriorities의 어느 위치에 있는지를 찾는다.
+                int LISValueOriginalIdx = staleSortPriorities.indexOf(LISValue);
+                // 새로운 sp 할당이 필요한 항의 개수
+                int needToAllocateNewSortPriorityNum = LISValueOriginalIdx - staleIdx;
+                
+                List<Integer> numbers = new ArrayList<>();
+                int intervalStartingValue = !newSortPriorityList.isEmpty() ? newSortPriorityList.get(newSortPriorityList.size() - 1) : 0;
+                
+                // 두 오름차순인 항 사이에 삽입될 새로운 sp들간의 간격 계산
+                double interval = (double) (LISValue - intervalStartingValue) / (needToAllocateNewSortPriorityNum + 1);
+                
+                // n개의 항을 리스트에 추가
+                for(int k = 1; k <= needToAllocateNewSortPriorityNum; k++) {
+                    newSortPriorityList.add((int) (intervalStartingValue + Math.round(k * interval)));
                 }
-                staleIdx++;
+                
+                // LISValue를 리스트에 추가
+                newSortPriorityList.add(LISValue);
+                staleIdx = staleIdx + needToAllocateNewSortPriorityNum;
+                
+            } else {
+                newSortPriorityList.add(staleSortPriority);
             }
+            staleIdx++;
+        }
             
             
             return newSortPriorityList;

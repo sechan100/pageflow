@@ -36,7 +36,7 @@ const sampleOutline : Outline = {
 
 
 const getOutlineById = async (id : number) : Promise<Outline> => {
-  const response = await axios.get(`/api/book/outline/${id}`);
+  const response = await axios.get(`/api/book/${id}/outline`);
 
   if(response.status !== 200){
     throw new Error("책 정보를 가져오는데 실패했습니다.");

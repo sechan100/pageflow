@@ -1,4 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import axios from 'axios';
+import { ChapterSummary, Outline } from '../../types/types';
 
 
 export interface IOutlineSidebarProps {
@@ -34,12 +36,54 @@ interface IAddChapterBtnProps {
 
 function AddChapterBtn(drillingProps : IAddChapterBtnProps) {
 
-  function addChapter() {
-    const newChapter = {
-      id: Math.floor(Math.random() * 1000000000),
-      title: "새 챕터",
-      pages: []
-    };
+  const { bookId, queryClient } = drillingProps;
+
+
+  // 서버에서 새로운 Chapter 생성요청을 전달하고 받아온 생성된 Chapter를 react query가 관리하는 캐쉬에 반영.
+  async function addChapter() {
+
+    const response = await axios.post(`/api/book/${bookId}/chapter`);
+
+    if(response.status !== 200){
+      throw new Error("새로운 챕터를 생성하지 못했습니다.");
+    }
+  
+    if(response.data){
+      console.log("serverApiResponse-newChapter: " + response.data);
+    }
+
+    // 새로 생성된 Chapter 데이터
+    const newChapter =  response.data;
+
+    // 새로 생성된 Chapter 데이터를 ChapterSummary 타입으로 변환
+    const newChapterSummary : ChapterSummary = {
+      id: newChapter.id,
+      title: newChapter.title,
+      sortPriority: newChapter.sortPriority,
+      pages: newChapter.pages
+    }
+
+    queryClient.setQueryData(['book', bookId], (oldData : Outline) => {
+      
+      // 기존 챕터가 없던경우 새로운 챕터만 추가해서 반환
+      if(!oldData.chapters){
+        return {
+          ...oldData,
+          chapters: [
+            newChapterSummary
+          ]
+        }
+      } else {
+        // 기존 챕터가 있던 경우 원래 있던거에 추가해서 반환
+        return {
+          ...oldData,
+          chapters: [
+            ...oldData.chapters,
+            newChapterSummary
+          ]
+        }
+      }
+    });
   }
 
 

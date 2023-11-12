@@ -11,68 +11,48 @@ var __assign = (this && this.__assign) || function () {
     return __assign.apply(this, arguments);
 };
 exports.__esModule = true;
-exports.dummyBook = exports.pageDraggablePrefix = exports.chapterDraggablePrefix = exports.pageDropAreaPrefix = void 0;
+exports.pageDraggablePrefix = exports.chapterDraggablePrefix = exports.pageDropAreaPrefix = void 0;
 var react_beautiful_dnd_1 = require("react-beautiful-dnd");
 var react_1 = require("react");
 var BookBasicPage_1 = require("../outline/BookBasicPage");
 var Chapter_1 = require("./Chapter");
 var OutlineSidebarWrapper_1 = require("./OutlineSidebarWrapper");
 var Chapter_2 = require("./Chapter");
+var book_apis_1 = require("../../api/book-apis");
 exports.pageDropAreaPrefix = 'pageDropArea-';
 exports.chapterDraggablePrefix = 'chapter-';
 exports.pageDraggablePrefix = 'page-';
-exports.dummyBook = {
-    author: "Dummy Author",
-    chapters: [],
-    coverImgUrl: "https://example.com/dummy-cover.jpg",
-    createDate: "2023-01-01T00:00:00",
-    id: 1000,
-    modifyDate: "2023-01-02T00:00:00",
-    published: false,
-    title: "Dummy Book Title"
-};
-function OutlineSidebar() {
+function OutlineSidebar(drillingProps) {
+    var bookId = drillingProps.bookId, queryClient = drillingProps.queryClient;
+    // react query로 server book outline snapshot을 가져온다.
+    var outline = book_apis_1.useGetOutline(bookId);
     // 챕터의 드롭영역을 한정하기 위한 state; bookOutline droppable 영역의 isDropDisabled 속성에 사용된다.
     var _a = react_1.useState(false), isChapterDragging = _a[0], setIsChapterDragging = _a[1];
-    var _b = react_1.useState(exports.dummyBook), book = _b[0], setBook = _b[1];
     // 특정 타겟의 'dragging' state를 true로 변경
     var turnOnTargetDraggingState = function (start) {
         var isChapter = start.type === 'CHAPTER';
         setIsChapterDragging(isChapter);
     };
+    // 첫 매개변수로 받은 배열의 sourceIndex와 destinationIndex의 요소를 서로 교환하여 반환한다.
     function getReorderedArray(array, sourceIndex, destinationIndex) {
         var newArray = Array.from(array);
         var removedElement = newArray.splice(sourceIndex, 1)[0]; // 기존 위치의 요소를 제거
         newArray.splice(destinationIndex, 0, removedElement); // 새로운 위치에 요소를 삽입
         return newArray;
     }
-    function setStateChapters(newChapters) {
-        var newBook = __assign(__assign({}, book), { chapters: newChapters });
-        setBook(newBook);
-    }
-    function setStatePages(pages, sourceChapterId) {
-        var newChapters = book.chapters.map(function (chapter) {
-            // 변경된 페이지를 가지는 챕터는 새로운 페이지로 교체
-            if (chapter.id === sourceChapterId) {
-                return __assign(__assign({}, chapter), { pages: pages });
-                // 나머지 페이지는 유지
-            }
-            else {
-                return chapter;
-            }
-        });
-        setStateChapters(newChapters);
-    }
+    // DroppableId로부터 sourceChapter와 destinationChapter를 가져온다; destinationChapter가 닫힌 상태의 챕터라면, DrppableId가 다르기 때문에, 닫힌 챕터에 드롭되었는지의 여부도 인자로 받는다.
     function getSourceChapterAndDestinationChapter(sourceChapterDroppableId, destinationChapterDroppableId, isInClosingPageDropAreaDropped) {
-        var sourceChapter = book.chapters.find(function (chapter) { return exports.pageDropAreaPrefix + chapter.id === sourceChapterDroppableId; }); // 드래그 된 페이지가 원래 속한 챕터
+        if (!outline.chapters)
+            return [null, null];
+        var sourceChapter = outline.chapters.find(function (chapter) { return exports.pageDropAreaPrefix + chapter.id === sourceChapterDroppableId; }); // 드래그 된 페이지가 원래 속한 챕터
         var destinationChapter;
         // 닫혀있는 챕터로 destinationChapter를 찾음
         if (isInClosingPageDropAreaDropped) {
-            destinationChapter = book.chapters.find(function (chapter) { return Chapter_2.inClosingPageDropAreaPrefix + String(chapter.id) === destinationChapterDroppableId; });
+            destinationChapter = outline.chapters.find(function (chapter) { return Chapter_2.inClosingPageDropAreaPrefix + String(chapter.id) === destinationChapterDroppableId; });
             // 열린 상태인 챕터로 destinationChapter를 찾음
         }
         else {
-            destinationChapter = book.chapters.find(function (chapter) { return exports.pageDropAreaPrefix + String(chapter.id) === destinationChapterDroppableId; });
+            destinationChapter = outline.chapters.find(function (chapter) { return exports.pageDropAreaPrefix + String(chapter.id) === destinationChapterDroppableId; });
         }
         if (sourceChapter && destinationChapter) {
             return [sourceChapter, destinationChapter];
@@ -95,14 +75,14 @@ function OutlineSidebar() {
             return;
         }
         // re-order: 1. 챕터간의 순서 변경
-        if (type === 'CHAPTER') {
+        if (type === 'CHAPTER' && outline.chapters) {
             setIsChapterDragging(false); // 챕터의 드래그 상태를 종료.
-            var newChapters = getReorderedArray(book.chapters, source.index, destination.index);
+            var newChapters = getReorderedArray(outline.chapters, source.index, destination.index);
             setStateChapters(newChapters);
             return;
             // 페이지 변경
         }
-        else if (type === 'PAGE') {
+        else if (type === 'PAGE' && outline.chapters) {
             // 닫힌 상태의 챕터에 드롭되었는지 여부
             var isInClosingPageDropAreaDropped = destination.droppableId.startsWith(Chapter_2.inClosingPageDropAreaPrefix);
             // 출발지와 목적지의 챕터를 가져옴
@@ -133,7 +113,7 @@ function OutlineSidebar() {
                 }
                 var newSourceChapter_1 = __assign(__assign({}, sourceChapter), { pages: newSourcePages });
                 var newDestinationChapter_1 = __assign(__assign({}, destinationChapter), { pages: newDestinationPages });
-                var newChapters = book.chapters.map(function (chapter) {
+                var newChapters = outline.chapters.map(function (chapter) {
                     // sourceChapter인 경우, 새로운 newSourceChapter로 교체
                     if (chapter.id === newSourceChapter_1.id) {
                         return newSourceChapter_1;
@@ -151,12 +131,33 @@ function OutlineSidebar() {
             }
         }
     };
-    return (React.createElement(OutlineSidebarWrapper_1["default"], { setBook: setBook },
-        React.createElement(BookBasicPage_1["default"], { bookId: book.id }),
+    // queryClient의 ["book", bookId]로 저장된 서버 스냅샷을 업데이트한다. 
+    function setStateChapters(newChapters) {
+        var newOutline = __assign(__assign({}, outline), { chapters: newChapters });
+        queryClient.setQueryData(["book", bookId], newOutline);
+    }
+    // queryClient의 ["book", bookId]로 저장된 서버 스냅샷을 업데이트한다. 
+    function setStatePages(pages, sourceChapterId) {
+        if (!outline.chapters)
+            return;
+        var newChapters = outline.chapters.map(function (chapter) {
+            // 변경된 페이지를 가지는 챕터는 새로운 페이지로 교체
+            if (chapter.id === sourceChapterId) {
+                return __assign(__assign({}, chapter), { pages: pages });
+                // 나머지 페이지는 유지
+            }
+            else {
+                return chapter;
+            }
+        });
+        setStateChapters(newChapters);
+    }
+    return (React.createElement(OutlineSidebarWrapper_1["default"], __assign({}, drillingProps),
+        React.createElement(BookBasicPage_1["default"], { bookId: outline.id }),
         React.createElement(react_beautiful_dnd_1.DragDropContext, { onDragStart: turnOnTargetDraggingState, onDragEnd: onDragEnd },
             React.createElement(react_beautiful_dnd_1.Droppable, { droppableId: "chapter-outline", isDropDisabled: !isChapterDragging, type: 'CHAPTER' }, function (provided) {
                 var _a;
-                return (React.createElement("div", __assign({ ref: provided.innerRef }, provided.droppableProps), (_a = book.chapters) === null || _a === void 0 ? void 0 :
+                return (React.createElement("div", __assign({ ref: provided.innerRef }, provided.droppableProps), (_a = outline.chapters) === null || _a === void 0 ? void 0 :
                     _a.map(function (chapter, index) { return (React.createElement(react_beautiful_dnd_1.Draggable, { key: exports.chapterDraggablePrefix + chapter.id, draggableId: exports.chapterDraggablePrefix + chapter.id, index: index }, function (provided) { return (React.createElement("div", __assign({ ref: provided.innerRef }, provided.draggableProps, provided.dragHandleProps),
                         React.createElement(Chapter_1["default"], { chapter: chapter }))); })); }),
                     provided.placeholder));

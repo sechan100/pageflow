@@ -1,8 +1,8 @@
 import React from 'react';
-import {IPage} from '../../types/book'
+import {PageSummary} from '../../types/types'
 
 interface pageProps {
-  page: IPage;
+  page: PageSummary;
 }
 
 export default function Page(props : pageProps){

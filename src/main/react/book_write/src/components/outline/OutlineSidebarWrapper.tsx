@@ -1,25 +1,24 @@
-import { IBook } from "../../types/book";
-
+/* eslint-disable @typescript-eslint/no-unused-vars */
 
 
 export interface IOutlineSidebarProps {
   children: React.ReactNode;
-  setBook : any
+  bookId: number;
+  queryClient: any;
 }
 
 
-export default function OutlineSidebarWrapper(props : IOutlineSidebarProps) {
-
+export default function OutlineSidebarWrapper(drillingProps : IOutlineSidebarProps) {
 
 
   return (
     <>
       <aside id="page-outline-sidebar" className="fixed top-0 left-0 z-40 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0">
         <div className="overflow-y-auto pt-12 pb-5 px-3 h-full bg-white border-r border-gray-200 dark:bg-gray-800 dark:border-gray-700">
-          {props.children}
+          {drillingProps.children}
         </div>
       </aside>
-      <AddChapterBtn setBook={props.setBook} />
+      <AddChapterBtn {...drillingProps} />
       <div id="sidebar-placeholder" className="relative w-64 h-screen transition-transform -translate-x-full sm:translate-x-0"></div>
     </>
   );
@@ -28,11 +27,12 @@ export default function OutlineSidebarWrapper(props : IOutlineSidebarProps) {
 
 
 interface IAddChapterBtnProps {
-  setBook : any
+  bookId: number;
+  queryClient: any;
 }
 
 
-function AddChapterBtn(props : IAddChapterBtnProps) {
+function AddChapterBtn(drillingProps : IAddChapterBtnProps) {
 
   function addChapter() {
     const newChapter = {
@@ -40,16 +40,6 @@ function AddChapterBtn(props : IAddChapterBtnProps) {
       title: "새 챕터",
       pages: []
     };
-
-    props.setBook((prevBook : IBook) => {
-      return {
-        ...prevBook,
-        chapters: [
-          ...prevBook.chapters,
-          newChapter
-        ]
-      }
-    });
   }
 
 

@@ -1,13 +1,13 @@
 import React, { useRef } from "react";
 import Page from "./Page";
 import { useState } from "react";
-import {IChapter} from '../../types/book'
+import {ChapterSummary} from '../../types/types'
 import { Droppable, Draggable } from "react-beautiful-dnd";
 import { pageDropAreaPrefix, pageDraggablePrefix } from "./OutlineSidebar";
 
 
 interface chapterProps {
-  chapter: IChapter;
+  chapter: ChapterSummary;
 }
 
 

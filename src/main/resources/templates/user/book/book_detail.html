@@ -3,45 +3,46 @@
 
 <head>
     <title>Book</title>
+
+    <!--  홈/ 정보 버튼  -->
     <style>
-<!--   홈/ 정보 메뉴 스타일     -->
-            .chapter_btn {
-          padding: 15px 100px;
-          margin: 10px 4px;
-          color: red;
-          text-transform: uppercase;
-          position: relative;
-          text-decoration: none;
-          display: inline-block;
-        }
+        .chapter_btn {
+        padding: 15px 100px;
+        margin: 10px 4px;
+        color: red;
+        text-transform: uppercase;
+        position: relative;
+        text-decoration: none;
+        display: inline-block;
+      }
 
-        .chapter_btn::before {
-          content: "";
-          position: absolute;
-          bottom: 0;
-          left: 0;
-          width: 100%;
-          height: 2px;
-          background: #6098ff;
-          display: block;
-          -webkit-transform-origin: right top;
-          -ms-transform-origin: right top;
-          transform-origin: right top;
-          -webkit-transform: scale(0, 1);
-          -ms-transform: scale(0, 1);
-          transform: scale(0, 1);
-          -webkit-transition: transform 0.4s cubic-bezier(1, 0, 0, 1);
-          transition: transform 0.4s cubic-bezier(1, 0, 0, 1);
-        }
+      .chapter_btn::before {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background: #6098ff;
+        display: block;
+        -webkit-transform-origin: right top;
+        -ms-transform-origin: right top;
+        transform-origin: right top;
+        -webkit-transform: scale(0, 1);
+        -ms-transform: scale(0, 1);
+        transform: scale(0, 1);
+        -webkit-transition: transform 0.4s cubic-bezier(1, 0, 0, 1);
+        transition: transform 0.4s cubic-bezier(1, 0, 0, 1);
+      }
 
-        .chapter_btn:hover::before {
-          -webkit-transform-origin: left top;
-          -ms-transform-origin: left top;
-          transform-origin: left top;
-          -webkit-transform: scale(1, 1);
-          -ms-transform: scale(1, 1);
-          transform: scale(1, 1);
-        }
+      .chapter_btn:hover::before {
+        -webkit-transform-origin: left top;
+        -ms-transform-origin: left top;
+        transform-origin: left top;
+        -webkit-transform: scale(1, 1);
+        -ms-transform: scale(1, 1);
+        transform: scale(1, 1);
+      }
     </style>
 </head>
 
@@ -98,20 +99,20 @@
                             <div>
                                 <!--     홈/정보 메뉴    -->
                                 <ul class="flex justify-center  mt-5">
-                                    <li class="mr-10  p-4 rounded-lg chapter_btn">
-                                        <a  data-tip="Home">
+                                    <li class="mr-10  p-4 rounded-lg chapter_btn ">
+                                        <a href="#" data-tip="Hom" onclick="showTab('tab1')">
                                             <p>홈</p>
                                         </a>
                                     </li>
-                                    <li class=" p-4 rounded-lg chapter_btn">
-                                        <a data-tip="Details">
+                                    <li class=" p-4 rounded-lg chapter_btn" >
+                                        <a href="#" data-tip="Details" onclick="showTab('tab2')">
                                             <p>정보</p>
                                         </a>
                                     </li>
                                 </ul>
                             </div>
-                            <!--         책 챕터     -->
-                            <div class="flex flex-wrap -m-2">
+                            <!--         책 챕터 (홈)    -->
+                            <div class="flex flex-wrap -m-2 tab-content" id="tab1" >
                                 <div class="p-2 w-full">
                                     <div class="h-full flex items-center  p-4 rounded-lg ">
                                         <div class="flex-grow">
@@ -121,7 +122,8 @@
                                                          class="w-16 h-20 object-cover object-center flex-shrink-0 mr-4 rounded-lg"
                                                          alt="Book Image">
                                                     <div class="w-full py-3">
-                                                        <h1 class=" text-base " th:text="${chapters.title}"></h1>
+                                                        <div><a href="#" class=" text-base "
+                                                                th:text="${chapters.title}"></a></div>
                                                         <!--      작성 날짜 데아터 표기 해야함    -->
                                                         <span>책 작성 날짜</span>
                                                     </div>
@@ -130,6 +132,10 @@
                                         </div>
                                     </div>
                                 </div>
+                            </div>
+                            <!--         책 챕터 (정보)    -->
+                            <div class="flex flex-wrap -m-2 tab-content" id="tab2">
+                                <h1>정보페입지</h1>
                             </div>
                         </div>
                         <!--          책 챕터 끝    -->
@@ -162,118 +168,130 @@
 
     <!-- 댓글 작성 ajax-->
     <script>
-        let commentWrite_submitFormDone = false;
+        e        let commentWrite_submitFormDone = false;
 
-        function commentWrite_submitForm(form) {
-            form.content.value = form.content.value.trim();
+                function commentWrite_submitForm(form) {
+                    form.content.value = form.content.value.trim();
 
-            if (form.content.value.length === 0) {
-                alert("댓글을 입력해주세요");
-                form.content.focus();
-                return;
-            }
+                    if (form.content.value.length === 0) {
+                        alert("댓글을 입력해주세요");
+                        form.content.focus();
+                        return;
+                    }
 
-            var outlineId = [[${outline.id}]];
+                    var outlineId = [[${outline.id}]];
 
-            $.ajax({
-                type: 'POST',
-                url: `/comment/create/${outlineId}`,
-                data: { content: form.content.value },
-                success: function(comment) {
-                    console.log("확인");
-                    commentList(comment);
-                    form.content.value = '';
-                },
-                error: function(xhr, status, error) {
-                    console.error("error");
+                    $.ajax({
+                        type: 'POST',
+                        url: `/comment/create/${outlineId}`,
+                        data: { content: form.content.value },
+                        success: function(comment) {
+                            console.log("확인");
+                            commentList(comment);
+                            form.content.value = '';
+                        },
+                        error: function(xhr, status, error) {
+                            console.error("error");
+                        }
+                    });
                 }
-            });
-        }
 
-        $(document).ready(function() {
-            var outlineId = [[${outline.id}]];
+                $(document).ready(function() {
+                    var outlineId = [[${outline.id}]];
 
-            $.ajax({
-                type: 'GET',
-                url: `/comment/list/${outlineId}`,
-                success: function(comment) {
-                    commentList(comment);
-                },
-                error: function(xhr, status, error) {
-                    console.error("error");
+                    $.ajax({
+                        type: 'GET',
+                        url: `/comment/list/${outlineId}`,
+                        success: function(comment) {
+                            commentList(comment);
+                        },
+                        error: function(xhr, status, error) {
+                            console.error("error");
+                        }
+                    });
+                });
+
+            <!--댓글 목록 ajax-->
+                function commentList(comment) {
+                    var output = "";
+
+                    for (var i in comment) {
+                        output += "<div class='comment-item'>";
+                        output += "<p id='comment-" + comment[i].id + "'>" + comment[i].content + "</p>"; // 댓글을 텍스트로 표시
+                        output += "<a href='javascript:void(0);' class='recommend' onclick='recommendComment(" + comment[i].id + ")'>추천</a>";
+                        output += "<a href='javascript:void(0);' class='edit' onclick='editComment(" + comment[i].id + ")'>수정</a>";
+                        output += "<a href='javascript:void(0);' class='delete' onclick='deleteComment(" + comment[i].id + ")'>삭제</a>";
+                        output += "</div>";
+                    }
+
+                    $("#comment_list").html(output);
                 }
-            });
-        });
 
-    <!--댓글 목록 ajax-->
-        function commentList(comment) {
-            var output = "";
-
-            for (var i in comment) {
-                output += "<div class='comment-item'>";
-                output += "<p id='comment-" + comment[i].id + "'>" + comment[i].content + "</p>"; // 댓글을 텍스트로 표시
-                output += "<a href='javascript:void(0);' class='recommend' onclick='recommendComment(" + comment[i].id + ")'>추천</a>";
-                output += "<a href='javascript:void(0);' class='edit' onclick='editComment(" + comment[i].id + ")'>수정</a>";
-                output += "<a href='javascript:void(0);' class='delete' onclick='deleteComment(" + comment[i].id + ")'>삭제</a>";
-                output += "</div>";
-            }
-
-            $("#comment_list").html(output);
-        }
-
-<!--댓글 삭제 ajax-->
-        const deleteComment = (commentId) => {
-             if (confirm("정말로 삭제하시겠습니까?")) {
-                 $.ajax({
-                     type: 'GET',
-                     url: `/comment/delete/${commentId}`,
-                     success: function (comment) {
-                         console.log('삭제 완료');
-                         commentList(comment); // 댓글 목록 업데이트
-                     },
-                     error: function (xhr, status, error) {
-                         console.error("error");
+        <!--댓글 삭제 ajax-->
+                const deleteComment = (commentId) => {
+                     if (confirm("정말로 삭제하시겠습니까?")) {
+                         $.ajax({
+                             type: 'GET',
+                             url: `/comment/delete/${commentId}`,
+                             success: function (comment) {
+                                 console.log('삭제 완료');
+                                 commentList(comment); // 댓글 목록 업데이트
+                             },
+                             error: function (xhr, status, error) {
+                                 console.error("error");
+                             }
+                         });
                      }
-                 });
-             }
-         };
+                 };
 
 
-<!--     댓글 수정  ajax    -->
-        function editComment(commentId) {
-        var commentContent = $("#comment-" + commentId).text(); // 기존 댓글 내용 가져오기
-        var newContent = "<textarea> " + commentContent + "</textarea>"; // 수정할 내용을 입력받음
+        <!--     댓글 수정  ajax    -->
+                function editComment(commentId) {
+                var commentContent = $("#comment-" + commentId).text(); // 기존 댓글 내용 가져오기
+                var newContent = "<textarea> " + commentContent + "</textarea>"; // 수정할 내용을 입력받음
 
-        if (newContent !== null) { // 사용자가 취소하지 않은 경우
-            $("#comment-" + commentId).siblings().find("a").hide();
-            $("#comment-" + commentId).replaceWith("<textarea id='comment-" + commentId + "' style='width: 100%; resize: none;'>" + commentContent + "</textarea>");
-            $("#comment-" + commentId).siblings("button").hide();
-            $("#comment-" + commentId).after(`<button onclick="saveEdit(${commentId})">저장</button>`);
-            $("#comment-" + commentId).after(`<button onclick="cancelEdit(${commentId})">취소</button>`);
-        }
-    }
-
-    function saveEdit(commentId) {
-        var editedContent = $("#comment-" + commentId).val(); // 수정된 댓글 내용 가져오기
-        $.ajax({
-            type: 'POST',
-            url: `/comment/modify/${commentId}`,
-            data: { content: editedContent },
-            success: function (comment) {
-                console.log('수정 완료');
-                commentList(comment); // 댓글 목록 업데이트
-            },
-            error: function (xhr, status, error) {
-                console.error("error");
+                if (newContent !== null) { // 사용자가 취소하지 않은 경우
+                    $("#comment-" + commentId).siblings().find("a").hide();
+                    $("#comment-" + commentId).replaceWith("<textarea id='comment-" + commentId + "' style='width: 100%; resize: none;'>" + commentContent + "</textarea>");
+                    $("#comment-" + commentId).siblings("button").hide();
+                    $("#comment-" + commentId).after(`<button onclick="saveEdit(${commentId})">저장</button>`);
+                    $("#comment-" + commentId).after(`<button onclick="cancelEdit(${commentId})">취소</button>`);
+                }
             }
-        });
-    }
 
-    function cancelEdit(commentId) {
-        var commentContent = $("#comment-" + commentId).text(); // 기존 댓글 내용 가져오기
-        $("#comment-" + commentId).replaceWith("<p id='comment-" + commentId + "'>" + commentContent + "</p>");
-    }
+            function saveEdit(commentId) {
+                var editedContent = $("#comment-" + commentId).val(); // 수정된 댓글 내용 가져오기
+                $.ajax({
+                    type: 'POST',
+                    url: `/comment/modify/${commentId}`,
+                    data: { content: editedContent },
+                    success: function (comment) {
+                        console.log('수정 완료');
+                        commentList(comment); // 댓글 목록 업데이트
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("error");
+                    }
+                });
+            }
+
+            function cancelEdit(commentId) {
+                var commentContent = $("#comment-" + commentId).text(); // 기존 댓글 내용 가져오기
+                $("#comment-" + commentId).replaceWith("<p id='comment-" + commentId + "'>" + commentContent + "</p>");
+            }
     </script>
+
+<!--  홈/ 정보 비동기 이동  -->
+    <script>
+        function showTab(tabId) {
+  var tabContents = document.querySelectorAll(".tab-content");
+  tabContents.forEach(function (content) {
+    content.style.display = "none";
+  });
+  document.getElementById(tabId).style.display = "block";
+}
+    </script>
+    r
 
 
 </main>

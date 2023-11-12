@@ -1,8 +1,7 @@
 import './App.css';
-import BookBasicPageForm from './components/form/BookBasicPageForm';
 import { QueryClient, QueryClientProvider } from 'react-query';
-import OutlineSidebar from './components/outline/OutlineSidebar';
 import { useState } from 'react';
+import BookEntityDraggableContext from './components/BookEntityDraggableContext';
 
 
 function App() {
@@ -29,10 +28,7 @@ function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <OutlineSidebar {...drillingProps} />
-      <main className="px-24 mt-16 flex-auto">
-        <BookBasicPageForm {...drillingProps}/>
-      </main>
+      <BookEntityDraggableContext {...drillingProps} />
     </QueryClientProvider>
   );
 }

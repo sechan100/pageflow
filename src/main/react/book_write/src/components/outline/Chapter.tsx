@@ -33,10 +33,11 @@ export default function Chapter(props : chapterProps) {
 
   return (
     <div>
+      {/* 챕터 헤더 */}
       <Droppable droppableId={inClosingPageDropAreaPrefix + String(props.chapter.id)} isDropDisabled={!isPagesHidden} type='PAGE'>
         {(provided, snapshot) => (
           <div ref={provided.innerRef} {...provided.droppableProps}>
-            <div onClick={toggleInnerPageList} className={(snapshot.isDraggingOver ? "bg-gray-700 " : "") + "flex items-center p-1 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"}>
+            <div onClick={toggleInnerPageList} className={(snapshot.isDraggingOver ? "bg-gray-700 " : "") + "flex items-center p-1 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 bg-gray-800"}>
               <svg aria-hidden="true" className="w-4 h-4 text-gray-800 dark:text-white" fill="none" viewBox="0 0 16 12"><path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M1 1h14M1 6h14M1 11h7"/></svg>
               <span className="flex-1 ml-3 text-left whitespace-nowrap">
                 {chapter.title}

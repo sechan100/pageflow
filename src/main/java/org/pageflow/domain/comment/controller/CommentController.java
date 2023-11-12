@@ -27,19 +27,6 @@ public class CommentController {
     private final BookService bookService;
     private final Rq rq;
 
-//    @PostMapping("/create/{id}")
-//    public String create(Model model, @PathVariable("id") Long id, @Valid CommentForm commentForm,
-//                         BindingResult bindingResult, Principal principal) {
-//        Book book = this.bookService.delegateFindBookWithAuthorById(id);
-//        Account author = this.accountService.findFetchJoinProfileByUsername(principal.getName());
-//        if (bindingResult.hasErrors()) {
-//            model.addAttribute("book", book);
-//            return "/book_detail";
-//        }
-//        this.commentService.create(book, commentForm.getContent(),author);
-//        return String.format("redirect:/book/detail/%s", id);
-//    } //댓글 작성
-
     @PostMapping("/create/{id}")
     public ResponseEntity<List<Comment>> create(@RequestParam(value = "content") String content, @PathVariable("id") Long id, Principal principal) {
         Book book = this.bookService.delegateFindBookWithAuthorById(id);

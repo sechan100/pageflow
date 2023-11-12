@@ -1,5 +1,6 @@
 
 
+// Alert 끄기
 function dismissAlert(flowAlertId){
     $(`#flow-alert-${flowAlertId}`).addClass('animate__fadeOutDown');
 

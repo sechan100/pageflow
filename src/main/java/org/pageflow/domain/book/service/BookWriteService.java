@@ -102,6 +102,21 @@ public class BookWriteService {
     }
     
     
+    @Transactional
+    public boolean deleteChapter(Long chapterId) {
+            
+            Chapter chapterToDelete = chapterRepository.findById(chapterId).orElseThrow();
+            
+            try {
+                // Chapter 삭제 + 고아객체 삭제가 ON이므로, 참조를 잃은 Page들을 자동으로 같이 삭제
+                chapterRepository.delete(chapterToDelete);
+                return true;
+            } catch(Exception e) {
+                log.error("챕터 삭제 중 오류가 발생했습니다." + e.getMessage());
+                return false;
+            }
+    }
+    
     /**
      * 매개받은 챕터의 소속으로 제일 뒤에 새로운 페이지를 생성한다.
      * 추가로, 매개로 받은 Chapter 엔티티의 Pages 컬렉션의 참조를 통해서 생성된 페이지를 추가한다.
@@ -269,6 +284,7 @@ public class BookWriteService {
         return updatedEntityNum.get();
     }
     
+    
     /**
      * @param pageSummaries page 리스트
      * @param ownerChapterId outline 상으로 페이지들이 소속된 chapter의 id
@@ -335,6 +351,5 @@ public class BookWriteService {
             
             return newSortPriorityList;
     }
-    
 }
 

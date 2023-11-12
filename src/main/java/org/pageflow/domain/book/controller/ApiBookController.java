@@ -3,6 +3,7 @@ package org.pageflow.domain.book.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.pageflow.base.request.Rq;
+import org.pageflow.base.response.WithAlertApiResponse;
 import org.pageflow.domain.book.entity.Book;
 import org.pageflow.domain.book.entity.Chapter;
 import org.pageflow.domain.book.model.outline.Outline;
@@ -56,10 +57,31 @@ public class ApiBookController {
     }
     
     
+    /**
+     * 새로운 Chapter를 생성하여 반환
+     * @param bookId 책 아이디
+     * @return 새로 생성된 Chapter
+     */
     @PostMapping("/api/book/{bookId}/chapter")
     public Chapter createChapter(@PathVariable("bookId") Long bookId) {
         Book ownerBook = bookService.repoFindById(bookId);
         return bookWriteService.createBlankChapter(ownerBook);
+    }
+    
+    /**
+     * chapterId에 해당하는 Chapter를 삭제하고, 하위 Page들도 모두 삭제
+     * @param chapterId 삭제할 챕터 아이디
+     * @return 삭제 성공 여부를 담은 alert
+     */
+    @DeleteMapping("/api/chapter/{chapterId}")
+    public WithAlertApiResponse<Chapter> deleteChapter(@PathVariable("chapterId") Long chapterId) {
+        boolean isDeleteSuccess = bookWriteService.deleteChapter(chapterId);
+        
+        if(isDeleteSuccess) {
+            return WithAlertApiResponse.success("챕터를 삭제했습니다.");
+        } else {
+            return WithAlertApiResponse.error("챕터를 삭제하지 못했습니다. \n 잠시후에 다시 시도해주세요.");
+        }
     }
     
     

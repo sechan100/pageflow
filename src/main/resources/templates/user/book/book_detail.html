@@ -101,13 +101,13 @@
                         <div class=" h-3/5 rounded-lg" style="background-color : #e5e7eb;">
                             <div>
                                 <!--     홈/정보 메뉴    -->
-                                <ul class="flex justify-center  mt-5">
-                                    <li class="mr-10  p-4 rounded-lg chapter_btn ">
+                                <ul class="flex justify-center  mt-1">
+                                    <li class="mr-10  p-1 rounded-lg chapter_btn ">
                                         <a href="#" data-tip="Hom" onclick="showTab('tab1')">
                                             <p>홈</p>
                                         </a>
                                     </li>
-                                    <li class=" p-4 rounded-lg chapter_btn">
+                                    <li class=" p-1 rounded-lg chapter_btn">
                                         <a href="#" data-tip="Details" onclick="showTab('tab2')">
                                             <p>정보</p>
                                         </a>
@@ -117,12 +117,12 @@
                             <!--         책 챕터 (홈)    -->
                             <div class="flex flex-wrap -m-2 tab-content" id="tab1">
                                 <div class="p-2 w-full">
-                                    <div class="h-full flex items-center  p-4 rounded-lg ">
+                                    <div class="h-full flex items-center  p-3 rounded-lg ">
                                         <div class="flex-grow">
                                             <ul>
                                                 <li th:each=" chapters : ${outline.chapters}" class="flex mb-2">
                                                     <img th:src="@{${outline.coverImgUrl}}"
-                                                         class="w-16 h-20 object-cover object-center flex-shrink-0 mr-4 rounded-lg"
+                                                         class="w-14 h-16 object-cover object-center flex-shrink-0 mr-4 rounded-lg"
                                                          alt="Book Image">
                                                     <div class="w-full py-3">
                                                         <div><a href="#" class=" text-base "
@@ -143,9 +143,11 @@
                         </div>
                         <!--          책 챕터 끝    -->
                         <!--  댓글 레이아웃 -->
-                        <div class="h-2/5 flex flex-col relative rounded-lg mt-10 overflow-hidden"
+                        <div class="h-2/5 flex flex-col relative rounded-lg mt-5 overflow-hidden"
                              style="background-color : #e5e7eb;">
-                            <div id="comment_list" class="overfloew-auto h-5/6 border"></div>
+                            <div  class="h-5/6 border border-yellow-400 ">
+                                <div id="comment_list" class="  h-full border border-blue-400"></div>
+                            </div>
                             <div class="w-full absolute bottom-0 border">
                                 <div class="form-control flex">
                                     <form class="flex " onsubmit="commentWrite_submitForm(this); return false;">
@@ -173,6 +175,7 @@
     <script>
         let commentWrite_submitFormDone = false;
 
+<!-- 댓글 작성 -->
         function commentWrite_submitForm(form) {
             form.content.value = form.content.value.trim();
 
@@ -214,21 +217,31 @@
             });
         });
 
+<!-- 댓글 목록 -->
         function commentList(comment) {
             var output = "";
+            var userImg = "[[${outline.author.profileImgUrl}]]";
 
             for (var i in comment) {
-                output += "<div class='comment-item'>";
-                output += `<p id='comment-${comment[i].id}'>${comment[i].content}</p>`;
-                output += `<a href='javascript:void(0);' class='recommend' onclick='recommendComment(${comment[i].id})'>추천</a>`;
-                output += `<a href='javascript:void(0);' class='edit' onclick='editComment(${comment[i].id})'>수정</a>`;
-                output += `<a href='javascript:void(0);' class='delete' onclick='deleteComment(${comment[i].id})'>삭제</a>`;
+                output += "<div class=' flex text-xs mb-2 mt-1'>";
+                output += "<div class=' w-10 mr-2 ml-2 flex'>";
+                output += "<div class=' w-10 h-10 m-auto justify-items-center'>";
+                output += "<img src='" + userImg + "' alt='프로필이미지' class='rounded-full'>";
+                output += "</div>";
+                output += "</div>";
+                output += "<div class=' '>";
+                output += `<p id='comment-${comment[i].id}' class='mb-1'>${comment[i].content}</p>`;
+                output += `<a href='javascript:void(0);' class=' recommend mr-2' onclick='recommendComment(${comment[i].id})'>추천</a>`;
+                output += `<a href='javascript:void(0);' class='edit mr-2' onclick='editComment(${comment[i].id})'>수정</a>`;
+                output += `<a href='javascript:void(0);' class=' delete' onclick='deleteComment(${comment[i].id})'>삭제</a>`;
+                output += "</div>";
                 output += "</div>";
             }
 
             $("#comment_list").html(output);
         }
 
+<!-- 댓글 삭제   -->
         const deleteComment = (commentId) => {
             if (confirm("정말로 삭제하시겠습니까?")) {
                 $.ajax({
@@ -245,16 +258,20 @@
             }
         };
 
+<!-- 댓글 수정 -->
         function editComment(commentId) {
             var commentContent = $("#comment-" + commentId).text();
             var newContent = `<textarea>${commentContent}</textarea>`;
 
+
             if (newContent !== null) {
-                $("#comment-" + commentId).siblings().find("a").hide();
+                var elementsToHide = $("#comment-" + commentId).find('.recommend, .edit, .delete');
+                elementsToHide.hide();
                 $("#comment-" + commentId).replaceWith(`<textarea id='comment-${commentId}' style='width: 100%; resize: none;'>${commentContent}</textarea>`);
                 $("#comment-" + commentId).siblings("button").hide();
                 $("#comment-" + commentId).after(`<button onclick='saveEdit(${commentId})'>저장</button>`);
                 $("#comment-" + commentId).after(`<button onclick='cancelEdit(${commentId})'>취소</button>`);
+                 console.log('Cancel button clicked!');
             }
         }
 

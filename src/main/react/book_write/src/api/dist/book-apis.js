@@ -36,25 +36,83 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-exports.useGetBook = void 0;
+exports.useRearrangeOutline = exports.useGetOutline = void 0;
+/* eslint-disable @typescript-eslint/no-unused-vars */
 var react_query_1 = require("react-query");
 var axios_1 = require("axios");
-var getBookById = function (id) { return __awaiter(void 0, void 0, Promise, function () {
+var react_query_2 = require("react-query");
+var App_1 = require("../App");
+var sampleOutline = {
+    id: 0,
+    author: {
+        id: 0,
+        createDate: "생성일",
+        modifyDate: "수정일",
+        nickname: "닉네임",
+        profileImgUrl: "https://phinf.pstatic.net/contact/20230727_252/1690456995185MmBBn_JPEG/image.jpg"
+    },
+    title: "책이 로딩중입니다...",
+    published: false,
+    coverImgUrl: "https://phinf.pstatic.net/contact/20230727_252/1690456995185MmBBn_JPEG/image.jpg",
+    chapters: [
+        {
+            id: 0,
+            title: "챕터가 로딩중입니다...",
+            sortPriority: 10000,
+            pages: [
+                {
+                    id: 0,
+                    title: "페이지가 로딩중입니다...",
+                    sortPriority: 10000
+                }
+            ]
+        }
+    ]
+};
+var getOutlineById = function (id) { return __awaiter(void 0, void 0, Promise, function () {
     var response;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, axios_1["default"].get("/api/book?id=" + id)];
+            case 0: return [4 /*yield*/, axios_1["default"].get("/api/book/" + id + "/outline")];
             case 1:
                 response = _a.sent();
+                if (response.status !== 200) {
+                    throw new Error("책 정보를 가져오는데 실패했습니다.");
+                }
+                if (response.data) {
+                    console.log(response.data);
+                }
                 return [2 /*return*/, response.data];
         }
     });
 }); };
-exports.useGetBook = function (bookId) {
-    return react_query_1.useQuery(['book', bookId], // query key
-    function () { return getBookById(bookId); }, // query fn
+exports.useGetOutline = function (bookId) {
+    var _a = react_query_1.useQuery(['book', bookId], // query key
+    function () { return getOutlineById(bookId); }, // query fn
     {
-        onSuccess: function (data) { console.log(data); },
-        refetchOnWindowFocus: false
-    });
+        enabled: bookId > 0
+    }), data = _a.data, isLoading = _a.isLoading, isFetching = _a.isFetching, error = _a.error;
+    // 로딩중이거나 페칭중이라면 sampleOutline을 반환
+    if (isLoading || isFetching) {
+        return sampleOutline;
+    }
+    if (data) {
+        var outline = data;
+        return outline;
+    }
+    else {
+        return sampleOutline;
+    }
+};
+exports.useRearrangeOutline = function (bookId) {
+    var _a = react_query_2.useMutation(function (newOutline) { return axios_1["default"].put("/api/book/" + bookId + "/outline", newOutline); }, {
+        onSuccess: function () {
+            App_1.queryClient.invalidateQueries(['book', bookId]);
+        }
+    }), mutateAsync = _a.mutateAsync, isLoading = _a.isLoading, error = _a.error;
+    return {
+        mutateAsync: mutateAsync,
+        isLoading: isLoading,
+        error: error
+    };
 };

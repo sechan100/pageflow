@@ -1,5 +1,6 @@
 
 
+// Alert 끄기
 function dismissAlert(flowAlertId){
     $(`#flow-alert-${flowAlertId}`).addClass('animate__fadeOutDown');
 
@@ -13,7 +14,7 @@ function dismissAlert(flowAlertId){
 
 let alertIdCounter = 1;
 
-function flowAlert(alertType, msg) {
+export default function flowAlert(alertType, msg) {
 
     let color, bgColor, borderColor;
     const currentAlertId = alertIdCounter;

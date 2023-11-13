@@ -51,7 +51,7 @@ public class BookWriteService {
                 .build();
         
         // 책 먼저 영속
-        Book persistedBook = bookService.repoSave(newBook);
+        Book persistedBook = bookService.repoSaveBook(newBook);
         
         // 기본 챕터와 기본 페이지 생성
         Chapter defaultChapterWithDefaultPages = createBlankChapter(persistedBook);
@@ -152,6 +152,22 @@ public class BookWriteService {
     }
     
     
+    @Transactional
+    public boolean deletePage(Long pageId) {
+        
+        Page pageToDelete = pageRepository.findById(pageId).orElseThrow();
+        
+        try {
+            // page 삭제
+            pageRepository.delete(pageToDelete);
+            return true;
+        } catch(Exception e) {
+            log.error("페이지 삭제 중 오류가 발생했습니다." + e.getMessage());
+            return false;
+        }
+    }
+    
+    
     /**
      * @param updateRequest 업데이트 변경사항 dto
      * @return update된 책.
@@ -169,7 +185,7 @@ public class BookWriteService {
         staleBook.setPublished(updateRequest.isPublished());
         
         // 데이터 커밋
-        Book updatedBook = bookService.repoSave(staleBook);
+        Book updatedBook = bookService.repoSaveBook(staleBook);
         
         return updatedBook;
     }

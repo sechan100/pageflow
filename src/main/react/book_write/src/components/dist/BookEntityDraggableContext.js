@@ -17,58 +17,36 @@ var OutlineSidebar_1 = require("./outline/OutlineSidebar");
 var book_apis_1 = require("../api/book-apis");
 var react_1 = require("react");
 var Chapter_1 = require("./outline/Chapter");
+var axios_1 = require("axios");
+var flowAlert_1 = require("../etc/flowAlert");
 function BookEntityDraggableContext(drillingProps) {
     var bookId = drillingProps.bookId, queryClient = drillingProps.queryClient;
     // react query로 server book outline snapshot을 가져온다.
     var outline = book_apis_1.useGetOutline(bookId);
-    var deleteDropArea = react_1.useRef(null); // 삭제 드롭 영역의 DOM 참조
-    var turnOnTargetDraggingState = function (start) {
-        // 삭제 드롭영역 보이기
-        if (deleteDropArea.current) {
-            // @ts-ignore
-            deleteDropArea.current.classList.toggle("visible");
-            // @ts-ignore
-            deleteDropArea.current.classList.toggle("invisible");
-        }
-    };
-    // 첫 매개변수로 받은 배열의 sourceIndex와 destinationIndex의 요소를 서로 교환하여 반환한다.
-    function getReorderedArray(array, sourceIndex, destinationIndex) {
-        var newArray = Array.from(array);
-        var removedElement = newArray.splice(sourceIndex, 1)[0]; // 기존 위치의 요소를 제거
-        newArray.splice(destinationIndex, 0, removedElement); // 새로운 위치에 요소를 삽입
-        return newArray;
+    var chapterDeleteDropArea = react_1.useRef(null); // Chapter 삭제 드롭 영역의 DOM 참조
+    var pageDeleteDropArea = react_1.useRef(null); // Page 삭제 드롭 영역의 DOM 참조
+    return (React.createElement(React.Fragment, null,
+        React.createElement(react_beautiful_dnd_1.DragDropContext, { onDragStart: onDragStart, onDragEnd: onDragEnd },
+            React.createElement(OutlineSidebar_1["default"], __assign({}, drillingProps)),
+            React.createElement(react_beautiful_dnd_1.Droppable, { droppableId: "chapter-delete-drop-area", type: "CHAPTER" }, function (provided, snapshot) { return (React.createElement("div", { className: "bg-gray-500 animate-bounce hover:bg-gray-700 w-48 absolute invisible left-1/2 top-5 p-5 px-6 rounded-full", ref: chapterDeleteDropArea },
+                React.createElement("div", __assign({ ref: provided.innerRef }, provided.droppableProps, { className: "flex" }),
+                    React.createElement("svg", { className: "w-6 h-6 text-gray-800 dark:text-white mr-3", "aria-hidden": "true", xmlns: "http://www.w3.org/2000/svg", fill: "none", viewBox: "0 0 18 20" },
+                        React.createElement("path", { stroke: "currentColor", "stroke-linecap": "round", "stroke-linejoin": "round", "stroke-width": "2", d: "M1 5h16M7 8v8m4-8v8M7 1h4a1 1 0 0 1 1 1v3H6V2a1 1 0 0 1 1-1ZM3 5h12v13a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5Z" })),
+                    React.createElement("span", { className: "text-white" }, "\uB4DC\uB798\uADF8\uD558\uC5EC \uC0AD\uC81C")))); }),
+            React.createElement(react_beautiful_dnd_1.Droppable, { droppableId: "page-delete-drop-area", type: "PAGE" }, function (provided, snapshot) { return (React.createElement("div", { className: "bg-gray-500 animate-bounce hover:bg-gray-700 w-48 absolute invisible left-1/2 top-5 p-5 px-6 rounded-full", ref: pageDeleteDropArea },
+                React.createElement("div", __assign({ ref: provided.innerRef }, provided.droppableProps, { className: "flex" }),
+                    React.createElement("svg", { className: "w-6 h-6 text-gray-800 dark:text-white mr-3", "aria-hidden": "true", xmlns: "http://www.w3.org/2000/svg", fill: "none", viewBox: "0 0 18 20" },
+                        React.createElement("path", { stroke: "currentColor", "stroke-linecap": "round", "stroke-linejoin": "round", "stroke-width": "2", d: "M1 5h16M7 8v8m4-8v8M7 1h4a1 1 0 0 1 1 1v3H6V2a1 1 0 0 1 1-1ZM3 5h12v13a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5Z" })),
+                    React.createElement("span", { className: "text-white" }, "\uB4DC\uB798\uADF8\uD558\uC5EC \uC0AD\uC81C")))); }),
+            React.createElement("main", { className: "px-24 mt-16 flex-auto" },
+                React.createElement(BookBasicPageForm_1["default"], __assign({}, drillingProps))))));
+    function onDragStart(start) {
+        toggleDeleteDropAreaVisibility(start.type);
     }
-    // DroppableId로부터 sourceChapter와 destinationChapter를 가져온다; destinationChapter가 닫힌 상태의 챕터라면, DrppableId가 다르기 때문에, 닫힌 챕터에 드롭되었는지의 여부도 인자로 받는다.
-    function getSourceChapterAndDestinationChapter(sourceChapterDroppableId, destinationChapterDroppableId, isInClosingPageDropAreaDropped) {
-        if (!outline.chapters)
-            return [null, null];
-        var sourceChapter = outline.chapters.find(function (chapter) { return OutlineSidebar_1.pageDropAreaPrefix + chapter.id === sourceChapterDroppableId; }); // 드래그 된 페이지가 원래 속한 챕터
-        var destinationChapter;
-        // 닫혀있는 챕터로 destinationChapter를 찾음
-        if (isInClosingPageDropAreaDropped) {
-            destinationChapter = outline.chapters.find(function (chapter) { return Chapter_1.inClosingPageDropAreaPrefix + String(chapter.id) === destinationChapterDroppableId; });
-            // 열린 상태인 챕터로 destinationChapter를 찾음
-        }
-        else {
-            destinationChapter = outline.chapters.find(function (chapter) { return OutlineSidebar_1.pageDropAreaPrefix + String(chapter.id) === destinationChapterDroppableId; });
-        }
-        if (sourceChapter && destinationChapter) {
-            return [sourceChapter, destinationChapter];
-        }
-        else {
-            console.log('sourceChapter, 또는 destinationChapter가 정의되지 않았습니다.');
-            return [null, null];
-        }
-    }
-    var onDragEnd = function (result) {
+    ;
+    function onDragEnd(result) {
         console.log(result.destination);
-        // 삭제 드롭영역 숨기기
-        if (deleteDropArea.current) {
-            // @ts-ignore
-            deleteDropArea.current.classList.toggle("visible");
-            // @ts-ignore
-            deleteDropArea.current.classList.toggle("invisible");
-        }
+        toggleDeleteDropAreaVisibility(result.type);
         var destination = result.destination, // 최종 드롭된 위치(목적지)
         source = result.source, // 기존 위치(출발지)
         type = result.type // 드래그된 요소의 타입(특정 타입이 적용된 Droppable의 직계 자식은 해당 타입을 가진다.)
@@ -78,6 +56,11 @@ function BookEntityDraggableContext(drillingProps) {
         }
         // 원래 위치와 동일한 위치로 드래그 되었을 경우 state를 유지.
         if (destination.droppableId === source.droppableId && destination.index === source.index) {
+            return;
+        }
+        // 삭제 영역으로 드롭된 경우 삭제 로직 실행
+        if (destination.droppableId === 'chapter-delete-drop-area' || destination.droppableId === 'page-delete-drop-area') {
+            deleteDroppedElement(type, source, destination);
             return;
         }
         // re-order: 1. 챕터간의 순서 변경
@@ -135,7 +118,73 @@ function BookEntityDraggableContext(drillingProps) {
                 setStateChapters(newChapters);
             }
         }
-    };
+    }
+    ;
+    function toggleDeleteDropAreaVisibility(type) {
+        if (type !== 'PAGE' && pageDeleteDropArea.current) {
+            // @ts-ignore
+            pageDeleteDropArea.current.classList.toggle("visible");
+            // @ts-ignore
+            pageDeleteDropArea.current.classList.toggle("invisible");
+        }
+        else if (type === 'PAGE' && chapterDeleteDropArea.current) {
+            // @ts-ignore
+            chapterDeleteDropArea.current.classList.toggle("visible");
+            // @ts-ignore
+            chapterDeleteDropArea.current.classList.toggle("invisible");
+        }
+    }
+    function deleteDroppedElement(type, source, destination) {
+        if (window.confirm('정말로 삭제하시겠습니까?') === false)
+            return;
+        // 삭제할 챕터의 경우
+        if (type === 'CHAPTER' && outline.chapters) {
+            var newChapters = Array.from(outline.chapters);
+            var deletedChapter = newChapters.splice(source.index, 1)[0];
+            deleteDroppedElementOnServerAndApplyFE(deletedChapter.id, type);
+            // 삭제할 페이지의 경우
+        }
+        else if (type === 'PAGE' && outline.chapters) {
+            var sourceChapter = outline.chapters.find(function (chapter) { return OutlineSidebar_1.pageDropAreaPrefix + chapter.id === source.droppableId; }); // 드래그 된 페이지가 원래 속한 챕터
+            if (!sourceChapter)
+                return;
+            if (!sourceChapter.pages) {
+                return;
+            }
+            var newSourcePages = Array.from(sourceChapter.pages);
+            var deletedPage = newSourcePages.splice(source.index, 1)[0];
+            deleteDroppedElementOnServerAndApplyFE(deletedPage.id, type);
+        }
+    }
+    // 첫 매개변수로 받은 배열의 sourceIndex와 destinationIndex의 요소를 서로 교환하여 반환한다.
+    function getReorderedArray(array, sourceIndex, destinationIndex) {
+        var newArray = Array.from(array);
+        var removedElement = newArray.splice(sourceIndex, 1)[0]; // 기존 위치의 요소를 제거
+        newArray.splice(destinationIndex, 0, removedElement); // 새로운 위치에 요소를 삽입
+        return newArray;
+    }
+    // DroppableId로부터 sourceChapter와 destinationChapter를 가져온다; destinationChapter가 닫힌 상태의 챕터라면, DrppableId가 다르기 때문에, 닫힌 챕터에 드롭되었는지의 여부도 인자로 받는다.
+    function getSourceChapterAndDestinationChapter(sourceChapterDroppableId, destinationChapterDroppableId, isInClosingPageDropAreaDropped) {
+        if (!outline.chapters)
+            return [null, null];
+        var sourceChapter = outline.chapters.find(function (chapter) { return OutlineSidebar_1.pageDropAreaPrefix + chapter.id === sourceChapterDroppableId; }); // 드래그 된 페이지가 원래 속한 챕터
+        var destinationChapter;
+        // 닫혀있는 챕터로 destinationChapter를 찾음
+        if (isInClosingPageDropAreaDropped) {
+            destinationChapter = outline.chapters.find(function (chapter) { return Chapter_1.inClosingPageDropAreaPrefix + String(chapter.id) === destinationChapterDroppableId; });
+            // 열린 상태인 챕터로 destinationChapter를 찾음
+        }
+        else {
+            destinationChapter = outline.chapters.find(function (chapter) { return OutlineSidebar_1.pageDropAreaPrefix + String(chapter.id) === destinationChapterDroppableId; });
+        }
+        if (sourceChapter && destinationChapter) {
+            return [sourceChapter, destinationChapter];
+        }
+        else {
+            console.log('sourceChapter, 또는 destinationChapter가 정의되지 않았습니다.');
+            return [null, null];
+        }
+    }
     // queryClient의 ["book", bookId]로 저장된 서버 스냅샷을 업데이트한다. 
     function setStateChapters(newChapters) {
         var newOutline = __assign(__assign({}, outline), { chapters: newChapters });
@@ -157,15 +206,26 @@ function BookEntityDraggableContext(drillingProps) {
         });
         setStateChapters(newChapters);
     }
-    return (React.createElement(React.Fragment, null,
-        React.createElement(react_beautiful_dnd_1.DragDropContext, { onDragStart: turnOnTargetDraggingState, onDragEnd: onDragEnd },
-            React.createElement(OutlineSidebar_1["default"], __assign({}, drillingProps)),
-            React.createElement(react_beautiful_dnd_1.Droppable, { droppableId: "delete-drop-area", type: 'CHAPTER' }, function (provided, snapshot) { return (React.createElement("div", { className: "bg-gray-500 animate-bounce hover:bg-gray-700 w-48 absolute invisible left-1/2 top-5 p-5 px-6 rounded-full", ref: deleteDropArea },
-                React.createElement("div", __assign({ ref: provided.innerRef }, provided.droppableProps, { className: "flex" }),
-                    React.createElement("svg", { className: "w-6 h-6 text-gray-800 dark:text-white mr-3", "aria-hidden": "true", xmlns: "http://www.w3.org/2000/svg", fill: "none", viewBox: "0 0 18 20" },
-                        React.createElement("path", { stroke: "currentColor", "stroke-linecap": "round", "stroke-linejoin": "round", "stroke-width": "2", d: "M1 5h16M7 8v8m4-8v8M7 1h4a1 1 0 0 1 1 1v3H6V2a1 1 0 0 1 1-1ZM3 5h12v13a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5Z" })),
-                    React.createElement("span", { className: "text-white" }, "\uB4DC\uB798\uADF8\uD558\uC5EC \uC0AD\uC81C")))); }),
-            React.createElement("main", { className: "px-24 mt-16 flex-auto" },
-                React.createElement(BookBasicPageForm_1["default"], __assign({}, drillingProps))))));
+    function deleteDroppedElementOnServerAndApplyFE(id, type) {
+        if (type === 'CHAPTER') {
+            axios_1["default"]["delete"]("/api/chapter/" + id)
+                .then(function (response) {
+                if (response.data !== undefined) {
+                    flowAlert_1["default"](response.data.alertType, response.data.alert);
+                    queryClient.setQueryData(["book", bookId], response.data.data);
+                }
+            });
+        }
+        else if (type === 'PAGE') {
+            axios_1["default"]["delete"]("/api/page/" + id)
+                .then(function (response) {
+                if (response.data !== undefined) {
+                    flowAlert_1["default"](response.data.alertType, response.data.alert);
+                    queryClient.setQueryData(["book", bookId], response.data.data);
+                }
+            });
+        }
+        return outline;
+    }
 }
 exports["default"] = BookEntityDraggableContext;

@@ -6,6 +6,7 @@ import org.pageflow.base.request.Rq;
 import org.pageflow.base.response.WithAlertApiResponse;
 import org.pageflow.domain.book.entity.Book;
 import org.pageflow.domain.book.entity.Chapter;
+import org.pageflow.domain.book.entity.Page;
 import org.pageflow.domain.book.model.outline.Outline;
 import org.pageflow.domain.book.model.request.PageUpdateRequest;
 import org.pageflow.domain.book.service.BookService;
@@ -64,23 +65,41 @@ public class ApiBookController {
      */
     @PostMapping("/api/book/{bookId}/chapter")
     public Chapter createChapter(@PathVariable("bookId") Long bookId) {
-        Book ownerBook = bookService.repoFindById(bookId);
+        Book ownerBook = bookService.repoFindBookById(bookId);
         return bookWriteService.createBlankChapter(ownerBook);
     }
     
     /**
      * chapterId에 해당하는 Chapter를 삭제하고, 하위 Page들도 모두 삭제
      * @param chapterId 삭제할 챕터 아이디
-     * @return 삭제 성공 여부를 담은 alert
+     * @return 새로운 Outline과 삭제 성공 여부를 담은 alert
      */
     @DeleteMapping("/api/chapter/{chapterId}")
-    public WithAlertApiResponse<Chapter> deleteChapter(@PathVariable("chapterId") Long chapterId) {
+    public WithAlertApiResponse<Outline> deleteChapter(@PathVariable("chapterId") Long chapterId) {
+        Chapter deleteTargetChapter = bookService.repoFindChapterById(chapterId);
         boolean isDeleteSuccess = bookWriteService.deleteChapter(chapterId);
         
         if(isDeleteSuccess) {
-            return WithAlertApiResponse.success("챕터를 삭제했습니다.");
+            return WithAlertApiResponse.success(String.format("'%s' 챕터를 삭제했습니다.", deleteTargetChapter.getTitle()), bookService.getOutline(deleteTargetChapter.getBook().getId()));
         } else {
-            return WithAlertApiResponse.error("챕터를 삭제하지 못했습니다. \n 잠시후에 다시 시도해주세요.");
+            return WithAlertApiResponse.error("챕터를 삭제하지 못했습니다. 잠시후에 다시 시도해주세요.");
+        }
+    }
+    
+    /**
+     * pageId에 해당하는 Page를 삭제하고 결과가 적용된 Outline을 반환
+     * @param pageId 삭제할 Page 아이디
+     * @return 새로운 Outline과 삭제 성공 여부를 담은 alert
+     */
+    @DeleteMapping("/api/page/{pageId}")
+    public WithAlertApiResponse<Outline> deletePage(@PathVariable("pageId") Long pageId) {
+        Page deleteTargetPage = bookService.repoFindPageById(pageId);
+        boolean isDeleteSuccess = bookWriteService.deletePage(pageId);
+        
+        if(isDeleteSuccess) {
+            return WithAlertApiResponse.success(String.format("'%s' 페이지를 삭제했습니다.", deleteTargetPage.getTitle()), bookService.getOutline(deleteTargetPage.getChapter().getBook().getId()));
+        } else {
+            return WithAlertApiResponse.error("페이지를 삭제하지 못했습니다. 잠시후에 다시 시도해주세요.");
         }
     }
     

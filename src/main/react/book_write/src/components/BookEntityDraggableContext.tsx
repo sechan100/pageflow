@@ -3,8 +3,10 @@ import BookBasicPageForm from "./form/BookBasicPageForm";
 import OutlineSidebar, { pageDropAreaPrefix } from "./outline/OutlineSidebar";
 import { ChapterSummary, Outline, PageSummary } from "../types/types";
 import { useGetOutline } from "../api/book-apis";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { inClosingPageDropAreaPrefix } from "./outline/Chapter";
+import axios from "axios";
+import  flowAlert  from "../etc/flowAlert";
 
 
 
@@ -20,68 +22,62 @@ export default function BookEntityDraggableContext(drillingProps : BookEntityDra
   const { bookId, queryClient } = drillingProps;
   // react query로 server book outline snapshot을 가져온다.
   const outline : Outline = useGetOutline(bookId);
-  const deleteDropArea = useRef(null); // 삭제 드롭 영역의 DOM 참조
+  const chapterDeleteDropArea = useRef(null); // Chapter 삭제 드롭 영역의 DOM 참조
+  const pageDeleteDropArea = useRef(null); // Page 삭제 드롭 영역의 DOM 참조
 
-  const turnOnTargetDraggingState = (start : any) => {
 
-    // 삭제 드롭영역 보이기
-    if(deleteDropArea.current){
-      // @ts-ignore
-      deleteDropArea.current.classList.toggle("visible");
-      // @ts-ignore
-      deleteDropArea.current.classList.toggle("invisible");
-    }
 
+  return (
+    <>
+      <DragDropContext onDragStart={onDragStart}  onDragEnd={onDragEnd}>
+        <OutlineSidebar {...drillingProps} />
+
+        {/* 삭제할 요소를 드롭 */}
+        <Droppable droppableId="chapter-delete-drop-area" type="CHAPTER">
+          {(provided, snapshot) => (
+            <div className="bg-gray-500 animate-bounce hover:bg-gray-700 w-48 absolute invisible left-1/2 top-5 p-5 px-6 rounded-full" ref={chapterDeleteDropArea}>
+              <div ref={provided.innerRef} {...provided.droppableProps} className="flex">
+                <svg className="w-6 h-6 text-gray-800 dark:text-white mr-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 20">
+                  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h16M7 8v8m4-8v8M7 1h4a1 1 0 0 1 1 1v3H6V2a1 1 0 0 1 1-1ZM3 5h12v13a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5Z"/>
+                </svg>
+                <span className="text-white">드래그하여 삭제</span>
+              </div>
+            </div>
+          )}
+        </Droppable> 
+
+        {/* 삭제할 요소를 드롭 */}
+        <Droppable droppableId="page-delete-drop-area" type="PAGE">
+          {(provided, snapshot) => (
+            <div className="bg-gray-500 animate-bounce hover:bg-gray-700 w-48 absolute invisible left-1/2 top-5 p-5 px-6 rounded-full" ref={pageDeleteDropArea}>
+              <div ref={provided.innerRef} {...provided.droppableProps} className="flex">
+                <svg className="w-6 h-6 text-gray-800 dark:text-white mr-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 20">
+                  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h16M7 8v8m4-8v8M7 1h4a1 1 0 0 1 1 1v3H6V2a1 1 0 0 1 1-1ZM3 5h12v13a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5Z"/>
+                </svg>
+                <span className="text-white">드래그하여 삭제</span>
+              </div>
+            </div>
+          )}
+        </Droppable>   
+
+        <main className="px-24 mt-16 flex-auto">
+          <BookBasicPageForm {...drillingProps}/>
+        </main>
+      </DragDropContext>
+    </>
+  );
+
+
+
+  function onDragStart(start : any) {
+    toggleDeleteDropAreaVisibility(start.type);
   };
 
-  // 첫 매개변수로 받은 배열의 sourceIndex와 destinationIndex의 요소를 서로 교환하여 반환한다.
-  function getReorderedArray<T>(array: T[], sourceIndex: number, destinationIndex: number) {
-
-    const newArray = Array.from(array);
-
-    const [removedElement] = newArray.splice(sourceIndex, 1); // 기존 위치의 요소를 제거
-    newArray.splice(destinationIndex, 0, removedElement); // 새로운 위치에 요소를 삽입
-
-    return newArray;
-  }
-
-  // DroppableId로부터 sourceChapter와 destinationChapter를 가져온다; destinationChapter가 닫힌 상태의 챕터라면, DrppableId가 다르기 때문에, 닫힌 챕터에 드롭되었는지의 여부도 인자로 받는다.
-  function getSourceChapterAndDestinationChapter(sourceChapterDroppableId : string, destinationChapterDroppableId : string, isInClosingPageDropAreaDropped : boolean){
-
-    if(!outline.chapters) return [null, null];
-
-    const sourceChapter = outline.chapters.find(chapter => pageDropAreaPrefix + chapter.id === sourceChapterDroppableId); // 드래그 된 페이지가 원래 속한 챕터
-    let destinationChapter;
-
-    // 닫혀있는 챕터로 destinationChapter를 찾음
-    if(isInClosingPageDropAreaDropped){
-      destinationChapter = outline.chapters.find(chapter => inClosingPageDropAreaPrefix + String(chapter.id) === destinationChapterDroppableId);
-
-    // 열린 상태인 챕터로 destinationChapter를 찾음
-    } else {
-      destinationChapter = outline.chapters.find(chapter => pageDropAreaPrefix + String(chapter.id) === destinationChapterDroppableId);
-    }
-
-    if(sourceChapter && destinationChapter) {
-      return [sourceChapter, destinationChapter];
-    } else {
-      console.log('sourceChapter, 또는 destinationChapter가 정의되지 않았습니다.');
-      return [null, null];
-    }
-
-  }
-
-  const onDragEnd = (result: any) => {
+  function onDragEnd(result: any){
 
     console.log(result.destination);
 
-    // 삭제 드롭영역 숨기기
-    if(deleteDropArea.current){
-      // @ts-ignore
-      deleteDropArea.current.classList.toggle("visible");
-      // @ts-ignore
-      deleteDropArea.current.classList.toggle("invisible");
-    }
+    toggleDeleteDropAreaVisibility(result.type);
 
     const {
       destination, // 최종 드롭된 위치(목적지)
@@ -97,6 +93,13 @@ export default function BookEntityDraggableContext(drillingProps : BookEntityDra
     if (destination.droppableId === source.droppableId && destination.index === source.index) {
       return;
     }
+
+    // 삭제 영역으로 드롭된 경우 삭제 로직 실행
+    if(destination.droppableId === 'chapter-delete-drop-area' || destination.droppableId === 'page-delete-drop-area'){
+      deleteDroppedElement(type, source, destination);
+      return;
+    }
+
 
     // re-order: 1. 챕터간의 순서 변경
     if (type === 'CHAPTER' && outline.chapters) {
@@ -171,7 +174,87 @@ export default function BookEntityDraggableContext(drillingProps : BookEntityDra
     }
   };
 
-  // queryClient의 ["book", bookId]로 저장된 서버 스냅샷을 업데이트한다. 
+  function toggleDeleteDropAreaVisibility(type : string){
+    if(type !== 'PAGE' && pageDeleteDropArea.current){
+      // @ts-ignore
+      pageDeleteDropArea.current.classList.toggle("visible");
+      // @ts-ignore
+      pageDeleteDropArea.current.classList.toggle("invisible");
+    } else if(type === 'PAGE' && chapterDeleteDropArea.current){
+      // @ts-ignore
+      chapterDeleteDropArea.current.classList.toggle("visible");
+      // @ts-ignore
+      chapterDeleteDropArea.current.classList.toggle("invisible");
+    }
+  }
+
+  function deleteDroppedElement(type : string, source : any, destination : any){
+    
+    if(window.confirm('정말로 삭제하시겠습니까?') === false) return;
+
+    // 삭제할 챕터의 경우
+    if(type === 'CHAPTER' && outline.chapters){
+
+      const newChapters = Array.from(outline.chapters);
+      const deletedChapter = newChapters.splice(source.index, 1)[0];
+      deleteDroppedElementOnServerAndApplyFE(deletedChapter.id, type);
+
+    // 삭제할 페이지의 경우
+    } else if (type === 'PAGE' && outline.chapters) {
+
+      const sourceChapter = outline.chapters.find(chapter => pageDropAreaPrefix + chapter.id === source.droppableId); // 드래그 된 페이지가 원래 속한 챕터
+
+      if(!sourceChapter) return;
+
+      if(!sourceChapter.pages){
+        return;
+      }
+
+      const newSourcePages = Array.from(sourceChapter.pages);
+      const deletedPage = newSourcePages.splice(source.index, 1)[0];
+      deleteDroppedElementOnServerAndApplyFE(deletedPage.id, type);
+      
+    }
+  }
+
+  // 첫 매개변수로 받은 배열의 sourceIndex와 destinationIndex의 요소를 서로 교환하여 반환한다.
+  function getReorderedArray<T>(array: T[], sourceIndex: number, destinationIndex: number) {
+
+    const newArray = Array.from(array);
+
+    const [removedElement] = newArray.splice(sourceIndex, 1); // 기존 위치의 요소를 제거
+    newArray.splice(destinationIndex, 0, removedElement); // 새로운 위치에 요소를 삽입
+
+    return newArray;
+  }
+
+  // DroppableId로부터 sourceChapter와 destinationChapter를 가져온다; destinationChapter가 닫힌 상태의 챕터라면, DrppableId가 다르기 때문에, 닫힌 챕터에 드롭되었는지의 여부도 인자로 받는다.
+  function getSourceChapterAndDestinationChapter(sourceChapterDroppableId : string, destinationChapterDroppableId : string, isInClosingPageDropAreaDropped : boolean){
+
+    if(!outline.chapters) return [null, null];
+
+    const sourceChapter = outline.chapters.find(chapter => pageDropAreaPrefix + chapter.id === sourceChapterDroppableId); // 드래그 된 페이지가 원래 속한 챕터
+    let destinationChapter;
+
+    // 닫혀있는 챕터로 destinationChapter를 찾음
+    if(isInClosingPageDropAreaDropped){
+      destinationChapter = outline.chapters.find(chapter => inClosingPageDropAreaPrefix + String(chapter.id) === destinationChapterDroppableId);
+
+    // 열린 상태인 챕터로 destinationChapter를 찾음
+    } else {
+      destinationChapter = outline.chapters.find(chapter => pageDropAreaPrefix + String(chapter.id) === destinationChapterDroppableId);
+    }
+
+    if(sourceChapter && destinationChapter) {
+      return [sourceChapter, destinationChapter];
+    } else {
+      console.log('sourceChapter, 또는 destinationChapter가 정의되지 않았습니다.');
+      return [null, null];
+    }
+
+  }
+
+      // queryClient의 ["book", bookId]로 저장된 서버 스냅샷을 업데이트한다. 
   function setStateChapters(newChapters : ChapterSummary[]){
     const newOutline : Outline = {
       ...outline,
@@ -204,30 +287,30 @@ export default function BookEntityDraggableContext(drillingProps : BookEntityDra
     setStateChapters(newChapters);
   }
 
+  function deleteDroppedElementOnServerAndApplyFE(id : number, type : string) : Outline {
+    if(type === 'CHAPTER'){
+      axios.delete(`/api/chapter/${id}`)
+      .then(response => {
+        if(response.data !== undefined){
+          flowAlert(response.data.alertType, response.data.alert);
+          queryClient.setQueryData(["book", bookId], response.data.data);
+        }
+      })
 
-  return (
-    <>
-      <DragDropContext onDragStart={turnOnTargetDraggingState}  onDragEnd={onDragEnd}>
-        <OutlineSidebar {...drillingProps} />
+    } else if (type === 'PAGE'){
+      axios.delete(`/api/page/${id}`)
+      .then(response => {
+        if(response.data !== undefined){
+          flowAlert(response.data.alertType, response.data.alert);
+          queryClient.setQueryData(["book", bookId], response.data.data);
+        }
+      })
+    }
 
-        {/* 삭제할 요소를 드롭 */}
-        <Droppable droppableId="delete-drop-area" type='CHAPTER'>
-          {(provided, snapshot) => (
-            <div className="bg-gray-500 animate-bounce hover:bg-gray-700 w-48 absolute invisible left-1/2 top-5 p-5 px-6 rounded-full" ref={deleteDropArea}>
-              <div ref={provided.innerRef} {...provided.droppableProps} className="flex">
-                <svg className="w-6 h-6 text-gray-800 dark:text-white mr-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 20">
-                  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h16M7 8v8m4-8v8M7 1h4a1 1 0 0 1 1 1v3H6V2a1 1 0 0 1 1-1ZM3 5h12v13a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5Z"/>
-                </svg>
-                <span className="text-white">드래그하여 삭제</span>
-              </div>
-            </div>
-          )}
-        </Droppable>
+    return outline;
+  }
 
-        <main className="px-24 mt-16 flex-auto">
-          <BookBasicPageForm {...drillingProps}/>
-        </main>
-      </DragDropContext>
-    </>
-  );
+
+
+
 }

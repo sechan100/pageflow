@@ -5,8 +5,12 @@ import lombok.RequiredArgsConstructor;
 import org.pageflow.base.entity.BaseEntity;
 import org.pageflow.domain.book.entity.Book;
 import org.pageflow.domain.book.entity.Chapter;
-import org.pageflow.domain.book.model.outline.*;
+import org.pageflow.domain.book.entity.Page;
+import org.pageflow.domain.book.model.outline.ChapterSummary;
+import org.pageflow.domain.book.model.outline.Outline;
+import org.pageflow.domain.book.model.outline.PageSummary;
 import org.pageflow.domain.book.repository.BookRepository;
+import org.pageflow.domain.book.repository.ChapterRepository;
 import org.pageflow.domain.book.repository.PageRepository;
 import org.pageflow.domain.user.entity.Account;
 import org.pageflow.infra.file.service.FileService;
@@ -29,6 +33,7 @@ public class BookService {
 
     private final BookRepository bookRepository;
     private final PageRepository pageRepository;
+    private final ChapterRepository chapterRepository;
     private final FileService fileService;
 
     private Specification<Book> search(String kw) {
@@ -121,12 +126,20 @@ public class BookService {
     
     
     
-    public Book repoSave(Book book) {
+    public Book repoSaveBook(Book book) {
         return bookRepository.save(book);
     }
     
-    public Book repoFindById(Long id) {
+    public Book repoFindBookById(Long id) {
         return bookRepository.findById(id).orElseThrow();
+    }
+    
+    public Chapter repoFindChapterById(Long id) {
+        return chapterRepository.findById(id).orElseThrow();
+    }
+    
+    public Page repoFindPageById(Long id) {
+        return pageRepository.findById(id).orElseThrow();
     }
     
     public Book repoFindBookWithAuthorById(Long id) {

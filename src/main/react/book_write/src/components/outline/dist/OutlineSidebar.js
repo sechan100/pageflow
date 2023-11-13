@@ -22,7 +22,7 @@ exports.pageDropAreaPrefix = 'pageDropArea-';
 exports.chapterDraggablePrefix = 'chapter-';
 exports.pageDraggablePrefix = 'page-';
 function OutlineSidebar(drillingProps) {
-    var bookId = drillingProps.bookId, queryClient = drillingProps.queryClient;
+    var bookId = drillingProps.bookId, queryClient = drillingProps.queryClient, outlineBufferStatusReducer = drillingProps.outlineBufferStatusReducer;
     var outline = book_apis_1.useGetOutline(bookId);
     var openedChapterIds = react_1.useRef([]);
     function addOpenedChapterIds(chapterId) {

@@ -62,45 +62,54 @@ function BookEntityDraggableContext(drillingProps) {
     var outline = book_apis_1.useGetOutline(bookId);
     var chapterDeleteDropArea = react_1.useRef(null); // Chapter 삭제 드롭 영역의 DOM 참조
     var pageDeleteDropArea = react_1.useRef(null); // Page 삭제 드롭 영역의 DOM 참조
-    // outline 재정렬 서버 요청을 보내는 것을 딜레이시키는 버퍼 state
-    var _a = react_1.useReducer(function (dummyObject, action) {
+    // outline 재정렬 여부에 대한 상태를 기록하고, 변경된 데이터 버퍼를 전송할지 말지에 관한 상태를 나타낸다.
+    var _a = react_1.useReducer(function (status, action) {
         switch (action.type) {
-            case 'stop':
-                return "stop";
-            case 'start':
-                return "start";
+            case 'flushed':
+                return "flushed";
+            case 'mutated':
+                return "mutated";
+            case 'waiting':
+                return "waiting";
             default:
                 throw new Error();
         }
-    }, "stop"), outlineBufferStatus = _a[0], outlineBufferStatusDispatch = _a[1];
+    }, "flushed"), outlineBufferStatus = _a[0], outlineBufferStatusDispatch = _a[1];
     var _b = book_apis_1.useRearrangeOutline(bookId), mutateAsync = _b.mutateAsync, isLoading = _b.isLoading, error = _b.error;
-    function updateOutlineOnServer() {
+    // 서버에 Outline 데이터의 재정렬 업데이트 요청을 보내는 함수
+    function updateOutlineOnServer(outline) {
         return __awaiter(this, void 0, void 0, function () {
             var error_1;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        _a.trys.push([0, 2, , 3]);
-                        return [4 /*yield*/, mutateAsync(outline)];
+                        if (!(outlineBufferStatus === 'mutated' || outlineBufferStatus === 'waiting')) return [3 /*break*/, 4];
+                        _a.label = 1;
                     case 1:
-                        _a.sent();
-                        flowAlert_1["default"]('success', "재정렬된 목차 정보가 저장되었습니다.");
-                        return [3 /*break*/, 3];
+                        _a.trys.push([1, 3, , 4]);
+                        return [4 /*yield*/, mutateAsync(outline)];
                     case 2:
+                        _a.sent();
+                        flowAlert_1["default"]('success', "목차 정보가 저장되었습니다.");
+                        // 요청을 전달한 후에 성공적으로 업데이트 되었다면, outlineBufferStatus를 flushed로 변경한다.
+                        outlineBufferStatusDispatch({ type: 'flushed' });
+                        return [3 /*break*/, 4];
+                    case 3:
                         error_1 = _a.sent();
-                        flowAlert_1["default"]('error', "재정렬된 목차 정보 동기화에 실패했습니다.");
-                        return [3 /*break*/, 3];
-                    case 3: return [2 /*return*/];
+                        flowAlert_1["default"]('error', "목차 정보를 서버와 동기화하지 못했습니다.");
+                        return [3 /*break*/, 4];
+                    case 4: return [2 /*return*/];
                 }
             });
         });
     }
     // outlineBuffer가 변경될 때마다 5초 뒤 서버에 재정렬 요청을 보내는 타이머를 시작, 도중에 outlineBuffer가 변경되면 타이머를 초기화한다.
     react_1.useEffect(function () {
-        if (outlineBufferStatus === "start") {
+        // outlineBufferStatus가 mutated인 경우, 업데이트 요청을 전송하기위한 타이머를 시작한다.
+        if (outlineBufferStatus === 'mutated') {
             var outlineBufferFlushTimer_1 = setTimeout(function () { return __awaiter(_this, void 0, void 0, function () {
                 return __generator(this, function (_a) {
-                    updateOutlineOnServer();
+                    updateOutlineOnServer(outline);
                     return [2 /*return*/];
                 });
             }); }, 7000);
@@ -112,7 +121,7 @@ function BookEntityDraggableContext(drillingProps) {
     }, [outlineBufferStatus]);
     return (React.createElement(React.Fragment, null,
         React.createElement(react_beautiful_dnd_1.DragDropContext, { onDragStart: onDragStart, onDragEnd: onDragEnd },
-            React.createElement(OutlineSidebar_1["default"], __assign({}, drillingProps)),
+            React.createElement(OutlineSidebar_1["default"], __assign({}, drillingProps, { outlineBufferStatusReducer: [outlineBufferStatus, outlineBufferStatusDispatch] })),
             React.createElement(react_beautiful_dnd_1.Droppable, { droppableId: "chapter-delete-drop-area", type: "CHAPTER" }, function (provided, snapshot) { return (React.createElement("div", { className: "bg-gray-500 animate-bounce hover:bg-gray-700 w-48 absolute invisible left-1/2 top-5 p-5 px-6 rounded-full", ref: chapterDeleteDropArea },
                 React.createElement("div", __assign({ ref: provided.innerRef }, provided.droppableProps, { className: "flex" }),
                     React.createElement("svg", { className: "w-6 h-6 text-gray-800 dark:text-white mr-3", "aria-hidden": "true", xmlns: "http://www.w3.org/2000/svg", fill: "none", viewBox: "0 0 18 20" },
@@ -127,8 +136,10 @@ function BookEntityDraggableContext(drillingProps) {
                 React.createElement(BookBasicPageForm_1["default"], __assign({}, drillingProps))))));
     function onDragStart(start) {
         toggleDeleteDropAreaVisibility(start.type);
-        // outline 데이터 업데이트 요청 버퍼를 드래그동안 일시 중지
-        outlineBufferStatusDispatch({ type: 'stop' });
+        // 만약 이전에 mutated였다면, 버퍼 전송을 flush하지는 않지만 잠시 멈춰두기 위해서 waiting으로 변경한다.
+        if (outlineBufferStatus === 'mutated') {
+            outlineBufferStatusDispatch({ type: 'waiting' });
+        }
     }
     ;
     function onDragEnd(result) {
@@ -203,8 +214,8 @@ function BookEntityDraggableContext(drillingProps) {
                 setStateChapters(newChapters);
             }
         }
-        // outline 데이터 업데이트 요청 버퍼를 초기화
-        outlineBufferStatusDispatch({ type: 'start' });
+        // outline 버퍼 상태를 mutated로 변경
+        outlineBufferStatusDispatch({ type: 'mutated' });
     }
     ;
     function toggleDeleteDropAreaVisibility(type) {
@@ -225,7 +236,7 @@ function BookEntityDraggableContext(drillingProps) {
         if (window.confirm('정말로 삭제하시겠습니까?') === false)
             return;
         // 삭제 요청 전송전에, outline 업데이트 요청을 먼저 보내고 데이터를 갱신한다.
-        updateOutlineOnServer();
+        updateOutlineOnServer(outline);
         // 삭제할 챕터의 경우
         if (type === 'CHAPTER' && outline.chapters) {
             var newChapters = Array.from(outline.chapters);

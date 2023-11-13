@@ -17,12 +17,16 @@ export const pageDraggablePrefix = 'page-';
 interface OutlineSidebarProps {
   bookId : number;
   queryClient : any;
+  outlineBufferStatusReducer : [
+    outlineBufferStatus : string,
+    outlineBufferStatusDispatch : any
+  ]
 }
 
 
 export default function OutlineSidebar(drillingProps : OutlineSidebarProps){
 
-  const { bookId, queryClient } = drillingProps;
+  const { bookId, queryClient, outlineBufferStatusReducer } = drillingProps;
   const outline : Outline = useGetOutline(bookId);
 
 

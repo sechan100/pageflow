@@ -56,6 +56,8 @@ var __spreadArrays = (this && this.__spreadArrays) || function () {
 exports.__esModule = true;
 /* eslint-disable @typescript-eslint/no-unused-vars */
 var axios_1 = require("axios");
+var book_apis_1 = require("../../api/book-apis");
+var flowAlert_1 = require("../../etc/flowAlert");
 function OutlineSidebarWrapper(drillingProps) {
     return (React.createElement(React.Fragment, null,
         React.createElement("aside", { id: "page-outline-sidebar", className: "fixed z-10 top-0 left-0 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0" },
@@ -65,21 +67,50 @@ function OutlineSidebarWrapper(drillingProps) {
 }
 exports["default"] = OutlineSidebarWrapper;
 function AddChapterBtn(drillingProps) {
-    var bookId = drillingProps.bookId, queryClient = drillingProps.queryClient;
+    var bookId = drillingProps.bookId, queryClient = drillingProps.queryClient, outlineBufferStatusReducer = drillingProps.outlineBufferStatusReducer;
+    var _a = book_apis_1.useRearrangeOutline(bookId), mutateAsync = _a.mutateAsync, isLoading = _a.isLoading, error = _a.error;
+    var outlineBufferStatus = outlineBufferStatusReducer[0], outlineBufferStatusDispatch = outlineBufferStatusReducer[1];
+    // 서버에 Outline 데이터의 재정렬 업데이트 요청을 보내는 함수
+    function updateOutlineOnServer(outline) {
+        return __awaiter(this, void 0, void 0, function () {
+            var error_1;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        if (!(outlineBufferStatus === 'mutated')) return [3 /*break*/, 4];
+                        _a.label = 1;
+                    case 1:
+                        _a.trys.push([1, 3, , 4]);
+                        return [4 /*yield*/, mutateAsync(outline)];
+                    case 2:
+                        _a.sent();
+                        flowAlert_1["default"]('success', "목차 정보가 저장되었습니다.");
+                        // 요청을 전달한 후에 성공적으로 업데이트 되었다면, outlineBufferStatus를 flushed로 변경한다.
+                        outlineBufferStatusDispatch({ type: 'flushed' });
+                        return [3 /*break*/, 4];
+                    case 3:
+                        error_1 = _a.sent();
+                        flowAlert_1["default"]('error', "목차 정보를 서버와 동기화하지 못했습니다.");
+                        return [3 /*break*/, 4];
+                    case 4: return [2 /*return*/];
+                }
+            });
+        });
+    }
     // 서버에서 새로운 Chapter 생성요청을 전달하고 받아온 생성된 Chapter를 react query가 관리하는 캐쉬에 반영.
     function addChapter() {
         return __awaiter(this, void 0, void 0, function () {
             var response, newChapter, newChapterSummary;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, axios_1["default"].post("/api/book/" + bookId + "/chapter")];
+                    case 0:
+                        // 변경된 Outline 정보가 있다면 먼저 동기화
+                        updateOutlineOnServer(queryClient.getQueryData(['book', bookId]));
+                        return [4 /*yield*/, axios_1["default"].post("/api/book/" + bookId + "/chapter")];
                     case 1:
                         response = _a.sent();
                         if (response.status !== 200) {
                             throw new Error("새로운 챕터를 생성하지 못했습니다.");
-                        }
-                        if (response.data) {
-                            console.log("serverApiResponse-newChapter: " + response.data);
                         }
                         newChapter = response.data;
                         newChapterSummary = {

@@ -10,6 +10,42 @@ var __assign = (this && this.__assign) || function () {
     };
     return __assign.apply(this, arguments);
 };
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __generator = (this && this.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (_) try {
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [op[0] & 2, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+};
 exports.__esModule = true;
 var react_beautiful_dnd_1 = require("react-beautiful-dnd");
 var BookBasicPageForm_1 = require("./form/BookBasicPageForm");
@@ -20,11 +56,52 @@ var Chapter_1 = require("./outline/Chapter");
 var axios_1 = require("axios");
 var flowAlert_1 = require("../etc/flowAlert");
 function BookEntityDraggableContext(drillingProps) {
+    var _this = this;
     var bookId = drillingProps.bookId, queryClient = drillingProps.queryClient;
     // react query로 server book outline snapshot을 가져온다.
     var outline = book_apis_1.useGetOutline(bookId);
     var chapterDeleteDropArea = react_1.useRef(null); // Chapter 삭제 드롭 영역의 DOM 참조
     var pageDeleteDropArea = react_1.useRef(null); // Page 삭제 드롭 영역의 DOM 참조
+    // outline 재정렬 서버 요청을 보내는 것을 딜레이시키는 버퍼 state
+    var _a = react_1.useReducer(function (dummyObject, action) {
+        switch (action.type) {
+            case 'stop':
+                return "stop";
+            case 'start':
+                return "start";
+            default:
+                throw new Error();
+        }
+    }, "stop"), outlineBufferStatus = _a[0], outlineBufferStatusDispatch = _a[1];
+    var _b = book_apis_1.useRearrangeOutline(bookId), mutateAsync = _b.mutateAsync, isLoading = _b.isLoading, error = _b.error;
+    // outlineBuffer가 변경될 때마다 5초 뒤 서버에 재정렬 요청을 보내는 타이머를 시작, 도중에 outlineBuffer가 변경되면 타이머를 초기화한다.
+    react_1.useEffect(function () {
+        if (outlineBufferStatus === "start") {
+            var outlineBufferFlushTimer_1 = setTimeout(function () { return __awaiter(_this, void 0, void 0, function () {
+                var error_1;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            _a.trys.push([0, 2, , 3]);
+                            return [4 /*yield*/, mutateAsync(outline)];
+                        case 1:
+                            _a.sent();
+                            flowAlert_1["default"]('success', "재정렬된 목차 정보가 저장되었습니다.");
+                            return [3 /*break*/, 3];
+                        case 2:
+                            error_1 = _a.sent();
+                            flowAlert_1["default"]('error', "재정렬된 목차 정보 동기화에 실패했습니다.");
+                            return [3 /*break*/, 3];
+                        case 3: return [2 /*return*/];
+                    }
+                });
+            }); }, 7000);
+            return function () {
+                clearTimeout(outlineBufferFlushTimer_1);
+            };
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [outlineBufferStatus]);
     return (React.createElement(React.Fragment, null,
         React.createElement(react_beautiful_dnd_1.DragDropContext, { onDragStart: onDragStart, onDragEnd: onDragEnd },
             React.createElement(OutlineSidebar_1["default"], __assign({}, drillingProps)),
@@ -42,10 +119,11 @@ function BookEntityDraggableContext(drillingProps) {
                 React.createElement(BookBasicPageForm_1["default"], __assign({}, drillingProps))))));
     function onDragStart(start) {
         toggleDeleteDropAreaVisibility(start.type);
+        // outline 데이터 업데이트 요청 버퍼를 드래그동안 일시 중지
+        outlineBufferStatusDispatch({ type: 'stop' });
     }
     ;
     function onDragEnd(result) {
-        console.log(result.destination);
         toggleDeleteDropAreaVisibility(result.type);
         var destination = result.destination, // 최종 드롭된 위치(목적지)
         source = result.source, // 기존 위치(출발지)
@@ -67,7 +145,6 @@ function BookEntityDraggableContext(drillingProps) {
         if (type === 'CHAPTER' && outline.chapters) {
             var newChapters = getReorderedArray(outline.chapters, source.index, destination.index);
             setStateChapters(newChapters);
-            return;
             // 페이지 변경
         }
         else if (type === 'PAGE' && outline.chapters) {
@@ -118,6 +195,8 @@ function BookEntityDraggableContext(drillingProps) {
                 setStateChapters(newChapters);
             }
         }
+        // outline 데이터 업데이트 요청 버퍼를 초기화
+        outlineBufferStatusDispatch({ type: 'start' });
     }
     ;
     function toggleDeleteDropAreaVisibility(type) {

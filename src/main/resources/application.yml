@@ -8,8 +8,13 @@ spring:
     ansi:
       enabled: always
 
-#logging:
-#  level:
+logging:
+  level:
+    org:
+      pageflow:
+        domain:
+          book:
+            service: DEBUG
 #    org:
 #      springframework:
 #        security: DEBUG

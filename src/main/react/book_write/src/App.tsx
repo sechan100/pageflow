@@ -4,21 +4,22 @@ import { useState } from 'react';
 import BookEntityDraggableContext from './components/BookEntityDraggableContext';
 
 
+export const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnMount: false,
+      refetchOnWindowFocus: false,
+      retry: false,
+      staleTime: 1000 * 60 * 60 // 1시간
+    }
+  }
+});
+
+
 function App() {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [bookId, setBookId] : [number, any] = useState(2);
-
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: {
-        refetchOnMount: false,
-        refetchOnWindowFocus: false,
-        retry: false,
-        staleTime: 1000 * 60 * 60 // 1시간
-      }
-    }
-  });
 
   const drillingProps = {
     bookId: bookId,

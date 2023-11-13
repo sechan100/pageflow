@@ -2,6 +2,8 @@
 import { useQuery } from 'react-query';
 import axios from 'axios';
 import { Outline } from '../types/types';
+import { useMutation } from 'react-query';
+import { queryClient } from '../App';
 
 
 const sampleOutline : Outline = {
@@ -75,4 +77,25 @@ export const useGetOutline = (bookId : number) : Outline => {
     return sampleOutline;
   }
 
-} 
+}
+
+
+export const useRearrangeOutline = (bookId : number) => {
+    
+  
+    const { mutateAsync, isLoading, error } = useMutation(
+      (newOutline : Outline) => axios.put(`/api/book/${bookId}/outline`, newOutline),
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries(['book', bookId]);
+        }
+      }
+    )
+
+    return {
+      mutateAsync,
+      isLoading,
+      error
+    }
+
+}

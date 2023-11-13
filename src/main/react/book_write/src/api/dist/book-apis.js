@@ -36,10 +36,12 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-exports.useGetOutline = void 0;
+exports.useRearrangeOutline = exports.useGetOutline = void 0;
 /* eslint-disable @typescript-eslint/no-unused-vars */
 var react_query_1 = require("react-query");
 var axios_1 = require("axios");
+var react_query_2 = require("react-query");
+var App_1 = require("../App");
 var sampleOutline = {
     id: 0,
     author: {
@@ -101,4 +103,16 @@ exports.useGetOutline = function (bookId) {
     else {
         return sampleOutline;
     }
+};
+exports.useRearrangeOutline = function (bookId) {
+    var _a = react_query_2.useMutation(function (newOutline) { return axios_1["default"].put("/api/book/" + bookId + "/outline", newOutline); }, {
+        onSuccess: function () {
+            App_1.queryClient.invalidateQueries(['book', bookId]);
+        }
+    }), mutateAsync = _a.mutateAsync, isLoading = _a.isLoading, error = _a.error;
+    return {
+        mutateAsync: mutateAsync,
+        isLoading: isLoading,
+        error: error
+    };
 };

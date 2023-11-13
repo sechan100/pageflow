@@ -2,8 +2,8 @@ import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import BookBasicPageForm from "./form/BookBasicPageForm";
 import OutlineSidebar, { pageDropAreaPrefix } from "./outline/OutlineSidebar";
 import { ChapterSummary, Outline, PageSummary } from "../types/types";
-import { useGetOutline } from "../api/book-apis";
-import { useRef } from "react";
+import { useGetOutline, useRearrangeOutline } from "../api/book-apis";
+import { useEffect, useReducer, useRef, useState } from "react";
 import { inClosingPageDropAreaPrefix } from "./outline/Chapter";
 import axios from "axios";
 import  flowAlert  from "../etc/flowAlert";
@@ -24,6 +24,44 @@ export default function BookEntityDraggableContext(drillingProps : BookEntityDra
   const outline : Outline = useGetOutline(bookId);
   const chapterDeleteDropArea = useRef(null); // Chapter 삭제 드롭 영역의 DOM 참조
   const pageDeleteDropArea = useRef(null); // Page 삭제 드롭 영역의 DOM 참조
+
+  // outline 재정렬 서버 요청을 보내는 것을 딜레이시키는 버퍼 state
+  const [outlineBufferStatus, outlineBufferStatusDispatch] = useReducer((dummyObject : string, action : {type:string}) => {
+    switch (action.type) {
+      case 'stop':
+        return "stop";
+      case 'start':
+        return "start";
+      default:
+        throw new Error();
+    }
+  }, "stop");
+
+
+  const { mutateAsync, isLoading, error } = useRearrangeOutline(bookId);
+
+  // outlineBuffer가 변경될 때마다 5초 뒤 서버에 재정렬 요청을 보내는 타이머를 시작, 도중에 outlineBuffer가 변경되면 타이머를 초기화한다.
+  useEffect(() => {
+    
+    if(outlineBufferStatus === "start"){
+
+      const outlineBufferFlushTimer = setTimeout(async () => {
+        try{
+          await mutateAsync(outline)
+          flowAlert('success', "재정렬된 목차 정보가 저장되었습니다.");
+        } catch(error) {
+          flowAlert('error', "재정렬된 목차 정보 동기화에 실패했습니다.");
+        }
+      }, 7000);
+
+      return () => {
+        clearTimeout(outlineBufferFlushTimer);
+      }
+    }
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [outlineBufferStatus]);
+
 
 
 
@@ -71,11 +109,12 @@ export default function BookEntityDraggableContext(drillingProps : BookEntityDra
 
   function onDragStart(start : any) {
     toggleDeleteDropAreaVisibility(start.type);
+    
+    // outline 데이터 업데이트 요청 버퍼를 드래그동안 일시 중지
+    outlineBufferStatusDispatch({type: 'stop'});
   };
 
   function onDragEnd(result: any){
-
-    console.log(result.destination);
 
     toggleDeleteDropAreaVisibility(result.type);
 
@@ -105,7 +144,6 @@ export default function BookEntityDraggableContext(drillingProps : BookEntityDra
     if (type === 'CHAPTER' && outline.chapters) {
       const newChapters = getReorderedArray(outline.chapters, source.index, destination.index);
       setStateChapters(newChapters)
-      return;
 
     // 페이지 변경
     } else if (type === 'PAGE' && outline.chapters) {
@@ -172,6 +210,8 @@ export default function BookEntityDraggableContext(drillingProps : BookEntityDra
         setStateChapters(newChapters);
       }
     }
+    // outline 데이터 업데이트 요청 버퍼를 초기화
+    outlineBufferStatusDispatch({type: 'start'});
   };
 
   function toggleDeleteDropAreaVisibility(type : string){
@@ -213,7 +253,7 @@ export default function BookEntityDraggableContext(drillingProps : BookEntityDra
       const newSourcePages = Array.from(sourceChapter.pages);
       const deletedPage = newSourcePages.splice(source.index, 1)[0];
       deleteDroppedElementOnServerAndApplyFE(deletedPage.id, type);
-      
+
     }
   }
 

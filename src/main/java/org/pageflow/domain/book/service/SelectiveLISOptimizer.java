@@ -75,14 +75,11 @@ public class SelectiveLISOptimizer {
      */
     private Integer isConstituentOfLIS(List<Integer> baseSequence, List<Integer> beforeCalledOmitTargetRemovedSequence, Integer omitTarget){
         
+        // 만약 이미 이전에 DFS로 1개이상의 항을 지운 기록이 있다면, 그 원본 배열의 데이터도 필요하기에 매개받음.
         List<Integer> beforeCalledOmitTargetRemovedSeq = new ArrayList<>(beforeCalledOmitTargetRemovedSequence);
         
         // 그냥 IS를 구한다.
         List<Integer> IS = findIS(baseSequence);
-        
-        // 제거할 대상 바로 앞에있는 수의 인덱스. 만약 0이라면 배열 맨 앞까지 제거했을 때에도 IS가 줄어들기만 했다는 것으로, 즉 모두 제거하지 않는 것이 LIS라는 의미다.
-        int prevIntOmitTargetNum = baseSequence.indexOf(omitTarget)-1;
-        if(prevIntOmitTargetNum == 0 && baseSequence.size() != beforeCalledOmitTargetRemovedSequence.size()) return -1;
         
         // omitTarget을 누락하고 IS를 구한다.
         boolean isOmited = beforeCalledOmitTargetRemovedSeq.remove(omitTarget);
@@ -95,8 +92,25 @@ public class SelectiveLISOptimizer {
             
         // 누락하고 계산한 결과가 더 짧은 경우, 아직은 기여를 판단할 수 없음.
         } else {
+            // 제거할 대상 바로 앞에있는 수의 인덱스. 만약 0이라면 배열 맨 앞까지 제거했을 때에도 IS가 줄어들기만 했다는 것으로, 즉 모두 제거하지 않는 것이 LIS라는 의미다.
+            int prevIntOmitTargetNum = baseSequence.indexOf(omitTarget)-1;
+            if(prevIntOmitTargetNum == 0 && baseSequence.size() != beforeCalledOmitTargetRemovedSequence.size() || prevIntOmitTargetNum == -1) return -1;
+            
             // 앞에 놈을 계속 지워가면서 계산해본다.
             return isConstituentOfLIS(baseSequence, beforeCalledOmitTargetRemovedSeq, baseSequence.get(prevIntOmitTargetNum));
         }
+    }
+    
+    
+    
+    public List<Integer> rebalance(List<Integer> listToRebalance){
+        
+        List<Integer> rebalancedList = new ArrayList<>();
+        
+        for(int i = 0; i < listToRebalance.size(); i++){
+            rebalancedList.add((i + 1) * 10000);
+        }
+        
+        return rebalancedList;
     }
 }

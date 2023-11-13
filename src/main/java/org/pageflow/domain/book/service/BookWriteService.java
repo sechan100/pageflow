@@ -251,9 +251,10 @@ public class BookWriteService {
         
         // page들의 sortPriority 업데이트
         chapterSummaries.forEach(chapterSummary -> {
-            allocateNewOwnerChapterId(chapterSummary.getPages(), chapterSummary.getId());
+            allocateNewOwnerChapterId(chapterSummary.getPages(), chapterSummary.getId()); // 소속 Chapter가 바뀐 Page가 있다면 해당 스트림에서 업데이트 예약됨.
             allocateNewSortPriorityOptimally(chapterSummary.getPages());
         });
+        
         chapterRepository.flush();
         pageRepository.flush();
         
@@ -270,34 +271,27 @@ public class BookWriteService {
         
         List<Integer> staleSortPriorities = rearrangeables.stream().map(Rearrangeable::getSortPriority).toList();
         
+        // 예를 들어 다른 Chapter에 있던 10000sp인 Page가 다른 챕터로 이동했는데, 거기 이미 10000sp인 Page가 존재한다면, 이는 중복된 sp가 존재하는 경우이다.
+        // 이 경우, 새롭게 sp를 할당하는게 더 복잡하고 비효율일 수 있기 때문에, 그냥 바로 rebalancing을 통해 해결한다.
+        if(staleSortPriorities.stream().distinct().count() != staleSortPriorities.size()){
+            return updateSortPriority(rearrangeables, selectiveLISOptimizer.rebalance(staleSortPriorities));
+        }
+        
         // Selective LIS 알고리즘을 적용하여 불연속적일 수 있는 항으로 이루어진 최장 오름차순 부분배열을 추출.
         List<Integer> staleSortPriorityLIS = selectiveLISOptimizer.findSelectiveLIS(staleSortPriorities);
         
         if(staleSortPriorities.size() == staleSortPriorityLIS.size()) return 0;
         
+        // 새롭게 할당할 sortPriority 리스트
         List<Integer> newAscendingSortPriorityList = getNewAscendingSortPriorityList(staleSortPriorities, staleSortPriorityLIS);
         
-        AtomicInteger updatedEntityNum = new AtomicInteger();
-        for(int i = 0; i < rearrangeables.size(); i++){
-            Rearrangeable rearrangeable = rearrangeables.get(i);
-            
-            // outline에 적힌 sp와 newAscendingSortPriorityList에 적힌 값이 다르면 sortPriority 업데이트가 필요한 chapter임.
-            if(!rearrangeable.getSortPriority().equals(newAscendingSortPriorityList.get(i))){
-                
-                if(rearrangeable instanceof PageSummary stalePage){
-                    Page rearrangeableEntity = pageRepository.findById(stalePage.getId()).orElseThrow();
-                    rearrangeableEntity.setSortPriority(newAscendingSortPriorityList.get(i));
-                    
-                } else if(rearrangeable instanceof ChapterSummary staleChapter){
-                    Chapter rearrangeableEntity = chapterRepository.findById(staleChapter.getId()).orElseThrow();
-                    rearrangeableEntity.setSortPriority(newAscendingSortPriorityList.get(i));
-                }
-                
-                updatedEntityNum.getAndIncrement();
-            }
+        // 만약 newAscendingSortPriorityList에 중복된 값이 존재한다면, 그냥 rebalancing을 진행하여 10000부터 새롭게 시작하는 newAscendingSortPriorityList를 반환한다.
+        if(newAscendingSortPriorityList.size() != newAscendingSortPriorityList.stream().distinct().count()){
+            newAscendingSortPriorityList = selectiveLISOptimizer.rebalance(newAscendingSortPriorityList);
         }
         
-        return updatedEntityNum.get();
+        return updateSortPriority(rearrangeables, newAscendingSortPriorityList);
+        
     }
     
     
@@ -321,6 +315,33 @@ public class BookWriteService {
         return updatedEntity.get();
     }
     
+    @Transactional
+    private <T extends Rearrangeable> int updateSortPriority(List<T> rearrangeables, List<Integer> newAscendingSortPriorityList){
+        AtomicInteger updatedEntityNum = new AtomicInteger();
+        for(int i = 0; i < rearrangeables.size(); i++){
+            Rearrangeable rearrangeable = rearrangeables.get(i);
+            
+            // outline에 적힌 sp와 newAscendingSortPriorityList에 적힌 값이 다르면 sortPriority 업데이트가 필요한 chapter임.
+            if(!rearrangeable.getSortPriority().equals(newAscendingSortPriorityList.get(i))){
+                
+                if(rearrangeable instanceof PageSummary stalePage){
+                    Page rearrangeableEntity = pageRepository.findById(stalePage.getId()).orElseThrow();
+                    rearrangeableEntity.setSortPriority(newAscendingSortPriorityList.get(i));
+                    log.debug("Page {}번의 P가 {} -> {}로 변경되었습니다. 페이지 변경 카운트: {}", rearrangeableEntity.getId(), stalePage.getSortPriority(), newAscendingSortPriorityList.get(i), updatedEntityNum.get() + 1);
+                    
+                } else if(rearrangeable instanceof ChapterSummary staleChapter){
+                    Chapter rearrangeableEntity = chapterRepository.findById(staleChapter.getId()).orElseThrow();
+                    rearrangeableEntity.setSortPriority(newAscendingSortPriorityList.get(i));
+                    log.debug("Chapter {}번의 SP가 {} -> {}로 변경되었습니다. 챕터 변경 카운트: {}", rearrangeableEntity.getId(), staleChapter.getSortPriority(), newAscendingSortPriorityList.get(i), updatedEntityNum.get() + 1);
+                }
+                
+                updatedEntityNum.getAndIncrement();
+            }
+        }
+        
+        return updatedEntityNum.get();
+    }
+    
     
     /**
      * @param staleSortPriorities 우선순위가 망가진 챕터들의 sortPriority 배열
@@ -329,10 +350,10 @@ public class BookWriteService {
      */
     private List<Integer> getNewAscendingSortPriorityList(List<Integer> staleSortPriorities, List<Integer> LIS){
             
-            List<Integer> newSortPriorityList = new ArrayList<>();
+        List<Integer> newSortPriorityList = new ArrayList<>();
             
-            int staleIdx = 0;
-            for(Integer li : LIS) {
+        int staleIdx = 0;
+        for(Integer li : LIS) {
             Integer staleSortPriority = staleSortPriorities.get(staleIdx);
             Integer LISValue = li;
             
@@ -363,9 +384,14 @@ public class BookWriteService {
             }
             staleIdx++;
         }
+        
+        // 기본적인 할당 로직이 끝난 후, 반환해야하는 newSPList의 길이가 staleSPList의 길이보다 짧으면 안된다.
+        // 만약 짧다면, LIS가 원본 배열의 앞쪽에 몰려있어서 뒤에는 할당이 잘 안된 것이기 때문에, 뒤에는 10000씩 더해가면서 size가 같아질 때까지 항을 추가한다.
+        while(newSortPriorityList.size() < staleSortPriorities.size()) {
+            newSortPriorityList.add(newSortPriorityList.get(newSortPriorityList.size() - 1) + 10000);
+        }
             
-            
-            return newSortPriorityList;
+        return newSortPriorityList;
     }
 }
 

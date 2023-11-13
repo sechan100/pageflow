@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { MutableRefObject, useRef } from 'react';
 import { Outline, ChapterSummary, PageSummary } from '../../types/types';
 import BookBasicPage from '../outline/BookBasicPage';
 import Chapter from './Chapter';
@@ -25,38 +25,28 @@ export default function OutlineSidebar(drillingProps : OutlineSidebarProps){
   const { bookId, queryClient } = drillingProps;
   const outline : Outline = useGetOutline(bookId);
 
-  // queryClient의 ["book", bookId]로 저장된 서버 스냅샷을 업데이트한다. 
-  function setStateChapters(newChapters : ChapterSummary[]){
-    const newOutline : Outline = {
-      ...outline,
-      chapters: newChapters
+
+
+  const openedChapterIds : MutableRefObject<string[]> = useRef([] as string[]);
+
+  function addOpenedChapterIds(chapterId : string){
+    openedChapterIds.current.push(chapterId);
+  }
+
+  function removeOpenedChapterIds(chapterId : string){
+    const index = openedChapterIds.current.indexOf(chapterId);
+    if (index > -1) {
+      openedChapterIds.current.splice(index, 1);
     }
-    queryClient.setQueryData(["book", bookId], newOutline);
   }
 
-  // queryClient의 ["book", bookId]로 저장된 서버 스냅샷을 업데이트한다. 
-  function setStatePages(pages : PageSummary[], sourceChapterId : number){
-    if(!outline.chapters) return;
-
-
-    const newChapters = outline.chapters.map(chapter => {
-
-      // 변경된 페이지를 가지는 챕터는 새로운 페이지로 교체
-      if (chapter.id === sourceChapterId) {
-        return {
-          ...chapter,
-          pages: pages
-        }
-
-      // 나머지 페이지는 유지
-      } else {
-        return chapter;
-      }
-
-    });
-
-    setStateChapters(newChapters);
+  const chapterOpenStatus = {
+    openedChapterIds,
+    addOpenedChapterIds,
+    removeOpenedChapterIds
   }
+
+
 
 
   return (
@@ -74,7 +64,7 @@ export default function OutlineSidebar(drillingProps : OutlineSidebarProps){
                   <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
 
                     {/* Chapter 컴포넌트 */}
-                    <Chapter chapter={chapter} />
+                    <Chapter chapter={chapter} chapterOpenStatus={chapterOpenStatus} />
 
                   </div>
                 )}

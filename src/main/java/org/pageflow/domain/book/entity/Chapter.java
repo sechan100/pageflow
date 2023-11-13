@@ -16,7 +16,7 @@ import java.util.Objects;
 @Setter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)//접근 수준. 상속관계에 있는 클래스에서만 생성자에 접근 가능
-@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"book_id", "sortPriority"}))
+//@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"book_id", "sortPriority"}))
 @DynamicUpdate
 public class Chapter extends BaseEntity {
     

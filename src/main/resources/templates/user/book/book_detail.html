@@ -144,9 +144,9 @@
                         <!--          책 챕터 끝    -->
                         <!--  댓글 레이아웃 -->
                         <div class="h-2/5 flex flex-col relative rounded-lg mt-5 overflow-hidden"
-                             style="background-color : #e5e7eb;">
-                            <div  class="h-5/6 border border-yellow-400 ">
-                                <div id="comment_list" class="  h-full border border-blue-400"></div>
+                             style="background-color: #e5e7eb; overflow-y: auto;">
+                            <div class="h-5/6">
+                                <div id="comment_list" class="h-full overflow-auto"></div>
                             </div>
                             <div class="w-full absolute bottom-0 border">
                                 <div class="form-control flex">
@@ -180,7 +180,12 @@
             form.content.value = form.content.value.trim();
 
             if (form.content.value.length === 0) {
-                alert("댓글을 입력해주세요");
+            Swal.fire({
+         icon: 'error',
+         title: '댓글 입력 오류',
+        text: '댓글을 입력해주세요',
+    });
+
                 form.content.focus();
                 return;
             }
@@ -225,7 +230,7 @@
             for (var i in comment) {
                 output += "<div class=' flex text-xs mb-2 mt-1'>";
                 output += "<div class=' w-10 mr-2 ml-2 flex'>";
-                output += "<div class=' w-10 h-10 m-auto justify-items-center'>";
+                output += "<div class=' w-7 h-7 m-auto justify-items-center'>";
                 output += "<img src='" + userImg + "' alt='프로필이미지' class='rounded-full'>";
                 output += "</div>";
                 output += "</div>";
@@ -242,21 +247,30 @@
         }
 
 <!-- 댓글 삭제   -->
-        const deleteComment = (commentId) => {
-            if (confirm("정말로 삭제하시겠습니까?")) {
-                $.ajax({
-                    type: 'GET',
-                    url: `/comment/delete/${commentId}`,
-                    success: function (comment) {
-                        console.log('삭제 완료');
-                        commentList(comment);
-                    },
-                    error: function (xhr, status, error) {
-                        console.error("error");
-                    }
-                });
-            }
-        };
+       const deleteComment = (commentId) => {
+    Swal.fire({
+        title: '댓글 삭제',
+        text: '정말로 삭제하시겠습니까?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: '삭제',
+        cancelButtonText: '취소'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                type: 'GET',
+                url: `/comment/delete/${commentId}`,
+                success: function (comment) {
+                    console.log('삭제 완료');
+                    commentList(comment);
+                },
+                error: function (xhr, status, error) {
+                    console.error("error");
+                }
+            });
+        }
+    });
+};
 
 <!-- 댓글 수정 -->
         function editComment(commentId) {

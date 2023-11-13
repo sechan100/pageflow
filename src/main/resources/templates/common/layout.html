@@ -36,8 +36,41 @@
     <!--  flowbite js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.8.1/flowbite.min.js"></script>
 
+    <!--  sweetalert.js  -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <!--    ajax.js  -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+
+    <!--  toastr 알림 창 옵션  -->
+    <script>
+        toastr.options = {
+            closeButton:  true,
+            debug: false,
+            newestOnTop: true,
+            progressBar: true,
+            positionClass: "toast-top-right",
+            preventDuplicates: false,
+            onclick: null,
+            showDuration: "300",
+            hideDuration: "1000",
+            timeOut: "5000",
+            extendedTimeOut: "1000",
+            showEasing: "swing",
+            hideEasing: "linear",
+            showMethod: "fadeIn",
+            hideMethod: "fadeOut"
+         };
+
+        function toastNotice(msg){
+            toastr["success"](msg, "알림");
+        }
+
+        function toastWarning(msg){
+            toastr["warning"](msg, "알림");
+        }
+    </script>
 
 </head>
 
@@ -182,6 +215,23 @@
             }
         });
         /*]]>*/
+
+        const params = /*[[${param}]]*/null;
+
+        if(params.msg){
+            toastNotice(params.msg[0]);
+        }
+
+        $(window).bind("pageshow", function(event){
+            const localStorageKeyAboutHistoryBackErrorMsg = "historyBackErrorMsg___" + location.href;
+
+            if(localStorage.getItem(localStorageKeyAboutHistoryBackErrorMsg) ){
+                toastWarning(localStorage.getItem(localStorageKeyAboutHistoryBackErrorMsg));
+                localStorage.removeItem(localStorageKeyAboutHistoryBackErrorMsg);
+            }
+        });
+
+
     </script>
 </body>
 </html>

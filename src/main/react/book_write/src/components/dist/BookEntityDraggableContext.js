@@ -74,26 +74,34 @@ function BookEntityDraggableContext(drillingProps) {
         }
     }, "stop"), outlineBufferStatus = _a[0], outlineBufferStatusDispatch = _a[1];
     var _b = book_apis_1.useRearrangeOutline(bookId), mutateAsync = _b.mutateAsync, isLoading = _b.isLoading, error = _b.error;
+    function updateOutlineOnServer() {
+        return __awaiter(this, void 0, void 0, function () {
+            var error_1;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 2, , 3]);
+                        return [4 /*yield*/, mutateAsync(outline)];
+                    case 1:
+                        _a.sent();
+                        flowAlert_1["default"]('success', "재정렬된 목차 정보가 저장되었습니다.");
+                        return [3 /*break*/, 3];
+                    case 2:
+                        error_1 = _a.sent();
+                        flowAlert_1["default"]('error', "재정렬된 목차 정보 동기화에 실패했습니다.");
+                        return [3 /*break*/, 3];
+                    case 3: return [2 /*return*/];
+                }
+            });
+        });
+    }
     // outlineBuffer가 변경될 때마다 5초 뒤 서버에 재정렬 요청을 보내는 타이머를 시작, 도중에 outlineBuffer가 변경되면 타이머를 초기화한다.
     react_1.useEffect(function () {
         if (outlineBufferStatus === "start") {
             var outlineBufferFlushTimer_1 = setTimeout(function () { return __awaiter(_this, void 0, void 0, function () {
-                var error_1;
                 return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            _a.trys.push([0, 2, , 3]);
-                            return [4 /*yield*/, mutateAsync(outline)];
-                        case 1:
-                            _a.sent();
-                            flowAlert_1["default"]('success', "재정렬된 목차 정보가 저장되었습니다.");
-                            return [3 /*break*/, 3];
-                        case 2:
-                            error_1 = _a.sent();
-                            flowAlert_1["default"]('error', "재정렬된 목차 정보 동기화에 실패했습니다.");
-                            return [3 /*break*/, 3];
-                        case 3: return [2 /*return*/];
-                    }
+                    updateOutlineOnServer();
+                    return [2 /*return*/];
                 });
             }); }, 7000);
             return function () {
@@ -216,6 +224,8 @@ function BookEntityDraggableContext(drillingProps) {
     function deleteDroppedElement(type, source, destination) {
         if (window.confirm('정말로 삭제하시겠습니까?') === false)
             return;
+        // 삭제 요청 전송전에, outline 업데이트 요청을 먼저 보내고 데이터를 갱신한다.
+        updateOutlineOnServer();
         // 삭제할 챕터의 경우
         if (type === 'CHAPTER' && outline.chapters) {
             var newChapters = Array.from(outline.chapters);

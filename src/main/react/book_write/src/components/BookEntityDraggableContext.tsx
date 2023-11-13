@@ -40,18 +40,22 @@ export default function BookEntityDraggableContext(drillingProps : BookEntityDra
 
   const { mutateAsync, isLoading, error } = useRearrangeOutline(bookId);
 
+  async function updateOutlineOnServer(){
+    try{
+      await mutateAsync(outline)
+      flowAlert('success', "재정렬된 목차 정보가 저장되었습니다.");
+    } catch(error) {
+      flowAlert('error', "재정렬된 목차 정보 동기화에 실패했습니다.");
+    }
+  }
+
   // outlineBuffer가 변경될 때마다 5초 뒤 서버에 재정렬 요청을 보내는 타이머를 시작, 도중에 outlineBuffer가 변경되면 타이머를 초기화한다.
   useEffect(() => {
     
     if(outlineBufferStatus === "start"){
 
       const outlineBufferFlushTimer = setTimeout(async () => {
-        try{
-          await mutateAsync(outline)
-          flowAlert('success', "재정렬된 목차 정보가 저장되었습니다.");
-        } catch(error) {
-          flowAlert('error', "재정렬된 목차 정보 동기화에 실패했습니다.");
-        }
+        updateOutlineOnServer();
       }, 7000);
 
       return () => {
@@ -231,6 +235,9 @@ export default function BookEntityDraggableContext(drillingProps : BookEntityDra
   function deleteDroppedElement(type : string, source : any, destination : any){
     
     if(window.confirm('정말로 삭제하시겠습니까?') === false) return;
+
+    // 삭제 요청 전송전에, outline 업데이트 요청을 먼저 보내고 데이터를 갱신한다.
+    updateOutlineOnServer();
 
     // 삭제할 챕터의 경우
     if(type === 'CHAPTER' && outline.chapters){

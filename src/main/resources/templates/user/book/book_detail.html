@@ -44,13 +44,6 @@
             transform: scale(1, 1);
         }
 
-        @media (max-width: 768px) {
-            .chapter_btn {
-                padding: 10px 60px;
-            }
-
-            /* 추가 모바일 스타일 지정 가능 */
-        }
     </style>
 
 </head>
@@ -62,10 +55,9 @@
     <section>
         <div class="py-1 w-9/12 m-auto h-full">
             <div class="mt-10 mb-10 flex flex-col">
-                <div class="flex flex-col sm:flex-row  h-screen justify-center "
-                >
+                <div class="flex flex-col sm:flex-row  h-screen justify-center">
                     <!-- 좌측 레이아웃 시작 -->
-                    <div style="width : 300px ;">
+                    <div class="w-[300px]">
                         <div class="w-full h-full rounded-lg" style="background-color : #e5e7eb; ">
                             <div class=" flex flex-col ">
                                 <div class=" h-full w-full relative">
@@ -84,9 +76,12 @@
                                         th:text="${outline.title}"></h2>
                                     <span class="font-semibold mt-8"
                                           th:text="${outline.author.nickname}"></span>
-                                    <i class="fa-solid fa-heart mt-4" style="color: #ff0000;"></i>
-                                    <!--    종아요를 누를 시 색 변화 -->
-                                    <!--   <i class="fa-solid fa-heart mt-4" style="color: #ffffff;"></i>-->
+                                    <div>
+                                        <a href="#" id="heart" data-filled="false" onclick="toggleHeart('heart')">
+                                            <i id="heartIcon" class="fa-solid fa-heart mt-4"
+                                               style="color: #ffffff;"></i>
+                                        </a>
+                                    </div>
                                     <a href="javascript:void(0);" class="recommend ">
                                     </a>
                                     <div class="mt-4">
@@ -154,14 +149,14 @@
                         <!--  댓글 레이아웃 -->
                         <div class="h-2/5 flex flex-col relative rounded-lg mt-5 overflow-hidden"
                              style="background-color: #e5e7eb; overflow-y: auto;">
-                            <div class="h-7 px-4 py-1 border border-red-500">
+                            <div class="h-7 px-4 py-1">
                                 <ul>
                                     <li>
                                         <i class="fa-regular fa-comment" style="color: #000000; ">
                                             <!--                                    <span class="text-danger small ms-2"-->
                                             <!--                                          th:if="${#lists.size(comment.id) > 0}"-->
                                             <!--                                          th:text="${#lists.size(comment.id)}"></span>-->
-                                            댓글수
+                                            댓글수(데이터 표기해야함)
                                         </i>
                                     </li>
                                     <li>
@@ -169,7 +164,7 @@
                                     </li>
                                 </ul>
                             </div>
-                            <div class="h-4/6">
+                            <div class="h-5/6">
                                 <div id="comment_list" class="h-full overflow-auto"></div>
                             </div>
                             <div class="w-full absolute bottom-0 border">
@@ -197,146 +192,160 @@
 
 
     <script>
-        let commentWrite_submitFormDone = false;
+     let commentWrite_submitFormDone = false;
 
-<!-- 댓글 작성 -->
-        function commentWrite_submitForm(form) {
-            form.content.value = form.content.value.trim();
+     // 댓글 작성 함수
+     function commentWrite_submitForm(form) {
+         form.content.value = form.content.value.trim();
 
-            if (form.content.value.length === 0) {
-            Swal.fire({
-         icon: 'error',
-         title: '댓글 입력 오류',
-        text: '댓글을 입력해주세요',
-    });
+         if (form.content.value.length === 0) {
+             Swal.fire({
+                 icon: 'error',
+                 title: '댓글 입력 오류',
+                 text: '댓글을 입력해주세요',
+             });
 
-                form.content.focus();
-                return;
-            }
+             form.content.focus();
+             return;
+         }
 
-            var outlineId = [[${outline.id}]];
+         var outlineId = [[${outline.id}]];
 
-            $.ajax({
-                type: 'POST',
-                url: `/comment/create/${outlineId}`,
-                data: { content: form.content.value },
-                success: function (comment) {
-                    console.log("확인");
-                    commentList(comment);
-                    form.content.value = '';
-                },
-                error: function (xhr, status, error) {
-                    console.error("에러");
-                }
-            });
-        }
+         $.ajax({
+             type: 'POST',
+             url: `/comment/create/${outlineId}`,
+             data: { content: form.content.value },
+             success: function (comment) {
+                 console.log("댓글 생성 완료");
+                 commentList(comment);
+                 form.content.value = '';
+             },
+             error: function (xhr, status, error) {
+                 console.error("댓글 생성 에러");
+             }
+         });
+     }
 
-        $(document).ready(function () {
-            var outlineId = [[${outline.id}]];
+    // 댓글 목록
+     $(document).ready(function () {
+         var outlineId = [[${outline.id}]];
 
-            $.ajax({
-                type: 'GET',
-                url: `/comment/list/${outlineId}`,
-                success: function (comment) {
-                    commentList(comment);
-                },
-                error: function (xhr, status, error) {
-                    console.error("작성오류");
-                }
-            });
-        });
+         $.ajax({
+             type: 'GET',
+             url: `/comment/list/${outlineId}`,
+             success: function (comment) {
+                 console.log("댓글 목록 로드 완료");
+                 commentList(comment);
+             },
+             error: function (xhr, status, error) {
+                 console.error("댓글 목록 로드 에러");
+             }
+         });
+     });
 
-<!-- 댓글 목록 -->
-        function commentList(comment) {
-            var output = "";
-            var userImg = "[[${outline.author.profileImgUrl}]]";
+     // 댓글 목록을 화면에 표시
+     function commentList(comment) {
+         var output = "";
+         var userImg = "[[${outline.author.profileImgUrl}]]";
 
-            comment.sort(function (a, b) {
-            return new Date(b.createDate) - new Date(a.createDate);
-        });
+         comment.sort(function (a, b) {
+             return new Date(b.createDate) - new Date(a.createDate);
+         });
 
-            for (var i in comment) {
-                output += "<div class=' flex text-xs mb-2 mt-1'>";
-                output += "<div class=' w-10 mr-2 ml-2 flex'>";
-                output += "<div class=' w-7 h-7 m-auto justify-items-center'>";
-                output += "<img src='" + userImg + "' alt='프로필이미지' class='rounded-full'>";
-                output += "</div>";
-                output += "</div>";
-                output += "<div class=' '>";
-                output += `<p id='comment-${comment[i].id}' class='mb-1'>${comment[i].content}</p>`;
-                output += `<a href='javascript:void(0);' class=' recommend mr-2' onclick='recommendComment(${comment[i].id})'>추천</a>`;
-                output += `<a href='javascript:void(0);' class='edit mr-2' onclick='editComment(${comment[i].id})'>수정</a>`;
-                output += `<a href='javascript:void(0);' class=' delete' onclick='deleteComment(${comment[i].id})'>삭제</a>`;
-                output += "</div>";
-                output += "</div>";
-            }
+         for (var i in comment) {
+             output += "<div class='flex text-xs mb-2 mt-1'>";
+             output += "<div class='w-10 mr-2 ml-2 flex'>";
+             output += "<div class='w-7 h-7 m-auto justify-items-center'>";
+             output += "<img src='" + userImg + "' alt='프로필이미지' class='rounded-full'>";
+             output += "</div>";
+             output += "</div>";
+             output += "<div class=''>";
+             output += `<p id='comment-${comment[i].id}' class='mb-1'>${comment[i].content}</p>`;
+             output += `<a href='javascript:void(0);' class='recommend mr-2' onclick='recommendComment(${comment[i].id})'>추천</a>`;
+             output += `<a href='javascript:void(0);' class='edit mr-2' onclick='editComment(${comment[i].id})'>수정</a>`;
+             output += `<a href='javascript:void(0);' class='delete' onclick='deleteComment(${comment[i].id})'>삭제</a>`;
+             output += "</div>";
+             output += "</div>";
 
-            $("#comment_list").html(output);
-        }
+         }
 
-<!-- 댓글 삭제   -->
-       const deleteComment = (commentId) => {
-    Swal.fire({
-        title: '댓글 삭제',
-        text: '정말로 삭제하시겠습니까?',
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonText: '삭제',
-        cancelButtonText: '취소'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            $.ajax({
-                type: 'GET',
-                url: `/comment/delete/${commentId}`,
-                success: function (comment) {
-                    console.log('삭제 완료');
-                    commentList(comment);
-                },
-                error: function (xhr, status, error) {
-                    console.error("error");
-                }
-            });
-        }
-    });
-};
+         $("#comment_list").html(output);
+     }
 
-<!-- 댓글 수정 -->
-        function editComment(commentId) {
-            var commentContent = $("#comment-" + commentId).text();
-            var newContent = `<textarea>${commentContent}</textarea>`;
+     // 댓글 삭제
+         const deleteComment = (commentId) => {
+         Swal.fire({
+             title: '댓글 삭제',
+             text: '정말로 삭제하시겠습니까?',
+             icon: 'question',
+             showCancelButton: true,
+             confirmButtonText: '삭제',
+             cancelButtonText: '취소'
+         }).then((result) => {
+             if (result.isConfirmed) {
+                 $.ajax({
+                     type: 'GET',
+                     url: `/comment/delete/${commentId}`,
+                     success: function (comment) {
+                         console.log('댓글 삭제 완료');
+                         commentList(comment);
+                     },
+                     error: function (xhr, status, error) {
+                         console.error("댓글 삭제 에러");
+                     }
+                 });
+             }
+         });
+     };
+
+     // 댓글 수정
+     function editComment(commentId) {
+         var commentContent = $("#comment-" + commentId).text();
+         var newContent = `<textarea>${commentContent}</textarea>`;
+
+         if (newContent !== null) {
+             $("#comment-" + commentId).replaceWith(`<textarea id='comment-${commentId}' style='width: 100%; resize: none;'>${commentContent}</textarea>`);
+             $("#comment-" + commentId).next().hide();
+             $("#comment-" + commentId).next().next().hide();
+             $("#comment-" + commentId).next().next().next().hide();
+             $("#comment-" + commentId).after(`<button onclick='saveEdit(${commentId})'>저장</button>`);
+             $("#comment-" + commentId).after(`<button onclick='cancelEdit(${commentId})'>취소</button>`);
+             console.log('Cancel button clicked!');
+         }
+     }
+
+    // 댓글 수정 저장
+     function saveEdit(commentId) {
+         var editedContent = $("#comment-" + commentId).val();
+         $.ajax({
+             type: 'POST',
+             url: `/comment/modify/${commentId}`,
+             data: { content: editedContent },
+             success: function (comment) {
+                 console.log('댓글 수정 완료');
+                 commentList(comment);
+             },
+             error: function (xhr, status, error) {
+                 console.error("댓글 수정 에러");
+             }
+         });
+     }
+
+    // 취소 시 화면 돌아감
+     function cancelEdit(commentId) {
+        var commentContent = $("#comment-" + commentId).text();
+        $("#comment-" + commentId).replaceWith(`<p id='comment-${commentId}'>${commentContent}</p>`);
+
+        var buttonsToShow = $("#comment-" + commentId).parent().find('.recommend, .edit, .delete');
+        buttonsToShow.show();
+
+        $("#comment-" + commentId).siblings("button").remove();
 
 
-            if (newContent !== null) {
-                var elementsToHide = $("#comment-" + commentId).find('.recommend, .edit, .delete');
-                elementsToHide.hide();
-                $("#comment-" + commentId).replaceWith(`<textarea id='comment-${commentId}' style='width: 100%; resize: none;'>${commentContent}</textarea>`);
-                $("#comment-" + commentId).siblings("button").hide();
-                $("#comment-" + commentId).after(`<button onclick='saveEdit(${commentId})'>저장</button>`);
-                $("#comment-" + commentId).after(`<button onclick='cancelEdit(${commentId})'>취소</button>`);
-                 console.log('Cancel button clicked!');
-            }
-        }
+         console.log('취소 에러 ');
 
-        function saveEdit(commentId) {
-            var editedContent = $("#comment-" + commentId).val();
-            $.ajax({
-                type: 'POST',
-                url: `/comment/modify/${commentId}`,
-                data: { content: editedContent },
-                success: function (comment) {
-                    console.log('수정 완료');
-                    commentList(comment);
-                },
-                error: function (xhr, status, error) {
-                    console.error("error");
-                }
-            });
-        }
+     }
 
-        function cancelEdit(commentId) {
-            var commentContent = $("#comment-" + commentId).text();
-            $("#comment-" + commentId).replaceWith(`<p id='comment-${commentId}'>${commentContent}</p>`);
-        }
     </script>
 
     <!--  홈/ 정보 비동기 이동  -->
@@ -357,6 +366,20 @@
           selectedTab.style.display = "block";
       }
 
+    </script>
+
+    <!--  좋아요를 누를 시 하트 색 변화  -->
+    <script>
+        function toggleHeart(heartId) {
+            var heart = document.getElementById(heartId);
+            var isFilled = (heart.getAttribute('data-filled') === 'true');
+            var heartIcon = document.getElementById('heartIcon');
+
+            heart.setAttribute('data-filled', (!isFilled).toString());
+
+            heartIcon.style.color = isFilled ? '#ffffff' : '#ff0000';
+
+        }
     </script>
 
 

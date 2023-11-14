@@ -15,7 +15,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"chapter_id", "sortPriority"}))
+//@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"chapter_id", "sortPriority"}))
 @DynamicUpdate
 public class Page extends BaseEntity {
 

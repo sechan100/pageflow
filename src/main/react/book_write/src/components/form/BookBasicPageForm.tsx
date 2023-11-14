@@ -1,35 +1,25 @@
-import React, { useState } from 'react';
-import { useGetBook } from '../../api/book-apis';
-import { dummyBook } from '../outline/OutlineSidebar';
+import { useGetOutline } from '../../api/book-apis';
+import { Outline } from '../../types/types';
 
 
-export default function BookBasicPageForm() {
+interface BookBasicPageFormProps {
+  bookId : number;
+  queryClient : any;
+}
 
+export default function BookBasicPageForm(drillingProps : BookBasicPageFormProps) {
 
-  // function changeBookTitle(titleInput : any) {
-  //   setBook({
-  //     ...book,
-  //     title: titleInput.target.value
-  //   })
-  // }
+  const { bookId, queryClient } = drillingProps;
 
-  // const book = dummyBook;
-  const { data: book, isLoading, isFetching } = useGetBook(1);
+  const outline : Outline = useGetOutline(bookId);
 
-  if (isLoading) {
-    return <div>Loading...</div>
-  }
-
-  if (isFetching) {
-    return <div>Updating...</div>
-  }
-
+  
   return (
     <>
       <form action="#">
         <div className="sm:col-span-2">
             <label htmlFor="title" className="block mb-2 text-sm font-medium text-gray-900">책 체목</label>
-            <input value={book?.title} type="text" name="title" id="title" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5" placeholder="책 제목을 입력해주세요." />
+            <input value={outline.title} type="text" name="title" id="title" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5" placeholder="책 제목을 입력해주세요." />
         </div>
         <div className="w-full">
             <label htmlFor="brand" className="block mb-2 text-sm font-medium text-gray-900">Brand</label>

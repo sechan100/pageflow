@@ -113,7 +113,7 @@ public class Rq {
      * alert 메시지를 띄우고 redirectUri로 이동
      *
      * @param msg : alert에 띄울 메시지
-     * @return flowAlert.js로 이동
+     * @return alertStorage.js로 이동
      */
     public String alert(AlertType alertType, String msg, String redirectUri) {
         request.setAttribute("msg", msg);
@@ -132,7 +132,7 @@ public class Rq {
      * alert 메시지를 띄우고 history.back()
      *
      * @param msg : alert에 띄울 메시지
-     * @return flowAlert.js로 이동
+     * @return alertStorage.js로 이동
      */
     public String alert(AlertType alertType, String msg) {
         return alert(alertType, msg, null);

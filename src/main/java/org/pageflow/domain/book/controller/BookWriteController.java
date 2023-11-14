@@ -20,7 +20,7 @@ public class BookWriteController {
      */
     @GetMapping("/book/write")
     public String bookWriteForm() {
-        return "forward:/react/build/index.html";
+        return "forward:/react/build/book_write/index.html";
     }
 
 

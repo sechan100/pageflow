@@ -73,4 +73,5 @@ custom:
   files:
     img:
       base-url: /files/img
+#      directory: C:/Users/SBS/local/uploads/img/
       directory: C:/Users/gsw05/local/uploads/img/

@@ -18,6 +18,7 @@
 
     <!--  tailwind  -->
     <script src="https://cdn.tailwindcss.com"></script>
+
     <!-- 데이지 UI -->
     <link href="https://cdn.jsdelivr.net/npm/daisyui@3.7.7/dist/full.css" rel="stylesheet" type="text/css" />
 
@@ -38,10 +39,6 @@
 
     <!--  sweetalert.js  -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-<!--    ajax.js  -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-
 
 </head>
 
@@ -186,23 +183,6 @@
             }
         });
         /*]]>*/
-
-        const params = /*[[${param}]]*/null;
-
-        if(params.msg){
-            toastNotice(params.msg[0]);
-        }
-
-        $(window).bind("pageshow", function(event){
-            const localStorageKeyAboutHistoryBackErrorMsg = "historyBackErrorMsg___" + location.href;
-
-            if(localStorage.getItem(localStorageKeyAboutHistoryBackErrorMsg) ){
-                toastWarning(localStorage.getItem(localStorageKeyAboutHistoryBackErrorMsg));
-                localStorage.removeItem(localStorageKeyAboutHistoryBackErrorMsg);
-            }
-        });
-
-
     </script>
 </body>
 </html>

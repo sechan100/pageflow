@@ -7,6 +7,7 @@ import { inClosingPageDropAreaPrefix } from "./outline/Chapter";
 import axios from "axios";
 import  flowAlert  from "../etc/flowAlert";
 import FormRoutes from "./form/FormRoutes";
+import FormSidebar from "./form/FormSidebar";
 
 
 
@@ -121,7 +122,8 @@ export default function BookEntityDraggableContext(props : BookEntityDraggableCo
           )}
         </Droppable>
 
-        <main className="px-24 mt-16 flex-auto">
+        <main className="flex-auto relative">
+          <FormSidebar {...props} />
           <FormRoutes {...props}  />
         </main>
       </DragDropContext>

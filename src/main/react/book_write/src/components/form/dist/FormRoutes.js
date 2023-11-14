@@ -15,9 +15,10 @@ var react_router_dom_1 = require("react-router-dom");
 var BookForm_1 = require("./BookForm");
 var ChapterForm_1 = require("./ChapterForm");
 function FormPage(props) {
-    return (React.createElement(react_router_dom_1.Routes, null,
-        React.createElement(react_router_dom_1.Route, { path: "/", element: React.createElement(BookForm_1["default"], __assign({}, props)) }),
-        React.createElement(react_router_dom_1.Route, { path: "/chapter/:chapterId", element: React.createElement(ChapterForm_1["default"], __assign({}, props)) }),
-        React.createElement(react_router_dom_1.Route, { path: "/page/:pageId", element: React.createElement(BookForm_1["default"], __assign({}, props)) })));
+    return (React.createElement("div", { className: "px-24 mt-16" },
+        React.createElement(react_router_dom_1.Routes, null,
+            React.createElement(react_router_dom_1.Route, { path: "/", element: React.createElement(BookForm_1["default"], __assign({}, props)) }),
+            React.createElement(react_router_dom_1.Route, { path: "/chapter/:chapterId", element: React.createElement(ChapterForm_1["default"], __assign({}, props)) }),
+            React.createElement(react_router_dom_1.Route, { path: "/page/:pageId", element: React.createElement(BookForm_1["default"], __assign({}, props)) }))));
 }
 exports["default"] = FormPage;

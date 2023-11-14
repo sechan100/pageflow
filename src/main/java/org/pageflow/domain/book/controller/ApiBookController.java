@@ -69,6 +69,7 @@ public class ApiBookController {
         return bookWriteService.createBlankChapter(ownerBook);
     }
     
+    
     /**
      * chapterId에 해당하는 Chapter를 삭제하고, 하위 Page들도 모두 삭제
      * @param chapterId 삭제할 챕터 아이디
@@ -85,6 +86,19 @@ public class ApiBookController {
             return WithAlertApiResponse.error("챕터를 삭제하지 못했습니다. 잠시후에 다시 시도해주세요.");
         }
     }
+    
+    
+    /**
+     * 새로운 Page를 생성하여 반환
+     * @param chapterId 챕터 아이디
+     * @return 새로 생성된 Page
+     */
+    @PostMapping("/api/chapter/{chapterId}/page")
+    public Page createPage(@PathVariable("chapterId") Long chapterId) {
+        Chapter ownerChapter = bookService.repoFindChapterById(chapterId);
+        return bookWriteService.createBlankPage(ownerChapter);
+    }
+    
     
     /**
      * pageId에 해당하는 Page를 삭제하고 결과가 적용된 Outline을 반환

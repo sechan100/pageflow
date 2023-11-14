@@ -21,8 +21,8 @@ var react_beautiful_dnd_1 = require("react-beautiful-dnd");
 exports.pageDropAreaPrefix = 'pageDropArea-';
 exports.chapterDraggablePrefix = 'chapter-';
 exports.pageDraggablePrefix = 'page-';
-function OutlineSidebar(drillingProps) {
-    var bookId = drillingProps.bookId, queryClient = drillingProps.queryClient, outlineBufferStatusReducer = drillingProps.outlineBufferStatusReducer;
+function OutlineSidebar(props) {
+    var bookId = props.bookId, queryClient = props.queryClient, outlineBufferStatusReducer = props.outlineBufferStatusReducer;
     var outline = book_apis_1.useGetOutline(bookId);
     var openedChapterIds = react_1.useRef([]);
     function addOpenedChapterIds(chapterId) {
@@ -39,7 +39,7 @@ function OutlineSidebar(drillingProps) {
         addOpenedChapterIds: addOpenedChapterIds,
         removeOpenedChapterIds: removeOpenedChapterIds
     };
-    return (React.createElement(OutlineSidebarWrapper_1["default"], __assign({}, drillingProps),
+    return (React.createElement(OutlineSidebarWrapper_1["default"], __assign({}, props),
         React.createElement(BookBasicPage_1["default"], { bookId: outline.id }),
         React.createElement(react_beautiful_dnd_1.Droppable, { droppableId: "chapter-outline", type: 'CHAPTER' }, function (provided) {
             var _a;

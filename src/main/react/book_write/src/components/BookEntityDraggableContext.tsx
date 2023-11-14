@@ -1,5 +1,4 @@
 import { DragDropContext, Droppable } from "react-beautiful-dnd";
-import BookBasicPageForm from "./form/BookBasicPageForm";
 import OutlineSidebar, { pageDropAreaPrefix } from "./outline/OutlineSidebar";
 import { ChapterSummary, Outline, PageSummary } from "../types/types";
 import { useGetOutline, useRearrangeOutline } from "../api/book-apis";
@@ -7,6 +6,7 @@ import { useEffect, useReducer, useRef } from "react";
 import { inClosingPageDropAreaPrefix } from "./outline/Chapter";
 import axios from "axios";
 import  flowAlert  from "../etc/flowAlert";
+import FormRoutes from "./form/FormRoutes";
 
 
 
@@ -17,9 +17,9 @@ interface BookEntityDraggableContextProps {
 }
 
 
-export default function BookEntityDraggableContext(drillingProps : BookEntityDraggableContextProps) {
+export default function BookEntityDraggableContext(props : BookEntityDraggableContextProps) {
 
-  const { bookId, queryClient } = drillingProps;
+  const { bookId, queryClient } = props;
   // react query로 server book outline snapshot을 가져온다.
   const outline : Outline = useGetOutline(bookId);
   const chapterDeleteDropArea = useRef(null); // Chapter 삭제 드롭 영역의 DOM 참조
@@ -91,7 +91,7 @@ export default function BookEntityDraggableContext(drillingProps : BookEntityDra
   return (
     <>
       <DragDropContext onDragStart={onDragStart}  onDragEnd={onDragEnd}>
-        <OutlineSidebar {...drillingProps} outlineBufferStatusReducer={[outlineBufferStatus, outlineBufferStatusDispatch]} />
+        <OutlineSidebar {...props} outlineBufferStatusReducer={[outlineBufferStatus, outlineBufferStatusDispatch]} />
 
         {/* 삭제할 요소를 드롭 */}
         <Droppable droppableId="chapter-delete-drop-area" type="CHAPTER">
@@ -119,10 +119,10 @@ export default function BookEntityDraggableContext(drillingProps : BookEntityDra
               </div>
             </div>
           )}
-        </Droppable>   
+        </Droppable>
 
         <main className="px-24 mt-16 flex-auto">
-          <BookBasicPageForm {...drillingProps}/>
+          <FormRoutes {...props}  />
         </main>
       </DragDropContext>
     </>

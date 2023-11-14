@@ -17,17 +17,17 @@ export interface IOutlineSidebarProps {
 }
 
 
-export default function OutlineSidebarWrapper(drillingProps : IOutlineSidebarProps) {
+export default function OutlineSidebarWrapper(props : IOutlineSidebarProps) {
 
 
   return (
     <>
       <aside id="page-outline-sidebar" className="fixed z-10 top-0 left-0 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0">
         <div className="overflow-y-auto pt-12 pb-5 px-3 h-full bg-white border-r border-gray-200 dark:bg-gray-800 dark:border-gray-700">
-          {drillingProps.children}
+          {props.children}
         </div>
       </aside>
-      <AddChapterBtn {...drillingProps} />
+      <AddChapterBtn {...props} />
       <div id="sidebar-placeholder" className="relative w-64 h-screen transition-transform -translate-x-full sm:translate-x-0"></div>
     </>
   );

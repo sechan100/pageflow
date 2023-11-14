@@ -43,35 +43,6 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
 
-    <!--  toastr 알림 창 옵션  -->
-    <script>
-        toastr.options = {
-            closeButton:  true,
-            debug: false,
-            newestOnTop: true,
-            progressBar: true,
-            positionClass: "toast-top-right",
-            preventDuplicates: false,
-            onclick: null,
-            showDuration: "300",
-            hideDuration: "1000",
-            timeOut: "5000",
-            extendedTimeOut: "1000",
-            showEasing: "swing",
-            hideEasing: "linear",
-            showMethod: "fadeIn",
-            hideMethod: "fadeOut"
-         };
-
-        function toastNotice(msg){
-            toastr["success"](msg, "알림");
-        }
-
-        function toastWarning(msg){
-            toastr["warning"](msg, "알림");
-        }
-    </script>
-
 </head>
 
 <body class="bg-white" th:with="user = ${@rq.userSession}">
@@ -186,7 +157,7 @@
 
     <div id="alert-container" class="sm:w-1/4 w-full z-50 fixed bottom-5 right-5 flex flex-col-reverse"></div>
 
-    <main layout:fragment="main" class="mt-20  text-black"></main>
+    <main layout:fragment="main" class="mt-20  text-black md:p-8 lg:p-12"></main>
 
     <script th:inline="javascript">
         /*<![CDATA[*/

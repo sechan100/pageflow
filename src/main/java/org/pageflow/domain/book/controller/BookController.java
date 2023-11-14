@@ -51,7 +51,7 @@ public class BookController {
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/book/modify/{id}")
     public String bookModify(BookForm bookForm, @PathVariable("id") Long id, Principal principal) {
-        Book book = this.bookService.delegateFindBookWithAuthorById(id);
+        Book book = this.bookService.repoFindBookWithAuthorById(id);
         if (!book.getAuthor().getNickname().equals(principal.getName())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정권한이 없습니다.");
         }
@@ -68,7 +68,7 @@ public class BookController {
             return "forward:/react/build/index.html\";";
         }
 
-        Book book = this.bookService.delegateFindBookWithAuthorById(id);
+        Book book = this.bookService.repoFindBookWithAuthorById(id);
         Account author = this.accountService.findFetchJoinProfileByUsername(principal.getName());
         if (!book.getAuthor().getNickname().equals(principal.getName())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정권한이 없습니다.");
@@ -81,7 +81,7 @@ public class BookController {
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/book/delete/{id}")
     public String bookDelete(Principal principal, @PathVariable("id") Long id) {
-        Book book = this.bookService.delegateFindBookWithAuthorById(id);
+        Book book = this.bookService.repoFindBookWithAuthorById(id);
         if (!book.getAuthor().getNickname().equals(principal.getName())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "삭제권한이 없습니다.");
         }

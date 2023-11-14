@@ -7,43 +7,52 @@
     <!--  홈/ 정보 버튼  -->
     <style>
         .chapter_btn {
-        padding: 15px 100px;
-        margin: 10px 4px;
-        color: red;
-        text-transform: uppercase;
-        position: relative;
-        text-decoration: none;
-        display: inline-block;
-      }
+            padding: 15px 100px;
+            margin: 10px 4px;
+            color: red;
+            text-transform: uppercase;
+            position: relative;
+            text-decoration: none;
+            display: inline-block;
+        }
 
-      .chapter_btn::before {
-        content: "";
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        height: 2px;
-        background: #6098ff;
-        display: block;
-        -webkit-transform-origin: right top;
-        -ms-transform-origin: right top;
-        transform-origin: right top;
-        -webkit-transform: scale(0, 1);
-        -ms-transform: scale(0, 1);
-        transform: scale(0, 1);
-        -webkit-transition: transform 0.4s cubic-bezier(1, 0, 0, 1);
-        transition: transform 0.4s cubic-bezier(1, 0, 0, 1);
-      }
+        .chapter_btn::before {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: #6098ff;
+            display: block;
+            -webkit-transform-origin: right top;
+            -ms-transform-origin: right top;
+            transform-origin: right top;
+            -webkit-transform: scale(0, 1);
+            -ms-transform: scale(0, 1);
+            transform: scale(0, 1);
+            -webkit-transition: transform 0.4s cubic-bezier(1, 0, 0, 1);
+            transition: transform 0.4s cubic-bezier(1, 0, 0, 1);
+        }
 
-      .chapter_btn:hover::before {
-        -webkit-transform-origin: left top;
-        -ms-transform-origin: left top;
-        transform-origin: left top;
-        -webkit-transform: scale(1, 1);
-        -ms-transform: scale(1, 1);
-        transform: scale(1, 1);
-      }
+        .chapter_btn:hover::before {
+            -webkit-transform-origin: left top;
+            -ms-transform-origin: left top;
+            transform-origin: left top;
+            -webkit-transform: scale(1, 1);
+            -ms-transform: scale(1, 1);
+            transform: scale(1, 1);
+        }
+
+        @media (max-width: 768px) {
+            .chapter_btn {
+                padding: 10px 60px;
+            }
+
+            /* 추가 모바일 스타일 지정 가능 */
+        }
     </style>
+
 </head>
 
 <body>
@@ -145,7 +154,22 @@
                         <!--  댓글 레이아웃 -->
                         <div class="h-2/5 flex flex-col relative rounded-lg mt-5 overflow-hidden"
                              style="background-color: #e5e7eb; overflow-y: auto;">
-                            <div class="h-5/6">
+                            <div class="h-7 px-4 py-1 border border-red-500">
+                                <ul>
+                                    <li>
+                                        <i class="fa-regular fa-comment" style="color: #000000; ">
+                                            <!--                                    <span class="text-danger small ms-2"-->
+                                            <!--                                          th:if="${#lists.size(comment.id) > 0}"-->
+                                            <!--                                          th:text="${#lists.size(comment.id)}"></span>-->
+                                            댓글수
+                                        </i>
+                                    </li>
+                                    <li>
+                                        <a href=""></a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="h-4/6">
                                 <div id="comment_list" class="h-full overflow-auto"></div>
                             </div>
                             <div class="w-full absolute bottom-0 border">
@@ -226,6 +250,10 @@
         function commentList(comment) {
             var output = "";
             var userImg = "[[${outline.author.profileImgUrl}]]";
+
+            comment.sort(function (a, b) {
+            return new Date(b.createDate) - new Date(a.createDate);
+        });
 
             for (var i in comment) {
                 output += "<div class=' flex text-xs mb-2 mt-1'>";

@@ -7,6 +7,7 @@ import org.pageflow.domain.book.service.BookService;
 import org.pageflow.domain.comment.entity.Comment;
 import org.pageflow.domain.comment.service.CommentService;
 import org.pageflow.domain.user.service.AccountService;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -29,7 +30,7 @@ public class CommentController {
 
     @PostMapping("/create/{id}")
     public ResponseEntity<List<Comment>> create(@RequestParam(value = "content") String content, @PathVariable("id") Long id, Principal principal) {
-        Book book = this.bookService.delegateFindBookWithAuthorById(id);
+        Book book = this.bookService.repoFindBookWithAuthorById(id);
 
         this.commentService.create(book, content, rq.getAccount().getProfile());
         List<Comment> commentList = this.commentService.findAll();
@@ -38,8 +39,9 @@ public class CommentController {
     } // 댓글 작성
 
     @GetMapping("/list/{id}")
-    public ResponseEntity<List<Comment>> list() {
-        List<Comment> commentList = this.commentService.findAll();
+    public ResponseEntity<List<Comment>> list(@PathVariable("id") Long id) {
+        Sort sort = Sort.by(Sort.Direction.DESC, "createDate");
+        List<Comment> commentList = this.commentService.findAllByOrderByCreateDateDesc(id);
 
         return ResponseEntity.ok().body(commentList);
     } // 댓글 리스트 조회
@@ -68,7 +70,7 @@ public class CommentController {
         }
 
         this.commentService.delete(comment);
-        List<Comment> commentList = this.commentService.findAllByBookId(comment.getBook().getId());
+        List<Comment> commentList = this.commentService.findAllByOrderByCreateDateDesc(comment.getBook().getId());
         return ResponseEntity.ok().body(commentList);
     } // 삭제
 

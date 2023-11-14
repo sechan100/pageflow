@@ -6,12 +6,12 @@ import org.pageflow.domain.book.entity.Book;
 import org.pageflow.domain.comment.entity.Comment;
 import org.pageflow.domain.comment.repository.CommentRepository;
 import org.pageflow.domain.user.entity.Profile;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-
 
 @Service
 @RequiredArgsConstructor
@@ -48,12 +48,12 @@ public class CommentService {
         this.commentRepository.delete(comment);
     } //댓글 삭제
 
-
     public List<Comment> findAll() {
         return this.commentRepository.findAll();
     }
 
-    public List<Comment> findAllByBookId(Long id) {
-        return this.commentRepository.findAllByBookId(id);
+    public List<Comment> findAllByOrderByCreateDateDesc(Long id) {
+        Sort sort = Sort.by(Sort.Direction.DESC, "createDate");
+        return commentRepository.findAllByBookId(id, sort);
     }
 }

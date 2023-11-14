@@ -13,6 +13,8 @@ import org.pageflow.domain.book.repository.BookRepository;
 import org.pageflow.domain.book.repository.ChapterRepository;
 import org.pageflow.domain.book.repository.PageRepository;
 import org.pageflow.domain.user.entity.Account;
+import org.pageflow.infra.file.constants.FileMetadataType;
+import org.pageflow.infra.file.entity.FileMetadata;
 import org.pageflow.infra.file.service.FileService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -21,7 +23,9 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.io.Serial;
 import java.util.*;
 import java.util.stream.Collectors;

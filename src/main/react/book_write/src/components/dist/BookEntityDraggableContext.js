@@ -55,6 +55,7 @@ var Chapter_1 = require("./outline/Chapter");
 var axios_1 = require("axios");
 var flowAlert_1 = require("../etc/flowAlert");
 var FormRoutes_1 = require("./form/FormRoutes");
+var FormSidebar_1 = require("./form/FormSidebar");
 function BookEntityDraggableContext(props) {
     var _this = this;
     var bookId = props.bookId, queryClient = props.queryClient;
@@ -132,7 +133,8 @@ function BookEntityDraggableContext(props) {
                     React.createElement("svg", { className: "w-6 h-6 text-gray-800 dark:text-white mr-3", "aria-hidden": "true", xmlns: "http://www.w3.org/2000/svg", fill: "none", viewBox: "0 0 18 20" },
                         React.createElement("path", { stroke: "currentColor", "stroke-linecap": "round", "stroke-linejoin": "round", "stroke-width": "2", d: "M1 5h16M7 8v8m4-8v8M7 1h4a1 1 0 0 1 1 1v3H6V2a1 1 0 0 1 1-1ZM3 5h12v13a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5Z" })),
                     React.createElement("span", { className: "text-white" }, "\uB4DC\uB798\uADF8\uD558\uC5EC \uC0AD\uC81C")))); }),
-            React.createElement("main", { className: "px-24 mt-16 flex-auto" },
+            React.createElement("main", { className: "flex-auto relative" },
+                React.createElement(FormSidebar_1["default"], __assign({}, props)),
                 React.createElement(FormRoutes_1["default"], __assign({}, props))))));
     function onDragStart(start) {
         toggleDeleteDropAreaVisibility(start.type);

@@ -8,16 +8,16 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 @RequiredArgsConstructor
 public class HomeController {
-    
+
     private final Rq rq;
 
-    
+
     @GetMapping("/")
     public String homePage() {
 
 
         return "/user/home/home";
     }
-    
-    
+
+
 }

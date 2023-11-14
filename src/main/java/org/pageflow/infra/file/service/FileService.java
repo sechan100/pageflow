@@ -18,35 +18,34 @@ import java.util.UUID;
 @Service
 @Slf4j
 public class FileService {
-    
+
     private final CustomProperties customProperties;
     private final FileMetadataRepository fileRepository;
     private String uploadDirectoryPath;
-    
-    
+
+
     public FileService(CustomProperties customProperties, FileMetadataRepository fileRepository) {
         this.customProperties = customProperties;
         this.fileRepository = fileRepository;
-        
+
         String uploadDirectoryPath = customProperties.getFiles().getImg().getDirectory();
-        if(!uploadDirectoryPath.endsWith("/")) {
+        if (!uploadDirectoryPath.endsWith("/")) {
             uploadDirectoryPath += "/";
         }
         this.uploadDirectoryPath = uploadDirectoryPath;
     }
-    
+
     public <E extends BaseEntity> FileMetadata uploadFile(MultipartFile fileToUpload, E ownerEntity, FileMetadataType fileMetadataType) {
-        
+
         String pathPrefix = getDailyPathPrefix();
         String originalFilename = fileToUpload.getOriginalFilename();
-        if(originalFilename == null) {
+        if (originalFilename == null) {
             throw new IllegalArgumentException("올바르지 않은 파일명입니다.");
         }
         String extension = extractExtension(originalFilename);
         String UUIDfilename = UUID.randomUUID() + "." + extension;
-        
-        
-        
+
+
         // DB에 파일 저장 정보 기록
         FileMetadata fileMetadata = FileMetadata.builder()
                 // {uploadDirectory}/{y}/{m}/{d}/{UUID}.{ext}
@@ -61,15 +60,15 @@ public class FileService {
                 .pathPrefix(pathPrefix) // {y}/{m}/{d}/
                 .build();
         fileRepository.save(fileMetadata);
-        
+
         // 파일 저장 디렉토리 생성   {uploadDirectory}/{y}/{m}/{d}/
         File uploadDirectoryFile = new File(uploadDirectoryPath + pathPrefix);
-        if(!uploadDirectoryFile.exists()) {
+        if (!uploadDirectoryFile.exists()) {
             boolean mkdirSuccess = uploadDirectoryFile.mkdirs();
         }
-        
+
         String uploadDirectoryFullPath = uploadDirectoryPath + pathPrefix + UUIDfilename;
-        
+
         // 파일 저장
         File fileToStore = new File(uploadDirectoryFullPath);
         try {
@@ -77,10 +76,10 @@ public class FileService {
         } catch (IOException e) {
             log.info("'{}' 파일 저장 중 오류가 발생했습니다.", fileMetadata.getUploadDirectory());
         }
-        
+
         return fileMetadata;
     }
-    
+
     /**
      * @param filePath /{y}/{m}/{d}/{UUID}.{ext}
      * @return 파일 삭제 성공 여부
@@ -90,8 +89,8 @@ public class FileService {
         boolean deleteSuccess = file.delete();
         String pathPrefix = filePath.substring(0, filePath.lastIndexOf("/") + 1);
         String managedFilename = filePath.substring(filePath.lastIndexOf("/") + 1);
-        
-        if(deleteSuccess){
+
+        if (deleteSuccess) {
             fileRepository.findByPathPrefixAndManagedFilename(pathPrefix, managedFilename)
                     .ifPresent(fileRepository::delete);
             return true;
@@ -100,7 +99,7 @@ public class FileService {
             return false;
         }
     }
-    
+
     public List<FileMetadata> getFileMetadatas(BaseEntity ownerEntity, FileMetadataType fileMetadataType) {
         return fileRepository.findAllByOwnerIdAndOwnerEntityTypeAndFileMetadataType(
                 ownerEntity.getId(),
@@ -108,16 +107,16 @@ public class FileService {
                 fileMetadataType
         );
     }
-    
+
     public String extractExtension(String filename) {
         String extension = filename.substring(filename.lastIndexOf(".") + 1);
-        if(extension.isEmpty()) {
+        if (extension.isEmpty()) {
             throw new IllegalArgumentException("파일명에 확장자가 없거나, 올바르지 않은 파일명입니다.");
         } else {
             return extension;
         }
     }
-    
+
     /**
      * @return {y}/{m}/{d}/
      */
@@ -125,15 +124,15 @@ public class FileService {
         LocalDateTime now = LocalDateTime.now();
         return now.getYear() + "/" + now.getMonthValue() + "/" + now.getDayOfMonth() + "/";
     }
-    
-    
+
+
     public String getImgUri(FileMetadata fileMetadata) {
         String imgResourcePathPrefix = customProperties.getFiles().getImg().getBaseUrl();
-        if(!imgResourcePathPrefix.endsWith("/")) {
+        if (!imgResourcePathPrefix.endsWith("/")) {
             imgResourcePathPrefix += "/";
         }
-        
-        return  imgResourcePathPrefix +
+
+        return imgResourcePathPrefix +
                 fileMetadata.getPathPrefix() +
                 fileMetadata.getManagedFilename();
     }

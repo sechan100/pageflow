@@ -26,22 +26,22 @@ public class FormLoginAuthenticationSuccessHandler implements AuthenticationSucc
     private final Rq rq;
     private RequestCache requestCache = new HttpSessionRequestCache();
     private RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
-    
+
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-        UserSession userSession = ((PrincipalContext)authentication.getPrincipal()).getUserSession();
+        UserSession userSession = ((PrincipalContext) authentication.getPrincipal()).getUserSession();
         String nickname = userSession.getNickname();
-        
+
         SavedRequest savedRequest = requestCache.getRequest(request, response);
-        
-        if(savedRequest != null) {
+
+        if (savedRequest != null) {
             String cachedRedirectUrl = savedRequest.getRedirectUrl();
             redirectStrategy.sendRedirect(
                     request,
                     response,
                     rq.getAlertStorageRedirectUri(AlertType.INFO, nickname + "님, 환영합니다.", cachedRedirectUrl)
             );
-            
+
         } else {
             redirectStrategy.sendRedirect(
                     request,

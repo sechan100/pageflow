@@ -10,19 +10,18 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 @RequiredArgsConstructor
 public class BookWriteController {
-    
+
     private final BookService bookService;
     private final AccountService accountService;
-    
-    
+
+
     /**
      * @return react book write form page
      */
     @GetMapping("/book/write")
     public String bookWriteForm() {
-        return "forward:/react/build/index.html";
+        return "forward:/react/build/book_write/index.html";
     }
-    
-    
+
 
 }

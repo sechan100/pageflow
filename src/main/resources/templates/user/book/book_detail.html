@@ -1,0 +1,388 @@
+<html lang="en" layout:decorate="~{/common/layout.html}" xmlns:th="http://www.w3.org/1999/xhtml" xmlns:layout=""
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <title>Book</title>
+
+    <!--  홈/ 정보 버튼  -->
+    <style>
+        .chapter_btn {
+            padding: 15px 100px;
+            margin: 10px 4px;
+            color: red;
+            text-transform: uppercase;
+            position: relative;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .chapter_btn::before {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: #6098ff;
+            display: block;
+            -webkit-transform-origin: right top;
+            -ms-transform-origin: right top;
+            transform-origin: right top;
+            -webkit-transform: scale(0, 1);
+            -ms-transform: scale(0, 1);
+            transform: scale(0, 1);
+            -webkit-transition: transform 0.4s cubic-bezier(1, 0, 0, 1);
+            transition: transform 0.4s cubic-bezier(1, 0, 0, 1);
+        }
+
+        .chapter_btn:hover::before {
+            -webkit-transform-origin: left top;
+            -ms-transform-origin: left top;
+            transform-origin: left top;
+            -webkit-transform: scale(1, 1);
+            -ms-transform: scale(1, 1);
+            transform: scale(1, 1);
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<main layout:fragment="main">
+
+    <section>
+        <div class="py-1 w-9/12 m-auto h-full">
+            <div class="mt-10 mb-10 flex flex-col">
+                <div class="flex flex-col sm:flex-row  h-screen justify-center">
+                    <!-- 좌측 레이아웃 시작 -->
+                    <div class="w-[300px]">
+                        <div class="w-full h-full rounded-lg" style="background-color : #e5e7eb; ">
+                            <div class=" flex flex-col ">
+                                <div class=" h-full w-full relative">
+                                    <div class="w-full" style=" filter: blur(2px) ;">
+                                        <img th:src="@{${outline.coverImgUrl}}" alt="Book Image">
+                                    </div>
+                                    <div class="w-9/12 absolute  top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+                                         style="z-index : 1;">
+                                        <img th:src="@{${outline.coverImgUrl}}" alt="Book Image">
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex flex-col items-center text-center justify-center w-full">
+                                    <h2 class="mt-8 font-black  text-2xl w-full"
+                                        th:text="${outline.title}"></h2>
+                                    <span class="font-semibold mt-8"
+                                          th:text="${outline.author.nickname}"></span>
+                                    <div>
+                                        <a href="#" id="heart" data-filled="false" onclick="toggleHeart('heart')">
+                                            <i id="heartIcon" class="fa-solid fa-heart mt-4"
+                                               style="color: #ffffff;"></i>
+                                        </a>
+                                    </div>
+                                    <a href="javascript:void(0);" class="recommend ">
+                                    </a>
+                                    <div class="mt-4">
+                                        <a th:href="@{|/outline/modify/${outline.id}|}" th:text="수정"
+                                           th:if="${outline.author != null and outline.getAuthor().getNickname() == outline.author.nickname}"
+                                           sec:authorize="isAuthenticated()"></a>
+                                        <a href="javascript:void(0);" class="delete"
+                                           th:data-uri="@{|/outline/delete/${outline.id}|}" th:text="삭제"
+                                           th:if="${outline.author != null and outline.getAuthor().getNickname() == outline.author.nickname}"
+                                           sec:authorize="isAuthenticated()"></a>
+                                    </div>
+                                    <button class="btn btn-outline btn-accent w-52 mt-20">읽기</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 좌측 레이아웃 끝 -->
+                    <!-- 우측 레이아웃 시작 -->
+                    <div class="sm:w-2/3 sm:mt-0 sm:ml-2 text-center sm:text-left flex flex-col h-full ">
+                        <!--      책 챕터 표기    -->
+                        <div class=" h-3/5 rounded-lg" style="background-color : #e5e7eb;">
+                            <div>
+                                <!--     홈/정보 메뉴    -->
+                                <ul class="flex justify-center  mt-1">
+                                    <li class="mr-10  p-1 rounded-lg chapter_btn ">
+                                        <a href="#" data-tip="Hom" onclick="showTab('tab1')">
+                                            <p>홈</p>
+                                        </a>
+                                    </li>
+                                    <li class=" p-1 rounded-lg chapter_btn">
+                                        <a href="#" data-tip="Details" onclick="showTab('tab2')">
+                                            <p>정보</p>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <!--         책 챕터 (홈)    -->
+                            <div class="flex flex-wrap -m-2 tab-content" id="tab1">
+                                <div class="p-2 w-full">
+                                    <div class="h-full flex items-center  p-3 rounded-lg ">
+                                        <div class="flex-grow">
+                                            <ul>
+                                                <li th:each=" chapters : ${outline.chapters}" class="flex mb-2">
+                                                    <img th:src="@{${outline.coverImgUrl}}"
+                                                         class="w-14 h-16 object-cover object-center flex-shrink-0 mr-4 rounded-lg"
+                                                         alt="Book Image">
+                                                    <div class="w-full py-3">
+                                                        <div><a href="#" class=" text-base "
+                                                                th:text="${chapters.title}"></a></div>
+                                                        <!--      작성 날짜 데아터 표기 해야함    -->
+                                                        <span th:text="${#temporals.format(outline.author.createDate, 'yyyy-MM-dd')}"></span>
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--         책 챕터 (정보)    -->
+                            <div class="flex flex-wrap -m-2 tab-content hidden" id="tab2">
+                                <h1 th:if="${selectedTab == 'tab2'}">정보페이지</h1>
+                            </div>
+                        </div>
+                        <!--          책 챕터 끝    -->
+                        <!--  댓글 레이아웃 -->
+                        <div class="h-2/5 flex flex-col relative rounded-lg mt-5 overflow-hidden"
+                             style="background-color: #e5e7eb; overflow-y: auto;">
+                            <div class="h-7 px-4 py-1">
+                                <ul>
+                                    <li>
+                                        <i class="fa-regular fa-comment" style="color: #000000; ">
+                                            <!--                                    <span class="text-danger small ms-2"-->
+                                            <!--                                          th:if="${#lists.size(comment.id) > 0}"-->
+                                            <!--                                          th:text="${#lists.size(comment.id)}"></span>-->
+                                            댓글수(데이터 표기해야함)
+                                        </i>
+                                    </li>
+                                    <li>
+                                        <a href=""></a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="h-5/6">
+                                <div id="comment_list" class="h-full overflow-auto"></div>
+                            </div>
+                            <div class="w-full absolute bottom-0 border">
+                                <div class="form-control flex">
+                                    <form class="flex " onsubmit="commentWrite_submitForm(this); return false;">
+                                        <div class="flex-1 px-2 py-1">
+                                            <label for="content"></label>
+                                            <input name="content" id="content" type="text" placeholder="소중한 의견을 남겨주세요"
+                                                   class="input input-bordered px-6 w-full rounded-lg"/>
+                                        </div>
+                                        <div class="w-1/5 px-2 py-1">
+                                            <input type="submit" class="input input-bordered w-full" value="등록"/>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                            <!-- 댓글 레이아웃 끝 -->
+                        </div>
+                    </div>
+                    <!-- 우측 레이아웃 끝 -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <script>
+     let commentWrite_submitFormDone = false;
+
+     // 댓글 작성 함수
+     function commentWrite_submitForm(form) {
+         form.content.value = form.content.value.trim();
+
+         if (form.content.value.length === 0) {
+             Swal.fire({
+                 icon: 'error',
+                 title: '댓글 입력 오류',
+                 text: '댓글을 입력해주세요',
+             });
+
+             form.content.focus();
+             return;
+         }
+
+         var outlineId = [[${outline.id}]];
+
+         $.ajax({
+             type: 'POST',
+             url: `/comment/create/${outlineId}`,
+             data: { content: form.content.value },
+             success: function (comment) {
+                 console.log("댓글 생성 완료");
+                 commentList(comment);
+                 form.content.value = '';
+             },
+             error: function (xhr, status, error) {
+                 console.error("댓글 생성 에러");
+             }
+         });
+     }
+
+    // 댓글 목록
+     $(document).ready(function () {
+         var outlineId = [[${outline.id}]];
+
+         $.ajax({
+             type: 'GET',
+             url: `/comment/list/${outlineId}`,
+             success: function (comment) {
+                 console.log("댓글 목록 로드 완료");
+                 commentList(comment);
+             },
+             error: function (xhr, status, error) {
+                 console.error("댓글 목록 로드 에러");
+             }
+         });
+     });
+
+     // 댓글 목록을 화면에 표시
+     function commentList(comment) {
+         var output = "";
+         var userImg = "[[${outline.author.profileImgUrl}]]";
+
+         comment.sort(function (a, b) {
+             return new Date(b.createDate) - new Date(a.createDate);
+         });
+
+         for (var i in comment) {
+             output += "<div class='flex text-xs mb-2 mt-1'>";
+             output += "<div class='w-10 mr-2 ml-2 flex'>";
+             output += "<div class='w-7 h-7 m-auto justify-items-center'>";
+             output += "<img src='" + userImg + "' alt='프로필이미지' class='rounded-full'>";
+             output += "</div>";
+             output += "</div>";
+             output += "<div class=''>";
+             output += `<p id='comment-${comment[i].id}' class='mb-1'>${comment[i].content}</p>`;
+             output += `<a href='javascript:void(0);' class='recommend mr-2' onclick='recommendComment(${comment[i].id})'>추천</a>`;
+             output += `<a href='javascript:void(0);' class='edit mr-2' onclick='editComment(${comment[i].id})'>수정</a>`;
+             output += `<a href='javascript:void(0);' class='delete' onclick='deleteComment(${comment[i].id})'>삭제</a>`;
+             output += "</div>";
+             output += "</div>";
+
+         }
+
+         $("#comment_list").html(output);
+     }
+
+     // 댓글 삭제
+         const deleteComment = (commentId) => {
+         Swal.fire({
+             title: '댓글 삭제',
+             text: '정말로 삭제하시겠습니까?',
+             icon: 'question',
+             showCancelButton: true,
+             confirmButtonText: '삭제',
+             cancelButtonText: '취소'
+         }).then((result) => {
+             if (result.isConfirmed) {
+                 $.ajax({
+                     type: 'GET',
+                     url: `/comment/delete/${commentId}`,
+                     success: function (comment) {
+                         console.log('댓글 삭제 완료');
+                         commentList(comment);
+                     },
+                     error: function (xhr, status, error) {
+                         console.error("댓글 삭제 에러");
+                     }
+                 });
+             }
+         });
+     };
+
+     // 댓글 수정
+     function editComment(commentId) {
+         var commentContent = $("#comment-" + commentId).text();
+         var newContent = `<textarea>${commentContent}</textarea>`;
+
+         if (newContent !== null) {
+             $("#comment-" + commentId).replaceWith(`<textarea id='comment-${commentId}' style='width: 100%; resize: none;'>${commentContent}</textarea>`);
+             $("#comment-" + commentId).next().hide();
+             $("#comment-" + commentId).next().next().hide();
+             $("#comment-" + commentId).next().next().next().hide();
+             $("#comment-" + commentId).after(`<button onclick='saveEdit(${commentId})'>저장</button>`);
+             $("#comment-" + commentId).after(`<button onclick='cancelEdit(${commentId})'>취소</button>`);
+             console.log('Cancel button clicked!');
+         }
+     }
+
+    // 댓글 수정 저장
+     function saveEdit(commentId) {
+         var editedContent = $("#comment-" + commentId).val();
+         $.ajax({
+             type: 'POST',
+             url: `/comment/modify/${commentId}`,
+             data: { content: editedContent },
+             success: function (comment) {
+                 console.log('댓글 수정 완료');
+                 commentList(comment);
+             },
+             error: function (xhr, status, error) {
+                 console.error("댓글 수정 에러");
+             }
+         });
+     }
+
+    // 취소 시 화면 돌아감
+     function cancelEdit(commentId) {
+        var commentContent = $("#comment-" + commentId).text();
+        $("#comment-" + commentId).replaceWith(`<p id='comment-${commentId}'>${commentContent}</p>`);
+
+        var buttonsToShow = $("#comment-" + commentId).parent().find('.recommend, .edit, .delete');
+        buttonsToShow.show();
+
+        $("#comment-" + commentId).siblings("button").remove();
+
+
+         console.log('취소 에러 ');
+
+     }
+
+    </script>
+
+    <!--  홈/ 정보 비동기 이동  -->
+    <script>
+        function showTab(tabId) {
+          var tabContents = document.querySelectorAll(".tab-content");
+
+          var selectedTab = document.getElementById(tabId);
+          if (!selectedTab) {
+              console.error("Tab with id '" + tabId + "' not found.");
+              return;
+          }
+
+          tabContents.forEach(function (content) {
+              content.style.display = "none";
+          });
+
+          selectedTab.style.display = "block";
+      }
+
+    </script>
+
+    <!--  좋아요를 누를 시 하트 색 변화  -->
+    <script>
+        function toggleHeart(heartId) {
+            var heart = document.getElementById(heartId);
+            var isFilled = (heart.getAttribute('data-filled') === 'true');
+            var heartIcon = document.getElementById('heartIcon');
+
+            heart.setAttribute('data-filled', (!isFilled).toString());
+
+            heartIcon.style.color = isFilled ? '#ffffff' : '#ff0000';
+
+        }
+    </script>
+
+
+</main>
+</body>
+</html>

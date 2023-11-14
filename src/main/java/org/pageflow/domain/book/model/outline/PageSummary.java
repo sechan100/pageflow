@@ -14,12 +14,12 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 public class PageSummary implements Rearrangeable {
-    
+
     private Long id;
     private String title;
     private Integer sortPriority;
     private Long ownerId; // chapter_id
-    
+
     public PageSummary(Page chapter, List<PageSummary> pages) {
         this.id = chapter.getId();
         this.title = chapter.getTitle();

@@ -13,6 +13,8 @@ import org.pageflow.domain.book.repository.BookRepository;
 import org.pageflow.domain.book.repository.ChapterRepository;
 import org.pageflow.domain.book.repository.PageRepository;
 import org.pageflow.domain.user.entity.Account;
+import org.pageflow.infra.file.constants.FileMetadataType;
+import org.pageflow.infra.file.entity.FileMetadata;
 import org.pageflow.infra.file.service.FileService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -21,7 +23,9 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.io.Serial;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -125,7 +129,7 @@ public class BookService {
     }
     
     
-    
+
     public Book repoSaveBook(Book book) {
         return bookRepository.save(book);
     }
@@ -133,20 +137,36 @@ public class BookService {
     public Book repoFindBookById(Long id) {
         return bookRepository.findById(id).orElseThrow();
     }
-    
+
     public Chapter repoFindChapterById(Long id) {
         return chapterRepository.findById(id).orElseThrow();
     }
-    
+
     public Page repoFindPageById(Long id) {
         return pageRepository.findById(id).orElseThrow();
     }
-    
+
     public Book repoFindBookWithAuthorById(Long id) {
         return bookRepository.findBookWithAuthorById(id);
     }
     
     public Book repoFindBookWithAuthorAndChapterById(Long id) {
         return bookRepository.findBookWithAuthorAndChapterById(id);
+    }
+
+    public Book modify(Book book, String title, MultipartFile file, Account author) throws IOException {
+
+        book.setTitle(title);
+        book.setAuthor(author.getProfile());
+
+        FileMetadata bookCoverFileMetadata = fileService.uploadFile(file, book, FileMetadataType.BOOK_COVER);
+        String imgUri = fileService.getImgUri(bookCoverFileMetadata);
+        book.setCoverImgUrl(imgUri);
+
+        return bookRepository.save(book);
+    } // 수정
+
+    public void delete(Book book) {
+        this.bookRepository.delete(book);
     }
 }

@@ -25,7 +25,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     properties:
       hibernate:
         show_sql: true
@@ -38,6 +38,7 @@ spring:
         registration:
 
           naver:
+            scope: profile,email
             client-name: naver
             authorization-grant-type: authorization_code
             redirect-uri: '${custom.site.base-url}/login/oauth2/code/naver'
@@ -73,4 +74,4 @@ custom:
     img:
       base-url: /files/img
 #      directory: C:/Users/SBS/local/uploads/img/
-      directory: /Users/sechan/local/uploads/img/
+      directory: C:/Users/gsw05/local/uploads/img/

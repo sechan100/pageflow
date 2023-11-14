@@ -13,20 +13,19 @@ import org.pageflow.domain.book.model.outline.PageSummary;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PageUpdateRequest extends RearrangeRequest {
-    
+
     private String title;
-    
+
     private String content;
-    
-    
-    
-    public PageUpdateRequest(Page page){
+
+
+    public PageUpdateRequest(Page page) {
         super("page", page.getId(), page.getSortPriority());
         this.title = page.getTitle();
         this.content = page.getContent();
     }
-    
-    public PageUpdateRequest(PageSummary page){
+
+    public PageUpdateRequest(PageSummary page) {
         super("page", page.getId(), page.getSortPriority());
         this.title = page.getTitle();
     }

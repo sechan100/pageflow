@@ -12,23 +12,24 @@ import org.pageflow.base.entity.BaseEntity;
 @ToString(callSuper = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Account extends BaseEntity {
-    
+
     private String provider;
-    
+
     @Column(unique = true)
     private String username;
-    
+
     private String password;
-    
+
     private String email;
-    
+
     private String role;
-    
+
     @OneToOne(
             optional = false,
             fetch = FetchType.EAGER,
             cascade = CascadeType.ALL
     )
     private Profile profile;
+
 
 }

@@ -10,25 +10,25 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class AwaitingVerificationEmailService {
-    
+
     private final AwaitingVerificationEmailRepository emailCacheRepository;
-    
+
     public AwaitingEmailVerificationRequest save(AwaitingEmailVerificationRequest awaitingVerificationEmail) {
         return emailCacheRepository.save(awaitingVerificationEmail);
     }
-    
+
     public boolean existsById(String email) {
         return emailCacheRepository.existsById(email);
     }
-    
+
     public AwaitingEmailVerificationRequest findById(String email) {
         return emailCacheRepository.findById(email).orElseThrow();
     }
-    
+
     public void delete(String email) {
         emailCacheRepository.deleteById(email);
     }
-    
+
     @Transactional
     public AwaitingEmailVerificationRequest verify(String email) {
         AwaitingEmailVerificationRequest awaitingEmailVerificationRequest = findById(email);

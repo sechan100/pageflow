@@ -8,9 +8,9 @@ import org.springframework.stereotype.Controller;
 @Controller
 @RequiredArgsConstructor
 public class DevController {
-    
+
     private final Rq rq;
     private final FileService fileService;
 
-    
+
 }

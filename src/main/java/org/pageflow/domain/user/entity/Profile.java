@@ -1,7 +1,9 @@
 package org.pageflow.domain.user.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.OneToOne;
 import lombok.*;
 import org.pageflow.base.entity.BaseEntity;
 
@@ -13,11 +15,11 @@ import org.pageflow.base.entity.BaseEntity;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Profile extends BaseEntity {
-    
+
     private String nickname;
-    
+
     private String profileImgUrl;
-    
+
     @OneToOne(
             optional = false,
             fetch = FetchType.LAZY,

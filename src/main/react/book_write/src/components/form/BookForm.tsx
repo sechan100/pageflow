@@ -2,15 +2,14 @@ import { useGetOutline } from '../../api/book-apis';
 import { Outline } from '../../types/types';
 
 
-interface BookBasicPageFormProps {
+interface BookFormProps {
   bookId : number;
   queryClient : any;
 }
 
-export default function BookBasicPageForm(drillingProps : BookBasicPageFormProps) {
+export default function BookForm(props : BookFormProps) {
 
-  const { bookId, queryClient } = drillingProps;
-
+  const { bookId, queryClient } = props;
   const outline : Outline = useGetOutline(bookId);
 
   

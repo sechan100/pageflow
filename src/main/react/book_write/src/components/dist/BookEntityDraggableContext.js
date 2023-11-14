@@ -48,16 +48,16 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 exports.__esModule = true;
 var react_beautiful_dnd_1 = require("react-beautiful-dnd");
-var BookBasicPageForm_1 = require("./form/BookBasicPageForm");
 var OutlineSidebar_1 = require("./outline/OutlineSidebar");
 var book_apis_1 = require("../api/book-apis");
 var react_1 = require("react");
 var Chapter_1 = require("./outline/Chapter");
 var axios_1 = require("axios");
 var flowAlert_1 = require("../etc/flowAlert");
-function BookEntityDraggableContext(drillingProps) {
+var FormRoutes_1 = require("./form/FormRoutes");
+function BookEntityDraggableContext(props) {
     var _this = this;
-    var bookId = drillingProps.bookId, queryClient = drillingProps.queryClient;
+    var bookId = props.bookId, queryClient = props.queryClient;
     // react query로 server book outline snapshot을 가져온다.
     var outline = book_apis_1.useGetOutline(bookId);
     var chapterDeleteDropArea = react_1.useRef(null); // Chapter 삭제 드롭 영역의 DOM 참조
@@ -121,7 +121,7 @@ function BookEntityDraggableContext(drillingProps) {
     }, [outlineBufferStatus]);
     return (React.createElement(React.Fragment, null,
         React.createElement(react_beautiful_dnd_1.DragDropContext, { onDragStart: onDragStart, onDragEnd: onDragEnd },
-            React.createElement(OutlineSidebar_1["default"], __assign({}, drillingProps, { outlineBufferStatusReducer: [outlineBufferStatus, outlineBufferStatusDispatch] })),
+            React.createElement(OutlineSidebar_1["default"], __assign({}, props, { outlineBufferStatusReducer: [outlineBufferStatus, outlineBufferStatusDispatch] })),
             React.createElement(react_beautiful_dnd_1.Droppable, { droppableId: "chapter-delete-drop-area", type: "CHAPTER" }, function (provided, snapshot) { return (React.createElement("div", { className: "bg-gray-500 animate-bounce hover:bg-gray-700 w-48 absolute invisible left-1/2 top-5 p-5 px-6 rounded-full", ref: chapterDeleteDropArea },
                 React.createElement("div", __assign({ ref: provided.innerRef }, provided.droppableProps, { className: "flex" }),
                     React.createElement("svg", { className: "w-6 h-6 text-gray-800 dark:text-white mr-3", "aria-hidden": "true", xmlns: "http://www.w3.org/2000/svg", fill: "none", viewBox: "0 0 18 20" },
@@ -133,7 +133,7 @@ function BookEntityDraggableContext(drillingProps) {
                         React.createElement("path", { stroke: "currentColor", "stroke-linecap": "round", "stroke-linejoin": "round", "stroke-width": "2", d: "M1 5h16M7 8v8m4-8v8M7 1h4a1 1 0 0 1 1 1v3H6V2a1 1 0 0 1 1-1ZM3 5h12v13a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5Z" })),
                     React.createElement("span", { className: "text-white" }, "\uB4DC\uB798\uADF8\uD558\uC5EC \uC0AD\uC81C")))); }),
             React.createElement("main", { className: "px-24 mt-16 flex-auto" },
-                React.createElement(BookBasicPageForm_1["default"], __assign({}, drillingProps))))));
+                React.createElement(FormRoutes_1["default"], __assign({}, props))))));
     function onDragStart(start) {
         toggleDeleteDropAreaVisibility(start.type);
         // 만약 이전에 mutated였다면, 버퍼 전송을 flush하지는 않지만 잠시 멈춰두기 위해서 waiting으로 변경한다.

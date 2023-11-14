@@ -58,11 +58,11 @@ exports.__esModule = true;
 var axios_1 = require("axios");
 var book_apis_1 = require("../../api/book-apis");
 var flowAlert_1 = require("../../etc/flowAlert");
-function OutlineSidebarWrapper(drillingProps) {
+function OutlineSidebarWrapper(props) {
     return (React.createElement(React.Fragment, null,
         React.createElement("aside", { id: "page-outline-sidebar", className: "fixed z-10 top-0 left-0 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0" },
-            React.createElement("div", { className: "overflow-y-auto pt-12 pb-5 px-3 h-full bg-white border-r border-gray-200 dark:bg-gray-800 dark:border-gray-700" }, drillingProps.children)),
-        React.createElement(AddChapterBtn, __assign({}, drillingProps)),
+            React.createElement("div", { className: "overflow-y-auto pt-12 pb-5 px-3 h-full bg-white border-r border-gray-200 dark:bg-gray-800 dark:border-gray-700" }, props.children)),
+        React.createElement(AddChapterBtn, __assign({}, props)),
         React.createElement("div", { id: "sidebar-placeholder", className: "relative w-64 h-screen transition-transform -translate-x-full sm:translate-x-0" })));
 }
 exports["default"] = OutlineSidebarWrapper;

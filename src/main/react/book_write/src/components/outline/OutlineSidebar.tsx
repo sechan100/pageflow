@@ -24,9 +24,9 @@ interface OutlineSidebarProps {
 }
 
 
-export default function OutlineSidebar(drillingProps : OutlineSidebarProps){
+export default function OutlineSidebar(props : OutlineSidebarProps){
 
-  const { bookId, queryClient, outlineBufferStatusReducer } = drillingProps;
+  const { bookId, queryClient, outlineBufferStatusReducer } = props;
   const outline : Outline = useGetOutline(bookId);
 
 
@@ -54,7 +54,7 @@ export default function OutlineSidebar(drillingProps : OutlineSidebarProps){
 
 
   return (
-    <OutlineSidebarWrapper {...drillingProps}>
+    <OutlineSidebarWrapper {...props}>
       <BookBasicPage bookId={outline.id}/>
 
       {/* 챕터 드롭 영역 */}

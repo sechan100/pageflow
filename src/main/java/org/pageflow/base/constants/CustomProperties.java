@@ -1,7 +1,6 @@
 package org.pageflow.base.constants;
 
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +13,7 @@ public class CustomProperties {
     private final Site site = new Site();
     private final Email email = new Email();
     private final Files files = new Files();
+    private final Defaults defaults = new Defaults();
 
 
     @Data
@@ -32,10 +32,32 @@ public class CustomProperties {
 
         private final Img img = new Img();
 
-        @Data
+        @Getter
+        @Setter
+        @NoArgsConstructor
         public static class Img {
             private String baseUrl;
             private String directory;
+            
+            
+            public Img(String baseUrl, String directory) {
+                if(!baseUrl.endsWith("/")) {
+                    baseUrl += "/";
+                }
+                if(!directory.endsWith("/")) {
+                    directory += "/";
+                }
+                
+                this.baseUrl = baseUrl;
+                this.directory = directory;
+                
+            }
         }
+    }
+    
+    @Data
+    public static class Defaults {
+        private String defaultUserProfileImg;
+        private String defaultBookCoverImg;
     }
 }

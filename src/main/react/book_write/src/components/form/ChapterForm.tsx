@@ -1,3 +1,4 @@
+import SaveMutationBtn from "./dist/SaveMutationBtn";
 
 
 
@@ -14,6 +15,8 @@ export default function ChapterForm(props : ChapterFormProps) {
 
   return (
     <>
+    <SaveMutationBtn />
+    <div className="px-24 mt-16">
       <form action="#">
         <div className="sm:col-span-2">
             <label htmlFor="title" className="block mb-2 text-sm font-medium text-gray-900">책 체목</label>
@@ -35,6 +38,7 @@ export default function ChapterForm(props : ChapterFormProps) {
             Add product
         </button>
       </form>
+    </div>
     </>
   );
 }

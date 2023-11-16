@@ -1,13 +1,12 @@
 import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import OutlineSidebar, { pageDropAreaPrefix } from "./outline/OutlineSidebar";
 import { ChapterSummary, Outline, PageSummary } from "../types/types";
-import { useGetOutline, useRearrangeOutline } from "../api/book-apis";
+import { useGetOutline, useRearrangeOutlineMutation } from "../api/book-apis";
 import { useEffect, useReducer, useRef } from "react";
 import { inClosingPageDropAreaPrefix } from "./outline/Chapter";
 import axios from "axios";
 import  flowAlert  from "../etc/flowAlert";
-import FormRoutes from "./form/FormRoutes";
-import FormSidebar from "./form/FormSidebar";
+import FormMain from "./form/FormMain";
 
 
 
@@ -46,7 +45,7 @@ export default function BookEntityDraggableContext(props : BookEntityDraggableCo
   }, "flushed");
 
 
-  const { mutateAsync, isLoading, error } = useRearrangeOutline(bookId);
+  const { mutateAsync, isLoading, error } = useRearrangeOutlineMutation(bookId);
 
   // 서버에 Outline 데이터의 재정렬 업데이트 요청을 보내는 함수
   async function updateOutlineOnServer(outline : Outline){
@@ -122,10 +121,7 @@ export default function BookEntityDraggableContext(props : BookEntityDraggableCo
           )}
         </Droppable>
 
-        <main className="flex-auto relative">
-          <FormSidebar {...props} />
-          <FormRoutes {...props}  />
-        </main>
+        <FormMain {...props} />
       </DragDropContext>
     </>
   );

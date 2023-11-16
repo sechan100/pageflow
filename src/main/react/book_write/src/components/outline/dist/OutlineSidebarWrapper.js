@@ -59,16 +59,16 @@ var axios_1 = require("axios");
 var book_apis_1 = require("../../api/book-apis");
 var flowAlert_1 = require("../../etc/flowAlert");
 function OutlineSidebarWrapper(props) {
-    return (React.createElement(React.Fragment, null,
+    return (React.createElement("div", { className: 'flex' },
         React.createElement("aside", { id: "page-outline-sidebar", className: "fixed z-10 top-0 left-0 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0" },
-            React.createElement("div", { className: "overflow-y-auto pt-12 pb-5 px-3 h-full bg-white border-r border-gray-200 dark:bg-gray-800 dark:border-gray-700" }, props.children)),
-        React.createElement(AddChapterBtn, __assign({}, props)),
-        React.createElement("div", { id: "sidebar-placeholder", className: "relative w-64 h-screen transition-transform -translate-x-full sm:translate-x-0" })));
+            React.createElement("div", { className: "overflow-y-auto pt-12 pb-5 px-3 h-full bg-white border-r border-gray-200 dark:bg-gray-800 dark:border-gray-700" }, props.children),
+            React.createElement(AddChapterBtn, __assign({}, props))),
+        React.createElement("div", { id: "sidebar-placeholder", className: "w-64 h-screen hidden sm:block" })));
 }
 exports["default"] = OutlineSidebarWrapper;
 function AddChapterBtn(drillingProps) {
     var bookId = drillingProps.bookId, queryClient = drillingProps.queryClient, outlineBufferStatusReducer = drillingProps.outlineBufferStatusReducer;
-    var _a = book_apis_1.useRearrangeOutline(bookId), mutateAsync = _a.mutateAsync, isLoading = _a.isLoading, error = _a.error;
+    var _a = book_apis_1.useRearrangeOutlineMutation(bookId), mutateAsync = _a.mutateAsync, isLoading = _a.isLoading, error = _a.error;
     var outlineBufferStatus = outlineBufferStatusReducer[0], outlineBufferStatusDispatch = outlineBufferStatusReducer[1];
     // 서버에 Outline 데이터의 재정렬 업데이트 요청을 보내는 함수
     function updateOutlineOnServer(outline) {

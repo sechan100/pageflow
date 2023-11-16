@@ -1,6 +1,7 @@
 import { Route, Routes } from "react-router-dom";
-import BookForm from "./BookForm";
 import ChapterForm from "./ChapterForm";
+import BookForm from "./BookForm";
+import { useRef, useState } from "react";
 
 
 
@@ -11,16 +12,17 @@ interface formPageProps {
   queryClient : any;
 }
 
+
 export default function FormPage(props : formPageProps) {
 
 
   return (
-    <div className="px-24 mt-16">
+    <main className="flex-auto relative">
       <Routes>
-        <Route path="/" element={<BookForm {...props}/>}></Route>
+        <Route path="/" element={<BookForm {...props} />}></Route>
         <Route path="/chapter/:chapterId" element={<ChapterForm {...props}/>}></Route>
-        <Route path="/page/:pageId" element={<BookForm {...props}/>}></Route>
+        {/* <Route path="/page/:pageId" element={<BookForm {...props}/>}></Route> */}
       </Routes>
-    </div>
+    </main>
   );
 }

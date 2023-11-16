@@ -1,4 +1,15 @@
 "use strict";
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -36,12 +47,14 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-exports.useRearrangeOutline = exports.useGetOutline = void 0;
+exports.useUpdateBook = exports.useRearrangeOutlineMutation = exports.useGetOutline = void 0;
 /* eslint-disable @typescript-eslint/no-unused-vars */
 var react_query_1 = require("react-query");
 var axios_1 = require("axios");
 var react_query_2 = require("react-query");
 var App_1 = require("../App");
+var flowAlert_1 = require("../etc/flowAlert");
+// 더미 데이터
 var sampleOutline = {
     id: 0,
     author: {
@@ -69,6 +82,7 @@ var sampleOutline = {
         }
     ]
 };
+// useGetOutline 내부적으로 호출하는 axios api
 var getOutlineById = function (id) { return __awaiter(void 0, void 0, Promise, function () {
     var response;
     return __generator(this, function (_a) {
@@ -80,12 +94,14 @@ var getOutlineById = function (id) { return __awaiter(void 0, void 0, Promise, f
                     throw new Error("책 정보를 가져오는데 실패했습니다.");
                 }
                 if (response.data) {
+                    console.log("Outline Get Success!");
                     console.log(response.data);
                 }
                 return [2 /*return*/, response.data];
         }
     });
 }); };
+// 목차정보 가져오는 api 훅
 exports.useGetOutline = function (bookId) {
     var _a = react_query_1.useQuery(['book', bookId], // query key
     function () { return getOutlineById(bookId); }, // query fn
@@ -104,10 +120,55 @@ exports.useGetOutline = function (bookId) {
         return sampleOutline;
     }
 };
-exports.useRearrangeOutline = function (bookId) {
+// 목차정보 업데이트 api 훅
+exports.useRearrangeOutlineMutation = function (bookId) {
     var _a = react_query_2.useMutation(function (newOutline) { return axios_1["default"].put("/api/book/" + bookId + "/outline", newOutline); }, {
         onSuccess: function () {
             App_1.queryClient.invalidateQueries(['book', bookId]);
+        }
+    }), mutateAsync = _a.mutateAsync, isLoading = _a.isLoading, error = _a.error;
+    return {
+        mutateAsync: mutateAsync,
+        isLoading: isLoading,
+        error: error
+    };
+};
+exports.useUpdateBook = function (bookId) {
+    var _a = react_query_2.useMutation(function (bookUpdateRequest) { return __awaiter(void 0, void 0, void 0, function () {
+        var formDate, response;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    formDate = new FormData();
+                    formDate.append("title", bookUpdateRequest.title);
+                    if (bookUpdateRequest.coverImg)
+                        formDate.append("coverImg", bookUpdateRequest.coverImg);
+                    return [4 /*yield*/, axios_1["default"].put("/api/book/" + bookId, formDate, {
+                            headers: {
+                                'Content-Type': 'multipart/form-data'
+                            }
+                        })];
+                case 1:
+                    response = _a.sent();
+                    if (response.status !== 200) {
+                        flowAlert_1["default"]("error", "책 정보를 업데이트하는데 실패했습니다.");
+                        throw new Error("책 정보를 업데이트하는데 실패했습니다.");
+                    }
+                    if (response.data) {
+                        console.log("Book Update Success!");
+                        console.log(response.data);
+                        return [2 /*return*/, response.data];
+                    }
+                    return [2 /*return*/];
+            }
+        });
+    }); }, {
+        onSuccess: function (data) {
+            var staleBook = App_1.queryClient.getQueryData(['book', bookId]);
+            // 클라이언트 캐시 데이터 업데이트: 서버와 재통신 하지 않고, 그냥 캐시만 낙관적으로 업데이트한다.
+            if (staleBook) {
+                App_1.queryClient.setQueryData(['book', bookId], __assign(__assign({}, staleBook), { title: data.title, coverImgUrl: data.coverImgUrl }));
+            }
         }
     }), mutateAsync = _a.mutateAsync, isLoading = _a.isLoading, error = _a.error;
     return {

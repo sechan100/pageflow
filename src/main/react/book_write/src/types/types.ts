@@ -30,3 +30,9 @@ export interface Author {
   profileImgUrl: string,
 }
 
+
+
+export interface BookUpdateRequest {
+  title: string,
+  coverImg: File | null,
+}

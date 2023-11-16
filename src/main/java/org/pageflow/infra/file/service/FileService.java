@@ -85,6 +85,13 @@ public class FileService {
      * @return 파일 삭제 성공 여부
      */
     public boolean deleteFile(String filePath) {
+        
+        // if filePath doesn't have /{y}/{m}/{d}/{UUID}.{ext} format, return throw Exception
+        if (!filePath.matches("^/\\d{4}/\\d{1,2}/\\d{1,2}/[\\w\\-]+\\.\\w+$")) {
+            throw new IllegalArgumentException("올바르지 않은 파일 경로입니다." + filePath);
+        }
+        
+        
         File file = new File(filePath);
         boolean deleteSuccess = file.delete();
         String pathPrefix = filePath.substring(0, filePath.lastIndexOf("/") + 1);
@@ -124,16 +131,28 @@ public class FileService {
         LocalDateTime now = LocalDateTime.now();
         return now.getYear() + "/" + now.getMonthValue() + "/" + now.getDayOfMonth() + "/";
     }
-
-
+    
+    
+    /**
+     * @param fileMetadata 파일 메타데이터
+     * @return 호스트에서 바로 접근 가능한 uri: /{imgResourcePathPrefix}/{y}/{m}/{d}/{UUID}.{ext}
+     */
     public String getImgUri(FileMetadata fileMetadata) {
         String imgResourcePathPrefix = customProperties.getFiles().getImg().getBaseUrl();
-        if (!imgResourcePathPrefix.endsWith("/")) {
-            imgResourcePathPrefix += "/";
-        }
+
 
         return imgResourcePathPrefix +
                 fileMetadata.getPathPrefix() +
                 fileMetadata.getManagedFilename();
+    }
+    
+    
+    /**
+     * @param filePath /{imgResourcePathPrefix}/{y}/{m}/{d}/{UUID}.{ext}
+     * @return  url상에서 접근 가능한 prefix를 제거한 디렉토리상의 위치와 일치하는 파일 경로: /{y}/{m}/{d}/{UUID}.{ext}
+     */
+    public String getPureFilePath(String filePath) {
+        String imgResourcePathPrefix = customProperties.getFiles().getImg().getBaseUrl();
+        return filePath.substring(imgResourcePathPrefix.length());
     }
 }

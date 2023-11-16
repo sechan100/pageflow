@@ -1,11 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { useQuery } from 'react-query';
 import axios from 'axios';
-import { Outline } from '../types/types';
+import { BookUpdateRequest, Outline } from '../types/types';
 import { useMutation } from 'react-query';
 import { queryClient } from '../App';
+import flowAlert from '../etc/flowAlert';
 
 
+// 더미 데이터
 const sampleOutline : Outline = {
   id: 0,
   author: {
@@ -34,9 +36,7 @@ const sampleOutline : Outline = {
   ]
 }
 
-
-
-
+// useGetOutline 내부적으로 호출하는 axios api
 const getOutlineById = async (id : number) : Promise<Outline> => {
   const response = await axios.get(`/api/book/${id}/outline`);
 
@@ -45,13 +45,14 @@ const getOutlineById = async (id : number) : Promise<Outline> => {
   }
 
   if(response.data){
+    console.log("Outline Get Success!");
     console.log(response.data);
   }
 
   return response.data;
 }
 
-
+// 목차정보 가져오는 api 훅
 export const useGetOutline = (bookId : number) : Outline => {
 
   const { data, isLoading, isFetching, error } =  useQuery<Outline>(
@@ -79,8 +80,8 @@ export const useGetOutline = (bookId : number) : Outline => {
 
 }
 
-
-export const useRearrangeOutline = (bookId : number) => {
+// 목차정보 업데이트 api 훅
+export const useRearrangeOutlineMutation = (bookId : number) => {
     
   
     const { mutateAsync, isLoading, error } = useMutation(
@@ -97,5 +98,61 @@ export const useRearrangeOutline = (bookId : number) => {
       isLoading,
       error
     }
+
+}
+
+
+
+export const useUpdateBook = (bookId : number) => {
+
+  const { mutateAsync, isLoading, error } = useMutation(
+    async (bookUpdateRequest : BookUpdateRequest) => {
+
+      const formDate = new FormData();
+      formDate.append("title", bookUpdateRequest.title);
+      if(bookUpdateRequest.coverImg) formDate.append("coverImg", bookUpdateRequest.coverImg);
+
+
+      const response = await axios.put(`/api/book/${bookId}`, formDate, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+      
+      if(response.status !== 200){
+        flowAlert("error", "책 정보를 업데이트하는데 실패했습니다.");
+        throw new Error("책 정보를 업데이트하는데 실패했습니다.");
+      }
+
+      if(response.data){
+        console.log("Book Update Success!");
+        console.log(response.data);
+        return response.data;
+      }
+    },
+    {
+      onSuccess: (data) => {
+        
+        const staleBook = queryClient.getQueryData(['book', bookId]);
+        
+        // 클라이언트 캐시 데이터 업데이트: 서버와 재통신 하지 않고, 그냥 캐시만 낙관적으로 업데이트한다.
+        if(staleBook){
+          queryClient.setQueryData(['book', bookId], {
+            ...staleBook,
+            title: data.title,
+            coverImgUrl: data.coverImgUrl
+          })
+        }
+
+      }
+    }
+  )
+
+  return {
+    mutateAsync,
+    isLoading,
+    error
+  }
+
 
 }

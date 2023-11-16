@@ -16,6 +16,7 @@ require("./App.css");
 var react_query_1 = require("react-query");
 var react_1 = require("react");
 var BookEntityDraggableContext_1 = require("./components/BookEntityDraggableContext");
+require("react-image-crop/dist/ReactCrop.css");
 exports.queryClient = new react_query_1.QueryClient({
     defaultOptions: {
         queries: {

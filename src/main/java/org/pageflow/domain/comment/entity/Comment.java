@@ -28,5 +28,7 @@ public class Comment extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Profile author;
-
+    
 }
+
+

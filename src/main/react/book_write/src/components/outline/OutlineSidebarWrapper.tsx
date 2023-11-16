@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import axios from 'axios';
 import { ChapterSummary, Outline } from '../../types/types';
-import { useRearrangeOutline } from '../../api/book-apis';
+import { useRearrangeOutlineMutation } from '../../api/book-apis';
 import { MutableRefObject } from 'react';
 import flowAlert from '../../etc/flowAlert';
 
@@ -21,15 +21,15 @@ export default function OutlineSidebarWrapper(props : IOutlineSidebarProps) {
 
 
   return (
-    <>
+    <div className='flex'>
       <aside id="page-outline-sidebar" className="fixed z-10 top-0 left-0 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0">
         <div className="overflow-y-auto pt-12 pb-5 px-3 h-full bg-white border-r border-gray-200 dark:bg-gray-800 dark:border-gray-700">
           {props.children}
         </div>
+        <AddChapterBtn {...props} />
       </aside>
-      <AddChapterBtn {...props} />
-      <div id="sidebar-placeholder" className="relative w-64 h-screen transition-transform -translate-x-full sm:translate-x-0"></div>
-    </>
+      <div id="sidebar-placeholder" className="w-64 h-screen hidden sm:block"></div>
+    </div>
   );
 }
 
@@ -48,7 +48,7 @@ interface IAddChapterBtnProps {
 function AddChapterBtn(drillingProps : IAddChapterBtnProps) {
 
   const { bookId, queryClient, outlineBufferStatusReducer } = drillingProps;
-  const { mutateAsync, isLoading, error } = useRearrangeOutline(bookId);
+  const { mutateAsync, isLoading, error } = useRearrangeOutlineMutation(bookId);
 
   const [outlineBufferStatus, outlineBufferStatusDispatch] = outlineBufferStatusReducer;
 

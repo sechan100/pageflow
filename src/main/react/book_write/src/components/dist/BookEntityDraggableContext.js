@@ -54,8 +54,7 @@ var react_1 = require("react");
 var Chapter_1 = require("./outline/Chapter");
 var axios_1 = require("axios");
 var flowAlert_1 = require("../etc/flowAlert");
-var FormRoutes_1 = require("./form/FormRoutes");
-var FormSidebar_1 = require("./form/FormSidebar");
+var FormMain_1 = require("./form/FormMain");
 function BookEntityDraggableContext(props) {
     var _this = this;
     var bookId = props.bookId, queryClient = props.queryClient;
@@ -76,7 +75,7 @@ function BookEntityDraggableContext(props) {
                 throw new Error();
         }
     }, "flushed"), outlineBufferStatus = _a[0], outlineBufferStatusDispatch = _a[1];
-    var _b = book_apis_1.useRearrangeOutline(bookId), mutateAsync = _b.mutateAsync, isLoading = _b.isLoading, error = _b.error;
+    var _b = book_apis_1.useRearrangeOutlineMutation(bookId), mutateAsync = _b.mutateAsync, isLoading = _b.isLoading, error = _b.error;
     // 서버에 Outline 데이터의 재정렬 업데이트 요청을 보내는 함수
     function updateOutlineOnServer(outline) {
         return __awaiter(this, void 0, void 0, function () {
@@ -133,9 +132,7 @@ function BookEntityDraggableContext(props) {
                     React.createElement("svg", { className: "w-6 h-6 text-gray-800 dark:text-white mr-3", "aria-hidden": "true", xmlns: "http://www.w3.org/2000/svg", fill: "none", viewBox: "0 0 18 20" },
                         React.createElement("path", { stroke: "currentColor", "stroke-linecap": "round", "stroke-linejoin": "round", "stroke-width": "2", d: "M1 5h16M7 8v8m4-8v8M7 1h4a1 1 0 0 1 1 1v3H6V2a1 1 0 0 1 1-1ZM3 5h12v13a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5Z" })),
                     React.createElement("span", { className: "text-white" }, "\uB4DC\uB798\uADF8\uD558\uC5EC \uC0AD\uC81C")))); }),
-            React.createElement("main", { className: "flex-auto relative" },
-                React.createElement(FormSidebar_1["default"], __assign({}, props)),
-                React.createElement(FormRoutes_1["default"], __assign({}, props))))));
+            React.createElement(FormMain_1["default"], __assign({}, props)))));
     function onDragStart(start) {
         toggleDeleteDropAreaVisibility(start.type);
         // 만약 이전에 mutated였다면, 버퍼 전송을 flush하지는 않지만 잠시 멈춰두기 위해서 waiting으로 변경한다.

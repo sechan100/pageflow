@@ -2,6 +2,8 @@ import './App.css';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { useState } from 'react';
 import BookEntityDraggableContext from './components/BookEntityDraggableContext';
+import 'react-image-crop/dist/ReactCrop.css';
+
 
 
 export const queryClient = new QueryClient({

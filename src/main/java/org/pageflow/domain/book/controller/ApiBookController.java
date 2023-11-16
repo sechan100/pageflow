@@ -1,6 +1,7 @@
 package org.pageflow.domain.book.controller;
 
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.pageflow.base.request.Rq;
 import org.pageflow.base.response.WithAlertApiResponse;
@@ -8,12 +9,15 @@ import org.pageflow.domain.book.entity.Book;
 import org.pageflow.domain.book.entity.Chapter;
 import org.pageflow.domain.book.entity.Page;
 import org.pageflow.domain.book.model.outline.Outline;
+import org.pageflow.domain.book.model.request.BookUpdateRequest;
 import org.pageflow.domain.book.model.request.PageUpdateRequest;
 import org.pageflow.domain.book.service.BookService;
 import org.pageflow.domain.book.service.BookWriteService;
 import org.pageflow.domain.user.service.AccountService;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -57,6 +61,29 @@ public class ApiBookController {
         return bookWriteService.createBlankBook(rq.getAccount().getProfile());
     }
     
+    
+    /**
+     * 책 정보 업데이트
+     * isPublished는 수정하지 않음
+     */
+    @PutMapping("/api/book/{bookId}")
+    public Map<String, String> updateBook(
+            @PathVariable("bookId") Long bookId, @Valid @ModelAttribute BookUpdateRequest updateRequest
+    ) {
+        
+        if(updateRequest.getId() == null){
+            updateRequest.setId(bookId);
+        }
+        
+        Book updatedBook = bookWriteService.updateBook(updateRequest);
+        
+        return Map.of(
+                "id", updatedBook.getId().toString(),
+                "title", updatedBook.getTitle(),
+                "coverImgUrl", updatedBook.getCoverImgUrl()
+        );
+        
+    }
     
     /**
      * 새로운 Chapter를 생성하여 반환

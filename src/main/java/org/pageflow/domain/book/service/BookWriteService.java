@@ -3,6 +3,7 @@ package org.pageflow.domain.book.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.TransientPropertyValueException;
+import org.pageflow.base.constants.CustomProperties;
 import org.pageflow.domain.book.entity.Book;
 import org.pageflow.domain.book.entity.Chapter;
 import org.pageflow.domain.book.entity.Page;
@@ -16,6 +17,9 @@ import org.pageflow.domain.book.model.request.RearrangeRequest;
 import org.pageflow.domain.book.repository.ChapterRepository;
 import org.pageflow.domain.book.repository.PageRepository;
 import org.pageflow.domain.user.entity.Profile;
+import org.pageflow.infra.file.constants.FileMetadataType;
+import org.pageflow.infra.file.entity.FileMetadata;
+import org.pageflow.infra.file.service.FileService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +36,8 @@ public class BookWriteService {
     private final ChapterRepository chapterRepository;
     private final PageRepository pageRepository;
     private final BookService bookService;
+    private final FileService fileService;
+    private final CustomProperties customProperties;
     private final SelectiveLISOptimizer selectiveLISOptimizer;
     
     /**
@@ -41,7 +47,7 @@ public class BookWriteService {
     public Book createBlankBook(Profile author) {
         
         // pp: 프로젝트 디렉토리에 기본 커버 이미지 저장하고 그 경로를 줘야함.
-        String defaultCoverImgUrl = "https://library.kbu.ac.kr/libeka/fileview/3025aced-3e0a-4266-86ed-a1894eb759b3.JPG";
+        String defaultCoverImgUrl = customProperties.getDefaults().getDefaultBookCoverImg();
         
         Book newBook = Book.builder()
                 .title("제목을 입력해주세요")
@@ -175,19 +181,33 @@ public class BookWriteService {
     @Transactional
     public Book updateBook(BookUpdateRequest updateRequest) {
         
+        // 유효성 검사
         if(updateRequest.getId() == null){
             throw new IllegalArgumentException("업데이트의 대상인 Book 엔티티를 특정할 수 없습니다.");
         }
         
+        // 업데이트의 대상인 Book 데이터를 가져옴
         Book staleBook = bookService.repoFindBookWithAuthorById(updateRequest.getId());
+        
+        /* BookUpdateRequest에 등록할 새로운 coverImg가 존재 && 기존의 이미지가 기본 커버 이미지가 아닌 경우
+         * -> 기존의 coverImg를 삭제후 새로운 이미지 등록
+         */
+        if(updateRequest.getCoverImg() != null && !staleBook.getCoverImgUrl().equals(customProperties.getDefaults().getDefaultBookCoverImg())){
+            
+            // 기존 이미지 삭제
+            fileService.deleteFile(fileService.getPureFilePath(staleBook.getCoverImgUrl()));
+            
+            // 새로운 이미지 등록 후 저장
+            FileMetadata newCoverImg = fileService.uploadFile(updateRequest.getCoverImg(), staleBook, FileMetadataType.BOOK_COVER_IMG);
+            staleBook.setCoverImgUrl(fileService.getImgUri(newCoverImg));
+        }
+        
+        // 제목 업데이트
         staleBook.setTitle(updateRequest.getTitle());
-        staleBook.setCoverImgUrl(updateRequest.getCoverImgUrl());
-        staleBook.setPublished(updateRequest.isPublished());
+        
         
         // 데이터 커밋
-        Book updatedBook = bookService.repoSaveBook(staleBook);
-        
-        return updatedBook;
+        return bookService.repoSaveBook(staleBook);
     }
     
     

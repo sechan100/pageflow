@@ -18,29 +18,29 @@ import java.io.IOException;
 @Component
 @RequiredArgsConstructor
 public class CustomLoginFailureHandler implements AuthenticationFailureHandler {
-    
+
     private final CustomProperties customProperties;
     private final Rq rq;
-    
-    
+
+
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
-        
+
         // UsernameNotFoundException
-        if(exception instanceof UsernameNotFoundException) {
-            
+        if (exception instanceof UsernameNotFoundException) {
+
             response.sendRedirect(
                     rq.getAlertStorageRedirectUri(AlertType.ERROR, "존재하지 않는 아이디입니다.", null)
             );
-            
-        // BadCredentialsException
-        } else if(exception instanceof BadCredentialsException) {
-            
+
+            // BadCredentialsException
+        } else if (exception instanceof BadCredentialsException) {
+
             response.sendRedirect(
                     rq.getAlertStorageRedirectUri(AlertType.ERROR, "비밀번호가 일치하지 않습니다.", null)
             );
-            
+
         }
-        
+
     }
 }

@@ -2,31 +2,40 @@ package org.pageflow.domain.book.service;
 
 import jakarta.persistence.criteria.*;
 import lombok.RequiredArgsConstructor;
+import org.pageflow.base.entity.BaseEntity;
 import org.pageflow.domain.book.entity.Book;
+import org.pageflow.domain.book.entity.Chapter;
+import org.pageflow.domain.book.entity.Page;
+import org.pageflow.domain.book.model.outline.ChapterSummary;
+import org.pageflow.domain.book.model.outline.Outline;
+import org.pageflow.domain.book.model.outline.PageSummary;
 import org.pageflow.domain.book.repository.BookRepository;
-import org.pageflow.domain.testbook.TestBook;
+import org.pageflow.domain.book.repository.ChapterRepository;
+import org.pageflow.domain.book.repository.PageRepository;
 import org.pageflow.domain.user.entity.Account;
 import org.pageflow.infra.file.constants.FileMetadataType;
 import org.pageflow.infra.file.entity.FileMetadata;
 import org.pageflow.infra.file.service.FileService;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.io.Serial;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Service
 @RequiredArgsConstructor
-// final 필드들 매개변수로 받는 생성자 자동 생성
-// spring에서 편의로 생성자가 딱 하나 일때는 @Auto 안 붙여도 자동으로 붙여줌
 public class BookService {
 
     private final BookRepository bookRepository;
+    private final PageRepository pageRepository;
+    private final ChapterRepository chapterRepository;
     private final FileService fileService;
 
     private Specification<Book> search(String kw) {
@@ -48,53 +57,109 @@ public class BookService {
         };
     }
 
-public Slice<Book> getList(int page, String kw, String sortOption) {
-    Pageable pageable = PageRequest.of(page, 16, Sort.by(Sort.Direction.DESC, sortOption));
-    Specification<Book> spec = search(kw);
-    return this.bookRepository.findAll(spec, pageable);
-}
-
-    public Optional<Book> getBook(Long id) {
-        return this.bookRepository.findById(id);
+    public Slice<Book> getList(int page, String kw, String sortOption) {
+        Pageable pageable = PageRequest.of(page, 16, Sort.by(Sort.Direction.DESC, sortOption));
+        Specification<Book> spec = search(kw);
+        return this.bookRepository.findAll(spec, pageable);
     }
-    public Book create(String title, MultipartFile file, Account author) throws IOException {
 
-        Book book = Book
-                .builder()
-                .title(title)
-                .author(author)
+
+    @Transactional(readOnly = true)
+    public Outline getOutline(Long bookId) {
+
+        // Book 엔티티를 author만 fetch join으로 조회.
+        Book book = bookRepository.findBookWithAuthorAndChapterById(bookId);
+
+        List<PageSummary> pageSummaries = pageRepository.findAllByChapterIdIn(
+                book.getChapters()
+                        .stream()
+                        .map(BaseEntity::getId)
+                        .toList()
+        );
+
+        // PageSummary를 chapterId를 기준으로 그룹화
+        Map<Long, List<PageSummary>> pageSummariesGroupedByChapter = pageSummaries.stream()
+                .collect(Collectors.groupingBy(PageSummary::getOwnerId));
+        Set<Long> chapterIdSet = pageSummariesGroupedByChapter.keySet();
+
+        // Page가 없는 Chapter는 PageSummary로 조회되지 않으므로 따로 Chapter를 넣어줘야한다. 이를 위한 원본 chapter들의 id 리스트.
+        List<Long> chapterIdsFromBook = book.getChapters().stream().map(Chapter::getId).toList();
+
+        // pageSummariesGroupedByChapter의 keySet에 없는 chapterId가 있다면, List<PageSummary>를 null로 가지고 Map에 추가.
+        chapterIdsFromBook.forEach(chapterId -> {
+            if(!chapterIdSet.contains(chapterId)) {
+                pageSummariesGroupedByChapter.put(chapterId, null);
+            }
+        });
+
+
+        // chapterId를 기준으로 그룹화된 map을 순회하여 각 ChapterSummary 객체를 생성
+        List<ChapterSummary> chapterSummaries = pageSummariesGroupedByChapter.entrySet().stream()
+                .map(entry -> {
+                    Long chapterId = entry.getKey();
+                    List<PageSummary> pageSummariesInChapter = entry.getValue();
+
+                    return new ChapterSummary(
+                            book.getChapters().stream().filter( // 해당 chapterId를 가진 Chapter 객체를 찾아온다.
+                                    chapter -> Objects.equals(chapter.getId(), chapterId)
+                            ).findAny().orElseThrow(),
+                            pageSummariesInChapter // orderNum 오름차순으로 정렬된 PageSummary 리스트
+                    );
+
+                })
+                .sorted(Comparator.comparingLong(ChapterSummary::getSortPriority)) // 챕터 sortPriority에 따라 정렬
+                .toList();
+
+        // Outline 구현체 제작 후 반환
+        return Outline.builder()
+                .id(book.getId())
+                .title(book.getTitle())
+                .author(book.getAuthor())
+                .coverImgUrl(book.getCoverImgUrl())
+                .published(book.isPublished())
+                .chapters(chapterSummaries)
                 .build();
+    }
 
-        Book savedBook = bookRepository.save(book);
 
-        FileMetadata bookCoverFileMetadata = fileService.uploadFile(file, savedBook, FileMetadataType.BOOK_COVER);
+
+    public Book repoSaveBook(Book book) {
+        return bookRepository.save(book);
+    }
+
+    public Book repoFindBookById(Long id) {
+        return bookRepository.findById(id).orElseThrow();
+    }
+
+    public Chapter repoFindChapterById(Long id) {
+        return chapterRepository.findById(id).orElseThrow();
+    }
+
+    public Page repoFindPageById(Long id) {
+        return pageRepository.findById(id).orElseThrow();
+    }
+
+    public Book repoFindBookWithAuthorById(Long id) {
+        return bookRepository.findBookWithAuthorById(id);
+    }
+
+    public Book repoFindBookWithAuthorAndChapterById(Long id) {
+        return bookRepository.findBookWithAuthorAndChapterById(id);
+    }
+
+    public Book modify(Book book, String title, MultipartFile file, Account author) throws IOException {
+
+        book.setTitle(title);
+        book.setAuthor(author.getProfile());
+
+        FileMetadata bookCoverFileMetadata = fileService.uploadFile(file, book, FileMetadataType.BOOK_COVER);
         String imgUri = fileService.getImgUri(bookCoverFileMetadata);
-        savedBook.setCoverImgUrl(imgUri);
+        book.setCoverImgUrl(imgUri);
 
+        return bookRepository.save(book);
+    } // 수정
 
-        return bookRepository.save(savedBook);
+    public void delete(Book book) {
+        this.bookRepository.delete(book);
     }
-
-    public void vote(Book book, Account siteUser) {
-        book.getVoters().add(siteUser);
-        this.bookRepository.save(book);
-    }
-//    @Transactional
-//    public Book createBookWithChaptersAndPages(Book book, List<Chapter> chapters, List<Page> pages) {
-//
-//        Book savedBooks = bookRepository.save(book);
-//
-//        for(Chapter chapter : chapters) {
-//            chapter.setBook(savedBooks);
-//            Chapter savedChapter = chapterRepository.save(chapter);
-//
-//            for(Page page : pages) {
-//                if(page.getChapter() == chapter) {
-//                    page.setChapter(savedChapter);
-//                    pageRepository.save(page);
-//                }
-//            }
-//        }
-//        return savedBooks;
-//    }
 }

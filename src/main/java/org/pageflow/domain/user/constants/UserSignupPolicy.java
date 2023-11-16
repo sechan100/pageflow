@@ -5,12 +5,12 @@ import lombok.Getter;
 import java.util.Set;
 
 public class UserSignupPolicy {
-    
+
     public static class Constraints {
-        
+
         @Getter
         private final static Set<String> invalidUsernames = Set.of("admin", "anonymous");
-    
+
     }
 
     public static class ViolationType {

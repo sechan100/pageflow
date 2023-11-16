@@ -15,19 +15,19 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
-    
+
     private final AccountRepository accountRepository;
-    
+
     @Override
     public PrincipalContext loadUserByUsername(String username) {
-        
-        Account account = accountRepository.findByUsernameWithProfile(username);
-        
+
+        Account account = accountRepository.findFetchJoinProfileByUsername(username);
+
         // username not found check
-        if(account == null) {
+        if (account == null) {
             throw new UsernameNotFoundException("Account Entity found by username '" + username + "' does not exist.");
         }
-        
+
         return new PrincipalContext(account);
     }
 }

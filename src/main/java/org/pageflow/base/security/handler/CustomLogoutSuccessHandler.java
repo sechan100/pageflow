@@ -17,16 +17,16 @@ import java.io.IOException;
 @Component
 @RequiredArgsConstructor
 public class CustomLogoutSuccessHandler implements LogoutSuccessHandler {
-    
+
     private RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
     private final Rq rq;
-    
+
     @Override
     public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-            redirectStrategy.sendRedirect(
-                    request,
-                    response,
-                    rq.getAlertStorageRedirectUri(AlertType.NEUTRAL, "로그아웃 되었습니다.", "/login")
-            );
+        redirectStrategy.sendRedirect(
+                request,
+                response,
+                rq.getAlertStorageRedirectUri(AlertType.NEUTRAL, "로그아웃 되었습니다.", "/login")
+        );
     }
 }

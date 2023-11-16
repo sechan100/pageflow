@@ -4,15 +4,17 @@ spring:
     include:
       - secret
 
-  jackson:
-    default-property-inclusion: non_null
-
   output:
     ansi:
       enabled: always
 
-#logging:
-#  level:
+logging:
+  level:
+    org:
+      pageflow:
+        domain:
+          book:
+            service: DEBUG
 #    org:
 #      springframework:
 #        security: DEBUG

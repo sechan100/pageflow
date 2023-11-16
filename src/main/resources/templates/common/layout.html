@@ -19,17 +19,31 @@
     <!--  tailwind  -->
     <script src="https://cdn.tailwindcss.com"></script>
 
+    <!-- 데이지 UI -->
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@3.7.7/dist/full.css" rel="stylesheet" type="text/css" />
+
     <!--  flowbite css  -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.8.1/flowbite.min.css" rel="stylesheet" />
 
     <!--  flowAlert.js  -->
     <script th:src="@{/js/flowAlert.js}"></script>
-</head>
 
-<body class="bg-gray-50" th:with="user = ${@rq.userSession}">
+    <!-- toastr  js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.js"></script>
+
+    <!-- toastr  css -->
+    <link href="https://jhs512.github.io/toastr/toastr.css" rel="stylesheet">
 
     <!--  flowbite js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.8.1/flowbite.min.js"></script>
+
+    <!--  sweetalert.js  -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+</head>
+
+<body class="bg-white" th:with="user = ${@rq.userSession}">
+
 
     <nav class="bg-white fixed w-full z-40 top-0 left-0 border-b border-gray-200">
 
@@ -61,8 +75,8 @@
                     <ul class="py-2 font-medium" role="none">
                         <li class="border border-b-1">
                             <span class="block px-4 py-2 text-sm text-gray-700" role="menuitem">
-                                <div class="ml-2 text-lg">[[ ${user.nickname} ]]</div>
-                                <div class="ml-2">[[ ${user.email} ]]</div>
+                                <div class="ml-2 text-lg">[[${user.nickname}]]</div>
+                                <div class="ml-2">[[${user.email}]]</div>
                             </span>
                         </li>
                         <li>
@@ -140,7 +154,7 @@
 
     <div id="alert-container" class="sm:w-1/4 w-full z-50 fixed bottom-5 right-5 flex flex-col-reverse"></div>
 
-    <main layout:fragment="main" class="px-4 mx-auto mt-28 max-w-screen-xl"></main>
+    <main layout:fragment="main" class="mt-20  text-black md:p-8 lg:p-12"></main>
 
     <script th:inline="javascript">
         /*<![CDATA[*/

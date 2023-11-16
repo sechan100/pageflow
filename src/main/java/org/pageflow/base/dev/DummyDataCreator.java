@@ -1,6 +1,8 @@
 //package org.pageflow.base.dev;
 //
 //
+//import lombok.RequiredArgsConstructor;
+//import org.pageflow.domain.book.service.BookService;
 //import org.pageflow.domain.user.service.AccountService;
 //import org.springframework.boot.ApplicationRunner;
 //import org.springframework.context.annotation.Bean;
@@ -10,8 +12,11 @@
 //import java.util.stream.IntStream;
 //
 //@Configuration
+//@RequiredArgsConstructor
 //@Profile("!prod")
-//public class DummyDataCreator {]
+//public class DummyDataCreator {
+//
+//    private final BookService bookService;
 //
 //    @Bean
 //    public ApplicationRunner init(AccountService memberService) {

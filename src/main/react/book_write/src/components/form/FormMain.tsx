@@ -1,26 +1,17 @@
 import { Route, Routes } from "react-router-dom";
-import ChapterForm from "./ChapterForm";
-import BookForm from "./BookForm";
-import { useRef, useState } from "react";
+import ChapterForm from "./pages/ChapterForm";
+import BookForm from "./pages/BookForm";
 
 
 
-
-
-interface formPageProps {
-  bookId : number;
-  queryClient : any;
-}
-
-
-export default function FormPage(props : formPageProps) {
+export default function FormPage() {
 
 
   return (
     <main className="flex-auto relative">
       <Routes>
-        <Route path="/" element={<BookForm {...props} />}></Route>
-        <Route path="/chapter/:chapterId" element={<ChapterForm {...props}/>}></Route>
+        <Route path="/" element={<BookForm />}></Route>
+        <Route path="/chapter/:chapterId" element={<ChapterForm />}></Route>
         {/* <Route path="/page/:pageId" element={<BookForm {...props}/>}></Route> */}
       </Routes>
     </main>

@@ -1,10 +1,10 @@
 "use strict";
 exports.__esModule = true;
 var react_router_dom_1 = require("react-router-dom");
-var book_apis_1 = require("../../api/book-apis");
+var outline_api_1 = require("../../../api/outline-api");
 function BookBasicPage(_a) {
     var bookId = _a.bookId;
-    var outline = book_apis_1.useGetOutline(bookId);
+    var outline = outline_api_1.useGetOutlineQuery(bookId);
     return (React.createElement("div", null,
         React.createElement(react_router_dom_1.Link, { to: "/", className: "flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group" },
             React.createElement("svg", { className: "w-6 h-6 text-gray-800 dark:text-white", xmlns: "http://www.w3.org/2000/svg", fill: "currentColor", viewBox: "0 0 16 20" },

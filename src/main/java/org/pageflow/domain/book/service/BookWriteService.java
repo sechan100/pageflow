@@ -192,10 +192,12 @@ public class BookWriteService {
         /* BookUpdateRequest에 등록할 새로운 coverImg가 존재 && 기존의 이미지가 기본 커버 이미지가 아닌 경우
          * -> 기존의 coverImg를 삭제후 새로운 이미지 등록
          */
-        if(updateRequest.getCoverImg() != null && !staleBook.getCoverImgUrl().equals(customProperties.getDefaults().getDefaultBookCoverImg())){
+        if(updateRequest.getCoverImg() != null){
             
-            // 기존 이미지 삭제
-            fileService.deleteFile(fileService.getPureFilePath(staleBook.getCoverImgUrl()));
+            // 기존 이미지가 default 이미지가 아니라면 삭제로직 실행
+            if(!staleBook.getCoverImgUrl().equals(customProperties.getDefaults().getDefaultBookCoverImg())){
+                fileService.deleteFile(fileService.getPureFilePath(staleBook.getCoverImgUrl()));
+            }
             
             // 새로운 이미지 등록 후 저장
             FileMetadata newCoverImg = fileService.uploadFile(updateRequest.getCoverImg(), staleBook, FileMetadataType.BOOK_COVER_IMG);

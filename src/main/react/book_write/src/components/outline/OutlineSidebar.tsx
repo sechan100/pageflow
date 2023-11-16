@@ -1,10 +1,11 @@
-import { MutableRefObject, useRef } from 'react';
-import { Outline, ChapterSummary, PageSummary } from '../../types/types';
-import BookBasicPage from '../outline/BookBasicPage';
-import Chapter from './Chapter';
+import { MutableRefObject, useContext, useRef } from 'react';
+import { Outline } from '../../types/types';
+import BookBasicPage from './items/BookBasicPage';
+import Chapter from './items/Chapter';
 import OutlineSidebarWrapper from './OutlineSidebarWrapper';
-import { useGetOutline } from '../../api/book-apis';
 import { Draggable, Droppable } from 'react-beautiful-dnd';
+import { useGetOutlineQuery } from '../../api/outline-api';
+import { QueryContext } from '../../App';
 
 
 
@@ -15,8 +16,6 @@ export const pageDraggablePrefix = 'page-';
 
 
 interface OutlineSidebarProps {
-  bookId : number;
-  queryClient : any;
   outlineBufferStatusReducer : [
     outlineBufferStatus : string,
     outlineBufferStatusDispatch : any
@@ -26,8 +25,8 @@ interface OutlineSidebarProps {
 
 export default function OutlineSidebar(props : OutlineSidebarProps){
 
-  const { bookId, queryClient, outlineBufferStatusReducer } = props;
-  const outline : Outline = useGetOutline(bookId);
+  const {bookId} = useContext(QueryContext);
+  const outline : Outline= useGetOutlineQuery(bookId);
 
 
 
@@ -49,7 +48,6 @@ export default function OutlineSidebar(props : OutlineSidebarProps){
     addOpenedChapterIds,
     removeOpenedChapterIds
   }
-
 
 
 

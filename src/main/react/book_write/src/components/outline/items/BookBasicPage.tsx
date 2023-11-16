@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
-import { useGetOutline } from '../../api/book-apis';
-import { Outline } from '../../types/types';
+import { useGetOutlineQuery } from '../../../api/outline-api';
+import { Outline } from '../../../types/types';
 
 
 interface IProps {
@@ -9,7 +9,8 @@ interface IProps {
 
 export default function BookBasicPage({bookId} : IProps){
 
-  const outline : Outline = useGetOutline(bookId);
+  const outline : Outline= useGetOutlineQuery(bookId);
+
 
   return (
     <div>

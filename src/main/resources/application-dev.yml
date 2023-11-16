@@ -72,10 +72,10 @@ custom:
     email-verify-sender: verify@pageflow.org
   defaults:
     default-user-profile-img: /img/default_profile_img.png
-    default-book-cover-img: https://library.kbu.ac.kr/libeka/fileview/3025aced-3e0a-4266-86ed-a1894eb759b3.JPG
+    default-book-cover-img: /img/unloaded_img.jpg
   files:
     img:
-      base-url: /files/img/
-#      directory: C:/Users/SBS/local/uploads/img/
-#      directory: C:/Users/gsw05/local/uploads/img/
-      directory: /Users/sechan/local/uploads/img/
+      base-url: /files/img
+#      directory: C:/Users/SBS/local/uploads/img
+#      directory: C:/Users/gsw05/local/uploads/img
+      directory: /Users/sechan/local/uploads/img

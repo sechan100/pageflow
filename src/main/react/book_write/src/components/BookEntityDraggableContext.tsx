@@ -1,27 +1,27 @@
-import { DragDropContext, Droppable } from "react-beautiful-dnd";
-import OutlineSidebar, { pageDropAreaPrefix } from "./outline/OutlineSidebar";
+import { useContext, useEffect, useReducer, useRef } from "react";
+import { useGetOutlineQuery, useRearrangeOutlineMutation } from "../api/outline-api";
 import { ChapterSummary, Outline, PageSummary } from "../types/types";
-import { useGetOutline, useRearrangeOutlineMutation } from "../api/book-apis";
-import { useEffect, useReducer, useRef } from "react";
-import { inClosingPageDropAreaPrefix } from "./outline/Chapter";
+import flowAlert from "../etc/flowAlert";
+import { DragDropContext, Droppable } from "react-beautiful-dnd";
+import { inClosingPageDropAreaPrefix } from "./outline/items/Chapter";
 import axios from "axios";
-import  flowAlert  from "../etc/flowAlert";
+import { QueryContext } from "../App";
+import OutlineSidebar from "./outline/OutlineSidebar";
 import FormMain from "./form/FormMain";
+import { pageDropAreaPrefix } from "./outline/OutlineSidebar";
 
 
 
 
-interface BookEntityDraggableContextProps {
-  bookId : number;
-  queryClient : any;
-}
 
+// 해당 컴포넌트는 페이지 전역에 걸친 DragDropContext를 제공한다. -> 삭제 드롭 영역을 Form 페이지 위에 나타내야하기 때문에 거의 전체 페이지에 걸쳐서 DragDropContext를 제공해야하므로..
+export default function BookEntityDraggableContext() {
+  
+  const {queryClient, bookId} = useContext(QueryContext);
+  const outline: Outline = useGetOutlineQuery(bookId);
 
-export default function BookEntityDraggableContext(props : BookEntityDraggableContextProps) {
-
-  const { bookId, queryClient } = props;
-  // react query로 server book outline snapshot을 가져온다.
-  const outline : Outline = useGetOutline(bookId);
+  // 두 Draggable 객체의 type이 각각 다르기 때문에, 각각에 해당하는 삭제 드롭 영역을 겹쳐서 놓아야한다.
+  // 그리고 실제로 드래그 된 요소의 type에 일치하는 영역만을 visible하게 만든다. 실제로는 2개가 겹쳐져 있는 것.
   const chapterDeleteDropArea = useRef(null); // Chapter 삭제 드롭 영역의 DOM 참조
   const pageDeleteDropArea = useRef(null); // Page 삭제 드롭 영역의 DOM 참조
 
@@ -44,39 +44,33 @@ export default function BookEntityDraggableContext(props : BookEntityDraggableCo
 
   }, "flushed");
 
+  const [mutateAsync, isMutateLoading] = useRearrangeOutlineMutation(bookId);
 
-  const { mutateAsync, isLoading, error } = useRearrangeOutlineMutation(bookId);
 
   // 서버에 Outline 데이터의 재정렬 업데이트 요청을 보내는 함수
   async function updateOutlineOnServer(outline : Outline){
-
     // outlineBufferStatus가 mutated, waiting인 경우에만 서버에 요청을 보낸다.
     if(outlineBufferStatus === 'mutated' || outlineBufferStatus === 'waiting'){
-
       try{
-
         await mutateAsync(outline)
-        flowAlert('success', "목차 정보가 저장되었습니다.");
-
+        // 데이터가 성공적으로 변경되면 알림
+        if(!isMutateLoading) flowAlert('success', "목차 정보가 저장되었습니다.");
         // 요청을 전달한 후에 성공적으로 업데이트 되었다면, outlineBufferStatus를 flushed로 변경한다.
         outlineBufferStatusDispatch({type: 'flushed'});
-
       } catch(error) {
         flowAlert('error', "목차 정보를 서버와 동기화하지 못했습니다.");
       }
     }
   }
 
-  // outlineBuffer가 변경될 때마다 5초 뒤 서버에 재정렬 요청을 보내는 타이머를 시작, 도중에 outlineBuffer가 변경되면 타이머를 초기화한다.
+
+  // outlineBuffer가 변경될 때마다 7초 뒤 서버에 재정렬 요청을 보내는 타이머를 시작, 도중에 outlineBuffer가 변경되면 타이머를 초기화한다.
   useEffect(() => {
-    
     // outlineBufferStatus가 mutated인 경우, 업데이트 요청을 전송하기위한 타이머를 시작한다.
     if(outlineBufferStatus === 'mutated'){
-
       const outlineBufferFlushTimer = setTimeout(async () => {
         updateOutlineOnServer(outline);
       }, 7000);
-
       return () => {
         clearTimeout(outlineBufferFlushTimer);
       }
@@ -86,12 +80,10 @@ export default function BookEntityDraggableContext(props : BookEntityDraggableCo
   }, [outlineBufferStatus]);
 
 
-
-
   return (
     <>
       <DragDropContext onDragStart={onDragStart}  onDragEnd={onDragEnd}>
-        <OutlineSidebar {...props} outlineBufferStatusReducer={[outlineBufferStatus, outlineBufferStatusDispatch]} />
+        <OutlineSidebar outlineBufferStatusReducer={[outlineBufferStatus, outlineBufferStatusDispatch]} />
 
         {/* 삭제할 요소를 드롭 */}
         <Droppable droppableId="chapter-delete-drop-area" type="CHAPTER">
@@ -99,7 +91,7 @@ export default function BookEntityDraggableContext(props : BookEntityDraggableCo
             <div className="bg-gray-500 animate-bounce hover:bg-gray-700 w-48 absolute invisible left-1/2 top-5 p-5 px-6 rounded-full" ref={chapterDeleteDropArea}>
               <div ref={provided.innerRef} {...provided.droppableProps} className="flex">
                 <svg className="w-6 h-6 text-gray-800 dark:text-white mr-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 20">
-                  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h16M7 8v8m4-8v8M7 1h4a1 1 0 0 1 1 1v3H6V2a1 1 0 0 1 1-1ZM3 5h12v13a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5Z"/>
+                  <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M1 5h16M7 8v8m4-8v8M7 1h4a1 1 0 0 1 1 1v3H6V2a1 1 0 0 1 1-1ZM3 5h12v13a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5Z"/>
                 </svg>
                 <span className="text-white">드래그하여 삭제</span>
               </div>
@@ -113,7 +105,7 @@ export default function BookEntityDraggableContext(props : BookEntityDraggableCo
             <div className="bg-gray-500 animate-bounce hover:bg-gray-700 w-48 absolute invisible left-1/2 top-5 p-5 px-6 rounded-full" ref={pageDeleteDropArea}>
               <div ref={provided.innerRef} {...provided.droppableProps} className="flex">
                 <svg className="w-6 h-6 text-gray-800 dark:text-white mr-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 20">
-                  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h16M7 8v8m4-8v8M7 1h4a1 1 0 0 1 1 1v3H6V2a1 1 0 0 1 1-1ZM3 5h12v13a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5Z"/>
+                  <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M1 5h16M7 8v8m4-8v8M7 1h4a1 1 0 0 1 1 1v3H6V2a1 1 0 0 1 1-1ZM3 5h12v13a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5Z"/>
                 </svg>
                 <span className="text-white">드래그하여 삭제</span>
               </div>
@@ -121,7 +113,7 @@ export default function BookEntityDraggableContext(props : BookEntityDraggableCo
           )}
         </Droppable>
 
-        <FormMain {...props} />
+        <FormMain />
       </DragDropContext>
     </>
   );
@@ -130,16 +122,14 @@ export default function BookEntityDraggableContext(props : BookEntityDraggableCo
 
   function onDragStart(start : any) {
     toggleDeleteDropAreaVisibility(start.type);
-    
     // 만약 이전에 mutated였다면, 버퍼 전송을 flush하지는 않지만 잠시 멈춰두기 위해서 waiting으로 변경한다.
     if(outlineBufferStatus === 'mutated'){
       outlineBufferStatusDispatch({type: 'waiting'});
     }
-
   };
 
-  function onDragEnd(result: any){
 
+  function onDragEnd(result: any){
     toggleDeleteDropAreaVisibility(result.type);
 
     const {
@@ -151,7 +141,7 @@ export default function BookEntityDraggableContext(props : BookEntityDraggableCo
     if (!destination) {
       return;
     }
-    
+  
     // 원래 위치와 동일한 위치로 드래그 되었을 경우 state를 유지.
     if (destination.droppableId === source.droppableId && destination.index === source.index) {
       return;
@@ -162,7 +152,6 @@ export default function BookEntityDraggableContext(props : BookEntityDraggableCo
       deleteDroppedElement(type, source, destination);
       return;
     }
-
 
     // re-order: 1. 챕터간의 순서 변경
     if (type === 'CHAPTER' && outline.chapters) {
@@ -376,8 +365,4 @@ export default function BookEntityDraggableContext(props : BookEntityDraggableCo
 
     return outline;
   }
-
-
-
-
 }

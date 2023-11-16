@@ -46,6 +46,20 @@
   <div id="alert-container" class="sm:w-1/4 w-full z-50 fixed bottom-5 right-5 flex flex-col-reverse"></div>
   <div id="root" class="flex"></div>
 
+
+<script>
+  // Alert 끄기
+  function dismissAlert(flowAlertId) {
+    const alertElement = document.getElementById(`flow-alert-${flowAlertId}`);
+    if (alertElement) {
+      alertElement.classList.add('animate__fadeOutDown');
+
+      setTimeout(() => {
+        alertElement.remove();
+      }, 500);
+    }
+  }
+</script>
 </body>
 </html>
 

@@ -31,10 +31,15 @@ function ImageCropComponent(_a) {
         savedCrop: crop
     });
     return (react_1["default"].createElement("div", null,
-        src && (react_1["default"].createElement(react_image_crop_1["default"], { crop: crop, onChange: onCropChange, aspect: 11 / 16 },
-            react_1["default"].createElement("div", { className: 'w-auto overflow-hidden border border-4 border-blue-500' },
-                react_1["default"].createElement("img", { src: croppedImageSrc !== null ? croppedImageSrc : src, ref: imageRef, alt: "Crop me" })))),
-        react_1["default"].createElement("div", { className: "flex items-center justify-between items-stretch w-full h-28" },
+        isModifyMode &&
+            react_1["default"].createElement("div", { className: 'flex justify-center border border-4 border-blue-500 p-5 bg-gray-100' },
+                react_1["default"].createElement(react_image_crop_1["default"], { crop: crop, onChange: onCropChange, aspect: 11 / 16, ruleOfThirds: true },
+                    react_1["default"].createElement("div", { className: 'w-auto overflow-hidden' },
+                        react_1["default"].createElement("img", { src: croppedImageSrc !== null ? croppedImageSrc : src, ref: imageRef, alt: "Crop me" })))),
+        !isModifyMode &&
+            react_1["default"].createElement("div", { className: 'w-auto flex justify-center overflow-hidden border border-4 border-blue-500 p-5 bg-gray-100' },
+                react_1["default"].createElement("img", { src: croppedImageSrc !== null ? croppedImageSrc : src, ref: imageRef, alt: "Crop me" })),
+        react_1["default"].createElement("div", { className: "flex items-center justify-between items-stretch w-full h-28 mt-1" },
             isModifyMode &&
                 react_1["default"].createElement("label", { htmlFor: "coverImgDropzone", className: "flex flex-col mr-5 items-center justify-center w-full h-28 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600" },
                     react_1["default"].createElement("div", { className: "flex flex-col items-center justify-center pt-5 pb-6" },
@@ -65,8 +70,8 @@ function ImageCropComponent(_a) {
     function saveCropStatus() {
         if (imageRef.current && crop.width && crop.height) {
             // [크롭 영역이 아닌 곳은 어두운 오버레이가 적용된 사진, 크롭 영역만 포함한 사진]
-            var _a = getCroppedImg(imageRef.current, crop), fullImageDataURL = _a[0], croppedImageSrc_1 = _a[1];
-            setCroppedImageSrc(fullImageDataURL);
+            var croppedImageSrc_1 = getCroppedImg(imageRef.current, crop);
+            setCroppedImageSrc(croppedImageSrc_1);
             cropedImgData.current.savedCrop = crop;
             setCrop({
                 x: 0,
@@ -92,34 +97,11 @@ function ImageCropComponent(_a) {
         var canvas = document.createElement('canvas');
         var scaleX = image.naturalWidth / image.width;
         var scaleY = image.naturalHeight / image.height;
-        // 캔버스의 크기를 원본 이미지의 크기로 설정
-        canvas.width = image.naturalWidth;
-        canvas.height = image.naturalHeight;
+        canvas.width = crop.width;
+        canvas.height = crop.height;
         var ctx = canvas.getContext('2d');
-        if (!ctx) {
-            return ['', ''];
-        }
-        // 원본 이미지를 캔버스에 그림
-        ctx.drawImage(image, 0, 0, image.naturalWidth, image.naturalHeight);
-        // 어두운 오버레이를 추가하기 위한 설정
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        // 크롭 영역 내에서만 원본 이미지를 그려넣음 (어두운 오버레이를 '지움')
-        ctx.globalCompositeOperation = 'destination-out';
-        ctx.drawImage(image, crop.x * scaleX, crop.y * scaleY, crop.width * scaleX, crop.height * scaleY, crop.x * scaleX, crop.y * scaleY, crop.width * scaleX, crop.height * scaleY);
-        // 크롭 영역 내 이미지를 복원
-        ctx.globalCompositeOperation = 'source-over';
-        ctx.drawImage(image, crop.x * scaleX, crop.y * scaleY, crop.width * scaleX, crop.height * scaleY, crop.x * scaleX, crop.y * scaleY, crop.width * scaleX, crop.height * scaleY);
-        // 어두운 오버레이가 적용된 전체 이미지의 Data URL
-        var fullImageDataURL = canvas.toDataURL('image/jpeg');
-        // 크롭된 영역만 포함한 이미지의 Data URL을 생성하기 위해 캔버스 크기 조정
-        canvas.width = crop.width * scaleX;
-        canvas.height = crop.height * scaleY;
-        ctx.drawImage(image, crop.x * scaleX, crop.y * scaleY, crop.width * scaleX, crop.height * scaleY, 0, 0, crop.width * scaleX, crop.height * scaleY);
-        // 크롭된 영역만 포함한 이미지의 Data URL
-        var croppedImageDataURL = canvas.toDataURL('image/jpeg');
-        // 어두운 오버레이가 적용된 전체 이미지의 Data URL과 크롭된 이미지의 Data URL을 배열로 반환
-        return [fullImageDataURL, croppedImageDataURL];
+        ctx === null || ctx === void 0 ? void 0 : ctx.drawImage(image, crop.x * scaleX, crop.y * scaleY, crop.width * scaleX, crop.height * scaleY, 0, 0, crop.width, crop.height);
+        return canvas.toDataURL('image/jpeg');
     }
     ;
     // dataURL을 File 객체로 변환

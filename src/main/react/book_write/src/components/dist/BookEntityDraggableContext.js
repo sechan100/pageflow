@@ -47,23 +47,27 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-var react_beautiful_dnd_1 = require("react-beautiful-dnd");
-var OutlineSidebar_1 = require("./outline/OutlineSidebar");
-var book_apis_1 = require("../api/book-apis");
 var react_1 = require("react");
-var Chapter_1 = require("./outline/Chapter");
-var axios_1 = require("axios");
+var outline_api_1 = require("../api/outline-api");
 var flowAlert_1 = require("../etc/flowAlert");
+var react_beautiful_dnd_1 = require("react-beautiful-dnd");
+var Chapter_1 = require("./outline/items/Chapter");
+var axios_1 = require("axios");
+var App_1 = require("../App");
+var OutlineSidebar_1 = require("./outline/OutlineSidebar");
 var FormMain_1 = require("./form/FormMain");
-function BookEntityDraggableContext(props) {
+var OutlineSidebar_2 = require("./outline/OutlineSidebar");
+// 해당 컴포넌트는 페이지 전역에 걸친 DragDropContext를 제공한다. -> 삭제 드롭 영역을 Form 페이지 위에 나타내야하기 때문에 거의 전체 페이지에 걸쳐서 DragDropContext를 제공해야하므로..
+function BookEntityDraggableContext() {
     var _this = this;
-    var bookId = props.bookId, queryClient = props.queryClient;
-    // react query로 server book outline snapshot을 가져온다.
-    var outline = book_apis_1.useGetOutline(bookId);
+    var _a = react_1.useContext(App_1.QueryContext), queryClient = _a.queryClient, bookId = _a.bookId;
+    var outline = outline_api_1.useGetOutlineQuery(bookId);
+    // 두 Draggable 객체의 type이 각각 다르기 때문에, 각각에 해당하는 삭제 드롭 영역을 겹쳐서 놓아야한다.
+    // 그리고 실제로 드래그 된 요소의 type에 일치하는 영역만을 visible하게 만든다. 실제로는 2개가 겹쳐져 있는 것.
     var chapterDeleteDropArea = react_1.useRef(null); // Chapter 삭제 드롭 영역의 DOM 참조
     var pageDeleteDropArea = react_1.useRef(null); // Page 삭제 드롭 영역의 DOM 참조
     // outline 재정렬 여부에 대한 상태를 기록하고, 변경된 데이터 버퍼를 전송할지 말지에 관한 상태를 나타낸다.
-    var _a = react_1.useReducer(function (status, action) {
+    var _b = react_1.useReducer(function (status, action) {
         switch (action.type) {
             case 'flushed':
                 return "flushed";
@@ -74,8 +78,8 @@ function BookEntityDraggableContext(props) {
             default:
                 throw new Error();
         }
-    }, "flushed"), outlineBufferStatus = _a[0], outlineBufferStatusDispatch = _a[1];
-    var _b = book_apis_1.useRearrangeOutlineMutation(bookId), mutateAsync = _b.mutateAsync, isLoading = _b.isLoading, error = _b.error;
+    }, "flushed"), outlineBufferStatus = _b[0], outlineBufferStatusDispatch = _b[1];
+    var _c = outline_api_1.useRearrangeOutlineMutation(bookId), mutateAsync = _c[0], isMutateLoading = _c[1];
     // 서버에 Outline 데이터의 재정렬 업데이트 요청을 보내는 함수
     function updateOutlineOnServer(outline) {
         return __awaiter(this, void 0, void 0, function () {
@@ -87,10 +91,14 @@ function BookEntityDraggableContext(props) {
                         _a.label = 1;
                     case 1:
                         _a.trys.push([1, 3, , 4]);
-                        return [4 /*yield*/, mutateAsync(outline)];
+                        return [4 /*yield*/, mutateAsync(outline)
+                            // 데이터가 성공적으로 변경되면 알림
+                        ];
                     case 2:
                         _a.sent();
-                        flowAlert_1["default"]('success', "목차 정보가 저장되었습니다.");
+                        // 데이터가 성공적으로 변경되면 알림
+                        if (!isMutateLoading)
+                            flowAlert_1["default"]('success', "목차 정보가 저장되었습니다.");
                         // 요청을 전달한 후에 성공적으로 업데이트 되었다면, outlineBufferStatus를 flushed로 변경한다.
                         outlineBufferStatusDispatch({ type: 'flushed' });
                         return [3 /*break*/, 4];
@@ -103,7 +111,7 @@ function BookEntityDraggableContext(props) {
             });
         });
     }
-    // outlineBuffer가 변경될 때마다 5초 뒤 서버에 재정렬 요청을 보내는 타이머를 시작, 도중에 outlineBuffer가 변경되면 타이머를 초기화한다.
+    // outlineBuffer가 변경될 때마다 7초 뒤 서버에 재정렬 요청을 보내는 타이머를 시작, 도중에 outlineBuffer가 변경되면 타이머를 초기화한다.
     react_1.useEffect(function () {
         // outlineBufferStatus가 mutated인 경우, 업데이트 요청을 전송하기위한 타이머를 시작한다.
         if (outlineBufferStatus === 'mutated') {
@@ -121,18 +129,18 @@ function BookEntityDraggableContext(props) {
     }, [outlineBufferStatus]);
     return (React.createElement(React.Fragment, null,
         React.createElement(react_beautiful_dnd_1.DragDropContext, { onDragStart: onDragStart, onDragEnd: onDragEnd },
-            React.createElement(OutlineSidebar_1["default"], __assign({}, props, { outlineBufferStatusReducer: [outlineBufferStatus, outlineBufferStatusDispatch] })),
+            React.createElement(OutlineSidebar_1["default"], { outlineBufferStatusReducer: [outlineBufferStatus, outlineBufferStatusDispatch] }),
             React.createElement(react_beautiful_dnd_1.Droppable, { droppableId: "chapter-delete-drop-area", type: "CHAPTER" }, function (provided, snapshot) { return (React.createElement("div", { className: "bg-gray-500 animate-bounce hover:bg-gray-700 w-48 absolute invisible left-1/2 top-5 p-5 px-6 rounded-full", ref: chapterDeleteDropArea },
                 React.createElement("div", __assign({ ref: provided.innerRef }, provided.droppableProps, { className: "flex" }),
                     React.createElement("svg", { className: "w-6 h-6 text-gray-800 dark:text-white mr-3", "aria-hidden": "true", xmlns: "http://www.w3.org/2000/svg", fill: "none", viewBox: "0 0 18 20" },
-                        React.createElement("path", { stroke: "currentColor", "stroke-linecap": "round", "stroke-linejoin": "round", "stroke-width": "2", d: "M1 5h16M7 8v8m4-8v8M7 1h4a1 1 0 0 1 1 1v3H6V2a1 1 0 0 1 1-1ZM3 5h12v13a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5Z" })),
+                        React.createElement("path", { stroke: "currentColor", strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: "2", d: "M1 5h16M7 8v8m4-8v8M7 1h4a1 1 0 0 1 1 1v3H6V2a1 1 0 0 1 1-1ZM3 5h12v13a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5Z" })),
                     React.createElement("span", { className: "text-white" }, "\uB4DC\uB798\uADF8\uD558\uC5EC \uC0AD\uC81C")))); }),
             React.createElement(react_beautiful_dnd_1.Droppable, { droppableId: "page-delete-drop-area", type: "PAGE" }, function (provided, snapshot) { return (React.createElement("div", { className: "bg-gray-500 animate-bounce hover:bg-gray-700 w-48 absolute invisible left-1/2 top-5 p-5 px-6 rounded-full", ref: pageDeleteDropArea },
                 React.createElement("div", __assign({ ref: provided.innerRef }, provided.droppableProps, { className: "flex" }),
                     React.createElement("svg", { className: "w-6 h-6 text-gray-800 dark:text-white mr-3", "aria-hidden": "true", xmlns: "http://www.w3.org/2000/svg", fill: "none", viewBox: "0 0 18 20" },
-                        React.createElement("path", { stroke: "currentColor", "stroke-linecap": "round", "stroke-linejoin": "round", "stroke-width": "2", d: "M1 5h16M7 8v8m4-8v8M7 1h4a1 1 0 0 1 1 1v3H6V2a1 1 0 0 1 1-1ZM3 5h12v13a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5Z" })),
+                        React.createElement("path", { stroke: "currentColor", strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: "2", d: "M1 5h16M7 8v8m4-8v8M7 1h4a1 1 0 0 1 1 1v3H6V2a1 1 0 0 1 1-1ZM3 5h12v13a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5Z" })),
                     React.createElement("span", { className: "text-white" }, "\uB4DC\uB798\uADF8\uD558\uC5EC \uC0AD\uC81C")))); }),
-            React.createElement(FormMain_1["default"], __assign({}, props)))));
+            React.createElement(FormMain_1["default"], null))));
     function onDragStart(start) {
         toggleDeleteDropAreaVisibility(start.type);
         // 만약 이전에 mutated였다면, 버퍼 전송을 flush하지는 않지만 잠시 멈춰두기 위해서 waiting으로 변경한다.
@@ -244,7 +252,7 @@ function BookEntityDraggableContext(props) {
             // 삭제할 페이지의 경우
         }
         else if (type === 'PAGE' && outline.chapters) {
-            var sourceChapter = outline.chapters.find(function (chapter) { return OutlineSidebar_1.pageDropAreaPrefix + chapter.id === source.droppableId; }); // 드래그 된 페이지가 원래 속한 챕터
+            var sourceChapter = outline.chapters.find(function (chapter) { return OutlineSidebar_2.pageDropAreaPrefix + chapter.id === source.droppableId; }); // 드래그 된 페이지가 원래 속한 챕터
             if (!sourceChapter)
                 return;
             if (!sourceChapter.pages) {
@@ -266,7 +274,7 @@ function BookEntityDraggableContext(props) {
     function getSourceChapterAndDestinationChapter(sourceChapterDroppableId, destinationChapterDroppableId, isInClosingPageDropAreaDropped) {
         if (!outline.chapters)
             return [null, null];
-        var sourceChapter = outline.chapters.find(function (chapter) { return OutlineSidebar_1.pageDropAreaPrefix + chapter.id === sourceChapterDroppableId; }); // 드래그 된 페이지가 원래 속한 챕터
+        var sourceChapter = outline.chapters.find(function (chapter) { return OutlineSidebar_2.pageDropAreaPrefix + chapter.id === sourceChapterDroppableId; }); // 드래그 된 페이지가 원래 속한 챕터
         var destinationChapter;
         // 닫혀있는 챕터로 destinationChapter를 찾음
         if (isInClosingPageDropAreaDropped) {
@@ -274,7 +282,7 @@ function BookEntityDraggableContext(props) {
             // 열린 상태인 챕터로 destinationChapter를 찾음
         }
         else {
-            destinationChapter = outline.chapters.find(function (chapter) { return OutlineSidebar_1.pageDropAreaPrefix + String(chapter.id) === destinationChapterDroppableId; });
+            destinationChapter = outline.chapters.find(function (chapter) { return OutlineSidebar_2.pageDropAreaPrefix + String(chapter.id) === destinationChapterDroppableId; });
         }
         if (sourceChapter && destinationChapter) {
             return [sourceChapter, destinationChapter];

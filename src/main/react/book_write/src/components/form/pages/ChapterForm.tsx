@@ -1,21 +1,14 @@
-import SaveMutationBtn from "./dist/SaveMutationBtn";
 
 
 
 
 
 
-interface ChapterFormProps {
-  bookId : number;
-  queryClient : any;
-}
 
-
-export default function ChapterForm(props : ChapterFormProps) {
+export default function ChapterForm() {
 
   return (
     <>
-    <SaveMutationBtn />
     <div className="px-24 mt-16">
       <form action="#">
         <div className="sm:col-span-2">

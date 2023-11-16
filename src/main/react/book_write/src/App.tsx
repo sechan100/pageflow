@@ -3,10 +3,10 @@ import { QueryClient, QueryClientProvider } from 'react-query';
 import { useState } from 'react';
 import BookEntityDraggableContext from './components/BookEntityDraggableContext';
 import 'react-image-crop/dist/ReactCrop.css';
+import React from 'react';
 
 
-
-export const queryClient = new QueryClient({
+const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       refetchOnMount: false,
@@ -17,21 +17,20 @@ export const queryClient = new QueryClient({
   }
 });
 
+export const QueryContext = React.createContext({queryClient, bookId: 0});
+
 
 function App() {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [bookId, setBookId] : [number, any] = useState(2);
 
-  const drillingProps = {
-    bookId: bookId,
-    queryClient: queryClient
-  }
-
 
   return (
     <QueryClientProvider client={queryClient}>
-      <BookEntityDraggableContext {...drillingProps} />
+      <QueryContext.Provider value={{queryClient, bookId}}>
+        <BookEntityDraggableContext />
+      </QueryContext.Provider>
     </QueryClientProvider>
   );
 }

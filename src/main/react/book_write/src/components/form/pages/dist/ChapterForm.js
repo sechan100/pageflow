@@ -1,9 +1,7 @@
 "use strict";
 exports.__esModule = true;
-var SaveMutationBtn_1 = require("./dist/SaveMutationBtn");
-function ChapterForm(props) {
+function ChapterForm() {
     return (React.createElement(React.Fragment, null,
-        React.createElement(SaveMutationBtn_1["default"], null),
         React.createElement("div", { className: "px-24 mt-16" },
             React.createElement("form", { action: "#" },
                 React.createElement("div", { className: "sm:col-span-2" },

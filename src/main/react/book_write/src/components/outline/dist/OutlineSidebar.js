@@ -13,17 +13,18 @@ var __assign = (this && this.__assign) || function () {
 exports.__esModule = true;
 exports.pageDraggablePrefix = exports.chapterDraggablePrefix = exports.pageDropAreaPrefix = void 0;
 var react_1 = require("react");
-var BookBasicPage_1 = require("../outline/BookBasicPage");
-var Chapter_1 = require("./Chapter");
+var BookBasicPage_1 = require("./items/BookBasicPage");
+var Chapter_1 = require("./items/Chapter");
 var OutlineSidebarWrapper_1 = require("./OutlineSidebarWrapper");
-var book_apis_1 = require("../../api/book-apis");
 var react_beautiful_dnd_1 = require("react-beautiful-dnd");
+var outline_api_1 = require("../../api/outline-api");
+var App_1 = require("../../App");
 exports.pageDropAreaPrefix = 'pageDropArea-';
 exports.chapterDraggablePrefix = 'chapter-';
 exports.pageDraggablePrefix = 'page-';
 function OutlineSidebar(props) {
-    var bookId = props.bookId, queryClient = props.queryClient, outlineBufferStatusReducer = props.outlineBufferStatusReducer;
-    var outline = book_apis_1.useGetOutline(bookId);
+    var bookId = react_1.useContext(App_1.QueryContext).bookId;
+    var outline = outline_api_1.useGetOutlineQuery(bookId);
     var openedChapterIds = react_1.useRef([]);
     function addOpenedChapterIds(chapterId) {
         openedChapterIds.current.push(chapterId);

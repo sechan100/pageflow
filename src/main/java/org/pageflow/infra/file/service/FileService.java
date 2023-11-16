@@ -7,6 +7,7 @@ import org.pageflow.infra.file.constants.FileMetadataType;
 import org.pageflow.infra.file.entity.FileMetadata;
 import org.pageflow.infra.file.repository.FileMetadataRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -27,12 +28,7 @@ public class FileService {
     public FileService(CustomProperties customProperties, FileMetadataRepository fileRepository) {
         this.customProperties = customProperties;
         this.fileRepository = fileRepository;
-
-        String uploadDirectoryPath = customProperties.getFiles().getImg().getDirectory();
-        if (!uploadDirectoryPath.endsWith("/")) {
-            uploadDirectoryPath += "/";
-        }
-        this.uploadDirectoryPath = uploadDirectoryPath;
+        this.uploadDirectoryPath = customProperties.getFiles().getImg().getDirectory();
     }
 
     public <E extends BaseEntity> FileMetadata uploadFile(MultipartFile fileToUpload, E ownerEntity, FileMetadataType fileMetadataType) {
@@ -49,7 +45,7 @@ public class FileService {
         // DB에 파일 저장 정보 기록
         FileMetadata fileMetadata = FileMetadata.builder()
                 // {uploadDirectory}/{y}/{m}/{d}/{UUID}.{ext}
-                .uploadDirectory(uploadDirectoryPath) // {uploadDirectory}/
+                .uploadDirectory(uploadDirectoryPath) // {uploadDirectory}
                 .managedFilename(UUIDfilename)  // {UUID}.{ext}
                 .originalFilename(originalFilename) // {originalFilename}.{ext}
                 .ownerEntityType(ownerEntity.getClass().getSimpleName()) // ex) Profile
@@ -57,17 +53,17 @@ public class FileService {
                 .originalExtension(extension)
                 .size(fileToUpload.getSize())
                 .fileMetadataType(fileMetadataType)
-                .pathPrefix(pathPrefix) // {y}/{m}/{d}/
+                .pathPrefix(pathPrefix) // /{y}/{m}/{d}
                 .build();
         fileRepository.save(fileMetadata);
 
-        // 파일 저장 디렉토리 생성   {uploadDirectory}/{y}/{m}/{d}/
+        // 파일 저장 디렉토리 생성   {uploadDirectory}/{y}/{m}/{d}
         File uploadDirectoryFile = new File(uploadDirectoryPath + pathPrefix);
         if (!uploadDirectoryFile.exists()) {
             boolean mkdirSuccess = uploadDirectoryFile.mkdirs();
         }
 
-        String uploadDirectoryFullPath = uploadDirectoryPath + pathPrefix + UUIDfilename;
+        String uploadDirectoryFullPath = uploadDirectoryPath + pathPrefix + "/" + UUIDfilename;
 
         // 파일 저장
         File fileToStore = new File(uploadDirectoryFullPath);
@@ -84,6 +80,7 @@ public class FileService {
      * @param filePath /{y}/{m}/{d}/{UUID}.{ext}
      * @return 파일 삭제 성공 여부
      */
+    @Transactional
     public boolean deleteFile(String filePath) {
         
         // if filePath doesn't have /{y}/{m}/{d}/{UUID}.{ext} format, return throw Exception
@@ -92,14 +89,14 @@ public class FileService {
         }
         
         
-        File file = new File(filePath);
+        File file = new File(customProperties.getFiles().getImg().getDirectory() + filePath);
         boolean deleteSuccess = file.delete();
-        String pathPrefix = filePath.substring(0, filePath.lastIndexOf("/") + 1);
+        String pathPrefix = filePath.substring(0, filePath.lastIndexOf("/"));
         String managedFilename = filePath.substring(filePath.lastIndexOf("/") + 1);
 
         if (deleteSuccess) {
-            fileRepository.findByPathPrefixAndManagedFilename(pathPrefix, managedFilename)
-                    .ifPresent(fileRepository::delete);
+            FileMetadata fileMetadataToDelete = fileRepository.findByPathPrefixAndManagedFilename(pathPrefix, managedFilename).orElseThrow();
+            fileRepository.delete(fileMetadataToDelete);
             return true;
         } else {
             log.info("'{}' 삭제할 파일의 경로를 찾을 수 없습니다.", filePath);
@@ -125,11 +122,11 @@ public class FileService {
     }
 
     /**
-     * @return {y}/{m}/{d}/
+     * @return /{y}/{m}/{d}
      */
     public String getDailyPathPrefix() {
         LocalDateTime now = LocalDateTime.now();
-        return now.getYear() + "/" + now.getMonthValue() + "/" + now.getDayOfMonth() + "/";
+        return "/" + now.getYear() + "/" + now.getMonthValue() + "/" + now.getDayOfMonth();
     }
     
     
@@ -142,14 +139,13 @@ public class FileService {
 
 
         return imgResourcePathPrefix +
-                fileMetadata.getPathPrefix() +
-                fileMetadata.getManagedFilename();
+                fileMetadata.getPathPrefix() + "/" + fileMetadata.getManagedFilename();
     }
     
     
     /**
      * @param filePath /{imgResourcePathPrefix}/{y}/{m}/{d}/{UUID}.{ext}
-     * @return  url상에서 접근 가능한 prefix를 제거한 디렉토리상의 위치와 일치하는 파일 경로: /{y}/{m}/{d}/{UUID}.{ext}
+     * @return  url상에서 접근 가능한 baseUrl prefix를 제거한 디렉토리상의 위치와 일치하는 파일 경로 /{y}/{m}/{d}/{UUID}.{ext}
      */
     public String getPureFilePath(String filePath) {
         String imgResourcePathPrefix = customProperties.getFiles().getImg().getBaseUrl();

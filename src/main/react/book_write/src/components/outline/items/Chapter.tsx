@@ -1,9 +1,9 @@
 import React, { useEffect, useRef } from "react";
 import Page from "./Page";
 import { useState } from "react";
-import {ChapterSummary} from '../../types/types'
+import {ChapterSummary} from '../../../types/types'
 import { Droppable, Draggable } from "react-beautiful-dnd";
-import { pageDropAreaPrefix, pageDraggablePrefix } from "./OutlineSidebar";
+import { pageDropAreaPrefix, pageDraggablePrefix } from "../OutlineSidebar";
 import { Link } from "react-router-dom";
 
 
@@ -83,7 +83,7 @@ export default function Chapter(props : chapterProps) {
       {/* ChapterForm으로 들어가는 링크를 hover시에 띄움 */}
       <Link to={"/chapter/" + props.chapter.id} onMouseOver={toggleChapterFormLink} onMouseOut={toggleChapterFormLink} className="hidden absolute inline z-50 px-1.5 py-1 -ml-1 -mt-1 -left-1/5 top-1.5 bg-gray-700 items-center text-white text-sm font-normal text-gray-900 rounded-lg transition duration-75 group" ref={chapterFormLink}>
         <svg className="w-5 h-5 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 17v1a.97.97 0 0 1-.933 1H1.933A.97.97 0 0 1 1 18V5.828a2 2 0 0 1 .586-1.414l2.828-2.828A2 2 0 0 1 5.828 1h8.239A.97.97 0 0 1 15 2M6 1v4a1 1 0 0 1-1 1H1m13.14.772 2.745 2.746M18.1 5.612a2.086 2.086 0 0 1 0 2.953l-6.65 6.646-3.693.739.739-3.692 6.646-6.646a2.087 2.087 0 0 1 2.958 0Z"/>
+          <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M15 17v1a.97.97 0 0 1-.933 1H1.933A.97.97 0 0 1 1 18V5.828a2 2 0 0 1 .586-1.414l2.828-2.828A2 2 0 0 1 5.828 1h8.239A.97.97 0 0 1 15 2M6 1v4a1 1 0 0 1-1 1H1m13.14.772 2.745 2.746M18.1 5.612a2.086 2.086 0 0 1 0 2.953l-6.65 6.646-3.693.739.739-3.692 6.646-6.646a2.087 2.087 0 0 1 2.958 0Z"/>
         </svg>
       </Link>
 

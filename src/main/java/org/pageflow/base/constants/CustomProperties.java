@@ -41,11 +41,11 @@ public class CustomProperties {
             
             
             public Img(String baseUrl, String directory) {
-                if(!baseUrl.endsWith("/")) {
-                    baseUrl += "/";
+                if(baseUrl.endsWith("/")) {
+                    baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
                 }
-                if(!directory.endsWith("/")) {
-                    directory += "/";
+                if(directory.endsWith("/")) {
+                    directory = directory.substring(0, directory.length() - 1);
                 }
                 
                 this.baseUrl = baseUrl;

@@ -2,88 +2,140 @@
 <head>
     <title>Book</title>
 </head>
-<<<<<<<< HEAD:src/main/resources/templates/user/book/cards.html
-========
-<body>
-
->>>>>>>> 73c4f563c82aa92979d89d18b32bc4b6b4389ffe:src/main/resources/templates/book/book_list.html
+</head>
 <main layout:fragment="main">
+    <!--  정렬순  -->
+    <select id="sortOption">
+        <option value="createDate">등록일순</option>
+        <option value="view">조회순</option>
+        <option value="voters">추천순</option> <!-- JPA에서 지원하는 함수나 필드를 이용 -->
+    </select>
+<!--  검색 시작  -->
     <div class="row my-3">
         <div class="col-6">
             <div class="input-group">
-                <label for="search_kw" class="hidden">search keyWord</label>
                 <input type="text" id="search_kw" class="form-control" th:value="${kw}">
                 <button class="btn btn-outline-secondary" type="button" id="btn_search">찾기</button>
             </div>
         </div>
     </div>
-    <div class="grid grid-cols-4 gap-4 ">
-        <!-- th:each 구문을 한 번만 사용하여 books 배열을 반복 -->
-        <div th:each="book, loop : ${paging}">
-            <a th:href="@{/book/detail/{id}(id=${book.id})}">
-                <img src="#" th:src="@{${book.coverImgUrl}}" alt="Book Image">
-                <h2 th:text="${book.title}"></h2>
-            </a>
-            <a href="javascript:void(0);" class="recommend btn btn-sm btn-outline-secondary"
-               th:data-uri="@{|/book/vote/${book.id}|}">
-                추천
-                <span class="badge rounded-pill bg-success" th:text="${#lists.size(book.voter)}"></span>
-            </a>
-            <p th:text="${book.author.profile.nickname}"></p>
-            <p th:text="${book.createDate}"></p>
+<!--  검색 끝  -->
+    <div class="container mx-auto" style="min-height: 101vh;">
+        <div class="grid grid-cols-4 gap-4">
+            <!-- Thymeleaf loop to iterate over the questions -->
+            <div th:each="book : ${paging}">
+                <div class="card border rounded p-4">
+                    <a href="|/book/detail/${book.id}|">
+                        <img th:src="@{${book.coverImgUrl}}" alt="Book Image">
+                        <h2 th:text="${book.title}"></h2>
+                    </a>
+                    <a href="javascript:void(0);" class="recommend btn btn-sm btn-outline-secondary"
+                       th:data-uri="@{|/book/vote/${book.id}|}">
+                        추천
+                        <span class="badge rounded-pill bg-success" th:text="${#lists.size(book.voters)}"></span>
+                    </a>
+                    <p th:text="${book.author.profile.nickname}"></p>
+                    <p th:text="${book.createDate}"></p>
+                </div>
+            </div>
         </div>
     </div>
-    <!-- 페이징처리 시작 -->
-    <div th:if="${!paging.isEmpty()}">
-        <ul class="pagination justify-content-center">
-            <li class="page-item" th:classappend="${!paging.hasPrevious} ? 'disabled'">
-                <a class="page-link"
-                   href="javascript:void(0)" th:data-page="${paging.number-1}">
-                    <span>이전</span>
-                </a>
-            </li>
-            <li th:each="page: ${#numbers.sequence(0, paging.totalPages-1)}"
-                th:if="${page >= paging.number-3 and page <= paging.number+3}"
-                th:classappend="${page == paging.number} ? 'active'"
-                class="page-item">
-                <a th:text="${page}" class="page-link" href="javascript:void(0)" th:data-page="${page}"></a>
-            </li>
-            <li class="page-item" th:classappend="${!paging.hasNext} ? 'disabled'">
-                <a class="page-link" href="javascript:void(0)" th:data-page="${paging.number+1}">
-                    <span>다음</span>
-                </a>
-            </li>
-        </ul>
-    </div>
-    <!-- 페이징처리 끝 -->
-    <form th:action="@{/book/list}" method="get" id="searchForm">
+
+    <form th:action="@{/book}" method="get" id="searchForm">
         <input type="hidden" id="kw" name="kw" th:value="${kw}">
         <input type="hidden" id="page" name="page" th:value="${paging.number}">
+        <input type="hidden" id="sort" name="sort" th:value="${sort}">
     </form>
-    <a th:href="@{/book/create}" class="btn btn-primary">질문 등록하기</a>
+    <a th:href="@{/book/create}"
+       class="block py-2 pl-3 pr-4 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0">
+        질문 등록
+    </a>
 
     <script type='text/javascript'>
-        const page_elements = document.getElementsByClassName("page-link");
-Array.from(page_elements).forEach(function(element) {
-    element.addEventListener('click', function() {
-        document.getElementById('page').value = this.dataset.page;
-        document.getElementById('searchForm').submit();
-    });
+        let currentPage = 0;
+          let isLoading = false;
+          let reachedEnd = false;
+
+  window.addEventListener('scroll', function() {
+    console.log('Scroll event triggered');
+      if (isLoading || reachedEnd) return;
+
+      if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
+        console.log('Reached bottom');  // 이 로그를 통해 페이지 하단 도달 확인
+          isLoading = true;
+          currentPage++;
+          fetchMoreBooks(currentPage);
+      }
+  });
+
+  function fetchMoreBooks(page) {
+       fetch(`/api/book/list?page=${page}&kw=${document.getElementById('search_kw').value}&sort=${document.getElementById('sortOption').value}`)
+          .then(response => {
+              console.log('Server Response:', response); // 서버 응답 로깅
+
+              return response.json();
+          })
+          .then(data => {
+              console.log('Data:', data); // 데이터 형식 로깅
+              isLoading = false;
+              if (Array.isArray(data)) {
+                  if (data.length === 0) {
+                      reachedEnd = true;
+                      return;
+                  }
+                  appendBooksToDOM(data);
+              } else {
+                  console.error('Received data is not an array.');
+              }
+          })
+          .catch(error => {
+              console.error('Fetch Error:', error); // 에러 로깅
+          });
+  }
+
+  function appendBooksToDOM(data) {
+      const bookContainer = document.querySelector('.grid.grid-cols-4.gap-4');
+      data.forEach(book => {
+          const bookElement = `
+                    <div class="card border rounded p-4">
+                <a href="/book/detail/${book.id}">
+                    <img src="${book.coverImgUrl}" alt="Book Image">
+                    <h2>${book.title}</h2>
+                </a>
+                <a href="javascript:void(0);" class="recommend btn btn-sm btn-outline-secondary">
+                    추천
+                    <span class="badge rounded-pill bg-success">${book.voters.length}</span>
+                </a>
+                <p>${book.author.profile.nickname}</p>
+                <p>${book.createDate}</p>
+            </div>
+          `;
+          bookContainer.innerHTML += bookElement;
+      });
+  }
+
+  const btn_search = document.getElementById("btn_search");
+  btn_search.addEventListener('click', function() {
+      document.getElementById('kw').value = document.getElementById('search_kw').value;
+      document.getElementById('page').value = 0;  // 검색버튼을 클릭할 경우 0페이지부터 조회한다.
+      document.getElementById('searchForm').submit();
+  });
+
+          const recommend_elements = document.getElementsByClassName("recommend");
+           Array.from(recommend_elements).forEach(function(element) {
+               element.addEventListener('click', function() {
+                   if(confirm("정말로 추천하시겠습니까?")) {
+                       location.href = this.dataset.uri;
+                   };
+               });
+           });
+
+           const sortOption = document.getElementById("sortOption");
+sortOption.addEventListener('change', function() {
+    const selectedOption = this.value;
+    document.getElementById('sort').value = selectedOption; // Hidden input에 sort 값 설정
+    document.getElementById('searchForm').submit();  // 폼 제출
 });
-const btn_search = document.getElementById("btn_search");
-btn_search.addEventListener('click', function() {
-    document.getElementById('kw').value = document.getElementById('search_kw').value;
-    document.getElementById('page').value = 0;  // 검색버튼을 클릭할 경우 0페이지부터 조회한다.
-    document.getElementById('searchForm').submit();
-});
-        const recommend_elements = document.getElementsByClassName("recommend");
-         Array.from(recommend_elements).forEach(function(element) {
-             element.addEventListener('click', function() {
-                 if(confirm("정말로 추천하시겠습니까?")) {
-                     location.href = this.dataset.uri;
-                 };
-             });
-         });
     </script>
 </main>
 </html>

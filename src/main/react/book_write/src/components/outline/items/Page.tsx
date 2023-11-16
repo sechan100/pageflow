@@ -1,5 +1,5 @@
 import React from 'react';
-import {PageSummary} from '../../types/types'
+import {PageSummary} from '../../../types/types'
 import { Link } from 'react-router-dom';
 
 interface pageProps {

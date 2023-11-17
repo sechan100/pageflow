@@ -35,15 +35,6 @@ public class BookController {
     private final AccountService accountService;
     private final CommentService commentService;
 
-    @GetMapping("/book")
-    public String bookMain(Model model, @RequestParam(value = "page", defaultValue = "0") int page,
-                           @RequestParam(value = "kw", defaultValue = "") String kw) {
-        Page<Book> paging = this.bookService.getList(page, kw);
-        model.addAttribute("paging", paging);
-        model.addAttribute("kw", kw);
-        return "/user/book/cards";
-    }
-
     @GetMapping(value = "/book/detail/{id}")
     public String bookDetail(Model model, @PathVariable("id") Long id) {
         Outline outline = this.bookService.getOutline(id);

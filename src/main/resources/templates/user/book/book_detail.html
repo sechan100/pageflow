@@ -137,7 +137,7 @@
                                 <form class="flex " onsubmit="commentWrite_submitForm(this); return false;">
                                     <div class="flex-1 px-2 py-1">
                                         <label for="content"></label>
-                                        <input name="content" id="content" type="text" placeholder="소중한 의견을 남겨주세요"
+                                        <input autofocus name="content" id="content" type="text" placeholder="소중한 의견을 남겨주세요"
                                                class="input input-bordered px-6 w-full rounded-lg" />
                                     </div>
                                     <div class="w-1/5 px-2 py-1">
@@ -312,41 +312,68 @@ function deleteComment(commentId) {
 
 // 댓글 수정 버튼 후 화면 표시
 function editComment(commentId) {
-closeModal(commentId);
-            var commentContent = $("#comment-" + commentId).text();
-            var containerHeight = $("#comment-" + commentId).parent().height();
-            var newContent = `<textarea id='comment-${commentId}' autofocus class='textarea textarea-bordered textarea-xs w-full max-w-full bg-slate-100' style='resize: none; height: ${containerHeight}px;'>${commentContent}</textarea>`;
+    closeModal(commentId);
 
-            if (newContent !== null) {
-                $("#comment-" + commentId).replaceWith(newContent);
-                $("#comment-" + commentId).next().hide();
-                $("#comment-" + commentId).next().next().hide();
-                $("#comment-" + commentId).next().next().next().hide();
-                $("#comment-" + commentId).after(`<button onclick='saveEdit(${commentId})'>저장</button>`);
-                $("#comment-" + commentId).after(`<button onclick='cancelEdit(${commentId})'>취소</button>`);
-            }
+    var commentContent = $("#comment-" + commentId).text();
+    var containerHeight = $("#comment-" + commentId).parent().height();
+
+    var newContent = `
+        <div class='w-full flex justify-between'>
+            <div id='comment-${commentId}' class='w-full flex justify-between'>
+                <textarea id='comment-${commentId}' autofocus class='textarea textarea-bordered textarea-xs bg-slate-100 mr-2 w-full' style='resize: none; height: ${containerHeight}px;'>${commentContent}</textarea>
+                <i onclick='openModal(${commentId})' class='fa-solid fa-bars modal_btn justify-end text-black text-base'></i>
+                <dialog id='my_modal_${commentId}' class='modal'>
+                    <div class='modal-box bg-white text-black'>
+                        <form method='dialog'>
+                            <button class='btn btn-sm btn-circle btn-ghost absolute right-3 top-3' onclick='closeModal(${commentId})'>✕</button>
+                        </form>
+                        <button onclick='saveEdit(${commentId})'>저장</button>
+                        <button  onclick='cancelEdit(${commentId})'>취소</button>
+                    </div>
+                </dialog>
+            </div>
+        </div>
+    `;
+
+if (newContent !== null) {
+$("#comment-" + commentId).replaceWith(newContent);
+$("#comment-" + commentId).next().hide();
+$("#comment-" + commentId).next().next().hide();
+$("#comment-" + commentId).next().next().next().hide();
+}
         }
 
    // 댓글 수정 저장
-function saveEdit(commentId) {
-    var editedContent = $("#comment-" + commentId).val();
-    $.ajax({
-        type: 'POST',
-        url: `/comment/modify/${commentId}`,
-        data: { content: editedContent },
-        success: function (comment) {
-            console.log('댓글 수정 완료:', comment);
-            commentList(comment);
-            // 댓글 개수 업데이트
-            updateCommentCount();
-        },
-        error: function (xhr, status, error) {
-            console.error('댓글 수정 에러:', xhr, status, error);
-            // 에러 메시지 출력
-            Swal.fire({
-                icon: 'error',
-                title: '댓글 수정 오류',
-                text: '댓글 수정 중 에러가 발생했습니다.'
+function deleteComment(commentId) {
+    closeModal(commentId);
+
+    Swal.fire({
+        title: '댓글 삭제',
+        text: '정말로 삭제하시겠습니까?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: '삭제',
+        cancelButtonText: '취소'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                type: 'GET',
+                url: `/comment/delete/${commentId}`,
+                success: function (comment) {
+                    console.log('댓글 삭제 완료:', comment);
+                    commentList(comment);
+                    // 댓글 개수 업데이트
+                    updateCommentCount();
+                },
+                error: function (xhr, status, error) {
+                    console.error('댓글 삭제 에러:', xhr, status, error);
+                    // 에러 메시지 출력
+                    Swal.fire({
+                        icon: 'error',
+                        title: '댓글 삭제 오류',
+                        text: '댓글 삭제 중 에러가 발생했습니다.'
+                    });
+                }
             });
         }
     });

@@ -7,12 +7,12 @@
     <!-- 댓글 스크롤바 스타일 -->
     <style>
         .scroll::-webkit-scrollbar {
-            width: 5px;
+          width: 5px;
         }
 
         .scroll::-webkit-scrollbar-thumb {
-            background: #c8c8c8;
-            border-radius: 10px;
+          background: #c8c8c8;
+          border-radius: 10px;
         }
     </style>
 
@@ -76,7 +76,7 @@
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
                                              viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                  d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                                                  d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
                                         </svg>
                                     </a>
                                 </li>
@@ -85,7 +85,7 @@
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
                                              viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                         </svg>
                                     </a>
                                 </li>
@@ -152,8 +152,10 @@
                 <!-- 우측 레이아웃 끝 -->
             </div>
         </div>
+
     </section>
 
+    <!--  댓글 관련 js  -->
     <script>
         let commentWrite_submitFormDone = false;
 
@@ -225,7 +227,6 @@
                 success: function (comment) {
                     console.log("댓글 목록 로드 완료");
                     commentList(comment);
-                    // 페이지 로드 시 댓글 개수 가져오고 업데이트
                     updateCommentCount();
                 },
                 error: function (xhr, status, error) {
@@ -234,67 +235,87 @@
             });
         });
 
-        // 댓글 목록을 화면에 표시
-        function commentList(comment) {
-            var output = "";
-            var userImg = "[[${outline.author.profileImgUrl}]]";
+// 댓글 목록을 화면에 표시
+function commentList(commentList) {
+    var output = "";
+    var userImg = "[[${outline.author.profileImgUrl}]]";
 
-            comment.sort(function (a, b) {
-                return new Date(b.createDate) - new Date(a.createDate);
-            });
+    commentList.sort(function (a, b) {
+        return new Date(b.createDate) - new Date(a.createDate);
+    });
 
-            for (var i in comment) {
-                output += "<div class='flex text-xs mb-2 mt-1'>";
-                output += "<div class='w-10 mr-2 ml-2 flex'>";
-                output += "<div class='w-7 h-7 m-auto justify-items-center'>";
-                output += "<img src='" + userImg + "' alt='프로필이미지' class='rounded-full'>";
-                output += "</div>";
-                output += "</div>";
-                output += "<div class=''>";
-                output += `<p id='comment-${comment[i].id}' class='mb-1'>${comment[i].content}</p>`;
-                output += `<a href='javascript:void(0);' class='recommend mr-2' onclick='recommendComment(${comment[i].id})'>추천</a>`;
-                output += `<a href='javascript:void(0);' class='edit mr-2' onclick='editComment(${comment[i].id})'>수정</a>`;
-                output += `<a href='javascript:void(0);' class='delete' onclick='deleteComment(${comment[i].id})'>삭제</a>`;
-                output += "</div>";
-                output += "</div>";
-            }
+    for (var i in commentList) {
+        var comment = commentList[i];
 
-            $("#comment_list").html(output);
-        }
+        output += "<div class='flex text-xs mb-2 mt-1'>";
+        output += "<div class='w-10 mr-2 ml-2 flex'>";
+        output += "<div class='w-7 h-7 m-auto justify-items-center'>";
+        output += "<img src='" + userImg + "' alt='프로필이미지' class='rounded-full'>";
+        output += "</div>";
+        output += "</div>";
+        output += "<div class='flex w-full p-1'>";
+        output += `<p id='comment-${comment.id}' class=' w-full flex justify-between'>${comment.content}`;
+        output += `<i onclick='openModal(${comment.id})' class='fa-solid fa-bars modal_btn justify-end text-black text-base'></i>`;
+        output += `<dialog id='my_modal_${comment.id}' class='modal'>`;
+        output += `<div class='modal-box bg-white text-black'>`;
+        output += `<form method='dialog'>`;
+        output += `<button class='btn btn-sm btn-circle btn-ghost absolute right-3 top-3' onclick='closeModal(${comment.id})'>✕</button>`;
+        output += `</form>`;
+        output += `<a href='javascript:void(0);' class='recommend mr-2' onclick='recommendComment(${comment.id})'>추천</a>`;
+        output += `<a href='javascript:void(0);' class='edit mr-2' onclick='editComment(${comment.id})'>수정</a>`;
+        output += `<a href='javascript:void(0);' class='delete' onclick='deleteComment(${comment.id})'>삭제</a>`;
+        output += `</div>`;
+        output += `</dialog>`;
+        output += "</div>";
+        output += "</p>";
+        output += "</div>";
+    }
 
-        // 댓글 삭제
-        const deleteComment = (commentId) => {
-            Swal.fire({
-                title: '댓글 삭제',
-                text: '정말로 삭제하시겠습니까?',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: '삭제',
-                cancelButtonText: '취소'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        type: 'GET',
-                        url: `/comment/delete/${commentId}`,
-                        success: function (comment) {
-                            console.log('댓글 삭제 완료');
-                            commentList(comment);
-                            // 댓글 개수 업데이트
-                            updateCommentCount();
-                        },
-                        error: function (xhr, status, error) {
-                            console.error("댓글 삭제 에러");
-                        }
+    $("#comment_list").html(output);
+}
+
+// 댓글 삭제
+function deleteComment(commentId) {
+    closeModal(commentId);
+
+    Swal.fire({
+        title: '댓글 삭제',
+        text: '정말로 삭제하시겠습니까?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: '삭제',
+        cancelButtonText: '취소'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                type: 'GET',
+                url: `/comment/delete/${commentId}`,
+                success: function (comment) {
+                    console.log('댓글 삭제 완료:', comment);
+                    commentList(comment);
+                    // 댓글 개수 업데이트
+                    updateCommentCount();
+                },
+                error: function (xhr, status, error) {
+                    console.error('댓글 삭제 에러:', xhr, status, error);
+                    // 에러 메시지 출력
+                    Swal.fire({
+                        icon: 'error',
+                        title: '댓글 삭제 오류',
+                        text: '댓글 삭제 중 에러가 발생했습니다.'
                     });
                 }
             });
-        };
+        }
+    });
+}
 
-        // 댓글 수정
-        function editComment(commentId) {
+// 댓글 수정 버튼 후 화면 표시
+function editComment(commentId) {
+closeModal(commentId);
             var commentContent = $("#comment-" + commentId).text();
             var containerHeight = $("#comment-" + commentId).parent().height();
-            var newContent = `<textarea id='comment-${commentId}' class='textarea textarea-bordered textarea-xs w-full max-w-full bg-slate-100' style='resize: none; height: ${containerHeight}px;'>${commentContent}</textarea>`;
+            var newContent = `<textarea id='comment-${commentId}' autofocus class='textarea textarea-bordered textarea-xs w-full max-w-full bg-slate-100' style='resize: none; height: ${containerHeight}px;'>${commentContent}</textarea>`;
 
             if (newContent !== null) {
                 $("#comment-" + commentId).replaceWith(newContent);
@@ -306,35 +327,54 @@
             }
         }
 
-        // 댓글 수정 저장
-        function saveEdit(commentId) {
-            var editedContent = $("#comment-" + commentId).val();
-            $.ajax({
-                type: 'POST',
-                url: `/comment/modify/${commentId}`,
-                data: { content: editedContent },
-                success: function (comment) {
-                    console.log('댓글 수정 완료');
-                    commentList(comment);
-                    // 댓글 개수 업데이트
-                    updateCommentCount();
-                },
-                error: function (xhr, status, error) {
-                    console.error("댓글 수정 에러");
-                }
+   // 댓글 수정 저장
+function saveEdit(commentId) {
+    var editedContent = $("#comment-" + commentId).val();
+    $.ajax({
+        type: 'POST',
+        url: `/comment/modify/${commentId}`,
+        data: { content: editedContent },
+        success: function (comment) {
+            console.log('댓글 수정 완료:', comment);
+            commentList(comment);
+            // 댓글 개수 업데이트
+            updateCommentCount();
+        },
+        error: function (xhr, status, error) {
+            console.error('댓글 수정 에러:', xhr, status, error);
+            // 에러 메시지 출력
+            Swal.fire({
+                icon: 'error',
+                title: '댓글 수정 오류',
+                text: '댓글 수정 중 에러가 발생했습니다.'
             });
         }
+    });
+}
 
-        // 취소 시 화면 돌아감
-        function cancelEdit(commentId) {
-            var commentContent = $("#comment-" + commentId).text();
-            $("#comment-" + commentId).replaceWith(`<p id='comment-${commentId}'>${commentContent}</p>`);
+// 취소 시 화면 표시
+function cancelEdit(commentId) {
+    var commentContent = $("#comment-" + commentId).text();
+    $("#comment-" + commentId).replaceWith(`<p id='comment-${commentId}'>${commentContent}</p>`);
 
-            var buttonsToShow = $("#comment-" + commentId).parent().find('.recommend, .edit, .delete');
-            buttonsToShow.show();
+    // 해당 댓글의 원래 버튼 표시
+    var buttonsToShow = $("#comment-" + commentId).parent().find('.modal_btn');
+    buttonsToShow.show();
 
-            $("#comment-" + commentId).siblings("button").remove();
-        }
+    $("#comment-" + commentId).siblings("button").remove();
+}
+
+        // 댓글 관련 버튼 모달 열기
+function openModal(commentId) {
+    var modal = document.getElementById('my_modal_' + commentId);
+    modal.showModal();
+}
+
+// 댓글 관련 버튼 모달 열기
+function closeModal(commentId) {
+    var modal = document.getElementById('my_modal_' + commentId);
+    modal.close();
+}
 
     </script>
 

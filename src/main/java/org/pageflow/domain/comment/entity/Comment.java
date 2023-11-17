@@ -30,4 +30,8 @@ public class Comment extends BaseEntity {
     @JsonIgnore
     private Profile author;
 
+    public Profile getAuthor() {
+        return this.author;
+    }
+
 }

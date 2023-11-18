@@ -27,6 +27,11 @@ public class Comment extends BaseEntity {
     private Book book;
 
     @ManyToOne(fetch = FetchType.EAGER)
+    @JsonIgnore
     private Profile author;
+
+    public Profile getAuthor() {
+        return this.author;
+    }
 
 }

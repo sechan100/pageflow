@@ -14,6 +14,43 @@
           background: #c8c8c8;
           border-radius: 10px;
         }
+
+    </style>
+
+    <!--읽기 버튼 커스텀-->
+    <style>
+        .read-btn {
+          transition: all 0.3s ease;
+        }
+        .read-btn:hover {
+          background: transparent;
+          color: #000;
+          box-shadow: -7px -7px 20px 0px #fff9, -4px -4px 5px 0px #fff9,
+            7px 7px 20px 0px #0002, 4px 4px 5px 0px #0001;
+        }
+        .read-btn:before,
+        .read-btn:after {
+          content: "";
+          position: absolute;
+          top: 0;
+          right: 0;
+          height: 2px;
+          width: 0;
+          background: #000;
+          transition: 400ms ease all;
+        }
+        .read-btn:after {
+          right: inherit;
+          top: inherit;
+          left: 0;
+          bottom: 0;
+        }
+        .read-btn:hover:before,
+        .read-btn:hover:after {
+          width: 100%;
+          transition: 800ms ease all;
+        }
+
     </style>
 
 </head>
@@ -58,7 +95,8 @@
                                        th:if="${outline.author != null and outline.getAuthor().getNickname() == outline.author.nickname}"
                                        sec:authorize="isAuthenticated()"></a>
                                 </div>
-                                <button class="btn btn-outline btn-accent bg-[#EEE5A2] w-52 mt-20">읽기</button>
+                                <a href="#"
+                                   class="custom-btn read-btn w-52 mt-20 relative rounded-sm font-semibold	leading-10 bg-black	text-white p-1">읽기</a>
                             </div>
                         </div>
                     </div>
@@ -123,8 +161,8 @@
                         <div class="h-10 p-2">
                             <ul class="mb-4 mt-2 border-b-2 ">
                                 <li >
-                                    <i class="fa-regular fa-comment" style="color: #000000; font-size: 1.2em;">
-                                    </i>
+                                    <i class="fa-regular fa-comment"
+                                       style="color: #000000; font-size: 1.2em;"></i>
                                     <span id="getCommentCount"></span>
                                 </li>
                             </ul>
@@ -255,7 +293,9 @@ function commentList(commentList) {
         output += "</div>";
         output += "<div class='flex w-full p-1'>";
         output += `<p id='comment-${comment.id}' class=' w-full flex justify-between'>${comment.content}`;
+        output += `<a href='#'>`;
         output += `<i onclick='openModal(${comment.id})' class='fa-solid fa-bars modal_btn justify-end text-black text-base'></i>`;
+        output += `</a>`;
         output += `<dialog id='my_modal_${comment.id}' class='modal'>`;
         output += `<div class='modal-box bg-white text-black'>`;
         output += `<form method='dialog'>`;
@@ -321,7 +361,9 @@ function editComment(commentId) {
         <div class='w-full flex justify-between'>
             <div id='comment-${commentId}' class='w-full flex justify-between'>
                 <textarea id='comment-${commentId}' autofocus class='textarea textarea-bordered textarea-xs bg-slate-100 mr-2 w-full' style='resize: none; height: ${containerHeight}px;'>${commentContent}</textarea>
+                 <a href='#'>
                 <i onclick='openModal(${commentId})' class='fa-solid fa-bars modal_btn justify-end text-black text-base'></i>
+                </a>
                 <dialog id='my_modal_${commentId}' class='modal'>
                     <div class='modal-box bg-white text-black'>
                         <form method='dialog'>

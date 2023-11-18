@@ -1,56 +1,131 @@
 <html lang="en" layout:decorate="~{/common/layout.html}" xmlns:th="http://www.w3.org/1999/xhtml" xmlns:layout="">
+
 <head>
     <title>Book</title>
+
+    <style>
+        .btn-select:hover,
+        .btn-select:focus {
+          < !-- border: 1px solid #9b51e0;
+          -->< !-- outline: 3px solid #f8e4ff;
+          -->
+        }
+
+        .btn-select.on+.list-member {
+          display: block;
+        }
+
+        // block 성질 중요
+        .list-member li {
+          width: 100%;
+          height: 40px;
+          box-sizing: border-box;
+        }
+
+        .list-member li button {
+          width: 100%;
+          padding: 7px 10px;
+          background-color: #fff;
+          cursor: pointer;
+          text-align: left;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          overflow: hidden;
+        }
+
+        .list-member li button:hover,
+        .list-member li button:focus {
+          background-color: #f8e4ff;
+        }
+    </style>
 </head>
 
 <main layout:fragment="main">
-    <!--  정렬순  -->
-    <select id="sortOption">
-        <option value="createDate">등록일순</option>
-<!--        <option value="view">조회순</option>-->
-<!--        <option value="voters">추천순</option> &lt;!&ndash; JPA에서 지원하는 함수나 필드를 이용 &ndash;&gt;-->
-    </select>
-    <!--  검색 시작  -->
-    <div class="row my-3">
-        <div class="col-6">
-            <div class="input-group">
-                <input type="text" id="search_kw" class="form-control" th:value="${kw}">
-                <button class="btn btn-outline-secondary" type="button" id="btn_search">찾기</button>
+
+    <div class="mx-auto max-w-2xl px-2 py-12 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
+        <div class="flex justify-between mb-16 w-full ">
+            <div class="flex grow">
+                <!--  책 등록  -->
+                <div class="max-w-md mr-4">
+                    <div class="w-full p-3 font-normal leading-4 text-sm border-2 rounded-md border-[#c4c4c4] text-center	cursor-pointer whitespace-nowrap text-ellipsis overflow-hidden	bg-white">
+                        <a th:href="@{/book/write}">
+                            책 등록
+                        </a>
+                    </div>
+                </div>
+                <!--  정렬순  -->
+                <div class="max-w-md  relative w-2/12">
+                    <button id="sortOption" class="btn-select w-full p-3 font-normal leading-4 text-sm border-2 rounded-md border-[#c4c4c4] text-center	cursor-pointer whitespace-nowrap text-ellipsis overflow-hidden	bg-white">
+                        정렬순
+                    </button>
+                    <ul class="list-member list-none hidden absolute w-full  text-sm rounded-md shadow-lg top-16 left-0">
+                        <li>
+                            <button th:value="${createDate}" type="button">작성 날짜</button>
+                        </li>
+                        <li>
+                            <button type="button">추천수</button>
+                        </li>
+                        <li>
+                            <button type="button">조회수</button>
+                        </li>
+                        <!--        <option value="view">조회순</option>-->
+                        <!--        <option value="voters">추천순</option> &lt;!&ndash; JPA에서 지원하는 함수나 필드를 이용 &ndash;&gt;-->
+                    </ul>
+                </div>
             </div>
+            <!--  검색 시작  -->
+            <div class="w-full flex max-w-md gap-x-4 ">
+                <input id="search_kw" th:value="${kw}" name="search_kw" type="text" autocomplete="search_kw" required class="form-control min-w-0 flex-auto rounded-md bg-white/5 px-3.5 py-2 text-black shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6" placeholder="검색어를 입력해주세요">
+                <button id="btn_search" type="button" class="flex-none rounded-md bg-indigo-500 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">
+                    검색
+                </button>
+            </div>
+            <!--  검색 끝  -->
         </div>
-    </div>
-    <!--  검색 끝  -->
-    <div class="container mx-auto" style="min-height: 101vh;">
-        <div class="grid grid-cols-4 gap-4">
-            <!-- Thymeleaf loop to iterate over the questions -->
-            <div th:each="book : ${paging}">
-                <div class="card border rounded p-4">
-                    <a href="|/book/detail/${book.id}|">
-                        <img th:src="@{${book.coverImgUrl}}" alt="Book Image">
-                        <h2 th:text="${book.title}"></h2>
-                    </a>
-<!--                    <a href="javascript:void(0);" class="recommend btn btn-sm btn-outline-secondary"-->
-<!--                       th:data-uri="@{|/book/vote/${book.id}|}">-->
-<!--                        추천-->
-<!--                        <span class="badge rounded-pill bg-success" th:text="${#lists.size(book.voters)}"></span>-->
-<!--                    </a>-->
-                    <p th:text="${book.author.nickname}"></p>
-                    <p th:text="${book.createDate}"></p>
+        <div style="min-height: 101vh;">
+            <div class="grid grid-cols-1 gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
+                <div th:each="book : ${paging}">
+                    <div class="aspect-h-2 aspect-w-1 w-full overflow-hidden rounded-lg xl:aspect-h-8 xl:aspect-w-7 relative">
+                        <div>
+                            <a href="@|/book/detail/${book.id}|">
+                                <div class="relative">
+                                    <img th:src="@{${book.coverImgUrl}}" alt="Book Image" class="h-full w-full object-cover object-center group-hover:opacity-75">
+                                    <div class="whitespace-normal leading-snug	absolute font-black text-xl inset-0 text-center top-60 italic ">
+                                        <h2 th:text="${book.title}" class="text-white"></h2>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        <!--                    <a href="javascript:void(0);" class="recommend btn btn-sm btn-outline-secondary"-->
+                        <!--                       th:data-uri="@{|/book/vote/${book.id}|}">-->
+                        <!--                        추천-->
+                        <!--                        <span class="badge rounded-pill bg-success" th:text="${#lists.size(book.voters)}"></span>-->
+                        <!--                    </a>-->
+                    </div>
                 </div>
             </div>
         </div>
+        <form th:action="@{/book}" method="get" id="searchForm">
+            <input type="hidden" id="kw" name="kw" th:value="${kw}">
+            <input type="hidden" id="page" name="page" th:value="${paging.number}">
+            <input type="hidden" id="sort" name="sort" th:value="${sort}">
+        </form>
+
     </div>
+    <script type='text/javascript'>
+        const btn = document.querySelector(".btn-select");
+const list = document.querySelector(".list-member");
+btn.addEventListener("click", () => {
+btn.classList.toggle("on");
+});
+list.addEventListener("click", (event) => {
+if (event.target.nodeName === "BUTTON") {
+btn.innerText = event.target.innerText;
+btn.classList.remove("on");
+}
+});
 
-    <form th:action="@{/book}" method="get" id="searchForm">
-        <input type="hidden" id="kw" name="kw" th:value="${kw}">
-        <input type="hidden" id="page" name="page" th:value="${paging.number}">
-        <input type="hidden" id="sort" name="sort" th:value="${sort}">
-    </form>
-    <a th:href="@{/book/write}"
-       class="block py-2 pl-3 pr-4 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0">
-        질문 등록
-    </a>
-
+    </script>
     <script type='text/javascript'>
         let currentPage = 0;
           let isLoading = false;
@@ -134,8 +209,12 @@
 sortOption.addEventListener('change', function() {
     const selectedOption = this.value;
     document.getElementById('sort').value = selectedOption; // Hidden input에 sort 값 설정
+    console.log('작동중?');
     document.getElementById('searchForm').submit();  // 폼 제출
+    console.error('dd');
 });
     </script>
+
+
 </main>
 </html>

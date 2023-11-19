@@ -234,6 +234,24 @@ public class BookWriteService {
     
     
     /**
+     * 여러개 업데이트
+     * @param updateRequests 업데이트 변경사항 dto 리스트
+     * @return update된 Chapter 리스트
+     */
+    @Transactional
+    public List<Chapter> updateChapters(List<ChapterUpdateRequest> updateRequests) {
+        
+        List<Chapter> updatedChapters = new ArrayList<>();
+        
+        updateRequests.forEach(chapter -> {
+            updatedChapters.add(updateChapter(chapter));
+        });
+        
+        return updatedChapters;
+    }
+    
+    
+    /**
      * @param updateRequest 업데이트 변경사항 dto
      * @return update된 Page
      */

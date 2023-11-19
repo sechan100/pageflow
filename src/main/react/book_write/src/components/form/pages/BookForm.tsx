@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 
-import { useContext, useEffect, useReducer, useState } from "react";
+import { useContext, useEffect, useReducer } from "react";
 import { QueryContext } from "../../../App";
 import { useGetOutlineQuery } from "../../../api/outline-api";
 import { BookMutation, Outline } from "../../../types/types";
@@ -8,9 +8,10 @@ import ImageCropComponent from "../BookCoverImgCropper";
 import { create } from "zustand";
 
 interface BookMutationStore {
-  payload: BookMutation,
-  isMutated: boolean,
-  isLoading: boolean,
+  payload: BookMutation;
+  isMutated: boolean;
+  resetMutation: () => void;
+  isLoading: boolean;
   dispatchs: {
     setTitle : (title : string) => void,
     setCoverImg : (coverImg : File) => void
@@ -20,6 +21,13 @@ interface BookMutationStore {
 export const useBookMutationStore = create<BookMutationStore>((set : any) => ({
   payload: { title: null, coverImg: null }, // 책 정보 변경사항을 서버에 요청하기 위한 객체
   isMutated: false, // 변경사항이 존재하는지 여부
+  resetMutation: () => set(
+    (state : any) => ({
+      ...state,
+      payload: { title: null, coverImg: null },
+      isMutated: false
+    })
+  ),
   isLoading: false, // 서버에 전달한 요청이 진행중인지의 여부. 기본적으로 false이지만, [true로 바뀌는 순간부터, 다시 false가 되는 순간]까지 서버에 요청중임을 의미한다.
   dispatchs: { // bookMutation 상태를 변경하는 dispatch 함수들. 내부적으로 isMutated를 true로 변경하는 로직을 포함한다.
 
@@ -54,7 +62,6 @@ export default function BookForm(){
   const outline : Outline = useGetOutlineQuery(bookId);
   const bookStore = useBookMutationStore();
   const [localBook, localBookDispatch] : [BookMutation, any] = useReducer(localBookReducer, bookStore.payload); // zustand store에 변경사항을 업데이트하기 전에 임시로 저장하는 로컬 상태
-
 
   // outline 데이터의 변경시, 이미 선언된 state인 bookMutation의 상태를 업데이트하기 위함
   useEffect(() => {

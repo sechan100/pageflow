@@ -11,104 +11,95 @@ var __assign = (this && this.__assign) || function () {
     };
     return __assign.apply(this, arguments);
 };
+var __spreadArrays = (this && this.__spreadArrays) || function () {
+    for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
+    for (var r = Array(s), k = 0, i = 0; i < il; i++)
+        for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
+            r[k] = a[j];
+    return r;
+};
 exports.__esModule = true;
+exports.useChapterMutationStore = void 0;
 var react_1 = require("react");
 var App_1 = require("../../../App");
 var outline_api_1 = require("../../../api/outline-api");
-var MutationSaveBtn_1 = require("../MutationSaveBtn");
-var flowAlert_1 = require("../../../etc/flowAlert");
+var zustand_1 = require("zustand");
 var react_router_dom_1 = require("react-router-dom");
-var chapter_api_1 = require("../../../api/chapter-api");
-function ChapterForm() {
-    var bookId = react_1.useContext(App_1.QueryContext).bookId;
-    var chapterId = react_router_dom_1.useParams().chapterId;
-    var outline = outline_api_1.useGetOutlineQuery(bookId);
-    var _a = react_1.useState(getChapterSummary(chapterId)), chapter = _a[0], setChapter = _a[1];
-    var isUpdated = react_1.useRef(false); // 실제로 데이터가 업데이트 되었는지를 기록, 불필요한 서버 통신을 사전에 막는다.
-    var _b = react_1.useState(false), saveActive = _b[0], setSaveActive = _b[1]; // Save 버튼의 클릭 상태를 상위 컴포넌트로 끌어올리기 위한 state
-    var _c = react_1.useState({
-        title: chapter.title
-    }), chapterMutation = _c[0], setChapterMutation = _c[1];
-    var _d = chapter_api_1.useChapterMutation(chapter.id), mutateAsync = _d[0], isLoading = _d[1], isError = _d[2];
-    react_1.useEffect(function () {
-        var newChapter = getChapterSummary(chapterId);
-        setChapter(newChapter);
-    }, [outline, chapterId]);
-    // outline으로인한 chapter 데이터의 변경시, 이미 선언된 state인 chapterMutation의 상태를 업데이트하기 위함
-    react_1.useEffect(function () {
-        if (chapter) {
-            setChapterMutation({
-                title: chapter.title
+exports.useChapterMutationStore = zustand_1.create(function (set) { return ({
+    payload: [],
+    isMutated: false,
+    resetMutation: function () { return set(function (state) { return (__assign(__assign({}, state), { payload: [], isMutated: false })); }); },
+    isLoading: false,
+    dispatchs: {
+        setTitle: function (chapterId, title) {
+            set(function (state) {
+                // 해당 chapterId를 가진 변경사항이 존재하는 경우, 해당 부분을 수정, 
+                // 존재하지 않는 경우, 새로운 chapterMutation을 추가한다.
+                var isExist = state.payload.find(function (chapter) { return chapter.id === chapterId; });
+                // 기존 변경사항이 존재하는 경우
+                if (isExist) {
+                    return __assign(__assign({}, state), { payload: state.payload.map(function (chapter) {
+                            if (chapter.id === chapterId)
+                                return __assign(__assign({}, chapter), { title: title });
+                            else
+                                return chapter;
+                        }), isMutated: true });
+                    // 기존 변경사항이 존재하지 않는 경우  
+                }
+                else {
+                    return __assign(__assign({}, state), { payload: __spreadArrays(state.payload, [
+                            {
+                                id: chapterId,
+                                title: title
+                            }
+                        ]), isMutated: true });
+                }
             });
         }
-    }, [chapter]);
+    }
+}); });
+function ChapterForm() {
+    var chapterId = react_router_dom_1.useParams().chapterId;
+    var bookId = react_1.useContext(App_1.QueryContext).bookId;
+    var outline = outline_api_1.useGetOutlineQuery(bookId);
+    var chapter = getChapterById(Number(chapterId));
+    var chapterStore = exports.useChapterMutationStore();
+    var _a = react_1.useReducer(localChapterReducer, chapterStore.payload), localChapter = _a[0], localChapterDispatch = _a[1]; // zustand store에 변경사항을 업데이트하기 전에 임시로 저장하는 로컬 상태
+    // outline 데이터의 변경시, 이미 선언된 state인 ChapterMutation의 상태를 업데이트하기 위함
     react_1.useEffect(function () {
-        // 업데이트가 되었다면 서버에 요청을 보낸다.
-        if (isUpdated.current) {
-            mutateAsync(chapterMutation);
+        if (outline) {
+            localChapterDispatch({ type: 'TITLE', payload: chapter ? chapter.title : null });
         }
-    }, [saveActive]);
-    // 업데이트가 완료되면 알림을 띄우고 isUpdated를 초기화한다.
+    }, [outline, chapterId]);
+    // 로컬 데이터의 변경사항을 zustand store에 업데이트
     react_1.useEffect(function () {
-        if (!isLoading && isUpdated.current) {
-            isUpdated.current = false; // 초기화
-            if (isError) {
-                flowAlert_1["default"]("error", "서버에 데이터를 저장하지 못했습니다. <br> 잠시후에 다시 시도해주세요.");
-                return;
-            }
-            else {
-                flowAlert_1["default"]("success", "챕터 정보가 업데이트 되었습니다.");
-            }
-        }
-    }, [isLoading]);
+        // local의 title 데이터가 존재하면서 outline의 title 데이터와 다를 경우 => title 변경사항이 존재
+        if (localChapter.title && isTitleChanged(localChapter.title))
+            chapterStore.dispatchs.setTitle(Number(chapterId), localChapter.title);
+    }, [localChapter]);
     return (React.createElement(React.Fragment, null,
-        React.createElement(MutationSaveBtn_1["default"], { setSaveActive: setSaveActive, isUpdated: isUpdated }),
         React.createElement("div", { className: "px-24 mt-16" },
             React.createElement("div", { className: "sm:col-span-2" },
                 React.createElement("label", { htmlFor: "title", className: "block mb-2 text-md font-medium text-gray-900" }, "\uCC55\uD130 \uCCB4\uBAA9"),
-                React.createElement("input", { value: chapterMutation.title, onChange: handleChapterTitle, onKeyDown: handleTitleInputEnterPress, type: "text", name: "title", id: "title", className: "bg-gray-50 border border-gray-300 text-gray-900 text-xl rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5", placeholder: "\uCC55\uD130 \uC81C\uBAA9\uC744 \uC785\uB825\uD574\uC8FC\uC138\uC694." })))));
-    function handleChapterTitle(e) {
-        setChapterMutation(function (prev) { return (__assign(__assign({}, prev), { title: e.target.value })); });
-        // 기존 업데이트 전의 데이터와 비교하여 다르다면 isUpdated를 true로 변경
-        if (e.target.value !== outline.title) {
-            isUpdated.current = true;
-            // 중간에 변경되었더라도, 다시 원래대로 돌아온 경우, isUpdated를 false로 변경  
-        }
-        else {
-            isUpdated.current = false;
+                React.createElement("input", { value: localChapter.title ? localChapter.title : '', onChange: handleTitleChange, type: "text", name: "title", id: "title", className: "bg-gray-50 border border-gray-300 text-gray-900 text-xl rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5", placeholder: "\uCC45 \uC81C\uBAA9\uC744 \uC785\uB825\uD574\uC8FC\uC138\uC694." })))));
+    function localChapterReducer(state, action) {
+        switch (action.type) {
+            case 'TITLE':
+                return __assign(__assign({}, state), { title: action.payload });
+            default:
+                return state;
         }
     }
-    function handleTitleInputEnterPress(e) {
-        if (e.key === 'Enter' && isUpdated.current) {
-            setSaveActive(function (prev) { return (!prev); });
-        }
+    // 현재 서버 상태에 저장된 데이터와 다른지...
+    function isTitleChanged(title) {
+        return (chapter === null || chapter === void 0 ? void 0 : chapter.title) !== title;
     }
-    function getChapterSummary(chapterIdStr) {
+    function getChapterById(chapterId) {
         var _a;
-        var chapterId = parseInt(chapterIdStr);
-        var fallbackChapter = {
-            id: 0,
-            title: "챕터가 로딩중입니다...",
-            sortPriority: 10000,
-            pages: []
-        };
-        if (outline.chapters) {
-            var chapter_1 = (_a = outline.chapters) === null || _a === void 0 ? void 0 : _a.find(function (chapter) { return chapter.id === chapterId; });
-            if (chapter_1) {
-                return chapter_1;
-                // fallback Chapter인 경우.
-            }
-            else if (outline.chapters[0].id === 0) {
-                return outline.chapters[0];
-            }
-            else {
-                return fallbackChapter;
-            }
-        }
-        else {
-            flowAlert_1["default"]("warning", "해당 책에 소속된 챕터가 없습니다.");
-            throw new Error("해당 책에 소속된 챕터가 없습니다.");
-        }
+        return (_a = outline.chapters) === null || _a === void 0 ? void 0 : _a.find(function (chapter) { return chapter.id === chapterId; });
+    }
+    function handleTitleChange(e) {
+        localChapterDispatch({ type: "TITLE", payload: e.target.value });
     }
 }
 exports["default"] = ChapterForm;

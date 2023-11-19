@@ -1,25 +1,24 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useContext, useEffect, useReducer, useRef } from "react";
-import { useGetOutlineQuery, useOutlineMutation } from "../api/outline-api";
+import { useGetOutlineQuery } from "../api/outline-api";
 import { ChapterSummary, Outline, OutlineMutation, PageSummary } from "../types/types";
-import flowAlert from "../etc/flowAlert";
 import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import { inClosingPageDropAreaPrefix } from "./outline/items/Chapter";
-import axios from "axios";
 import { QueryContext } from "../App";
-import OutlineSidebar from "./outline/OutlineSidebar";
+import OutlineContext from "./outline/OutlineContext";
 import FormMain from "./form/FormMain";
-import { pageDropAreaPrefix } from "./outline/OutlineSidebar";
+import { pageDropAreaPrefix } from "./outline/OutlineContext";
 import { create } from "zustand";
 
 
 interface UseOutlineMutationStore {
-  payload: OutlineMutation,
-  isMutated: boolean,
-  isLoading: boolean,
+  payload: OutlineMutation;
+  isMutated: boolean;
+  resetMutation: () => void;
+  isLoading: boolean;
   dispatchs: {
     setChapters : (chapters : ChapterSummary[]) => void
-  }
+  };
 }
 
 
@@ -27,6 +26,13 @@ interface UseOutlineMutationStore {
 export const useOutlineMutationStore = create<UseOutlineMutationStore>((set : any) => ({
   payload: { chapters: null }, // 목차 재배열 변경사항을 서버에 요청하기 위한 객체
   isMutated: false, // 변경사항이 존재하는지 여부
+  resetMutation: () => set(
+    (state : any) => ({
+      ...state,
+      payload: { chapters: null },
+      isMutated: false
+    })
+  ),
   isLoading: false, // 서버에 전달한 요청이 진행중인지의 여부. 기본적으로 false이지만, [true로 바뀌는 순간부터, 다시 false가 되는 순간]까지 서버에 요청중임을 의미한다.
   dispatchs: { // payload 상태를 변경하는 dispatch 함수들. 내부적으로 isMutated를 true로 변경하는 로직을 포함한다.
 
@@ -48,7 +54,7 @@ export const useOutlineMutationStore = create<UseOutlineMutationStore>((set : an
 // 해당 컴포넌트는 페이지 전역에 걸친 DragDropContext를 제공한다. -> 삭제 드롭 영역을 Form 페이지 위에 나타내야하기 때문에 거의 전체 페이지에 걸쳐서 DragDropContext를 제공해야하므로..
 export default function BookEntityDraggableContext() {
   
-  const {queryClient, bookId} = useContext(QueryContext);
+  const { bookId } = useContext(QueryContext);
   const outline: Outline = useGetOutlineQuery(bookId);
   const [localOutline, localOutlineDispatch] : [Outline, any] = useReducer(localOutlineReducer, outline); // zustand store에 변경사항을 업데이트하기 전에 임시로 저장하는 로컬 상태
 
@@ -64,10 +70,11 @@ export default function BookEntityDraggableContext() {
 
   // fallback 데이터가 아니면서 && localOutline에 변경사항이 적용된 경우...
   useEffect(() => {
-    if(localOutline.id !== 0 && outline !== localOutline){
+    if(localOutline.id !== 0 && outline.chapters !== localOutline.chapters){
       dispatchs.setChapters(localOutline.chapters as ChapterSummary[]);
     }
   }, [localOutline]);
+
 
 
 
@@ -80,7 +87,7 @@ export default function BookEntityDraggableContext() {
   return (
     <>
       <DragDropContext onDragStart={onDragStart}  onDragEnd={onDragEnd}>
-        <OutlineSidebar outline={localOutline} />
+        <OutlineContext outline={localOutline} />
 
         {/* 삭제할 요소를 드롭 */}
         <Droppable droppableId="chapter-delete-drop-area" type="CHAPTER">

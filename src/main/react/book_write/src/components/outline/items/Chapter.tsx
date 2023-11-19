@@ -3,7 +3,7 @@ import Page from "./Page";
 import { useState } from "react";
 import {ChapterSummary} from '../../../types/types'
 import { Droppable, Draggable } from "react-beautiful-dnd";
-import { pageDropAreaPrefix, pageDraggablePrefix } from "../OutlineSidebar";
+import { pageDropAreaPrefix, pageDraggablePrefix } from "../OutlineContext";
 import { Link } from "react-router-dom";
 
 

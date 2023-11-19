@@ -36,29 +36,51 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-exports.useChapterMutation = void 0;
+exports.useChapterMutation = exports.useCreateChapterMutation = void 0;
 /* eslint-disable @typescript-eslint/no-unused-vars */
 var axios_1 = require("axios");
 var react_query_1 = require("react-query");
 var App_1 = require("../App");
 var flowAlert_1 = require("../etc/flowAlert");
 var react_1 = require("react");
-// Book 데이터 업데이트 훅
-exports.useChapterMutation = function (chapterId) {
-    var _a = react_1.useContext(App_1.QueryContext), queryClient = _a.queryClient, bookId = _a.bookId;
-    var _b = react_query_1.useMutation(function (chapterUpdateRequest) { return __awaiter(void 0, void 0, void 0, function () {
-        var formDate, response;
+exports.useCreateChapterMutation = function (bookId) {
+    var queryClient = react_1.useContext(App_1.QueryContext).queryClient;
+    var _a = react_query_1.useMutation(function () { return __awaiter(void 0, void 0, void 0, function () {
+        var response;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0:
-                    formDate = new FormData();
-                    if (chapterUpdateRequest.title)
-                        formDate.append("title", chapterUpdateRequest.title);
-                    return [4 /*yield*/, axios_1["default"].put("/api/book/" + bookId + "/chapter/" + chapterId, formDate, {
-                            headers: {
-                                'Content-Type': 'multipart/form-data' // 확장 가능성 염두
-                            }
-                        })];
+                case 0: return [4 /*yield*/, axios_1["default"].post("/api/book/" + bookId + "/chapter")];
+                case 1:
+                    response = _a.sent();
+                    if (response.status !== 200) {
+                        throw new Error("챕터를 생성하는데 실패했습니다.");
+                    }
+                    if (response.data) {
+                        console.log("Sercer Response: create new chapter", response.data);
+                    }
+                    return [2 /*return*/];
+            }
+        });
+    }); }, {
+        onSuccess: function () {
+            // 임시캐시 설정
+            queryClient.invalidateQueries(['book', bookId]);
+        }
+    }), mutateAsync = _a.mutateAsync, isLoading = _a.isLoading, isError = _a.isError;
+    return { mutateAsync: mutateAsync, isLoading: isLoading, isError: isError };
+};
+// chapter 데이터 업데이트 훅
+exports.useChapterMutation = function () {
+    var _a = react_1.useContext(App_1.QueryContext), queryClient = _a.queryClient, bookId = _a.bookId;
+    var _b = react_query_1.useMutation(function (chapterMutations) { return __awaiter(void 0, void 0, void 0, function () {
+        var response;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, axios_1["default"].put("/api/book/" + bookId + "/chapters", chapterMutations, {
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    })];
                 case 1:
                     response = _a.sent();
                     if (response.status !== 200) {
@@ -76,5 +98,5 @@ exports.useChapterMutation = function (chapterId) {
             queryClient.invalidateQueries(['book', bookId]);
         }
     }), mutateAsync = _b.mutateAsync, isLoading = _b.isLoading, isError = _b.isError;
-    return [mutateAsync, isLoading, isError];
+    return { mutateAsync: mutateAsync, isLoading: isLoading, isError: isError };
 };

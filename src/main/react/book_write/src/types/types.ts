@@ -44,5 +44,6 @@ export interface BookMutation {
 
 
 export interface ChapterMutation {
+  id: number | null,
   title: string | null,
 }

@@ -21,6 +21,7 @@ var zustand_1 = require("zustand");
 exports.useBookMutationStore = zustand_1.create(function (set) { return ({
     payload: { title: null, coverImg: null },
     isMutated: false,
+    resetMutation: function () { return set(function (state) { return (__assign(__assign({}, state), { payload: { title: null, coverImg: null }, isMutated: false })); }); },
     isLoading: false,
     dispatchs: {
         setTitle: function (title) {

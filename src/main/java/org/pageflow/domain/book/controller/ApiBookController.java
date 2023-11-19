@@ -18,6 +18,7 @@ import org.pageflow.domain.user.service.AccountService;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -108,23 +109,15 @@ public class ApiBookController {
     /**
      * 챕터 정보 업데이트
      */
-    @PutMapping("/api/book/{bookId}/chapter/{chapterId}")
-    public Map<String, String> updateChapter(
-            @PathVariable("chapterId") Long chapterId,
-            @Valid @ModelAttribute ChapterUpdateRequest updateRequest
-    ) {
-        if(updateRequest.getId() == null){
-            updateRequest.setId(chapterId);
-        }
-        Chapter updatedChapter = bookWriteService.updateChapter(updateRequest);
+    @PutMapping("/api/book/{bookId}/chapters")
+    public List<Map<String, String>> updateChapters(@Valid @RequestBody List<ChapterUpdateRequest> updateRequests) {
+
+        List<Chapter> updatedChapters = bookWriteService.updateChapters(updateRequests);
         
-        return Map.of(
-                "id", updatedChapter.getId().toString(),
-                "title", updatedChapter.getTitle()
-        );
-        
+        return updatedChapters.stream()
+                .map(chapter -> Map.of("id", chapter.getId().toString(), "title", chapter.getTitle()))
+                .toList();
     }
-    
     
     
     /**

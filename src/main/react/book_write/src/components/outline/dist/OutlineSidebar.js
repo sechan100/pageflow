@@ -1,50 +1,12 @@
 "use strict";
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
 exports.__esModule = true;
-exports.pageDraggablePrefix = exports.chapterDraggablePrefix = exports.pageDropAreaPrefix = void 0;
-var react_1 = require("react");
-var BookBasicPage_1 = require("./items/BookBasicPage");
-var Chapter_1 = require("./items/Chapter");
-var OutlineSidebarWrapper_1 = require("./OutlineSidebarWrapper");
-var react_beautiful_dnd_1 = require("react-beautiful-dnd");
-exports.pageDropAreaPrefix = 'pageDropArea-';
-exports.chapterDraggablePrefix = 'chapter-';
-exports.pageDraggablePrefix = 'page-';
+var NewChapterBtn_1 = require("./newItemBtn/NewChapterBtn");
 function OutlineSidebar(_a) {
-    var localOutline = _a.outline;
-    var openedChapterIds = react_1.useRef([]);
-    function addOpenedChapterIds(chapterId) {
-        openedChapterIds.current.push(chapterId);
-    }
-    function removeOpenedChapterIds(chapterId) {
-        var index = openedChapterIds.current.indexOf(chapterId);
-        if (index > -1) {
-            openedChapterIds.current.splice(index, 1);
-        }
-    }
-    var chapterOpenStatus = {
-        openedChapterIds: openedChapterIds,
-        addOpenedChapterIds: addOpenedChapterIds,
-        removeOpenedChapterIds: removeOpenedChapterIds
-    };
-    return (React.createElement(OutlineSidebarWrapper_1["default"], null,
-        React.createElement(BookBasicPage_1["default"], { outline: localOutline }),
-        React.createElement(react_beautiful_dnd_1.Droppable, { droppableId: "chapter-outline", type: 'CHAPTER' }, function (provided) {
-            var _a;
-            return (React.createElement("div", __assign({ ref: provided.innerRef }, provided.droppableProps), (_a = localOutline.chapters) === null || _a === void 0 ? void 0 :
-                _a.map(function (chapter, index) { return (React.createElement(react_beautiful_dnd_1.Draggable, { key: exports.chapterDraggablePrefix + chapter.id, draggableId: exports.chapterDraggablePrefix + chapter.id, index: index }, function (provided) { return (React.createElement("div", __assign({ ref: provided.innerRef }, provided.draggableProps, provided.dragHandleProps),
-                    React.createElement(Chapter_1["default"], { chapter: chapter, chapterOpenStatus: chapterOpenStatus }))); })); }),
-                provided.placeholder));
-        })));
+    var children = _a.children, localOutline = _a.outline;
+    return (React.createElement("div", { className: 'flex' },
+        React.createElement("aside", { id: "page-outline-sidebar", className: "fixed z-10 top-0 left-0 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0" },
+            React.createElement("div", { className: "overflow-y-auto pt-12 pb-5 px-3 h-full bg-white border-r border-gray-200 dark:bg-gray-800 dark:border-gray-700" }, children),
+            React.createElement(NewChapterBtn_1["default"], { outline: localOutline })),
+        React.createElement("div", { id: "sidebar-placeholder", className: "w-64 h-screen hidden sm:block" })));
 }
 exports["default"] = OutlineSidebar;

@@ -32,7 +32,17 @@ export interface Author {
 
 
 
-export interface BookUpdateRequest {
-  title: string,
+export interface OutlineMutation {
+  chapters: ChapterSummary[] | null
+}
+
+
+export interface BookMutation {
+  title: string | null,
   coverImg: File | null,
+}
+
+
+export interface ChapterMutation {
+  title: string | null,
 }

@@ -1,6 +1,6 @@
 import axios, { AxiosResponse } from "axios";
 import { UseMutateAsyncFunction, useMutation, useQuery } from "react-query";
-import { Outline } from "../types/types";
+import { Outline, OutlineMutation } from "../types/types";
 import { QueryContext } from "../App";
 import { useContext } from "react";
 
@@ -60,9 +60,7 @@ const getOutlineById = async (id : number) => {
   const response = await axios.get(`/api/book/${id}/outline`);
 
   if(response && response.status === 200 && response.data){
-    console.log("=========[Outline 데이터를 가져왔습니다]=========");
-    console.log(response.data);
-    console.log("============================================");
+    console.log("====[ Success to Fetching Outline ]====", response.data);
     return response.data as Outline;
   } else {
     console.log("Outline 데이터를 가져오는데 실패했습니다.")
@@ -72,12 +70,12 @@ const getOutlineById = async (id : number) => {
 
 
 // 목차정보 업데이트 api 훅
-export const useRearrangeOutlineMutation = (bookId : number) : [UseMutateAsyncFunction<AxiosResponse<any, any>, unknown, Outline, unknown>, boolean] => {
+export const useOutlineMutation = (bookId : number) : UseOutlineMutationReturn => {
     
     const {queryClient} = useContext(QueryContext);
   
-    const {mutateAsync, isLoading} = useMutation(
-      (newOutline : Outline) => axios.put(`/api/book/${bookId}/outline`, newOutline),
+    const { mutateAsync, isLoading, isError } = useMutation(
+      (outlineUpdateBody : OutlineMutation) => axios.put(`/api/book/${bookId}/outline`, outlineUpdateBody),
       {
         onSuccess: () => {
           queryClient.invalidateQueries(['book', bookId]);
@@ -85,5 +83,12 @@ export const useRearrangeOutlineMutation = (bookId : number) : [UseMutateAsyncFu
       }
     )
 
-    return [mutateAsync, isLoading];
+    return {mutateAsync, isLoading, isError};
+}
+
+
+export interface UseOutlineMutationReturn {
+  mutateAsync: UseMutateAsyncFunction<AxiosResponse<any, any>, unknown, OutlineMutation, unknown>;
+  isLoading: boolean;
+  isError: boolean;
 }

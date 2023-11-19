@@ -36,7 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-exports.useRearrangeOutlineMutation = exports.useGetOutlineQuery = void 0;
+exports.useOutlineMutation = exports.useGetOutlineQuery = void 0;
 var axios_1 = require("axios");
 var react_query_1 = require("react-query");
 var App_1 = require("../App");
@@ -91,9 +91,7 @@ var getOutlineById = function (id) { return __awaiter(void 0, void 0, void 0, fu
             case 1:
                 response = _a.sent();
                 if (response && response.status === 200 && response.data) {
-                    console.log("=========[Outline 데이터를 가져왔습니다]=========");
-                    console.log(response.data);
-                    console.log("============================================");
+                    console.log("====[ Success to Fetching Outline ]====", response.data);
                     return [2 /*return*/, response.data];
                 }
                 else {
@@ -105,12 +103,12 @@ var getOutlineById = function (id) { return __awaiter(void 0, void 0, void 0, fu
     });
 }); };
 // 목차정보 업데이트 api 훅
-exports.useRearrangeOutlineMutation = function (bookId) {
+exports.useOutlineMutation = function (bookId) {
     var queryClient = react_1.useContext(App_1.QueryContext).queryClient;
-    var _a = react_query_1.useMutation(function (newOutline) { return axios_1["default"].put("/api/book/" + bookId + "/outline", newOutline); }, {
+    var _a = react_query_1.useMutation(function (outlineUpdateBody) { return axios_1["default"].put("/api/book/" + bookId + "/outline", outlineUpdateBody); }, {
         onSuccess: function () {
             queryClient.invalidateQueries(['book', bookId]);
         }
-    }), mutateAsync = _a.mutateAsync, isLoading = _a.isLoading;
-    return [mutateAsync, isLoading];
+    }), mutateAsync = _a.mutateAsync, isLoading = _a.isLoading, isError = _a.isError;
+    return { mutateAsync: mutateAsync, isLoading: isLoading, isError: isError };
 };

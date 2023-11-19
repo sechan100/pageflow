@@ -1,11 +1,9 @@
-import { MutableRefObject, useContext, useRef } from 'react';
+import { MutableRefObject, useRef } from 'react';
 import { Outline } from '../../types/types';
 import BookBasicPage from './items/BookBasicPage';
 import Chapter from './items/Chapter';
 import OutlineSidebarWrapper from './OutlineSidebarWrapper';
 import { Draggable, Droppable } from 'react-beautiful-dnd';
-import { useGetOutlineQuery } from '../../api/outline-api';
-import { QueryContext } from '../../App';
 
 
 
@@ -15,20 +13,8 @@ export const chapterDraggablePrefix = 'chapter-';
 export const pageDraggablePrefix = 'page-';
 
 
-interface OutlineSidebarProps {
-  outlineBufferStatusReducer : [
-    outlineBufferStatus : string,
-    outlineBufferStatusDispatch : any
-  ]
-}
 
-
-export default function OutlineSidebar(props : OutlineSidebarProps){
-
-  const {bookId} = useContext(QueryContext);
-  const outline : Outline= useGetOutlineQuery(bookId);
-
-
+export default function OutlineSidebar({outline: localOutline} : {outline : Outline}){
 
   const openedChapterIds : MutableRefObject<string[]> = useRef([] as string[]);
 
@@ -52,15 +38,15 @@ export default function OutlineSidebar(props : OutlineSidebarProps){
 
 
   return (
-    <OutlineSidebarWrapper {...props}>
-      <BookBasicPage bookId={outline.id}/>
+    <OutlineSidebarWrapper >
+      <BookBasicPage outline={localOutline} />
 
       {/* 챕터 드롭 영역 */}
       <Droppable droppableId="chapter-outline" type='CHAPTER' >
         {(provided : any) => (
           <div ref={provided.innerRef} {...provided.droppableProps}>
             {/* Draggable Chapter 설정 */}
-            {outline.chapters?.map((chapter, index) => (
+            {localOutline.chapters?.map((chapter, index) => (
               <Draggable key={chapterDraggablePrefix + chapter.id} draggableId={chapterDraggablePrefix + chapter.id} index={index} >
                 {(provided : any) => (
                   <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>

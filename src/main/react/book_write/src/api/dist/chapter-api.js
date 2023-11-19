@@ -36,7 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-exports.useBookMutation = void 0;
+exports.useChapterMutation = void 0;
 /* eslint-disable @typescript-eslint/no-unused-vars */
 var axios_1 = require("axios");
 var react_query_1 = require("react-query");
@@ -44,31 +44,29 @@ var App_1 = require("../App");
 var flowAlert_1 = require("../etc/flowAlert");
 var react_1 = require("react");
 // Book 데이터 업데이트 훅
-exports.useBookMutation = function (bookId) {
-    var queryClient = react_1.useContext(App_1.QueryContext).queryClient;
-    var _a = react_query_1.useMutation(function (bookMutation) { return __awaiter(void 0, void 0, void 0, function () {
+exports.useChapterMutation = function (chapterId) {
+    var _a = react_1.useContext(App_1.QueryContext), queryClient = _a.queryClient, bookId = _a.bookId;
+    var _b = react_query_1.useMutation(function (chapterUpdateRequest) { return __awaiter(void 0, void 0, void 0, function () {
         var formDate, response;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     formDate = new FormData();
-                    if (bookMutation.title)
-                        formDate.append("title", bookMutation.title);
-                    if (bookMutation.coverImg)
-                        formDate.append("coverImg", bookMutation.coverImg);
-                    return [4 /*yield*/, axios_1["default"].put("/api/book/" + bookId, formDate, {
+                    if (chapterUpdateRequest.title)
+                        formDate.append("title", chapterUpdateRequest.title);
+                    return [4 /*yield*/, axios_1["default"].put("/api/book/" + bookId + "/chapter/" + chapterId, formDate, {
                             headers: {
-                                'Content-Type': 'multipart/form-data'
+                                'Content-Type': 'multipart/form-data' // 확장 가능성 염두
                             }
                         })];
                 case 1:
                     response = _a.sent();
                     if (response.status !== 200) {
-                        flowAlert_1["default"]("error", "책 정보를 업데이트하는데 실패했습니다.");
-                        throw new Error("책 정보를 업데이트하는데 실패했습니다.");
+                        flowAlert_1["default"]("error", "챕터 정보를 업데이트하는데 실패했습니다.");
+                        throw new Error("챕터 정보를 업데이트하는데 실패했습니다.");
                     }
                     if (response.data) {
-                        console.log("Book Update Success!", response.data);
+                        console.log("Chapter Update Success!", response.data);
                     }
                     return [2 /*return*/];
             }
@@ -77,6 +75,6 @@ exports.useBookMutation = function (bookId) {
         onSuccess: function () {
             queryClient.invalidateQueries(['book', bookId]);
         }
-    }), mutateAsync = _a.mutateAsync, isLoading = _a.isLoading, isError = _a.isError;
-    return { mutateAsync: mutateAsync, isLoading: isLoading, isError: isError };
+    }), mutateAsync = _b.mutateAsync, isLoading = _b.isLoading, isError = _b.isError;
+    return [mutateAsync, isLoading, isError];
 };

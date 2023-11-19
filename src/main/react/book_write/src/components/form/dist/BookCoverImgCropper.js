@@ -82,7 +82,7 @@ function ImageCropComponent(_a) {
             });
             setIsModifyMode(function (prev) { return !prev; });
             var cropedCoverImg = dataURLtoFile(croppedImageSrc_1);
-            setFileDate(cropedCoverImg);
+            setFileDate({ type: "COVER_IMG", payload: cropedCoverImg });
         }
     }
     ;

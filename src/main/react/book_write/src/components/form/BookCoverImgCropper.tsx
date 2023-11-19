@@ -6,7 +6,7 @@ import 'react-image-crop/dist/ReactCrop.css';
 interface ImageCropComponentProps {
   cropedFilename : string;
   defaultSrc? : string;
-  setFileDate : React.Dispatch<React.SetStateAction<File | null>>;
+  setFileDate : any;
 }
 
 
@@ -130,7 +130,7 @@ function ImageCropComponent({cropedFilename, defaultSrc, setFileDate} : ImageCro
 
       
       const cropedCoverImg : File = dataURLtoFile(croppedImageSrc);
-      setFileDate(cropedCoverImg);
+      setFileDate({type: "COVER_IMG", payload: cropedCoverImg});
     }
   };
 

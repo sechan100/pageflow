@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import axios from 'axios';
-import { BookUpdateRequest, Outline } from '../types/types';
+import { BookMutation, Outline } from '../types/types';
 import { UseMutateAsyncFunction, useMutation } from 'react-query';
 import { QueryContext } from '../App';
 import flowAlert from '../etc/flowAlert';
@@ -9,16 +9,16 @@ import { useContext } from 'react';
 
 
 // Book 데이터 업데이트 훅
-export const useUpdateBook = (bookId : number) : [UseMutateAsyncFunction<any, unknown, BookUpdateRequest, unknown>, boolean, boolean] => {
+export const useBookMutation = (bookId : number) : UseBookMutationReturn => {
 
   const {queryClient} = useContext(QueryContext);
 
   const { mutateAsync, isLoading, isError } = useMutation(
-    async (bookUpdateRequest : BookUpdateRequest) => {
+    async (bookMutation : BookMutation) => {
 
       const formDate = new FormData();
-      formDate.append("title", bookUpdateRequest.title);
-      if(bookUpdateRequest.coverImg) formDate.append("coverImg", bookUpdateRequest.coverImg);
+      if(bookMutation.title) formDate.append("title", bookMutation.title);
+      if(bookMutation.coverImg) formDate.append("coverImg", bookMutation.coverImg);
 
 
       const response = await axios.put(`/api/book/${bookId}`, formDate, {
@@ -33,30 +33,24 @@ export const useUpdateBook = (bookId : number) : [UseMutateAsyncFunction<any, un
       }
 
       if(response.data){
-        console.log("Book Update Success!");
-        console.log(response.data);
-        return response.data;
+        console.log("Book Update Success!", response.data);
       }
     },
     {
-      onSuccess: (data) => {
-        
-        const staleBook = queryClient.getQueryData(['book', bookId]);
-        
-        // 클라이언트 캐시 데이터 업데이트: 서버와 재통신 하지 않고, 그냥 캐시만 낙관적으로 업데이트한다.
-        if(staleBook){
-          queryClient.setQueryData(['book', bookId], {
-            ...staleBook,
-            title: data.title,
-            coverImgUrl: data.coverImgUrl
-          })
-        }
-
+      onSuccess: () => {
+        queryClient.invalidateQueries(['book', bookId]);
       }
     }
   )
 
-  return [mutateAsync, isLoading, isError];
+  return {mutateAsync, isLoading, isError};
 
 
+}
+
+
+export interface UseBookMutationReturn {
+  mutateAsync: UseMutateAsyncFunction<void, unknown, BookMutation, unknown>;
+  isLoading: boolean;
+  isError: boolean;
 }

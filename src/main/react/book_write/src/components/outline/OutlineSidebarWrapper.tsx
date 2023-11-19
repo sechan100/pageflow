@@ -3,16 +3,12 @@ import axios from 'axios';
 import { ChapterSummary, Outline } from '../../types/types';
 import { MutableRefObject, useContext } from 'react';
 import flowAlert from '../../etc/flowAlert';
-import { useRearrangeOutlineMutation } from '../../api/outline-api';
+import { useOutlineMutation } from '../../api/outline-api';
 import { QueryContext } from '../../App';
 
 
 export interface IOutlineSidebarProps {
   children: React.ReactNode;
-  outlineBufferStatusReducer : [
-    outlineBufferStatus : string,
-    outlineBufferStatusDispatch : any
-  ]
 }
 
 
@@ -25,7 +21,7 @@ export default function OutlineSidebarWrapper(props : IOutlineSidebarProps) {
         <div className="overflow-y-auto pt-12 pb-5 px-3 h-full bg-white border-r border-gray-200 dark:bg-gray-800 dark:border-gray-700">
           {props.children}
         </div>
-        <AddChapterBtn {...props} />
+        <AddChapterBtn />
       </aside>
       <div id="sidebar-placeholder" className="w-64 h-screen hidden sm:block"></div>
     </div>
@@ -34,38 +30,10 @@ export default function OutlineSidebarWrapper(props : IOutlineSidebarProps) {
 
 
 
-interface IAddChapterBtnProps {
-  outlineBufferStatusReducer : [
-    outlineBufferStatus : string,
-    outlineBufferStatusDispatch : any
-  ]
-}
 
-
-function AddChapterBtn(drillingProps : IAddChapterBtnProps) {
+function AddChapterBtn() {
 
   const { bookId, queryClient } = useContext(QueryContext);
-  const { outlineBufferStatusReducer } = drillingProps;
-  const [mutateAsync, isLoading] = useRearrangeOutlineMutation(bookId);
-
-  const [outlineBufferStatus, outlineBufferStatusDispatch] = outlineBufferStatusReducer;
-
-  // 서버에 Outline 데이터의 재정렬 업데이트 요청을 보내는 함수
-  async function updateOutlineOnServer(outline : Outline){
-    // isOutlineRearranged가 true인 경우에만 서버에 요청을 보낸다.
-    if(outlineBufferStatus === 'mutated'){
-      try{
-        await mutateAsync(outline)
-        if(!isLoading){
-          flowAlert('success', "목차 정보가 저장되었습니다.");
-        }
-        // 요청을 전달한 후에 성공적으로 업데이트 되었다면, outlineBufferStatus를 flushed로 변경한다.
-        outlineBufferStatusDispatch({type: 'flushed'});
-      } catch(error) {
-        flowAlert('error', "목차 정보를 서버와 동기화하지 못했습니다.");
-      }
-    }
-  }
 
 
   // 서버에서 새로운 Chapter 생성요청을 전달하고 받아온 생성된 Chapter를 react query가 관리하는 캐쉬에 반영.
@@ -73,7 +41,7 @@ function AddChapterBtn(drillingProps : IAddChapterBtnProps) {
 
     // 변경된 Outline 정보가 있다면 먼저 동기화
     const queryCache : Outline | undefined = queryClient.getQueryData(['book', bookId]);
-    if(queryCache) updateOutlineOnServer(queryCache);
+    // if(queryCache) updateOutlineOnServer(queryCache);
 
     const response = await axios.post(`/api/book/${bookId}/chapter`);
 

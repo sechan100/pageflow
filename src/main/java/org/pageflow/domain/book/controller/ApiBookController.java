@@ -4,12 +4,13 @@ package org.pageflow.domain.book.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.pageflow.base.request.Rq;
-import org.pageflow.base.response.WithAlertApiResponse;
 import org.pageflow.domain.book.entity.Book;
 import org.pageflow.domain.book.entity.Chapter;
 import org.pageflow.domain.book.entity.Page;
 import org.pageflow.domain.book.model.outline.Outline;
 import org.pageflow.domain.book.model.request.BookUpdateRequest;
+import org.pageflow.domain.book.model.request.ChapterUpdateRequest;
+import org.pageflow.domain.book.model.request.OutlineUpdateRequest;
 import org.pageflow.domain.book.model.request.PageUpdateRequest;
 import org.pageflow.domain.book.service.BookService;
 import org.pageflow.domain.book.service.BookWriteService;
@@ -44,11 +45,18 @@ public class ApiBookController {
     
     /**
      * 새롭게 정렬된 Outline 데이터를 기반으로 서버 데이터를 업데이트하고 반환.
+     * Chapter 재정렬, Page 재정렬, Chapter 삭제, Page 삭제를 처리
      */
     @PutMapping("/api/book/{bookId}/outline")
-    public Outline rearrangeOutlineItems(
-            @PathVariable("bookId") Long bookId, @RequestBody Outline rearrangeRequest) {
-        return bookWriteService.delegateRearrange(rearrangeRequest);
+    public Outline updateOutline(
+            @PathVariable("bookId") Long bookId,
+            @Valid @RequestBody OutlineUpdateRequest outlineUpdateRequest
+    ) {
+        outlineUpdateRequest.setId(bookId);
+        
+        bookWriteService.delegateDeleteRearrangeable(outlineUpdateRequest);
+        
+        return bookWriteService.delegateRearrange(outlineUpdateRequest);
     }
     
     
@@ -68,7 +76,8 @@ public class ApiBookController {
      */
     @PutMapping("/api/book/{bookId}")
     public Map<String, String> updateBook(
-            @PathVariable("bookId") Long bookId, @Valid @ModelAttribute BookUpdateRequest updateRequest
+            @PathVariable("bookId") Long bookId,
+            @Valid @ModelAttribute BookUpdateRequest updateRequest
     ) {
         
         if(updateRequest.getId() == null){
@@ -96,23 +105,26 @@ public class ApiBookController {
         return bookWriteService.createBlankChapter(ownerBook);
     }
     
-    
     /**
-     * chapterId에 해당하는 Chapter를 삭제하고, 하위 Page들도 모두 삭제
-     * @param chapterId 삭제할 챕터 아이디
-     * @return 새로운 Outline과 삭제 성공 여부를 담은 alert
+     * 챕터 정보 업데이트
      */
-    @DeleteMapping("/api/chapter/{chapterId}")
-    public WithAlertApiResponse<Outline> deleteChapter(@PathVariable("chapterId") Long chapterId) {
-        Chapter deleteTargetChapter = bookService.repoFindChapterById(chapterId);
-        boolean isDeleteSuccess = bookWriteService.deleteChapter(chapterId);
-        
-        if(isDeleteSuccess) {
-            return WithAlertApiResponse.success(String.format("'%s' 챕터를 삭제했습니다.", deleteTargetChapter.getTitle()), bookService.getOutline(deleteTargetChapter.getBook().getId()));
-        } else {
-            return WithAlertApiResponse.error("챕터를 삭제하지 못했습니다. 잠시후에 다시 시도해주세요.");
+    @PutMapping("/api/book/{bookId}/chapter/{chapterId}")
+    public Map<String, String> updateChapter(
+            @PathVariable("chapterId") Long chapterId,
+            @Valid @ModelAttribute ChapterUpdateRequest updateRequest
+    ) {
+        if(updateRequest.getId() == null){
+            updateRequest.setId(chapterId);
         }
+        Chapter updatedChapter = bookWriteService.updateChapter(updateRequest);
+        
+        return Map.of(
+                "id", updatedChapter.getId().toString(),
+                "title", updatedChapter.getTitle()
+        );
+        
     }
+    
     
     
     /**
@@ -120,37 +132,24 @@ public class ApiBookController {
      * @param chapterId 챕터 아이디
      * @return 새로 생성된 Page
      */
-    @PostMapping("/api/chapter/{chapterId}/page")
-    public Page createPage(@PathVariable("chapterId") Long chapterId) {
+    @PostMapping("/api/book/{bookId}/chapter/{chapterId}/page")
+    public Page createPage(
+            @PathVariable("bookId") Long bookId,
+            @PathVariable("chapterId") Long chapterId)
+    {
         Chapter ownerChapter = bookService.repoFindChapterById(chapterId);
         return bookWriteService.createBlankPage(ownerChapter);
     }
     
     
     /**
-     * pageId에 해당하는 Page를 삭제하고 결과가 적용된 Outline을 반환
-     * @param pageId 삭제할 Page 아이디
-     * @return 새로운 Outline과 삭제 성공 여부를 담은 alert
-     */
-    @DeleteMapping("/api/page/{pageId}")
-    public WithAlertApiResponse<Outline> deletePage(@PathVariable("pageId") Long pageId) {
-        Page deleteTargetPage = bookService.repoFindPageById(pageId);
-        boolean isDeleteSuccess = bookWriteService.deletePage(pageId);
-        
-        if(isDeleteSuccess) {
-            return WithAlertApiResponse.success(String.format("'%s' 페이지를 삭제했습니다.", deleteTargetPage.getTitle()), bookService.getOutline(deleteTargetPage.getChapter().getBook().getId()));
-        } else {
-            return WithAlertApiResponse.error("페이지를 삭제하지 못했습니다. 잠시후에 다시 시도해주세요.");
-        }
-    }
-    
-    
-    /**
      * 책 페이지 정보 수정
      */
-    @PutMapping("/api/book/page/{pageId}")
+    @PutMapping("/api/book/{bookId}/chapter/page/{pageId}")
     public void updatePage(
-            @PathVariable("pageId") Long pageId, @RequestBody PageUpdateRequest updateRequest
+            @PathVariable("bookId") Long bookId,
+            @PathVariable("pageId") Long pageId,
+            @RequestBody PageUpdateRequest updateRequest
     ) {
         bookWriteService.updatePage(updateRequest);
     }

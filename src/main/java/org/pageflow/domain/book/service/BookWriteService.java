@@ -12,8 +12,9 @@ import org.pageflow.domain.book.model.outline.Outline;
 import org.pageflow.domain.book.model.outline.PageSummary;
 import org.pageflow.domain.book.model.outline.Rearrangeable;
 import org.pageflow.domain.book.model.request.BookUpdateRequest;
+import org.pageflow.domain.book.model.request.ChapterUpdateRequest;
+import org.pageflow.domain.book.model.request.OutlineUpdateRequest;
 import org.pageflow.domain.book.model.request.PageUpdateRequest;
-import org.pageflow.domain.book.model.request.RearrangeRequest;
 import org.pageflow.domain.book.repository.ChapterRepository;
 import org.pageflow.domain.book.repository.PageRepository;
 import org.pageflow.domain.user.entity.Profile;
@@ -23,10 +24,9 @@ import org.pageflow.infra.file.service.FileService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -207,7 +207,6 @@ public class BookWriteService {
         // 제목 업데이트
         staleBook.setTitle(updateRequest.getTitle());
         
-        
         // 데이터 커밋
         return bookService.repoSaveBook(staleBook);
     }
@@ -218,14 +217,14 @@ public class BookWriteService {
      * @return update된 Chapter
      */
     @Transactional
-    public Chapter updateChapter(RearrangeRequest updateRequest) {
+    public Chapter updateChapter(ChapterUpdateRequest updateRequest) {
         
         if(updateRequest.getId() == null){
             throw new IllegalArgumentException("업데이트의 대상인 Chapter 엔티티를 특정할 수 없습니다.");
         }
         
         Chapter staleChapter = chapterRepository.findById(updateRequest.getId()).orElseThrow();
-        staleChapter.setSortPriority(updateRequest.getSortPriority() != null ? updateRequest.getSortPriority() : staleChapter.getSortPriority());
+        staleChapter.setTitle(updateRequest.getTitle() != null ? updateRequest.getTitle() : staleChapter.getTitle());
         
         // 데이터 커밋
         Chapter updatedChapter = chapterRepository.save(staleChapter);
@@ -260,13 +259,13 @@ public class BookWriteService {
     /**
      * Selctive LIS 알고리즘을 통해서 오름차순이 파괴된 수열에서 필요한 항을 제해가면서 가장 긴 오름차순 배열을 추출해낼 수 있다.
      * 이를 통해서 최소한의 엔트리 업데이트를 통해서도 오름차순 정렬을 유지할 수 있다.
-     * @param rearrangeRequest 재정렬 변경사항 dto
+     * @param outlineUpdateRequest 재정렬 변경사항 dto
      * @return update된 Outline
      */
     @Transactional
-    public Outline delegateRearrange(Outline rearrangeRequest) {
+    public Outline delegateRearrange(OutlineUpdateRequest outlineUpdateRequest) {
         
-        List<ChapterSummary> chapterSummaries = rearrangeRequest.getChapters();
+        List<ChapterSummary> chapterSummaries = outlineUpdateRequest.getChapters();
 
         // chapter sortPriority 업데이트
         int updatedEntityChapter = allocateNewSortPriorityOptimally(chapterSummaries);
@@ -280,7 +279,17 @@ public class BookWriteService {
         chapterRepository.flush();
         pageRepository.flush();
         
-        return bookService.getOutline(rearrangeRequest.getId());
+        return bookService.getOutline(outlineUpdateRequest.getId());
+    }
+    
+    @Transactional
+    public void delegateDeleteRearrangeable(OutlineUpdateRequest outlineUpdateRequest) {
+        // 삭제해야하는 Chapter, Page의 id들을 추출
+        // { "chapter": set[Long], "page": set[Long] }
+        Map<String, Set<Long>> deleteTargets = detectDeleteTargets(bookService.getOutline(outlineUpdateRequest.getId()), outlineUpdateRequest);
+        
+        deleteTargets.get("chapter").forEach(this::deleteChapter);
+        deleteTargets.get("page").forEach(this::deletePage);
     }
     
     
@@ -336,6 +345,7 @@ public class BookWriteService {
         
         return updatedEntity.get();
     }
+    
     
     @Transactional
     private <T extends Rearrangeable> int updateSortPriority(List<T> rearrangeables, List<Integer> newAscendingSortPriorityList){
@@ -415,5 +425,47 @@ public class BookWriteService {
             
         return newSortPriorityList;
     }
+    
+    
+    /**
+     * @return {
+     *     "chapter": set[Long],
+     *     "page": set[Long]
+     *     }
+     */
+    private Map<String, Set<Long>> detectDeleteTargets(Outline staleOutline, OutlineUpdateRequest outlineUpdateRequest){
+        Map<String, Set<Long>> deleteTargets = new HashMap<>();
+        
+        Set<Long> staleChapterIds = staleOutline.getChapters().stream()
+                .map(ChapterSummary::getId)
+                .collect(Collectors.toSet());
+        
+        Set<Long> stalePageIds = staleOutline.getChapters().stream()
+                .flatMap(chapterSummary ->
+                        chapterSummary.getPages().stream()
+                                .map(PageSummary::getId)
+                )
+                .collect(Collectors.toSet());
+        
+        Set<Long> newChapterIds = outlineUpdateRequest.getChapters().stream()
+                .map(ChapterSummary::getId)
+                .collect(Collectors.toSet());
+        
+        Set<Long> newPageIds = outlineUpdateRequest.getChapters().stream()
+                .flatMap(chapterSummary ->
+                        chapterSummary.getPages().stream()
+                                .map(PageSummary::getId)
+                )
+                .collect(Collectors.toSet());
+        
+        deleteTargets.put("chapter", new HashSet<>(staleChapterIds));
+        deleteTargets.put("page", new HashSet<>(stalePageIds));
+        
+        deleteTargets.get("chapter").removeAll(newChapterIds);
+        deleteTargets.get("page").removeAll(newPageIds);
+        
+        return deleteTargets;
+    }
+    
 }
 

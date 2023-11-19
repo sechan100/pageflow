@@ -7,10 +7,11 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class RearrangeRequest {
+abstract public class RearrangeRequest {
 
     private String type;
     private Long id;
+    private String title;
     private Integer sortPriority;
 
 }

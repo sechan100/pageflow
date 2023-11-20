@@ -1,98 +1,93 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+import { useContext, useEffect, useReducer, useRef } from "react";
+import { useGetOutlineQuery } from "../api/outline-api";
+import { ChapterSummary, Outline, OutlineMutation, PageSummary } from "../types/types";
 import { DragDropContext, Droppable } from "react-beautiful-dnd";
-import OutlineSidebar, { pageDropAreaPrefix } from "./outline/OutlineSidebar";
-import { ChapterSummary, Outline, PageSummary } from "../types/types";
-import { useGetOutline, useRearrangeOutline } from "../api/book-apis";
-import { useEffect, useReducer, useRef } from "react";
-import { inClosingPageDropAreaPrefix } from "./outline/Chapter";
-import axios from "axios";
-import  flowAlert  from "../etc/flowAlert";
-import FormRoutes from "./form/FormRoutes";
-import FormSidebar from "./form/FormSidebar";
+import { inClosingPageDropAreaPrefix } from "./outline/items/Chapter";
+import { QueryContext } from "../App";
+import OutlineContext from "./outline/OutlineContext";
+import FormMain from "./form/FormMain";
+import { pageDropAreaPrefix } from "./outline/OutlineContext";
+import { create } from "zustand";
 
 
-
-
-interface BookEntityDraggableContextProps {
-  bookId : number;
-  queryClient : any;
+interface UseOutlineMutationStore {
+  payload: OutlineMutation;
+  isMutated: boolean;
+  resetMutation: () => void;
+  isLoading: boolean;
+  dispatchs: {
+    setChapters : (chapters : ChapterSummary[]) => void
+  };
 }
 
 
-export default function BookEntityDraggableContext(props : BookEntityDraggableContextProps) {
 
-  const { bookId, queryClient } = props;
-  // react query로 server book outline snapshot을 가져온다.
-  const outline : Outline = useGetOutline(bookId);
+export const useOutlineMutationStore = create<UseOutlineMutationStore>((set : any) => ({
+  payload: { chapters: null }, // 목차 재배열 변경사항을 서버에 요청하기 위한 객체
+  isMutated: false, // 변경사항이 존재하는지 여부
+  resetMutation: () => set(
+    (state : any) => ({
+      ...state,
+      payload: { chapters: null },
+      isMutated: false
+    })
+  ),
+  isLoading: false, // 서버에 전달한 요청이 진행중인지의 여부. 기본적으로 false이지만, [true로 바뀌는 순간부터, 다시 false가 되는 순간]까지 서버에 요청중임을 의미한다.
+  dispatchs: { // payload 상태를 변경하는 dispatch 함수들. 내부적으로 isMutated를 true로 변경하는 로직을 포함한다.
+
+    setChapters : (chapters : ChapterSummary[]) => {
+      set((state : any) => ({
+        payload: {
+          ...state.payload,
+          chapters: chapters
+        },
+        isMutated: true
+      }));
+    }
+
+  },
+}));
+
+
+
+// 해당 컴포넌트는 페이지 전역에 걸친 DragDropContext를 제공한다. -> 삭제 드롭 영역을 Form 페이지 위에 나타내야하기 때문에 거의 전체 페이지에 걸쳐서 DragDropContext를 제공해야하므로..
+export default function BookEntityDraggableContext() {
+  
+  const { bookId } = useContext(QueryContext);
+  const outline: Outline = useGetOutlineQuery(bookId);
+  const [localOutline, localOutlineDispatch] : [Outline, any] = useReducer(localOutlineReducer, outline); // zustand store에 변경사항을 업데이트하기 전에 임시로 저장하는 로컬 상태
+
+  // outline query data -> localOutline 상태에 동기화
+  useEffect(() => {
+    if(outline){
+      localOutlineDispatch({type: 'SET_OUTLINE', payload: outline});
+    }
+  }, [outline]);
+
+  // Outline 변경사항에 관한 zusatnd store
+  const { dispatchs } = useOutlineMutationStore();
+
+  // fallback 데이터가 아니면서 && localOutline에 변경사항이 적용된 경우...
+  useEffect(() => {
+    if(localOutline.id !== 0 && outline.chapters !== localOutline.chapters){
+      dispatchs.setChapters(localOutline.chapters as ChapterSummary[]);
+    }
+  }, [localOutline]);
+
+
+
+
+  // 두 Draggable 객체의 type이 각각 다르기 때문에, 각각에 해당하는 삭제 드롭 영역을 겹쳐서 놓아야한다.
+  // 그리고 실제로 드래그 된 요소의 type에 일치하는 영역만을 visible하게 만든다. 실제로는 2개가 겹쳐져 있는 것.
   const chapterDeleteDropArea = useRef(null); // Chapter 삭제 드롭 영역의 DOM 참조
   const pageDeleteDropArea = useRef(null); // Page 삭제 드롭 영역의 DOM 참조
-
-  // outline 재정렬 여부에 대한 상태를 기록하고, 변경된 데이터 버퍼를 전송할지 말지에 관한 상태를 나타낸다.
-  const [outlineBufferStatus, outlineBufferStatusDispatch] = useReducer((status : string, action : {type:string}) => {
-
-    switch (action.type) { 
-      case 'flushed':
-        return "flushed";
-
-      case 'mutated':
-        return "mutated";
-
-      case 'waiting':
-        return "waiting";
-
-      default:
-        throw new Error();
-    }
-
-  }, "flushed");
-
-
-  const { mutateAsync, isLoading, error } = useRearrangeOutline(bookId);
-
-  // 서버에 Outline 데이터의 재정렬 업데이트 요청을 보내는 함수
-  async function updateOutlineOnServer(outline : Outline){
-
-    // outlineBufferStatus가 mutated, waiting인 경우에만 서버에 요청을 보낸다.
-    if(outlineBufferStatus === 'mutated' || outlineBufferStatus === 'waiting'){
-
-      try{
-
-        await mutateAsync(outline)
-        flowAlert('success', "목차 정보가 저장되었습니다.");
-
-        // 요청을 전달한 후에 성공적으로 업데이트 되었다면, outlineBufferStatus를 flushed로 변경한다.
-        outlineBufferStatusDispatch({type: 'flushed'});
-
-      } catch(error) {
-        flowAlert('error', "목차 정보를 서버와 동기화하지 못했습니다.");
-      }
-    }
-  }
-
-  // outlineBuffer가 변경될 때마다 5초 뒤 서버에 재정렬 요청을 보내는 타이머를 시작, 도중에 outlineBuffer가 변경되면 타이머를 초기화한다.
-  useEffect(() => {
-    
-    // outlineBufferStatus가 mutated인 경우, 업데이트 요청을 전송하기위한 타이머를 시작한다.
-    if(outlineBufferStatus === 'mutated'){
-
-      const outlineBufferFlushTimer = setTimeout(async () => {
-        updateOutlineOnServer(outline);
-      }, 7000);
-
-      return () => {
-        clearTimeout(outlineBufferFlushTimer);
-      }
-    }
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [outlineBufferStatus]);
-
-
 
 
   return (
     <>
       <DragDropContext onDragStart={onDragStart}  onDragEnd={onDragEnd}>
-        <OutlineSidebar {...props} outlineBufferStatusReducer={[outlineBufferStatus, outlineBufferStatusDispatch]} />
+        <OutlineContext outline={localOutline} />
 
         {/* 삭제할 요소를 드롭 */}
         <Droppable droppableId="chapter-delete-drop-area" type="CHAPTER">
@@ -100,7 +95,7 @@ export default function BookEntityDraggableContext(props : BookEntityDraggableCo
             <div className="bg-gray-500 animate-bounce hover:bg-gray-700 w-48 absolute invisible left-1/2 top-5 p-5 px-6 rounded-full" ref={chapterDeleteDropArea}>
               <div ref={provided.innerRef} {...provided.droppableProps} className="flex">
                 <svg className="w-6 h-6 text-gray-800 dark:text-white mr-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 20">
-                  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h16M7 8v8m4-8v8M7 1h4a1 1 0 0 1 1 1v3H6V2a1 1 0 0 1 1-1ZM3 5h12v13a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5Z"/>
+                  <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M1 5h16M7 8v8m4-8v8M7 1h4a1 1 0 0 1 1 1v3H6V2a1 1 0 0 1 1-1ZM3 5h12v13a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5Z"/>
                 </svg>
                 <span className="text-white">드래그하여 삭제</span>
               </div>
@@ -114,7 +109,7 @@ export default function BookEntityDraggableContext(props : BookEntityDraggableCo
             <div className="bg-gray-500 animate-bounce hover:bg-gray-700 w-48 absolute invisible left-1/2 top-5 p-5 px-6 rounded-full" ref={pageDeleteDropArea}>
               <div ref={provided.innerRef} {...provided.droppableProps} className="flex">
                 <svg className="w-6 h-6 text-gray-800 dark:text-white mr-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 20">
-                  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h16M7 8v8m4-8v8M7 1h4a1 1 0 0 1 1 1v3H6V2a1 1 0 0 1 1-1ZM3 5h12v13a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5Z"/>
+                  <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M1 5h16M7 8v8m4-8v8M7 1h4a1 1 0 0 1 1 1v3H6V2a1 1 0 0 1 1-1ZM3 5h12v13a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5Z"/>
                 </svg>
                 <span className="text-white">드래그하여 삭제</span>
               </div>
@@ -122,10 +117,7 @@ export default function BookEntityDraggableContext(props : BookEntityDraggableCo
           )}
         </Droppable>
 
-        <main className="flex-auto relative">
-          <FormSidebar {...props} />
-          <FormRoutes {...props}  />
-        </main>
+        <FormMain />
       </DragDropContext>
     </>
   );
@@ -134,16 +126,10 @@ export default function BookEntityDraggableContext(props : BookEntityDraggableCo
 
   function onDragStart(start : any) {
     toggleDeleteDropAreaVisibility(start.type);
-    
-    // 만약 이전에 mutated였다면, 버퍼 전송을 flush하지는 않지만 잠시 멈춰두기 위해서 waiting으로 변경한다.
-    if(outlineBufferStatus === 'mutated'){
-      outlineBufferStatusDispatch({type: 'waiting'});
-    }
+  }
 
-  };
 
   function onDragEnd(result: any){
-
     toggleDeleteDropAreaVisibility(result.type);
 
     const {
@@ -155,7 +141,7 @@ export default function BookEntityDraggableContext(props : BookEntityDraggableCo
     if (!destination) {
       return;
     }
-    
+  
     // 원래 위치와 동일한 위치로 드래그 되었을 경우 state를 유지.
     if (destination.droppableId === source.droppableId && destination.index === source.index) {
       return;
@@ -163,18 +149,17 @@ export default function BookEntityDraggableContext(props : BookEntityDraggableCo
 
     // 삭제 영역으로 드롭된 경우 삭제 로직 실행
     if(destination.droppableId === 'chapter-delete-drop-area' || destination.droppableId === 'page-delete-drop-area'){
-      deleteDroppedElement(type, source, destination);
+      deleteDroppedElement(type, source);
       return;
     }
 
-
     // re-order: 1. 챕터간의 순서 변경
-    if (type === 'CHAPTER' && outline.chapters) {
-      const newChapters = getReorderedArray(outline.chapters, source.index, destination.index);
-      setStateChapters(newChapters)
+    if (type === 'CHAPTER' && localOutline.chapters) {
+      const newChapters = getReorderedArray(localOutline.chapters, source.index, destination.index);
+      localOutlineDispatch({type: 'SET_CHAPTERS', payload: newChapters});
 
     // 페이지 변경
-    } else if (type === 'PAGE' && outline.chapters) {
+    } else if (type === 'PAGE' && localOutline.chapters) {
 
       // 닫힌 상태의 챕터에 드롭되었는지 여부
       const isInClosingPageDropAreaDropped : boolean = destination.droppableId.startsWith(inClosingPageDropAreaPrefix);
@@ -192,7 +177,7 @@ export default function BookEntityDraggableContext(props : BookEntityDraggableCo
       // re-order: 2. 페이지의 챕터 내부 순서 변경 (출발지와 목적지가 같은 경우)
       if(sourceChapter === destinationChapter) {
         const newPages = getReorderedArray(sourceChapter.pages, source.index, destination.index);
-        setStatePages(newPages, sourceChapter.id);
+        localOutlineDispatch({type: 'SET_PAGES', payload: newPages, chapterId: sourceChapter.id});
 
       // re-order: 3. 페이지의 챕터간 이동
       } else if (sourceChapter !== destinationChapter) {
@@ -219,7 +204,7 @@ export default function BookEntityDraggableContext(props : BookEntityDraggableCo
           pages: newDestinationPages
         }
 
-        const newChapters = outline.chapters.map(chapter => {
+        const newChapters = localOutline.chapters.map(chapter => {
 
           // sourceChapter인 경우, 새로운 newSourceChapter로 교체
           if (chapter.id === newSourceChapter.id) {
@@ -235,12 +220,11 @@ export default function BookEntityDraggableContext(props : BookEntityDraggableCo
           }
         });
 
-        setStateChapters(newChapters);
+        localOutlineDispatch({type: 'SET_CHAPTERS', payload: newChapters});
       }
     }
-    // outline 버퍼 상태를 mutated로 변경
-    outlineBufferStatusDispatch({type: 'mutated'});
-  };
+  }
+
 
   function toggleDeleteDropAreaVisibility(type : string){
     if(type !== 'PAGE' && pageDeleteDropArea.current){
@@ -256,24 +240,22 @@ export default function BookEntityDraggableContext(props : BookEntityDraggableCo
     }
   }
 
-  function deleteDroppedElement(type : string, source : any, destination : any){
+
+  function deleteDroppedElement(type : string, source : any){
     
     if(window.confirm('정말로 삭제하시겠습니까?') === false) return;
 
-    // 삭제 요청 전송전에, outline 업데이트 요청을 먼저 보내고 데이터를 갱신한다.
-    updateOutlineOnServer(outline);
-
     // 삭제할 챕터의 경우
-    if(type === 'CHAPTER' && outline.chapters){
+    if(type === 'CHAPTER' && localOutline.chapters){
 
-      const newChapters = Array.from(outline.chapters);
-      const deletedChapter = newChapters.splice(source.index, 1)[0];
-      deleteDroppedElementOnServerAndApplyFE(deletedChapter.id, type);
+      const newChapters = Array.from(localOutline.chapters);
+      newChapters.splice(source.index, 1);
+      localOutlineDispatch({type: 'SET_CHAPTERS', payload: newChapters});
 
     // 삭제할 페이지의 경우
-    } else if (type === 'PAGE' && outline.chapters) {
+    } else if (type === 'PAGE' && localOutline.chapters) {
 
-      const sourceChapter = outline.chapters.find(chapter => pageDropAreaPrefix + chapter.id === source.droppableId); // 드래그 된 페이지가 원래 속한 챕터
+      const sourceChapter = localOutline.chapters.find(chapter => pageDropAreaPrefix + chapter.id === source.droppableId); // 드래그 된 페이지가 원래 속한 챕터
 
       if(!sourceChapter) return;
 
@@ -282,11 +264,21 @@ export default function BookEntityDraggableContext(props : BookEntityDraggableCo
       }
 
       const newSourcePages = Array.from(sourceChapter.pages);
-      const deletedPage = newSourcePages.splice(source.index, 1)[0];
-      deleteDroppedElementOnServerAndApplyFE(deletedPage.id, type);
+      newSourcePages.splice(source.index, 1);
+      sourceChapter.pages = newSourcePages;
 
+      const newChapters = localOutline.chapters.map(chapter => {
+        if (chapter.id === sourceChapter.id) {
+          return sourceChapter;
+        } else {
+          return chapter;
+        }
+      });
+
+      localOutlineDispatch({type: 'SET_CHAPTERS', payload: newChapters});
     }
   }
+
 
   // 첫 매개변수로 받은 배열의 sourceIndex와 destinationIndex의 요소를 서로 교환하여 반환한다.
   function getReorderedArray<T>(array: T[], sourceIndex: number, destinationIndex: number) {
@@ -299,21 +291,22 @@ export default function BookEntityDraggableContext(props : BookEntityDraggableCo
     return newArray;
   }
 
+
   // DroppableId로부터 sourceChapter와 destinationChapter를 가져온다; destinationChapter가 닫힌 상태의 챕터라면, DrppableId가 다르기 때문에, 닫힌 챕터에 드롭되었는지의 여부도 인자로 받는다.
   function getSourceChapterAndDestinationChapter(sourceChapterDroppableId : string, destinationChapterDroppableId : string, isInClosingPageDropAreaDropped : boolean){
 
-    if(!outline.chapters) return [null, null];
+    if(!localOutline.chapters) return [null, null];
 
-    const sourceChapter = outline.chapters.find(chapter => pageDropAreaPrefix + chapter.id === sourceChapterDroppableId); // 드래그 된 페이지가 원래 속한 챕터
+    const sourceChapter = localOutline.chapters.find(chapter => pageDropAreaPrefix + chapter.id === sourceChapterDroppableId); // 드래그 된 페이지가 원래 속한 챕터
     let destinationChapter;
 
     // 닫혀있는 챕터로 destinationChapter를 찾음
     if(isInClosingPageDropAreaDropped){
-      destinationChapter = outline.chapters.find(chapter => inClosingPageDropAreaPrefix + String(chapter.id) === destinationChapterDroppableId);
+      destinationChapter = localOutline.chapters.find(chapter => inClosingPageDropAreaPrefix + String(chapter.id) === destinationChapterDroppableId);
 
     // 열린 상태인 챕터로 destinationChapter를 찾음
     } else {
-      destinationChapter = outline.chapters.find(chapter => pageDropAreaPrefix + String(chapter.id) === destinationChapterDroppableId);
+      destinationChapter = localOutline.chapters.find(chapter => pageDropAreaPrefix + String(chapter.id) === destinationChapterDroppableId);
     }
 
     if(sourceChapter && destinationChapter) {
@@ -325,63 +318,40 @@ export default function BookEntityDraggableContext(props : BookEntityDraggableCo
 
   }
 
-      // queryClient의 ["book", bookId]로 저장된 서버 스냅샷을 업데이트한다. 
-  function setStateChapters(newChapters : ChapterSummary[]){
-    const newOutline : Outline = {
-      ...outline,
-      chapters: newChapters
-    }
-    queryClient.setQueryData(["book", bookId], newOutline);
-  }
 
-  // queryClient의 ["book", bookId]로 저장된 서버 스냅샷을 업데이트한다. 
-  function setStatePages(pages : PageSummary[], sourceChapterId : number){
-    if(!outline.chapters) return;
-
-
-    const newChapters = outline.chapters.map(chapter => {
-
-      // 변경된 페이지를 가지는 챕터는 새로운 페이지로 교체
-      if (chapter.id === sourceChapterId) {
+  /* action : { 
+    type : string, // 'SET_CHAPTERS' | 'SET_PAGES'
+    payload : ChapterSummary[] | PageSummary[], Chapter배열 또는 Page배열
+    chapterId?: number // action.type이 'SET_PAGES'인 경우,변경된 페이지를 가지게될 챕터의 id
+  } */
+  function localOutlineReducer(state : Outline, action : { type : string, payload : ChapterSummary[] | PageSummary[] | Outline, chapterId?: number }) : Outline {
+    if(!state.chapters) return state;
+    switch(action.type){
+      case 'SET_CHAPTERS':
         return {
-          ...chapter,
-          pages: pages
+          ...state,
+          chapters: action.payload as ChapterSummary[]
         }
-
-      // 나머지 페이지는 유지
-      } else {
-        return chapter;
-      }
-
-    });
-
-    setStateChapters(newChapters);
-  }
-
-  function deleteDroppedElementOnServerAndApplyFE(id : number, type : string) : Outline {
-    if(type === 'CHAPTER'){
-      axios.delete(`/api/chapter/${id}`)
-      .then(response => {
-        if(response.data !== undefined){
-          flowAlert(response.data.alertType, response.data.alert);
-          queryClient.setQueryData(["book", bookId], response.data.data);
+      case 'SET_PAGES': 
+        return {
+          ...state,
+          chapters: state.chapters.map(chapter => {
+            // 변경된 페이지를 가지는 챕터는 새로운 페이지로 교체
+            if (chapter.id === action.chapterId) {
+              return {
+                ...chapter,
+                pages: action.payload as PageSummary[]
+              }
+            // 나머지 페이지는 유지
+            } else {
+              return chapter;
+            }
+          })
         }
-      })
-
-    } else if (type === 'PAGE'){
-      axios.delete(`/api/page/${id}`)
-      .then(response => {
-        if(response.data !== undefined){
-          flowAlert(response.data.alertType, response.data.alert);
-          queryClient.setQueryData(["book", bookId], response.data.data);
-        }
-      })
+      case 'SET_OUTLINE':
+        return action.payload as Outline;
+      default:
+        return state;
     }
-
-    return outline;
   }
-
-
-
-
 }

@@ -65,7 +65,7 @@ public class SignupController {
      * @return 이메일 인증 대기 페이지
      */
     @PostMapping("/verify/email")
-    public String verifyEmail(@Valid BasicSignupAccountDto form, Model model) {
+    public String verifyEmail(@Valid @ModelAttribute BasicSignupAccountDto form, Model model) {
 
         // ProviderType.NATIVE으로 고정 설정
         form.setProvider(ProviderType.NATIVE);

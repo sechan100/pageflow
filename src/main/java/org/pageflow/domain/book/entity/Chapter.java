@@ -30,9 +30,9 @@ public class Chapter extends BaseEntity {
     @Column(nullable = false)
     private Integer sortPriority;
 
-    @OneToMany(fetch = FetchType.LAZY, orphanRemoval = true, mappedBy = "chapter")
+    // Page가 Chapter를 이동할 수도 있기 때문에, Chapter에서 Page의 고아객체를 관리하지 않는다.
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "chapter")
     private List<Page> pages = new ArrayList<>();
-
 
     @PrePersist
     private void autoSetSortPriority() {

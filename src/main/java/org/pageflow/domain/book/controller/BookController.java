@@ -1,6 +1,5 @@
 package org.pageflow.domain.book.controller;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.pageflow.domain.book.entity.Book;
 import org.pageflow.domain.book.model.form.BookForm;
@@ -8,22 +7,15 @@ import org.pageflow.domain.book.model.outline.Outline;
 import org.pageflow.domain.book.service.BookService;
 import org.pageflow.domain.comment.entity.Comment;
 import org.pageflow.domain.comment.service.CommentService;
-import org.pageflow.domain.user.entity.Account;
 import org.pageflow.domain.user.service.AccountService;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.io.IOException;
 import java.security.Principal;
 import java.util.List;
 
@@ -57,23 +49,6 @@ public class BookController {
         return "forward:/react/build/index.html\";";
     } // 수정 get
 
-    @PreAuthorize("isAuthenticated()")
-    @PostMapping("/book/modify/{id}")
-    public String bookModify(@Valid BookForm bookForm, BindingResult bindingResult,
-                             Principal principal, @PathVariable("id") Long id, @RequestParam("file") MultipartFile file) throws IOException {
-        if (bindingResult.hasErrors() || file.isEmpty()) {
-            return "forward:/react/build/index.html\";";
-        }
-
-        Book book = this.bookService.repoFindBookWithAuthorById(id);
-        Account author = this.accountService.findFetchJoinProfileByUsername(principal.getName());
-        if (!book.getAuthor().getNickname().equals(principal.getName())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정권한이 없습니다.");
-        }
-        Book modifiedBook = this.bookService.modify(book, bookForm.getTitle(), file, author);
-        return "redirect:/user/book/cards";
-
-    } // 수정 post
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/book/delete/{id}")

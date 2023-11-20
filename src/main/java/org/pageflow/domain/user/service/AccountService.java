@@ -78,7 +78,7 @@ public class AccountService {
 
             // 프로필 사진을 등록하지 않은 경우
         } else {
-            setProfileImg("/img/default_profile_img.png", savedAccount);
+            setProfileImg(customProperties.getDefaults().getDefaultUserProfileImg(), savedAccount);
         }
     }
 
@@ -124,8 +124,13 @@ public class AccountService {
      */
     @Transactional
     public String setProfileImg(MultipartFile profileImg, Account account) {
-
-        // 기존 파일 삭제하는 로직 추가 필요
+        String staleProfileImgUrl = account.getProfile().getProfileImgUrl();
+        
+        // 프로필 이미지가 없거나 기본 이미지가 아닌 경우, 기존에 있던 프로필 사진은 삭제한다.
+        if(isDefaultProfileImgOrNull(staleProfileImgUrl)){
+            fileService.deleteFile(fileService.getPureFilePath(staleProfileImgUrl));
+        }
+        
         FileMetadata profileImgMetadata = fileService.uploadFile(profileImg, account.getProfile(), FileMetadataType.PROFILE_IMG);
         String imgUri = fileService.getImgUri(profileImgMetadata);
         account.getProfile().setProfileImgUrl(imgUri);
@@ -133,6 +138,7 @@ public class AccountService {
         return imgUri;
     }
 
+    
     /**
      * 프로필 사진 설정
      * 프로필 사진 URl을 받고, 해당 URL을 Profile 엔티티에 저장
@@ -144,7 +150,11 @@ public class AccountService {
         accountRepository.save(account);
         return profileImgUrl;
     }
-
+    
+    
+    public boolean isDefaultProfileImgOrNull(String profileImgUrl) {
+        return profileImgUrl == null || profileImgUrl.equals(customProperties.getDefaults().getDefaultUserProfileImg());
+    }
 
     // ****************************************************
     // *********     JPA Repository service      **********

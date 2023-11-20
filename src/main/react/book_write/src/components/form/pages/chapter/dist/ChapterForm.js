@@ -21,8 +21,8 @@ var __spreadArrays = (this && this.__spreadArrays) || function () {
 exports.__esModule = true;
 exports.useChapterMutationStore = void 0;
 var react_1 = require("react");
-var App_1 = require("../../../App");
-var outline_api_1 = require("../../../api/outline-api");
+var App_1 = require("../../../../App");
+var outline_api_1 = require("../../../../api/outline-api");
 var zustand_1 = require("zustand");
 var react_router_dom_1 = require("react-router-dom");
 exports.useChapterMutationStore = zustand_1.create(function (set) { return ({
@@ -31,15 +31,16 @@ exports.useChapterMutationStore = zustand_1.create(function (set) { return ({
     resetMutation: function () { return set(function (state) { return (__assign(__assign({}, state), { payload: [], isMutated: false })); }); },
     isLoading: false,
     dispatchs: {
-        setTitle: function (chapterId, title) {
+        updateChapter: function (_a) {
+            var id = _a.id, title = _a.title;
             set(function (state) {
                 // 해당 chapterId를 가진 변경사항이 존재하는 경우, 해당 부분을 수정, 
                 // 존재하지 않는 경우, 새로운 chapterMutation을 추가한다.
-                var isExist = state.payload.find(function (chapter) { return chapter.id === chapterId; });
+                var isExist = state.payload.find(function (chapter) { return chapter.id === id; });
                 // 기존 변경사항이 존재하는 경우
                 if (isExist) {
                     return __assign(__assign({}, state), { payload: state.payload.map(function (chapter) {
-                            if (chapter.id === chapterId)
+                            if (chapter.id === id)
                                 return __assign(__assign({}, chapter), { title: title });
                             else
                                 return chapter;
@@ -49,7 +50,7 @@ exports.useChapterMutationStore = zustand_1.create(function (set) { return ({
                 else {
                     return __assign(__assign({}, state), { payload: __spreadArrays(state.payload, [
                             {
-                                id: chapterId,
+                                id: id,
                                 title: title
                             }
                         ]), isMutated: true });
@@ -75,12 +76,12 @@ function ChapterForm() {
     react_1.useEffect(function () {
         // local의 title 데이터가 존재하면서 outline의 title 데이터와 다를 경우 => title 변경사항이 존재
         if (localChapter.title && isTitleChanged(localChapter.title))
-            chapterStore.dispatchs.setTitle(Number(chapterId), localChapter.title);
+            chapterStore.dispatchs.updateChapter({ id: Number(chapterId), title: localChapter.title });
     }, [localChapter]);
     return (React.createElement(React.Fragment, null,
         React.createElement("div", { className: "px-24 mt-16" },
             React.createElement("div", { className: "sm:col-span-2" },
-                React.createElement("label", { htmlFor: "title", className: "block mb-2 text-md font-medium text-gray-900" }, "\uCC55\uD130 \uCCB4\uBAA9"),
+                React.createElement("label", { htmlFor: "title", className: "block mb-2 text-md font-medium text-gray-900" }, "\uCC55\uD130 \uC81C\uBAA9"),
                 React.createElement("input", { value: localChapter.title ? localChapter.title : '', onChange: handleTitleChange, type: "text", name: "title", id: "title", className: "bg-gray-50 border border-gray-300 text-gray-900 text-xl rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5", placeholder: "\uCC45 \uC81C\uBAA9\uC744 \uC785\uB825\uD574\uC8FC\uC138\uC694." })))));
     function localChapterReducer(state, action) {
         switch (action.type) {

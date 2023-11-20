@@ -134,6 +134,18 @@ public class ApiBookController {
         return bookWriteService.createBlankPage(ownerChapter);
     }
     
+    /**
+     * @param bookId 책 아이디
+     * @param pageId 페이지 아이디
+     * @return 책 페이지 정보
+     */
+    @GetMapping("/api/book/{bookId}/chapter/page/{pageId}")
+    public Page readPage(
+            @PathVariable("bookId") Long bookId,
+            @PathVariable("pageId") Long pageId
+    ) {
+        return bookService.repoFindPageById(pageId);
+    }
     
     /**
      * 책 페이지 정보 수정

@@ -243,9 +243,7 @@ public class BookWriteService {
         
         List<Chapter> updatedChapters = new ArrayList<>();
         
-        updateRequests.forEach(chapter -> {
-            updatedChapters.add(updateChapter(chapter));
-        });
+        updateRequests.forEach(chapter -> updatedChapters.add(updateChapter(chapter)));
         
         return updatedChapters;
     }

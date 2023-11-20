@@ -1,7 +1,7 @@
 "use strict";
 exports.__esModule = true;
 var react_router_dom_1 = require("react-router-dom");
-var BookForm_1 = require("../../form/pages/BookForm");
+var BookForm_1 = require("../../form/pages/book/BookForm");
 function BookBasicPage(_a) {
     var localOutline = _a.outline;
     var bookStore = BookForm_1.useBookMutationStore();

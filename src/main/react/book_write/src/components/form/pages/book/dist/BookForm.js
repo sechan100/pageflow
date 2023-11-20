@@ -14,9 +14,9 @@ var __assign = (this && this.__assign) || function () {
 exports.__esModule = true;
 exports.useBookMutationStore = void 0;
 var react_1 = require("react");
-var App_1 = require("../../../App");
-var outline_api_1 = require("../../../api/outline-api");
-var BookCoverImgCropper_1 = require("../BookCoverImgCropper");
+var App_1 = require("../../../../App");
+var outline_api_1 = require("../../../../api/outline-api");
+var BookCoverImgCropper_1 = require("./BookCoverImgCropper");
 var zustand_1 = require("zustand");
 exports.useBookMutationStore = zustand_1.create(function (set) { return ({
     payload: { title: null, coverImg: null },
@@ -61,7 +61,7 @@ function BookForm() {
     return (React.createElement(React.Fragment, null,
         React.createElement("div", { className: "px-24 mt-16" },
             React.createElement("div", { className: "sm:col-span-2" },
-                React.createElement("label", { htmlFor: "title", className: "block mb-2 text-md font-medium text-gray-900" }, "\uCC45 \uCCB4\uBAA9"),
+                React.createElement("label", { htmlFor: "title", className: "block mb-2 text-md font-medium text-gray-900" }, "\uCC45 \uC81C\uBAA9"),
                 React.createElement("input", { value: localBook.title !== null ? localBook.title : '', onChange: function (e) { return localBookDispatch({ type: "TITLE", payload: e.target.value }); }, type: "text", name: "title", id: "title", className: "bg-gray-50 border border-gray-300 text-gray-900 text-xl rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5", placeholder: "\uCC45 \uC81C\uBAA9\uC744 \uC785\uB825\uD574\uC8FC\uC138\uC694." })),
             React.createElement("br", null),
             React.createElement("br", null),

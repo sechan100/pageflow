@@ -1,9 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 
 import { useContext, useEffect, useReducer } from "react";
-import { QueryContext } from "../../../App";
-import { useGetOutlineQuery } from "../../../api/outline-api";
-import { ChapterMutation, ChapterSummary, Outline } from "../../../types/types";
+import { QueryContext } from "../../../../App";
+import { useGetOutlineQuery } from "../../../../api/outline-api";
+import { ChapterMutation, ChapterSummary, Outline } from "../../../../types/types";
 import { create } from "zustand";
 import { useParams } from "react-router-dom";
 
@@ -13,7 +13,7 @@ interface ChapterMutationStore {
   resetMutation: () => void;
   isLoading: boolean;
   dispatchs: {
-    setTitle : (chapterId : number, title : string) => void
+    updateChapter: (update: ChapterMutation) => void;
   }
 }
 
@@ -30,12 +30,12 @@ export const useChapterMutationStore = create<ChapterMutationStore>((set : any) 
   isLoading: false, // 서버에 전달한 요청이 진행중인지의 여부. 기본적으로 false이지만, [true로 바뀌는 순간부터, 다시 false가 되는 순간]까지 서버에 요청중임을 의미한다.
   dispatchs: { // bookMutation 상태를 변경하는 dispatch 함수들. 내부적으로 isMutated를 true로 변경하는 로직을 포함한다.
 
-    setTitle : (chapterId : number, title : string) => {
+    updateChapter : ({id, title} : ChapterMutation) => {
       set((state : ChapterMutationStore) : ChapterMutationStore => {
 
         // 해당 chapterId를 가진 변경사항이 존재하는 경우, 해당 부분을 수정, 
         // 존재하지 않는 경우, 새로운 chapterMutation을 추가한다.
-        const isExist = state.payload.find(chapter => chapter.id === chapterId);
+        const isExist = state.payload.find(chapter => chapter.id === id);
 
         // 기존 변경사항이 존재하는 경우
         if(isExist){
@@ -43,7 +43,7 @@ export const useChapterMutationStore = create<ChapterMutationStore>((set : any) 
           return {
             ...state,
             payload: state.payload.map(chapter => {
-              if(chapter.id === chapterId) return {...chapter, title: title} 
+              if(chapter.id === id) return {...chapter, title: title} 
               else return chapter;
             }),
             isMutated: true
@@ -56,7 +56,7 @@ export const useChapterMutationStore = create<ChapterMutationStore>((set : any) 
             payload: [
               ...state.payload,
               {
-                id: chapterId,
+                id: id,
                 title: title
               }
             ],
@@ -91,7 +91,7 @@ export default function ChapterForm(){
   useEffect(() => {
 
     // local의 title 데이터가 존재하면서 outline의 title 데이터와 다를 경우 => title 변경사항이 존재
-    if(localChapter.title && isTitleChanged(localChapter.title)) chapterStore.dispatchs.setTitle(Number(chapterId), localChapter.title);
+    if(localChapter.title && isTitleChanged(localChapter.title)) chapterStore.dispatchs.updateChapter({id: Number(chapterId), title: localChapter.title});
 
   }, [localChapter]);
 
@@ -101,7 +101,7 @@ export default function ChapterForm(){
       <div className="px-24 mt-16">
         {/* title */}
         <div className="sm:col-span-2">
-            <label htmlFor="title" className="block mb-2 text-md font-medium text-gray-900">챕터 체목</label>
+            <label htmlFor="title" className="block mb-2 text-md font-medium text-gray-900">챕터 제목</label>
             <input value={localChapter.title ? localChapter.title : ''} onChange={handleTitleChange} type="text" name="title" id="title" className="bg-gray-50 border border-gray-300 text-gray-900 text-xl rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5" placeholder="책 제목을 입력해주세요." />
         </div>
       </div>

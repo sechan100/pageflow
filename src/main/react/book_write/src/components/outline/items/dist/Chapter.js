@@ -68,7 +68,7 @@ function Chapter(props) {
                 var _a;
                 return (react_1["default"].createElement("div", __assign({ ref: provided.innerRef }, provided.droppableProps), (_a = chapter.pages) === null || _a === void 0 ? void 0 :
                     _a.map(function (page, index) { return (react_1["default"].createElement(react_beautiful_dnd_1.Draggable, { key: OutlineContext_1.pageDraggablePrefix + page.id, draggableId: OutlineContext_1.pageDraggablePrefix + page.id, index: index }, function (provided) { return (react_1["default"].createElement("div", __assign({ ref: provided.innerRef }, provided.draggableProps, provided.dragHandleProps),
-                        react_1["default"].createElement(Page_1["default"], { page: page }))); })); }),
+                        react_1["default"].createElement(Page_1["default"], { chapterId: chapter.id, page: page }))); })); }),
                     provided.placeholder));
             }))));
     // Chapter 요소에 hover시에, chapter 옆에 ChapterForm으로 들어가는 링크 버튼을 보여주는 함수

@@ -3,12 +3,12 @@ import { useContext, useEffect, useRef, useState } from "react";
 import flowAlert from "../../etc/flowAlert";
 import { useBookMutation } from "../../api/book-api";
 import { QueryContext } from "../../App";
-import { useBookMutationStore } from "./pages/BookForm";
+import { useBookMutationStore } from "../form/pages/book/BookForm";
 import { useOutlineMutationStore } from "../BookEntityDraggableContext";
 import { useOutlineMutation } from "../../api/outline-api";
 import { useChapterMutation, useCreateChapterMutation } from "../../api/chapter-api";
 import { useCreateChapterStore } from "../outline/newItemBtn/NewChapterBtn";
-import { useChapterMutationStore } from "./pages/ChapterForm";
+import { useChapterMutationStore } from "../form/pages/chapter/ChapterForm";
 
 
 

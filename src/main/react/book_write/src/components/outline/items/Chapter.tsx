@@ -100,7 +100,7 @@ export default function Chapter(props : chapterProps) {
                     <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
 
                       {/* Page 컴포넌트 */}
-                      <Page page={page} />
+                      <Page chapterId={chapter.id} page={page} />
 
                     </div>
                   )}

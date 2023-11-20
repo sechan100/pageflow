@@ -1,10 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 
 import { useContext, useEffect, useReducer } from "react";
-import { QueryContext } from "../../../App";
-import { useGetOutlineQuery } from "../../../api/outline-api";
-import { BookMutation, Outline } from "../../../types/types";
-import ImageCropComponent from "../BookCoverImgCropper";
+import { QueryContext } from "../../../../App";
+import { useGetOutlineQuery } from "../../../../api/outline-api";
+import { BookMutation, Outline } from "../../../../types/types";
+import ImageCropComponent from "./BookCoverImgCropper";
 import { create } from "zustand";
 
 interface BookMutationStore {
@@ -88,7 +88,7 @@ export default function BookForm(){
       <div className="px-24 mt-16">
         {/* title */}
         <div className="sm:col-span-2">
-            <label htmlFor="title" className="block mb-2 text-md font-medium text-gray-900">책 체목</label>
+            <label htmlFor="title" className="block mb-2 text-md font-medium text-gray-900">책 제목</label>
             <input value={localBook.title !== null ? localBook.title : ''} onChange={(e) => localBookDispatch({type: "TITLE", payload: e.target.value})} type="text" name="title" id="title" className="bg-gray-50 border border-gray-300 text-gray-900 text-xl rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5" placeholder="책 제목을 입력해주세요." />
         </div>
         <br /><br />

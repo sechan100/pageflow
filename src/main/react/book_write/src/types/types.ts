@@ -21,6 +21,12 @@ export interface PageSummary {
   sortPriority : number
 }
 
+export interface IPage {
+  id: number,
+  title: string,
+  content: string
+}
+
 
 export interface Author {
   id: number,
@@ -30,3 +36,26 @@ export interface Author {
   profileImgUrl: string,
 }
 
+
+export interface OutlineMutation {
+  chapters: ChapterSummary[] | null
+}
+
+
+export interface BookMutation {
+  title: string | null,
+  coverImg: File | null,
+}
+
+
+export interface ChapterMutation {
+  id: number | null,
+  title: string | null,
+}
+
+
+export interface PageMutation {
+  id: number | null,
+  title: string | null,
+  content: string | null,
+}

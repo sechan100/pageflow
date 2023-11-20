@@ -40,7 +40,7 @@
         <div class="flex justify-between mb-16 w-full ">
             <div class="flex grow">
                 <!--  책 등록  -->
-                <div class="max-w-md mr-4  border-0 p-3 font-semibold text-sm leading-6 bg-[#FFBB5C] relative inline-block text-center text-white active:top-[4px] shadow-[0px_4px_#FF9B50] active:shadow-[0px_0px_#FFBB5C] active:bg-[#FF9B50]">
+                <div class="max-w-md mr-4  border-0 p-3 rounded font-semibold text-sm leading-6 bg-[#FFBB5C] relative inline-block text-center text-white active:top-[2px] active:bg-[#FF9B50]">
                     <div class="w-full h-full">
                         <a th:href="@{/book/write}">
                             책 등록
@@ -48,11 +48,11 @@
                     </div>
                 </div>
                 <!--  정렬순  -->
-                <div class="max-w-md  relative w-2/12 z-50  max-w-md mr-4 font-semibold	  border-0 p-3 bg-[#FFBB5C] relative inline-block text-center text-sm leading-6 text-white active:top-[4px] shadow-[0px_4px_#FF9B50] active:shadow-[0px_0px_#FFBB5C] active:bg-[#FF9B50]">
+                <div class="max-w-md  relative w-2/12 z-50  rounded max-w-md mr-4 font-semibold	  border-0 p-3 bg-[#FFBB5C] relative inline-block text-center text-sm leading-6 text-white active:top-[2px] active:bg-[#FF9B50]">
                     <button id="sortOption" class="btn-select w-full cursor-pointer  overflow-hidden">
                         정렬순
                     </button>
-                    <ul class="list-member list-none hidden absolute w-full rounded  text-black text-sm	 top-16 left-0">
+                    <ul class="list-member list-none hidden absolute w-full rounded font-medium text-black text-sm  top-16 left-0">
                         <li>
                             <button th:value="${createDate}" type="button">작성 날짜</button>
                         </li>
@@ -70,7 +70,7 @@
             <!--  검색 시작  -->
             <div class="w-full flex max-w-md gap-x-4 ">
                 <input id="search_kw" th:value="${kw}" name="search_kw" type="text" autocomplete="search_kw"  placeholder="검색어를 입력해주세요" required  class="input input-bordered w-full  shadow-inner rounded max-w-xs flex-auto text-black border-[#FF9B50] sm:text-sm sm:leading-6 ">
-                <button id="btn_search" type="button" class="flex-none  font-semibold	 border-0 p-3 text-sm leading-6 bg-[#FFBB5C] relative inline-block text-center text-white active:top-[4px] shadow-[0px_4px_#FF9B50] active:shadow-[0px_0px_#FFBB5C] active:bg-[#FF9B50]">
+                <button id="btn_search" type="button" class="flex-none  font-semibold rounded border-0 p-3 text-sm leading-6 bg-[#FFBB5C] relative inline-block text-center text-white active:top-[2px] active:bg-[#FF9B50]">
                     검색
                 </button>
             </div>
@@ -106,6 +106,9 @@
         </form>
 
     </div>
+
+
+
     <script type='text/javascript'>
         const btn = document.querySelector(".btn-select");
 const list = document.querySelector(".list-member");
@@ -208,6 +211,8 @@ sortOption.addEventListener('change', function() {
     console.error('dd');
 });
     </script>
+
+
 
 
 </main>

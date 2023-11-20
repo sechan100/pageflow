@@ -28,7 +28,7 @@ public class CommentService {
     }// 댓글 작성
 
     public Comment getComment(Long id) {
-        return this.commentRepository.findById(id).orElseThrow();
+        return this.commentRepository.findById(id).orElseThrow(null);
     }
 
     public void modify(Comment comment, String content) {
@@ -49,4 +49,9 @@ public class CommentService {
         Sort sort = Sort.by(Sort.Direction.DESC, "createDate");
         return commentRepository.findAllByBookId(id, sort);
     }
+
+    public Long countByBookId(Long id) {
+        return commentRepository.findAllByBookId(id);
+    }
+    // 댓글 개수 가져오기
 }

@@ -16,7 +16,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RequiredArgsConstructor
 @Controller
@@ -45,6 +47,20 @@ public class CommentController {
 
         return ResponseEntity.ok().body(commentList);
     } // 댓글 리스트 조회
+
+    public Map<String, Object> getCommentListAndCount(@PathVariable("id") Long id) {
+        Map<String, Object> result = new HashMap<>();
+
+        List<Comment> commentList = this.commentService.findAllByOrderByCreateDateDesc(id);
+
+        Long commentCount = this.commentService.countByBookId(id);
+
+        result.put("commentList", commentList);
+        result.put("commentCount", commentCount);
+
+        return result;
+    }
+    // 댓글 개수 가져오기
 
 
     @PreAuthorize("isAuthenticated()")

@@ -13,9 +13,13 @@ import org.pageflow.domain.book.repository.BookRepository;
 import org.pageflow.domain.book.repository.ChapterRepository;
 import org.pageflow.domain.book.repository.PageRepository;
 import org.pageflow.domain.user.entity.Account;
+import org.pageflow.domain.user.entity.Profile;
+import org.pageflow.infra.file.constants.FileMetadataType;
+import org.pageflow.infra.file.entity.FileMetadata;
 import org.pageflow.infra.file.service.FileService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.lang.NonNull;
@@ -38,35 +42,31 @@ public class BookService {
 
     private Specification<Book> search(String kw) {
         return new Specification<>() {
-            @Serial
             private static final long serialVersionUID = 1L;
-            
             @Override
-            public Predicate toPredicate(@NonNull Root<Book> b, @NonNull CriteriaQuery<?> query, @NonNull CriteriaBuilder cb) {
+            public Predicate toPredicate(Root<Book> b, CriteriaQuery<?> query, CriteriaBuilder cb) {
                 // b - 기준을 의미하는 Book 앤티티의 객체(책 제목 검색)
 
                 query.distinct(true); //중복 제거
 
-                Join<Book, Account> u1 = b.join("author", JoinType.LEFT);
+                Join<Book, Profile> u1 = b.join("author", JoinType.LEFT);
                 // u1-Book 엔티티와 Account 엔티티를 아우터 조인하여 만든 Account 앤티티 객체.
                 // Book 앤티티와 Account 앤티티는 author 속성으로 연결되어 있기 때문에
                 // 질문 작성자 검색
                 return cb.or(cb.like(b.get("title"), "%" + kw + "%"),
-                        cb.like(u1.get("username"), "%" + kw + "%"));
+                        cb.like(u1.get("nickname"), "%" + kw + "%"));
             }
         };
     }
 
-    
-    public org.springframework.data.domain.Page<Book> getList(int page, String kw) {
-        List<Sort.Order> sorts = new ArrayList<>();
-        sorts.add(Sort.Order.desc("createDate"));
-        Pageable pageable = PageRequest.of(page, 10, Sort.by(sorts));
+
+    public Slice<Book> getList(int page, String kw, String sortOption) {
+        Pageable pageable = PageRequest.of(page, 16, Sort.by(Sort.Direction.DESC, sortOption));
         Specification<Book> spec = search(kw);
         return this.bookRepository.findAll(spec, pageable);
     }
-    
-    
+
+
     @Transactional(readOnly = true)
     public Outline getOutline(Long bookId) {
         

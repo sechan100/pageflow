@@ -37,10 +37,44 @@
         .list-member li button:focus {
           background-color: #f8e4ff;
         }
+
+.dark-mode {
+  background-color: #1a1a1a;
+  color: #ffffff;
+}
+
+.dark-mode .btn-select:hover,
+.dark-mode .btn-select:focus {
+  border: 1px solid #9b51e0;
+  outline: 3px solid #f8e4ff;
+}
+
+.dark-mode .btn-select.on+.list-member {
+  display: block;
+}
+
+.dark-mode .list-member li button:hover,
+.dark-mode .list-member li button:focus {
+  background-color: #f8e4ff;
+}
+
     </style>
 </head>
 
 <main layout:fragment="main">
+    <script>
+
+        const toggleDarkMode = () => {
+          const htmlElement = document.querySelector('html');
+          htmlElement.classList.toggle('dark-mode');
+        };
+
+        const btnDarkMode = document.getElementById('btnDarkMode');
+        btnDarkMode.addEventListener('click', toggleDarkMode);
+
+    </script>
+
+    <button id="btnDarkMode">Toggle Dark Mode</button>
 
     <div class="mx-auto max-w-2xl px-2 py-12 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
         <div class="flex justify-between mb-16 w-full ">
@@ -213,6 +247,7 @@ sortOption.addEventListener('change', function() {
     document.getElementById('searchForm').submit();  // 폼 제출
     console.error('dd');
 });
+
     </script>
 
 

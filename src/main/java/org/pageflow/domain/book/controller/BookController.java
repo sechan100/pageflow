@@ -6,6 +6,8 @@ import org.pageflow.domain.book.entity.Book;
 import org.pageflow.domain.book.model.form.BookForm;
 import org.pageflow.domain.book.model.outline.Outline;
 import org.pageflow.domain.book.service.BookService;
+import org.pageflow.domain.comment.entity.Comment;
+import org.pageflow.domain.comment.service.CommentService;
 import org.pageflow.domain.user.entity.Account;
 import org.pageflow.domain.user.service.AccountService;
 import org.springframework.data.domain.Page;
@@ -23,6 +25,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.security.Principal;
+import java.util.List;
 
 @RequiredArgsConstructor
 @Controller
@@ -30,10 +33,13 @@ public class BookController {
 
     private final BookService bookService;
     private final AccountService accountService;
+    private final CommentService commentService;
 
     @GetMapping(value = "/book/detail/{id}")
     public String bookDetail(Model model, @PathVariable("id") Long id) {
         Outline outline = this.bookService.getOutline(id);
+        List<Comment> comment = this.commentService.findAllByOrderByCreateDateDesc(id);
+        model.addAttribute("comment", comment);
         model.addAttribute("outline", outline);
         model.addAttribute("chapters", outline.getChapters());
         return "/user/book/book_detail";

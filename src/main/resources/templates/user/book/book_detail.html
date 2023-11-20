@@ -4,44 +4,51 @@
 <head>
     <title>Book</title>
 
-    <!--  홈/ 정보 버튼  -->
+    <!-- 댓글 스크롤바 스타일 -->
     <style>
-        .chapter_btn {
-            padding: 15px 100px;
-            margin: 10px 4px;
-            color: red;
-            text-transform: uppercase;
-            position: relative;
-            text-decoration: none;
-            display: inline-block;
+        .scroll::-webkit-scrollbar {
+          width: 5px;
         }
 
-        .chapter_btn::before {
-            content: "";
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background: #6098ff;
-            display: block;
-            -webkit-transform-origin: right top;
-            -ms-transform-origin: right top;
-            transform-origin: right top;
-            -webkit-transform: scale(0, 1);
-            -ms-transform: scale(0, 1);
-            transform: scale(0, 1);
-            -webkit-transition: transform 0.4s cubic-bezier(1, 0, 0, 1);
-            transition: transform 0.4s cubic-bezier(1, 0, 0, 1);
+        .scroll::-webkit-scrollbar-thumb {
+          background: #c8c8c8;
+          border-radius: 10px;
         }
 
-        .chapter_btn:hover::before {
-            -webkit-transform-origin: left top;
-            -ms-transform-origin: left top;
-            transform-origin: left top;
-            -webkit-transform: scale(1, 1);
-            -ms-transform: scale(1, 1);
-            transform: scale(1, 1);
+    </style>
+
+    <!--읽기 버튼 커스텀-->
+    <style>
+        .read-btn {
+          transition: all 0.3s ease;
+        }
+        .read-btn:hover {
+          background: transparent;
+          color: #000;
+          box-shadow: -7px -7px 20px 0px #fff9, -4px -4px 5px 0px #fff9,
+            7px 7px 20px 0px #0002, 4px 4px 5px 0px #0001;
+        }
+        .read-btn:before,
+        .read-btn:after {
+          content: "";
+          position: absolute;
+          top: 0;
+          right: 0;
+          height: 2px;
+          width: 0;
+          background: #000;
+          transition: 400ms ease all;
+        }
+        .read-btn:after {
+          right: inherit;
+          top: inherit;
+          left: 0;
+          bottom: 0;
+        }
+        .read-btn:hover:before,
+        .read-btn:hover:after {
+          width: 100%;
+          transition: 800ms ease all;
         }
 
     </style>
@@ -52,299 +59,391 @@
 
 <main layout:fragment="main">
 
-    <section>
-        <div class="py-1 w-9/12 m-auto h-full">
-            <div class="mt-10 mb-10 flex flex-col">
-                <div class="flex flex-col sm:flex-row  h-screen justify-center">
-                    <!-- 좌측 레이아웃 시작 -->
-                    <div class="w-[300px]">
-                        <div class="w-full h-full rounded-lg" style="background-color : #e5e7eb; ">
-                            <div class=" flex flex-col ">
-                                <div class=" h-full w-full relative">
-                                    <div class="w-full" style=" filter: blur(2px) ;">
-                                        <img th:src="@{${outline.coverImgUrl}}" alt="Book Image">
-                                    </div>
-                                    <div class="w-9/12 absolute  top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
-                                         style="z-index : 1;">
-                                        <img th:src="@{${outline.coverImgUrl}}" alt="Book Image">
-                                    </div>
+    <section class="container max-w-[70%] m-auto">
+        <div class="mt-10 mb-10 flex flex-col">
+            <div class="flex flex-col md:flex-row justify-center sm:h-full">
+                <!-- 좌측 레이아웃 시작 -->
+                <div class="sm:max-w-[250px] h-[900px]  mr-6 container">
+                    <div class="md:w-full h-full rounded-lg bg-[#f7f7f7] shadow-md bg-blur">
+                        <div class="flex flex-col">
+                            <div class="h-full w-full relative">
+                                <div class="w-full" style="filter: blur(5px);">
+                                    <img th:src="@{${outline.coverImgUrl}}" alt="Book Image">
+                                </div>
+                                <div class="w-9/12 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+                                     style="z-index : 1;">
+                                    <img th:src="@{${outline.coverImgUrl}}" alt="Book Image">
                                 </div>
                             </div>
-                            <div>
-                                <div class="flex flex-col items-center text-center justify-center w-full">
-                                    <h2 class="mt-8 font-black  text-2xl w-full"
-                                        th:text="${outline.title}"></h2>
-                                    <span class="font-semibold mt-8"
-                                          th:text="${outline.author.nickname}"></span>
-                                    <div>
-                                        <a href="#" id="heart" data-filled="false" onclick="toggleHeart('heart')">
-                                            <i id="heartIcon" class="fa-solid fa-heart mt-4"
-                                               style="color: #ffffff;"></i>
-                                        </a>
-                                    </div>
-                                    <a href="javascript:void(0);" class="recommend ">
+                        </div>
+                        <div>
+                            <div class="flex flex-col items-center text-center justify-center w-full">
+                                <h2 class="mt-8 mb-8 font-black text-2xl w-full" th:text="${outline.title}"></h2>
+                                <div>
+                                    <span class="font-semibold mt-8 mr-3" th:text="${outline.author.nickname}"></span>
+                                    <a href="#" id="heart" data-filled="false" onclick="toggleHeart('heart')">
+                                        <i id="heartIcon" class="fa-regular fa-heart" style="color: #000000;"></i>
                                     </a>
-                                    <div class="mt-4">
-                                        <a th:href="@{|/outline/modify/${outline.id}|}" th:text="수정"
-                                           th:if="${outline.author != null and outline.getAuthor().getNickname() == outline.author.nickname}"
-                                           sec:authorize="isAuthenticated()"></a>
-                                        <a href="javascript:void(0);" class="delete"
-                                           th:data-uri="@{|/outline/delete/${outline.id}|}" th:text="삭제"
-                                           th:if="${outline.author != null and outline.getAuthor().getNickname() == outline.author.nickname}"
-                                           sec:authorize="isAuthenticated()"></a>
-                                    </div>
-                                    <button class="btn btn-outline btn-accent w-52 mt-20">읽기</button>
                                 </div>
+                                <a href="javascript:void(0);" class="recommend"></a>
+                                <div class="mt-4">
+                                    <a th:href="@{|/outline/modify/${outline.id}|}" th:text="수정"
+                                       th:if="${outline.author != null and outline.getAuthor().getNickname() == outline.author.nickname}"
+                                       sec:authorize="isAuthenticated()"></a>
+                                    <a href="javascript:void(0);" class="delete"
+                                       th:data-uri="@{|/outline/delete/${outline.id}|}" th:text="삭제"
+                                       th:if="${outline.author != null and outline.getAuthor().getNickname() == outline.author.nickname}"
+                                       sec:authorize="isAuthenticated()"></a>
+                                </div>
+                                <a href="#"
+                                   class="custom-btn read-btn w-52 mt-20 relative rounded-sm font-semibold	leading-10 bg-black	text-white p-1">읽기</a>
                             </div>
                         </div>
                     </div>
-                    <!-- 좌측 레이아웃 끝 -->
-                    <!-- 우측 레이아웃 시작 -->
-                    <div class="sm:w-2/3 sm:mt-0 sm:ml-2 text-center sm:text-left flex flex-col h-full ">
-                        <!--      책 챕터 표기    -->
-                        <div class=" h-3/5 rounded-lg" style="background-color : #e5e7eb;">
-                            <div>
-                                <!--     홈/정보 메뉴    -->
-                                <ul class="flex justify-center  mt-1">
-                                    <li class="mr-10  p-1 rounded-lg chapter_btn ">
-                                        <a href="#" data-tip="Hom" onclick="showTab('tab1')">
-                                            <p>홈</p>
-                                        </a>
-                                    </li>
-                                    <li class=" p-1 rounded-lg chapter_btn">
-                                        <a href="#" data-tip="Details" onclick="showTab('tab2')">
-                                            <p>정보</p>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                            <!--         책 챕터 (홈)    -->
-                            <div class="flex flex-wrap -m-2 tab-content" id="tab1">
-                                <div class="p-2 w-full">
-                                    <div class="h-full flex items-center  p-3 rounded-lg ">
-                                        <div class="flex-grow">
-                                            <ul>
-                                                <li th:each=" chapters : ${outline.chapters}" class="flex mb-2">
-                                                    <img th:src="@{${outline.coverImgUrl}}"
-                                                         class="w-14 h-16 object-cover object-center flex-shrink-0 mr-4 rounded-lg"
-                                                         alt="Book Image">
-                                                    <div class="w-full py-3">
-                                                        <div><a href="#" class=" text-base "
-                                                                th:text="${chapters.title}"></a></div>
-                                                        <!--      작성 날짜 데아터 표기 해야함    -->
-                                                        <span th:text="${#temporals.format(outline.author.createDate, 'yyyy-MM-dd')}"></span>
-                                                    </div>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <!--         책 챕터 (정보)    -->
-                            <div class="flex flex-wrap -m-2 tab-content hidden" id="tab2">
-                                <h1 th:if="${selectedTab == 'tab2'}">정보페이지</h1>
-                            </div>
-                        </div>
-                        <!--          책 챕터 끝    -->
-                        <!--  댓글 레이아웃 -->
-                        <div class="h-2/5 flex flex-col relative rounded-lg mt-5 overflow-hidden"
-                             style="background-color: #e5e7eb; overflow-y: auto;">
-                            <div class="h-7 px-4 py-1">
-                                <ul>
-                                    <li>
-                                        <i class="fa-regular fa-comment" style="color: #000000; ">
-                                            <!--                                    <span class="text-danger small ms-2"-->
-                                            <!--                                          th:if="${#lists.size(comment.id) > 0}"-->
-                                            <!--                                          th:text="${#lists.size(comment.id)}"></span>-->
-                                            댓글수(데이터 표기해야함)
-                                        </i>
-                                    </li>
-                                    <li>
-                                        <a href=""></a>
-                                    </li>
-                                </ul>
-                            </div>
-                            <div class="h-5/6">
-                                <div id="comment_list" class="h-full overflow-auto"></div>
-                            </div>
-                            <div class="w-full absolute bottom-0 border">
-                                <div class="form-control flex">
-                                    <form class="flex " onsubmit="commentWrite_submitForm(this); return false;">
-                                        <div class="flex-1 px-2 py-1">
-                                            <label for="content"></label>
-                                            <input name="content" id="content" type="text" placeholder="소중한 의견을 남겨주세요"
-                                                   class="input input-bordered px-6 w-full rounded-lg"/>
-                                        </div>
-                                        <div class="w-1/5 px-2 py-1">
-                                            <input type="submit" class="input input-bordered w-full" value="등록"/>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                            <!-- 댓글 레이아웃 끝 -->
-                        </div>
-                    </div>
-                    <!-- 우측 레이아웃 끝 -->
                 </div>
+                <!-- 좌측 레이아웃 끝 -->
+                <!-- 우측 레이아웃 시작 -->
+                <div class="w-full mt-0 ml-0 text-center sm:text-left flex flex-col container">
+                    <!-- 책 챕터 표기 -->
+                    <div class="h-3/5 rounded-lg bg-[#f7f7f7] shadow-md bg-blur container">
+                        <div>
+                            <!-- 홈/정보 메뉴 -->
+                            <ul class="flex justify-center text-xl font-bold mt-1 menu menu-horizontal rounded-box">
+                                <li class="mr-14 p-1 rounded-lg ">
+                                    <a href="#" data-tip="Hom" onclick="showTab('tab1')">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+                                             viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                  d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                                        </svg>
+                                    </a>
+                                </li>
+                                <li class="p-1 rounded-lg ">
+                                    <a href="#" data-tip="Details" onclick="showTab('tab2')">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+                                             viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        </svg>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        <!-- 책 챕터 (홈) -->
+                        <div class="flex flex-wrap -m-2 tab-content" id="tab1">
+                            <div class="p-2 w-full">
+                                <div class="h-full flex items-center p-3 rounded-lg ">
+                                    <div class="flex-grow">
+                                        <ul>
+                                            <li th:each="chapters : ${outline.chapters}" class="flex mb-2">
+                                                <img th:src="@{${outline.coverImgUrl}}"
+                                                     class="w-14 h-16 object-cover object-center flex-shrink-0 mr-4 rounded-lg"
+                                                     alt="Book Image">
+                                                <div class="w-full py-3">
+                                                    <div><a href="#" class="font-semibold" th:text="${chapters.title}"></a></div>
+                                                    <span class="font-normal"
+                                                          th:text="${#temporals.format(outline.author.createDate, 'yyyy-MM-dd')}"></span>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 책 챕터 (정보) -->
+                        <div class="flex flex-wrap -m-2 tab-content hidden" id="tab2">
+                            <h1 th:if="${selectedTab == 'tab2'}">정보페이지</h1>
+                        </div>
+                    </div>
+                    <!-- 책 챕터 끝 -->
+                    <!-- 댓글 레이아웃 -->
+                    <div class="h-3/5 flex flex-col relative rounded-lg mt-5 overflow-hidden bg-[#f7f7f7] shadow-md bg-blur">
+                        <div class="h-10 p-2">
+                            <ul class="mb-4 mt-2 border-b-2 ">
+                                <li >
+                                    <i class="fa-regular fa-comment"
+                                       style="color: #000000; font-size: 1.2em;"></i>
+                                    <span id="getCommentCount"></span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="h-[332px] ">
+                            <div id="comment_list" class="scroll h-full overflow-auto"></div>
+                        </div>
+                        <div class="w-full absolute bottom-0 border">
+                            <div class="form-control flex">
+                                <form class="flex " onsubmit="commentWrite_submitForm(this); return false;">
+                                    <div class="flex-1 px-2 py-1">
+                                        <label for="content"></label>
+                                        <input autofocus name="content" id="content" type="text" placeholder="소중한 의견을 남겨주세요"
+                                               class="input input-bordered px-6 w-full rounded-lg" />
+                                    </div>
+                                    <div class="w-1/5 px-2 py-1">
+                                        <input type="submit" class="input input-bordered w-full" value="등록" />
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 댓글 레이아웃 끝 -->
+                </div>
+                <!-- 우측 레이아웃 끝 -->
             </div>
         </div>
+
     </section>
 
-
+    <!--  댓글 관련 js  -->
     <script>
-     let commentWrite_submitFormDone = false;
+        let commentWrite_submitFormDone = false;
 
-     // 댓글 작성 함수
-     function commentWrite_submitForm(form) {
-         form.content.value = form.content.value.trim();
+        // 페이지 로드 시 댓글 개수 가져오기
+        $(document).ready(function () {
+            updateCommentCount();
+        });
 
-         if (form.content.value.length === 0) {
-             Swal.fire({
-                 icon: 'error',
-                 title: '댓글 입력 오류',
-                 text: '댓글을 입력해주세요',
-             });
+        // 댓글 개수를 가져오고 업데이트하는 함수
+        function updateCommentCount() {
+            var outlineId = [[${outline.id}]];
 
-             form.content.focus();
-             return;
-         }
+            $.ajax({
+                type: 'GET',
+                url: `/comment/list/${outlineId}`,
+                success: function (commentList) {
+                    var count = commentList.length;
+                    console.log("댓글 개수 가져오기 성공: " + count);
+                    $("#getCommentCount").text(count);
+                },
+                error: function (xhr, status, error) {
+                    console.error("댓글 개수 가져오기 실패");
+                }
+            });
+        }
 
-         var outlineId = [[${outline.id}]];
+        // 댓글 작성 함수
+        function commentWrite_submitForm(form) {
+            form.content.value = form.content.value.trim();
 
-         $.ajax({
-             type: 'POST',
-             url: `/comment/create/${outlineId}`,
-             data: { content: form.content.value },
-             success: function (comment) {
-                 console.log("댓글 생성 완료");
-                 commentList(comment);
-                 form.content.value = '';
-             },
-             error: function (xhr, status, error) {
-                 console.error("댓글 생성 에러");
-             }
-         });
-     }
+            if (form.content.value.length === 0) {
+                Swal.fire({
+                    icon: 'error',
+                    title: '댓글 입력 오류',
+                    text: '댓글을 입력해주세요',
+                });
 
-    // 댓글 목록
-     $(document).ready(function () {
-         var outlineId = [[${outline.id}]];
+                form.content.focus();
+                return;
+            }
 
-         $.ajax({
-             type: 'GET',
-             url: `/comment/list/${outlineId}`,
-             success: function (comment) {
-                 console.log("댓글 목록 로드 완료");
-                 commentList(comment);
-             },
-             error: function (xhr, status, error) {
-                 console.error("댓글 목록 로드 에러");
-             }
-         });
-     });
+            var outlineId = [[${outline.id}]];
 
-     // 댓글 목록을 화면에 표시
-     function commentList(comment) {
-         var output = "";
-         var userImg = "[[${outline.author.profileImgUrl}]]";
+            $.ajax({
+                type: 'POST',
+                url: `/comment/create/${outlineId}`,
+                data: { content: form.content.value },
+                success: function (comment) {
+                    console.log("댓글 생성 완료");
+                    // 댓글 목록 업데이트
+                    commentList(comment);
+                    // 댓글 개수 업데이트
+                    updateCommentCount();
+                    form.content.value = '';
+                },
+                error: function (xhr, status, error) {
+                    console.error("댓글 생성 에러");
+                }
+            });
+        }
 
-         comment.sort(function (a, b) {
-             return new Date(b.createDate) - new Date(a.createDate);
-         });
+        // 댓글 목록
+        $(document).ready(function () {
+            var outlineId = [[${outline.id}]];
 
-         for (var i in comment) {
-             output += "<div class='flex text-xs mb-2 mt-1'>";
-             output += "<div class='w-10 mr-2 ml-2 flex'>";
-             output += "<div class='w-7 h-7 m-auto justify-items-center'>";
-             output += "<img src='" + userImg + "' alt='프로필이미지' class='rounded-full'>";
-             output += "</div>";
-             output += "</div>";
-             output += "<div class=''>";
-             output += `<p id='comment-${comment[i].id}' class='mb-1'>${comment[i].content}</p>`;
-             output += `<a href='javascript:void(0);' class='recommend mr-2' onclick='recommendComment(${comment[i].id})'>추천</a>`;
-             output += `<a href='javascript:void(0);' class='edit mr-2' onclick='editComment(${comment[i].id})'>수정</a>`;
-             output += `<a href='javascript:void(0);' class='delete' onclick='deleteComment(${comment[i].id})'>삭제</a>`;
-             output += "</div>";
-             output += "</div>";
+            $.ajax({
+                type: 'GET',
+                url: `/comment/list/${outlineId}`,
+                success: function (comment) {
+                    console.log("댓글 목록 로드 완료");
+                    commentList(comment);
+                    updateCommentCount();
+                },
+                error: function (xhr, status, error) {
+                    console.error("댓글 목록 로드 에러");
+                }
+            });
+        });
 
-         }
+// 댓글 목록을 화면에 표시
+function commentList(commentList) {
+    var output = "";
+    var userImg = "[[${outline.author.profileImgUrl}]]";
 
-         $("#comment_list").html(output);
-     }
+    commentList.sort(function (a, b) {
+        return new Date(b.createDate) - new Date(a.createDate);
+    });
 
-     // 댓글 삭제
-         const deleteComment = (commentId) => {
-         Swal.fire({
-             title: '댓글 삭제',
-             text: '정말로 삭제하시겠습니까?',
-             icon: 'question',
-             showCancelButton: true,
-             confirmButtonText: '삭제',
-             cancelButtonText: '취소'
-         }).then((result) => {
-             if (result.isConfirmed) {
-                 $.ajax({
-                     type: 'GET',
-                     url: `/comment/delete/${commentId}`,
-                     success: function (comment) {
-                         console.log('댓글 삭제 완료');
-                         commentList(comment);
-                     },
-                     error: function (xhr, status, error) {
-                         console.error("댓글 삭제 에러");
-                     }
-                 });
-             }
-         });
-     };
+    for (var i in commentList) {
+        var comment = commentList[i];
 
-     // 댓글 수정
-     function editComment(commentId) {
-         var commentContent = $("#comment-" + commentId).text();
-         var newContent = `<textarea>${commentContent}</textarea>`;
+        output += "<div class='flex text-xs mb-2 mt-1'>";
+        output += "<div class='w-10 mr-2 ml-2 flex'>";
+        output += "<div class='w-7 h-7 m-auto justify-items-center'>";
+        output += "<img src='" + userImg + "' alt='프로필이미지' class='rounded-full'>";
+        output += "</div>";
+        output += "</div>";
+        output += "<div class='flex w-full p-1'>";
+        output += `<p id='comment-${comment.id}' class=' w-full flex justify-between'>${comment.content}`;
+        output += `<a href='#'>`;
+        output += `<i onclick='openModal(${comment.id})' class='fa-solid fa-bars modal_btn justify-end text-black text-base'></i>`;
+        output += `</a>`;
+        output += `<dialog id='my_modal_${comment.id}' class='modal'>`;
+        output += `<div class='modal-box bg-white text-black'>`;
+        output += `<form method='dialog'>`;
+        output += `<button class='btn btn-sm btn-circle btn-ghost absolute right-3 top-3' onclick='closeModal(${comment.id})'>✕</button>`;
+        output += `</form>`;
+        output += `<a href='javascript:void(0);' class='recommend mr-2' onclick='recommendComment(${comment.id})'>추천</a>`;
+        output += `<a href='javascript:void(0);' class='edit mr-2' onclick='editComment(${comment.id})'>수정</a>`;
+        output += `<a href='javascript:void(0);' class='delete' onclick='deleteComment(${comment.id})'>삭제</a>`;
+        output += `</div>`;
+        output += `</dialog>`;
+        output += "</div>";
+        output += "</p>";
+        output += "</div>";
+    }
 
-         if (newContent !== null) {
-             $("#comment-" + commentId).replaceWith(`<textarea id='comment-${commentId}' style='width: 100%; resize: none;'>${commentContent}</textarea>`);
-             $("#comment-" + commentId).next().hide();
-             $("#comment-" + commentId).next().next().hide();
-             $("#comment-" + commentId).next().next().next().hide();
-             $("#comment-" + commentId).after(`<button onclick='saveEdit(${commentId})'>저장</button>`);
-             $("#comment-" + commentId).after(`<button onclick='cancelEdit(${commentId})'>취소</button>`);
-             console.log('Cancel button clicked!');
-         }
-     }
+    $("#comment_list").html(output);
+}
 
-    // 댓글 수정 저장
-     function saveEdit(commentId) {
-         var editedContent = $("#comment-" + commentId).val();
-         $.ajax({
-             type: 'POST',
-             url: `/comment/modify/${commentId}`,
-             data: { content: editedContent },
-             success: function (comment) {
-                 console.log('댓글 수정 완료');
-                 commentList(comment);
-             },
-             error: function (xhr, status, error) {
-                 console.error("댓글 수정 에러");
-             }
-         });
-     }
+// 댓글 삭제
+function deleteComment(commentId) {
+    closeModal(commentId);
 
-    // 취소 시 화면 돌아감
-     function cancelEdit(commentId) {
-        var commentContent = $("#comment-" + commentId).text();
-        $("#comment-" + commentId).replaceWith(`<p id='comment-${commentId}'>${commentContent}</p>`);
+    Swal.fire({
+        title: '댓글 삭제',
+        text: '정말로 삭제하시겠습니까?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: '삭제',
+        cancelButtonText: '취소'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                type: 'GET',
+                url: `/comment/delete/${commentId}`,
+                success: function (comment) {
+                    console.log('댓글 삭제 완료:', comment);
+                    commentList(comment);
+                    // 댓글 개수 업데이트
+                    updateCommentCount();
+                },
+                error: function (xhr, status, error) {
+                    console.error('댓글 삭제 에러:', xhr, status, error);
+                    // 에러 메시지 출력
+                    Swal.fire({
+                        icon: 'error',
+                        title: '댓글 삭제 오류',
+                        text: '댓글 삭제 중 에러가 발생했습니다.'
+                    });
+                }
+            });
+        }
+    });
+}
 
-        var buttonsToShow = $("#comment-" + commentId).parent().find('.recommend, .edit, .delete');
-        buttonsToShow.show();
+// 댓글 수정 버튼 후 화면 표시
+function editComment(commentId) {
+    closeModal(commentId);
 
-        $("#comment-" + commentId).siblings("button").remove();
+    var commentContent = $("#comment-" + commentId).text();
+    var containerHeight = $("#comment-" + commentId).parent().height();
 
+    var newContent = `
+        <div class='w-full flex justify-between'>
+            <div id='comment-${commentId}' class='w-full flex justify-between'>
+                <textarea id='comment-${commentId}' autofocus class='textarea textarea-bordered textarea-xs bg-slate-100 mr-2 w-full' style='resize: none; height: ${containerHeight}px;'>${commentContent}</textarea>
+                 <a href='#'>
+                <i onclick='openModal(${commentId})' class='fa-solid fa-bars modal_btn justify-end text-black text-base'></i>
+                </a>
+                <dialog id='my_modal_${commentId}' class='modal'>
+                    <div class='modal-box bg-white text-black'>
+                        <form method='dialog'>
+                            <button class='btn btn-sm btn-circle btn-ghost absolute right-3 top-3' onclick='closeModal(${commentId})'>✕</button>
+                        </form>
+                        <button onclick='saveEdit(${commentId})'>저장</button>
+                        <button  onclick='cancelEdit(${commentId})'>취소</button>
+                    </div>
+                </dialog>
+            </div>
+        </div>
+    `;
 
-         console.log('취소 에러 ');
+if (newContent !== null) {
+$("#comment-" + commentId).replaceWith(newContent);
+$("#comment-" + commentId).next().hide();
+$("#comment-" + commentId).next().next().hide();
+$("#comment-" + commentId).next().next().next().hide();
+}
+        }
 
-     }
+   // 댓글 수정 저장
+function deleteComment(commentId) {
+    closeModal(commentId);
+
+    Swal.fire({
+        title: '댓글 삭제',
+        text: '정말로 삭제하시겠습니까?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: '삭제',
+        cancelButtonText: '취소'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                type: 'GET',
+                url: `/comment/delete/${commentId}`,
+                success: function (comment) {
+                    console.log('댓글 삭제 완료:', comment);
+                    commentList(comment);
+                    // 댓글 개수 업데이트
+                    updateCommentCount();
+                },
+                error: function (xhr, status, error) {
+                    console.error('댓글 삭제 에러:', xhr, status, error);
+                    // 에러 메시지 출력
+                    Swal.fire({
+                        icon: 'error',
+                        title: '댓글 삭제 오류',
+                        text: '댓글 삭제 중 에러가 발생했습니다.'
+                    });
+                }
+            });
+        }
+    });
+}
+
+// 취소 시 화면 표시
+function cancelEdit(commentId) {
+    var commentContent = $("#comment-" + commentId).text();
+    $("#comment-" + commentId).replaceWith(`<p id='comment-${commentId}'>${commentContent}</p>`);
+
+    // 해당 댓글의 원래 버튼 표시
+    var buttonsToShow = $("#comment-" + commentId).parent().find('.modal_btn');
+    buttonsToShow.show();
+
+    $("#comment-" + commentId).siblings("button").remove();
+}
+
+        // 댓글 관련 버튼 모달 열기
+function openModal(commentId) {
+    var modal = document.getElementById('my_modal_' + commentId);
+    modal.showModal();
+}
+
+// 댓글 관련 버튼 모달 열기
+function closeModal(commentId) {
+    var modal = document.getElementById('my_modal_' + commentId);
+    modal.close();
+}
 
     </script>
 
@@ -377,7 +476,7 @@
 
             heart.setAttribute('data-filled', (!isFilled).toString());
 
-            heartIcon.style.color = isFilled ? '#ffffff' : '#ff0000';
+            heartIcon.style.color = isFilled ? '#000000' : '#ff0000';
 
         }
     </script>

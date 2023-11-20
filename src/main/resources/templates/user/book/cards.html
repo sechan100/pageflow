@@ -69,7 +69,7 @@
             </div>
             <!--  검색 시작  -->
             <div class="w-full flex max-w-md gap-x-4 ">
-                <input id="search_kw" th:value="${kw}" name="search_kw" type="text" autocomplete="search_kw"  placeholder="검색어를 입력해주세요" required  class="input input-bordered w-full  shadow-inner rounded max-w-xs flex-auto text-black border-[#FF9B50] sm:text-sm sm:leading-6 ">
+                <input id="search_kw" th:value="${kw}" name="search_kw" type="text" autocomplete="search_kw"  placeholder="검색어를 입력해주세요" required  class="input w-full focus:outline-0 focus:border-[#FF9B50] focus:ring-0 rounded max-w-xs flex-auto text-black border-[#FF9B50] sm:text-sm sm:leading-6 ">
                 <button id="btn_search" type="button" class="flex-none  font-semibold rounded border-0 p-3 text-sm leading-6 bg-[#FFBB5C] relative inline-block text-center text-white active:top-[2px] active:bg-[#FF9B50]">
                     검색
                 </button>

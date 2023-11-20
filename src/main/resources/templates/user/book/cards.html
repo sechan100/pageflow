@@ -3,14 +3,8 @@
 <head>
     <title>Book</title>
 
+<!--  select 정렬순 스타일  -->
     <style>
-        .btn-select:hover,
-        .btn-select:focus {
-          < !-- border: 1px solid #9b51e0;
-          -->< !-- outline: 3px solid #f8e4ff;
-          -->
-        }
-
         .btn-select.on+.list-member {
           display: block;
         }
@@ -35,64 +29,30 @@
 
         .list-member li button:hover,
         .list-member li button:focus {
-          background-color: #f8e4ff;
+          background-color: #FFBB5C;
         }
-
-.dark-mode {
-  background-color: #1a1a1a;
-  color: #ffffff;
-}
-
-.dark-mode .btn-select:hover,
-.dark-mode .btn-select:focus {
-  border: 1px solid #9b51e0;
-  outline: 3px solid #f8e4ff;
-}
-
-.dark-mode .btn-select.on+.list-member {
-  display: block;
-}
-
-.dark-mode .list-member li button:hover,
-.dark-mode .list-member li button:focus {
-  background-color: #f8e4ff;
-}
-
     </style>
 </head>
 
 <main layout:fragment="main">
-    <script>
-
-        const toggleDarkMode = () => {
-          const htmlElement = document.querySelector('html');
-          htmlElement.classList.toggle('dark-mode');
-        };
-
-        const btnDarkMode = document.getElementById('btnDarkMode');
-        btnDarkMode.addEventListener('click', toggleDarkMode);
-
-    </script>
-
-    <button id="btnDarkMode">Toggle Dark Mode</button>
 
     <div class="mx-auto max-w-2xl px-2 py-12 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
         <div class="flex justify-between mb-16 w-full ">
             <div class="flex grow">
                 <!--  책 등록  -->
-                <div class="max-w-md mr-4">
-                    <div class="w-full p-3 font-normal leading-4 text-sm border-2 rounded-md border-[#c4c4c4] text-center	cursor-pointer whitespace-nowrap text-ellipsis overflow-hidden	bg-white">
+                <div class="max-w-md mr-4 rounded border-0 p-3 font-semibold	 text-sm leading-6 bg-[#FFBB5C] relative inline-block text-center text-white active:top-[4px] shadow-[0px_4px_#FF9B50] active:shadow-[0px_0px_#FFBB5C] active:bg-[#FF9B50]">
+                    <div class="w-full h-full">
                         <a th:href="@{/book/write}">
                             책 등록
                         </a>
                     </div>
                 </div>
                 <!--  정렬순  -->
-                <div class="max-w-md  relative w-2/12">
-                    <button id="sortOption" class="btn-select w-full p-3 font-normal leading-4 text-sm border-2 rounded-md border-[#c4c4c4] text-center	cursor-pointer whitespace-nowrap text-ellipsis overflow-hidden	bg-white">
+                <div class="max-w-md  relative w-2/12 z-50  max-w-md mr-4 font-semibold	 rounded border-0 p-3 bg-[#FFBB5C] relative inline-block text-center text-sm leading-6 text-white active:top-[4px] shadow-[0px_4px_#FF9B50] active:shadow-[0px_0px_#FFBB5C] active:bg-[#FF9B50]">
+                    <button id="sortOption" class="btn-select w-full cursor-pointer  overflow-hidden">
                         정렬순
                     </button>
-                    <ul class="list-member list-none hidden absolute w-full  text-sm rounded-md shadow-lg top-16 left-0">
+                    <ul class="list-member list-none hidden absolute w-full rounded  text-black text-sm	 top-16 left-0">
                         <li>
                             <button th:value="${createDate}" type="button">작성 날짜</button>
                         </li>
@@ -109,8 +69,8 @@
             </div>
             <!--  검색 시작  -->
             <div class="w-full flex max-w-md gap-x-4 ">
-                <input id="search_kw" th:value="${kw}" name="search_kw" type="text" autocomplete="search_kw" required class="form-control min-w-0 flex-auto rounded-md bg-white/5 px-3.5 py-2 text-black shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6" placeholder="검색어를 입력해주세요">
-                <button id="btn_search" type="button" class="flex-none rounded-md bg-indigo-500 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">
+                <input id="search_kw" th:value="${kw}" name="search_kw" type="text" autocomplete="search_kw"  placeholder="검색어를 입력해주세요" required  class="input input-bordered w-full  shadow-inner rounded max-w-xs flex-auto text-black border-[#FF9B50] sm:text-sm sm:leading-6 ">
+                <button id="btn_search" type="button" class="flex-none rounded font-semibold	 border-0 p-3 text-sm leading-6 bg-[#FFBB5C] relative inline-block text-center text-white active:top-[4px] shadow-[0px_4px_#FF9B50] active:shadow-[0px_0px_#FFBB5C] active:bg-[#FF9B50]">
                     검색
                 </button>
             </div>
@@ -119,7 +79,7 @@
         <div style="min-height: 101vh;">
             <div class="grid grid-cols-1 gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
                 <div th:each="book : ${paging}">
-                    <div class="aspect-h-2 aspect-w-1 w-full overflow-hidden rounded-lg xl:aspect-h-8 xl:aspect-w-7 relative">
+                    <div class="aspect-h-2 aspect-w-1 w-full overflow-hidden rounded xl:aspect-h-8 xl:aspect-w-7 relative">
                         <div>
                             <a href="@|/book/detail/${book.id}|">
                                 <div class="relative">
@@ -247,7 +207,6 @@ sortOption.addEventListener('change', function() {
     document.getElementById('searchForm').submit();  // 폼 제출
     console.error('dd');
 });
-
     </script>
 
 

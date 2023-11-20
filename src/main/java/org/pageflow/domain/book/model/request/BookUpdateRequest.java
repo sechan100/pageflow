@@ -1,24 +1,20 @@
 package org.pageflow.domain.book.model.request;
 
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
-import org.pageflow.domain.book.entity.Book;
+import org.springframework.web.multipart.MultipartFile;
 
+/**
+ * 책 수정 요청드
+ */
 @Data
 public class BookUpdateRequest {
 
     private Long id;
 
+    @NotEmpty
     private String title;
 
-    private String coverImgUrl;
-
-    private boolean isPublished;
-
-
-    public BookUpdateRequest(Book book) {
-        this.id = book.getId();
-        this.title = book.getTitle();
-        this.coverImgUrl = book.getCoverImgUrl();
-        this.isPublished = book.isPublished();
-    }
+    private MultipartFile coverImg;
+    
 }

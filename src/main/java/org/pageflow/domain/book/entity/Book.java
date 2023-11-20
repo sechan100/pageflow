@@ -5,6 +5,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import lombok.*;
+import org.hibernate.annotations.DynamicUpdate;
 import org.pageflow.base.entity.BaseEntity;
 import org.pageflow.domain.user.entity.Profile;
 
@@ -17,6 +18,7 @@ import java.util.Objects;
 @Builder
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED) //접근 수준. 상속관계에 있는 클래스에서만 생성자에 접근 가능
+@DynamicUpdate
 public class Book extends BaseEntity {
 
     private String title;

@@ -3,22 +3,22 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Outline } from "../../types/types";
 import ProgressionBar from "./ProgressionBar";
 import { useNavStore } from "../viewer/ViewerContext";
-import { ILocation } from "./PageCursor";
+import { ILocation, useLocationStore } from "./PageCursor";
 
 
 
 
 interface NavbarProps {
-  location: ILocation;
   outline: Outline;
 }
 
 
 
 
-export default function Navbar({location, outline} : NavbarProps) {
+export default function Navbar({outline} : NavbarProps) {
 
   const [absolutePage, setAbsolutePage] : [number, Dispatch<SetStateAction<number>>] = useState<number>(0);
+  const {location} = useLocationStore();
   const { isVisible } = useNavStore();
 
   // location 변화에 맞춰서 absolutePage를 동기화.
@@ -71,16 +71,16 @@ export default function Navbar({location, outline} : NavbarProps) {
     return absolutePage;
   }
 
-  function getChapterTitle(outline : Outline, chapterIdx : number){
-    if(outline.chapters){
-      return outline.chapters[chapterIdx].title;
-    }
-  }
+}
 
-  function getPageTitle(outline : Outline, {chapterIdx, pageIdx} : ILocation){
-    if(outline.chapters){
-      return outline.chapters[chapterIdx].pages?.[pageIdx].title;
-    }
+export function getChapterTitle(outline : Outline, chapterIdx : number){
+  if(outline.chapters){
+    return outline.chapters[chapterIdx].title;
   }
+}
 
+export function getPageTitle(outline : Outline, {chapterIdx, pageIdx} : ILocation){
+  if(outline.chapters){
+    return outline.chapters[chapterIdx].pages?.[pageIdx].title;
+  }
 }

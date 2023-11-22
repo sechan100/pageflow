@@ -1,4 +1,10 @@
 import { create } from "zustand";
+import { useGetPage } from "../api/page-api";
+import { Outline } from "../../types/types";
+import { metaPageType, useLocationStore } from "../nav/PageCursor";
+import { getChapterTitle } from "../nav/Navbar";
+import { useEffect, useRef } from "react";
+import Carousel from "./Carousel";
 
 
 
@@ -19,28 +25,53 @@ export const useNavStore = create<UseNavStore>((set, get) => ({
 
 
 
-export default function ViewerContext() {
+export default function ViewerContext({outline}: {outline: Outline}) {
 
   const { toggle } = useNavStore();
+  const { location, metaPage } = useLocationStore();
+  const getPageAsync = useGetPage(outline.id, getPageMap(outline));
+  const currentPage = getPageAsync(location);
+  const contentContainer = useRef<HTMLDivElement>(null);
 
-
+  // 총 칼럼이 홀수개일 경우, 마지막 칼럼의 오른쪽은 빈 페이지여야한다. 근데 해결 방법이 마땅치 않아서 그냥 줄바꿈태그를 최소 한도로 넣어놓음.
+  const lastColumnOffset = ("<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>");
 
   return (
-    <div className="h-screen" onClick={toggle}>
+    <div className="" onClick={toggle}>
       <div className="text-center py-20 sm:px-10 xl:px-52">
-        <div className="flex justify-end text-left">
-          <p className="mr-10 select-none">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum condimentum augue sed felis luctus luctus. Mauris iaculis dolor interdum felis ultrices, egestas aliquam dui sagittis. Vestibulum sed erat pretium, semper mauris id, placerat turpis. In in ultricies nunc, in posuere ante. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Cras et molestie orci. Ut vel blandit mauris. Vestibulum aliquam viverra sem a suscipit. Proin sit amet faucibus orci. Curabitur a massa sapien. Curabitur dolor risus, iaculis sit amet porta non, varius vitae mauris. Ut tincidunt libero quis molestie convallis.
-            Phasellus est neque, posuere non consectetur sit amet, euismod aliquet felis. Quisque ornare, lectus ut convallis consequat, lectus ipsum convallis urna, cursus egestas sem urna quis nunc. Ut ut velit sed nisl bibendum rutrum et sed purus. Etiam suscipit lectus et tincidunt feugiat. Praesent placerat at dui ut condimentum. Duis porttitor elit et elementum mollis. Ut vitae mauris lacinia, commodo elit et, vulputate erat. Nullam in felis ac metus facilisis maximus. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Duis sed sagittis justo. Maecenas porta justo quis bibendum mattis.
-            Maecenas aliquet dignissim condimentum. Maecenas lacinia ultrices justo. In placerat neque quis dui porttitor, mollis pulvinar velit vestibulum. Maecenas bibendum velit non diam suscipit feugiat. Sed rhoncus dolor sed molestie pharetra. Suspendisse ultricies mattis justo, ut accumsan lectus interdum fermentum. Aenean id diam nec augue efficitur fringilla.Donec auctor dui et mi dignissim convallis. Donec mollis varius sem, nec imperdiet mauris molestie et. Fusce rutrum leo et urna cursus finibus. Aenean consequat ante nec 
-          </p>
-          <p className="ml-10 select-none">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum condimentum augue sed felis luctus luctus. Mauris iaculis dolor interdum felis ultrices, egestas aliquam dui sagittis. Vestibulum sed erat pretium, semper mauris id, placerat turpis. In in ultricies nunc, in posuere ante. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Cras et molestie orci. Ut vel blandit mauris. Vestibulum aliquam viverra sem a suscipit. Proin sit amet faucibus orci. Curabitur a massa sapien. Curabitur dolor risus, iaculis sit amet porta non, varius vitae mauris. Ut tincidunt libero quis molestie convallis.
-            Phasellus est neque, posuere non consectetur sit amet, euismod aliquet felis. Quisque ornare, lectus ut convallis consequat, lectus ipsum convallis urna, cursus egestas sem urna quis nunc. Ut ut velit sed nisl bibendum rutrum et sed purus. Etiam suscipit lectus et tincidunt feugiat. Praesent placerat at dui ut condimentum. Duis porttitor elit et elementum mollis. Ut vitae mauris lacinia, commodo elit et, vulputate erat. Nullam in felis ac metus facilisis maximus. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Duis sed sagittis justo. Maecenas porta justo quis bibendum mattis.
-            Maecenas aliquet dignissim condimentum. Maecenas lacinia ultrices justo. In placerat neque quis dui porttitor, mollis pulvinar velit vestibulum. Maecenas bibendum velit non diam suscipit feugiat. Sed rhoncus dolor sed molestie pharetra. Suspendisse ultricies mattis justo, ut accumsan lectus interdum fermentum. Aenean id diam nec augue efficitur fringilla.Donec auctor dui et mi dignissim convallis. Donec mollis varius sem, nec imperdiet mauris molestie et. Fusce rutrum leo et urna cursus finibus. Aenean consequat ante nec 
-          </p>
+        { metaPage.isMetaPage && metaPage.type === metaPageType.CHAPTER_INIT &&
+          <div className="text-2xl mt-20">{getChapterTitle(outline, location.chapterIdx)}</div>
+        }
+        <div className="text-justify">
+          <Carousel container={contentContainer}>
+            { !metaPage.isMetaPage &&
+              <div
+                id="viewer-page-content-container" 
+                ref={contentContainer}
+                style={{columnFill: "auto", columnGap: "8%"}} 
+                className="select-none columns-2 h-[79vh] text-lg racking-wide leading-loose"
+                dangerouslySetInnerHTML={{__html: currentPage.content + lastColumnOffset}}>
+              </div>
+            }
+          </Carousel>
         </div>
       </div>
     </div>
   );
+
+
+    // [chapterIdx, PageIdx] 구조인 ILocation 타입을 key, pageId를 value로 하는 map을 반환한다.
+    function getPageMap(outline : Outline) : Map<string, number>{
+
+      const pageMap = new Map<string, number>();
+  
+      outline.chapters.forEach((chapter, chapterIdx) => {
+        chapter.pages?.forEach((page, pageIdx) => {
+          pageMap.set(`${chapterIdx},${pageIdx}`, page.id);
+        });
+      });
+  
+      return pageMap;
+    }
+
 }

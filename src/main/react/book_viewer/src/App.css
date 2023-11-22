@@ -1,3 +1,22 @@
 .App {
   text-align: center;
 }
+
+
+/* viewer의 content container안의 img 태그 설정 */
+#viewer-page-content-container img {
+  margin: 5% auto;
+  width: 90%;
+}
+
+
+
+.carousel {
+  overflow-x: auto;
+  white-space: nowrap;
+  scrollbar-width: none; /* Firefox */
+}
+
+.carousel::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera*/
+}

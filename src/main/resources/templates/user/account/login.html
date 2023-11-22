@@ -3,85 +3,93 @@
     <title>login</title>
 </head>
 <main layout:fragment="main">
+    <div class="m-8 flex">
+        <!--    좌측 이미지 레이아웃   -->
+        <div class="w-2/5 h-full hidden lg:block">
+            <img src="https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2FMjAyMTEyMjlfNDkg%2FMDAxNjQwNzU3MDY4NjI4.KMKJJfEDSMYmO4oo2hpuVNF8FsCX7jODYMPBtzp81VQg.9BRUMzJpUOjgeivtJkduMO24ytYxl5DO8qRzxNE9dOAg.JPEG.p_solej%2FTumblr%25A3%25DFl%25A3%25DF2251323718386081.jpg&type=a340" alt="로그인 이미지" class="h-full w-full object-cover rounded-2xl bg-gradient-to-tl from-zinc-800 to-zinc-700 opacity-70">
+        </div>
+        <!--    로그인 레이아웃    -->
+        <div class="w-full lg:w-3/5 flex flex-col items-center justify-center">
+            <div class="w-full flex flex-col items-center justify-center px-6 py-8 mx-auto lg:py-0">
+                <div class="w-full bg-white rounded-lg shadow md:mt-0 sm:max-w-md xl:p-0 ">
+                    <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
 
-    <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto lg:py-0">
-        <div class="w-full bg-white rounded-lg shadow md:mt-0 sm:max-w-md xl:p-0 ">
-            <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
-
-                <!--로고-->
-                <a href="/" class="flex items-center justify-center mb-6 text-2xl font-semibold text-gray-900">
-                    <img th:src="@{/img/ssegTextLogo.png}" alt="logo" src="">
-                </a>
+                        <!--로고-->
+                        <a href="/" class="flex items-center justify-center mb-6 text-2xl font-semibold text-gray-900">
+                            <img th:src="@{/img/ssegTextLogo.png}" alt="logo" src="">
+                        </a>
 
 
-                <!--로그인 페이지 안내 문구: 그냥 들어왔을 때-->
-                <div class="text-center text-lg font-bold leading-tight tracking-tight text-gray-900 md:text-xl">
-                    Sign in SSEG
-                </div>
+                        <!--로그인 페이지 안내 문구: 그냥 들어왔을 때-->
+                        <div class="text-center text-lg font-bold leading-tight tracking-tight text-gray-900 md:text-xl">
+                            Sign in SSEG
+                        </div>
 
-                <!-- 로그인 form-->
-                <form class="space-y-4 md:space-y-6" action="#" th:action="@{/login}" method="POST" onsubmit="LoginForm__submit(this); return false;">
+                        <!-- 로그인 form-->
+                        <form class="space-y-4 md:space-y-6" action="#" th:action="@{/login}" method="POST" onsubmit="LoginForm__submit(this); return false;">
 
-                    <!--username-->
-                    <div>
-                        <label for="username" class="block mb-2 text-sm font-medium text-gray-900">Username</label>
-                        <input id="username" type="text" name="username" class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5" placeholder="아이디를 입력해주세요" required="" autofocus>
-                    </div>
-                    <span th:if="${#strings.equals(param.error, 'username')}" class="text-sm leading-tight tracking-tight text-red-400 md:text-sm">
+                            <!--username-->
+                            <div>
+                                <label for="username" class="block mb-2 text-sm font-medium text-gray-900">Username</label>
+                                <input id="username" type="text" name="username" class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5" placeholder="아이디를 입력해주세요" required="" autofocus>
+                            </div>
+                            <span th:if="${#strings.equals(param.error, 'username')}" class="text-sm leading-tight tracking-tight text-red-400 md:text-sm">
                         존재하지 않는 아이디입니다
                     </span>
 
-                    <!--password-->
-                    <div>
-                        <label for="password" class="block mb-2 text-sm font-medium text-gray-900 ">Password</label>
-                        <input type="password" name="password" id="password" placeholder="••••••••" class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5" required="">
-                    </div>
-                    <span th:if="${#strings.equals(param.error, 'password')}" class="text-sm leading-tight tracking-tight text-red-400 md:text-sm">
+                            <!--password-->
+                            <div>
+                                <label for="password" class="block mb-2 text-sm font-medium text-gray-900 ">Password</label>
+                                <input type="password" name="password" id="password" placeholder="••••••••" class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5" required="">
+                            </div>
+                            <span th:if="${#strings.equals(param.error, 'password')}" class="text-sm leading-tight tracking-tight text-red-400 md:text-sm">
                         비밀번호가 일치하지 않습니다
                     </span>
 
-                    <!--비밀번호 찾기-->
-                    <div class="flex items-center justify-end">
-                        <a href="#" class="text-sm font-medium text-primary-600 hover:underline">Forgot password?</a>
-                    </div>
+                            <!--비밀번호 찾기-->
+                            <div class="flex items-center justify-end">
+                                <a href="#" class="text-sm font-medium text-primary-600 hover:underline">Forgot password?</a>
+                            </div>
 
-                    <!--로그인 버튼-->
-                    <button type="submit" class="relative inline-flex items-center justify-center p-0.5 w-full mb-2 mr-2 overflow-hidden text-sm font-medium text-gray-900 rounded-full group bg-gradient-to-br from-red-200 via-red-300 to-yellow-200 group-hover:from-red-200 group-hover:via-red-300 group-hover:to-yellow-200 focus:ring-4 focus:outline-none focus:ring-red-100">
+                            <!--로그인 버튼-->
+                            <button type="submit" class="relative inline-flex items-center justify-center p-0.5 w-full mb-2 mr-2 overflow-hidden text-sm font-medium text-gray-900 rounded-full group bg-gradient-to-br from-red-200 via-red-300 to-yellow-200 group-hover:from-red-200 group-hover:via-red-300 group-hover:to-yellow-200 focus:ring-4 focus:outline-none focus:ring-red-100">
                       <span class="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white rounded-full w-full group-hover:bg-opacity-0">
                           SIGN IN
                       </span>
-                    </button>
+                            </button>
 
 
-                    <!--소셜 로그인-->
-                    <div class="flex flex-col">
-                        <a href="/oauth2/authorization/google" class="text-center text-white bg-[#4285F4] hover:bg-[#4285F4]/90 focus:ring-4 focus:outline-none focus:ring-[#4285F4]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center mr-2 mb-2">
-                            <svg class="w-4 h-4 mr-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 19">
-                                <path fill-rule="evenodd" d="M8.842 18.083a8.8 8.8 0 0 1-8.65-8.948 8.841 8.841 0 0 1 8.8-8.652h.153a8.464 8.464 0 0 1 5.7 2.257l-2.193 2.038A5.27 5.27 0 0 0 9.09 3.4a5.882 5.882 0 0 0-.2 11.76h.124a5.091 5.091 0 0 0 5.248-4.057L14.3 11H9V8h8.34c.066.543.095 1.09.088 1.636-.086 5.053-3.463 8.449-8.4 8.449l-.186-.002Z" clip-rule="evenodd"/>
-                            </svg>
-                            Sign in with Google
-                        </a>
+                            <!--소셜 로그인-->
+                            <div class="flex flex-col">
+                                <a href="/oauth2/authorization/google" class="text-center text-white bg-[#4285F4] hover:bg-[#4285F4]/90 focus:ring-4 focus:outline-none focus:ring-[#4285F4]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center mr-2 mb-2">
+                                    <svg class="w-4 h-4 mr-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 19">
+                                        <path fill-rule="evenodd" d="M8.842 18.083a8.8 8.8 0 0 1-8.65-8.948 8.841 8.841 0 0 1 8.8-8.652h.153a8.464 8.464 0 0 1 5.7 2.257l-2.193 2.038A5.27 5.27 0 0 0 9.09 3.4a5.882 5.882 0 0 0-.2 11.76h.124a5.091 5.091 0 0 0 5.248-4.057L14.3 11H9V8h8.34c.066.543.095 1.09.088 1.636-.086 5.053-3.463 8.449-8.4 8.449l-.186-.002Z" clip-rule="evenodd"/>
+                                    </svg>
+                                    Sign in with Google
+                                </a>
 
-                        <a href="/oauth2/authorization/naver" class="text-center text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-400 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center mr-2 mb-2">
-                            <svg class="w-4 h-4 mr-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M4,4 L4,20 L8,20 L8,10 L16,20 L20,20 L20,4 L16,4 L16,14 L8,4 L4,4 Z"></path>
-                            </svg>
-                            Sign in with Naver
-                        </a>
+                                <a href="/oauth2/authorization/naver" class="text-center text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-400 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center mr-2 mb-2">
+                                    <svg class="w-4 h-4 mr-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M4,4 L4,20 L8,20 L8,10 L16,20 L20,20 L20,4 L16,4 L16,14 L8,4 L4,4 Z"></path>
+                                    </svg>
+                                    Sign in with Naver
+                                </a>
 
-                        <a href="/oauth2/authorization/github" class="text-center text-white bg-black hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-500 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center mr-2 mb-2">
-                            <svg class="w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                                <path fill="currentColor" d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6 .111 .82-.261 .82-.577 0-.285-.01-1.04-.015-2.04-3.338 .725-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744 .084-.729 .084-.729 1.205 .084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495 1 .108-.776 .417-1.305 .76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31 .467-2.38 1.235-3.22-.135-.303-.54-1.523 .105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02 .006 2.04 .138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23 .645 1.653 .24 2.873 .12 3.176 .765 .84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42 .36 .81 1.096 .81 2.22 0 1.605-.015 2.89-.015 3.285 0 .319 .21 .694 .825 .577C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"></path>
-                            </svg>
-                            Sign in with GitHub
-                        </a>
+                                <a href="/oauth2/authorization/github" class="text-center text-white bg-black hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-500 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center mr-2 mb-2">
+                                    <svg class="w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                        <path fill="currentColor" d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6 .111 .82-.261 .82-.577 0-.285-.01-1.04-.015-2.04-3.338 .725-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744 .084-.729 .084-.729 1.205 .084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495 1 .108-.776 .417-1.305 .76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31 .467-2.38 1.235-3.22-.135-.303-.54-1.523 .105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02 .006 2.04 .138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23 .645 1.653 .24 2.873 .12 3.176 .765 .84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42 .36 .81 1.096 .81 2.22 0 1.605-.015 2.89-.015 3.285 0 .319 .21 .694 .825 .577C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"></path>
+                                    </svg>
+                                    Sign in with GitHub
+                                </a>
+                            </div>
+
+                            <!--회원가입-->
+                            <p class="text-sm font-light text-gray-500">
+                                아직 계정이 없으신가요? <a href="/signup" class="font-medium text-primary-600 hover:underline">회원가입</a>
+                            </p>
+                        </form>
                     </div>
-
-                    <!--회원가입-->
-                    <p class="text-sm font-light text-gray-500">
-                        아직 계정이 없으신가요? <a href="/signup" class="font-medium text-primary-600 hover:underline">회원가입</a>
-                    </p>
-                </form>
+                </div>
             </div>
         </div>
     </div>

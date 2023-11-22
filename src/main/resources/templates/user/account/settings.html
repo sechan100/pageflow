@@ -82,16 +82,19 @@
                         <div class="     flex-auto">
                             <div class=" flex flex-wrap m-auto">
                                 <div class=" w-full m-auto max-w-full md:w-6/12 md:flex-none xl:mb-0 xl:w-3/12">
-                                    <div class="relative flex flex-col min-w-0 ">
-                                        <div class="flex min-h-full flex-col justify-center px-1 py-1 lg:px-8 mx-auto">
-                                            <div class="mt-1 mb-6 sm:mx-auto sm:w-full sm:max-w-sm border border-red-400">
+                                    <div class="w-full relative flex flex-col min-w-0">
+                                        <div class="w-full min-h-full mx-auto">
+                                            <div class="w-full mt-1 mb-6 sm:mx-auto sm:w-full sm:max-w-sm">
                                                 <div>
                                                     <label class="block text-sm font-medium leading-6 text-gray-900">profile
                                                         Img</label>
-                                                    <div class="mt-2 mb-2">
-                                                        <label class="py-2 px-24 border text-gray-600 focus:outline-0 focus:border-[#FF9B50] rounded max-w-xs border-[#FF9B50] sm:text-sm sm:leading-6 cursor-pointer"0
+                                                    <div class="mt-2 mb-2 flex">
+                                                        <p id="originName" class="border p-3 w-9/12 text-black text-xs rounded" >파일명</p>
+                                                        <label class="p-2 text-white bg-gray-300 cursor-pointer ml-2 sm:text-sm sm:leading-6"
                                                                for="profileImg">첨부 파일 </label>
-                                                        <input onchange="previewImage();" required autocomplete="profileImg" type="file" id="profileImg" class="hidden">
+                                                        <input onchange="previewImage();" data-ax-path="file" required
+                                                               autocomplete="profileImg" type="file" id="profileImg"
+                                                               class="hidden">
                                                     </div>
                                                 </div>
                                                 <div>
@@ -101,7 +104,7 @@
                                                         <input id="nickname" name="nickname" type="text"
                                                                autocomplete="nickname"
                                                                required th:field="*{profile.nickname}"
-                                                               class="input w-full focus:outline-0 focus:border-[#FF9B50] focus:ring-0 rounded max-w-xs flex-auto text-black border-[#FF9B50] sm:text-sm sm:leading-6">
+                                                               class="input w-full focus:outline-0 focus:border focus:ring-0 rounded text-black border sm:text-sm sm:leading-6">
                                                     </div>
                                                 </div>
                                                 <div>
@@ -109,8 +112,8 @@
                                                            class="block text-sm font-medium leading-6 text-gray-900">email</label>
                                                     <div class="mt-2">
                                                         <input id="email" name="email" type="email" autocomplete="email"
-                                                               required
-                                                               class="input w-full focus:outline-0 focus:border-[#FF9B50] focus:ring-0 rounded max-w-xs flex-auto text-black border-[#FF9B50] sm:text-sm sm:leading-6">
+                                                               required th:value="${user.email}"
+                                                               class="input w-full focus:outline-0 focus:border focus:ring-0 rounded flex-auto text-black border sm:text-sm sm:leading-6">
                                                     </div>
                                                 </div>
                                                 <div>
@@ -119,8 +122,8 @@
                                                     <div class="mt-2">
                                                         <input id="password" name="password" type="password"
                                                                autocomplete="password"
-                                                               required
-                                                               class="input w-full focus:outline-0 focus:border-[#FF9B50] focus:ring-0 rounded max-w-xs flex-auto text-black border-[#FF9B50] sm:text-sm sm:leading-6">
+                                                               required placeholder="비밀번호를 입력하세요"
+                                                               class="input w-full focus:outline-0 focus:border focus:ring-0 rounded flex-auto text-black border sm:text-sm sm:leading-6">
                                                     </div>
                                                 </div>
                                                 <div>
@@ -129,8 +132,8 @@
                                                     <div class="mt-2">
                                                         <input id="passwordCheck" name="passwordCheck" type="password"
                                                                autocomplete="passwordCheck"
-                                                               required
-                                                               class="input w-full focus:outline-0 focus:border-[#FF9B50] focus:ring-0 rounded max-w-xs flex-auto text-black border-[#FF9B50] sm:text-sm sm:leading-6">
+                                                               required placeholder=""
+                                                               class="input w-full focus:outline-0 focus:border focus:ring-0 rounded flex-auto text-black border sm:text-sm sm:leading-6">
                                                     </div>
                                                 </div>
                                                 <div>
@@ -168,6 +171,30 @@
                  preview.hide();
              }
          }
+
+// p태그에 파일명 확장자 간단하게 보이게 하기
+    window.onload = function () {
+    target = document.getElementById('profileImg');
+    target.addEventListener('change', function () {
+
+        if (target.value.length) {
+            var fileName = target.files[0].name;
+            var lastIndex = fileName.lastIndexOf("\\");
+            var displayFileName = fileName.substring(lastIndex + 1);
+            var fileExtension = displayFileName.split('.').pop();
+
+            // 출력할 파일명 형식: 파일명 (확장자)
+            var displayText = displayFileName.replace('.' + fileExtension, '') + ' (' + fileExtension + ')';
+
+            $('#originName').html(displayText);
+        } else {
+            $('#originName').html("");
+        }
+
+    });
+}
+
+
     </script>
 </main>
 </html>

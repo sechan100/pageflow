@@ -189,15 +189,17 @@ export default function PageCursor() {
 
   const {isVisible} = useNavStore();
   const { location, metaPage, prev, next} = useLocationStore();
-  const { carouselIdx, isLastCarousel, prevCarousel, nextCarousel, resetCarouselIdx, setIsLastCarousel } = useCarouselStore();
+  const { carouselIdx, prevCarousel, nextCarousel, isLastCarousel, setCarouselIdx, setReserveMoveLastCarousel } = useCarouselStore();
 
   
   useEffect(() => {
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [isLastCarousel, location, metaPage]);
+  }, [location, metaPage, carouselIdx, isLastCarousel]);
 
 
+  // console.log("캐러셀인덱스", carouselIdx);
+  // console.log("메타페이지인가?", metaPage.isMetaPage);
 
   return (<>
     {isVisible &&
@@ -225,30 +227,29 @@ export default function PageCursor() {
   );
 
 
+  
   function goPrev() {
-    // 내부 캐러셀에서 마지막 페이지가 아니라면 innerPage를 한장 넘긴다.
+    // 캐러셀이 처음 캐러셀이 아니고, metaPage도 아니라면 한장 뒤로간다.
     if(carouselIdx !== 0 && !metaPage.isMetaPage){
       prevCarousel();
-      if(isLastCarousel){
-        setIsLastCarousel(false);
-      }
-      return;
 
-    } else {
-      prev(); // 다음 페이지로 이동.
-      resetCarouselIdx(); // 새로운 페이지로 넘어가고, isLastInnerPage를 false로 초기화
+    } else if(carouselIdx === 0 && !metaPage.isMetaPage){
+      setReserveMoveLastCarousel(true); // 전 Page로 이동할 때, 마지막 캐러셀로 이동해야한다는 것을 알림.
+      prev(); // 전 페이지로 이동.
     }
   }
 
   function goNext(){
-    // 내부 캐러셀에서 마지막 페이지가 아니라면 innerPage를 한장 넘긴다.
+    // console.log("마지막 일까요?", isLastCarousel);
+    // 캐러셀이 마지막 캐러셀이 아니라면 캐러셀를 한장 넘긴다.
     if(!isLastCarousel && !metaPage.isMetaPage){
       nextCarousel();
       return;
 
     } else {
+      // console.log("마지막 캐러셀이니까 다음페이지로!!!!!!!");
+      setCarouselIdx(0); // 캐러셀을 처음으로 초기화한다.
       next(); // 다음 페이지로 이동.
-      resetCarouselIdx(); // 새로운 페이지로 넘어가고, isLastInnerPage를 false로 초기화
     }
   }
 

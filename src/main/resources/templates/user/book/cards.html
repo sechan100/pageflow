@@ -39,7 +39,7 @@
     <div class="flex flex-col w-full">
         <div class="relative h-[500px] flex items-center justify-center ">
             <!-- 상단 이미지 -->
-            <div class="absolute inset-0 overflow-hidden shadow-lg">
+            <div class="absolute inset-0 overflow-hidden drop-shadow-2xl shadow-2xl">
                 <img src="https://img1.daumcdn.net/thumb/R1280x0/?fname=http://t1.daumcdn.net/brunch/service/user/9kE1/image/k3uEfFMvJOS81qkiAml4EMnsVzs.jpg"
                      alt="Background Image" class="w-full h-full object-cover filter grayscale">
             </div>
@@ -64,19 +64,19 @@
                 </div>
                 <!--  정렬순  -->
                 <div class="max-w-md mr-4 w-1/5 z-10  border-2 p-3 border-gray-400 rounded font-semibold text-sm text-gray-600 relative text-center active:top-[3px]">
-                    <button id="sortOption" name="sort" th:value="${sort}"
+                    <button id="sortOption" name="sort" th:value="${sort}" data-sort="${sort}"
                             class="btn-select w-full cursor-pointer  overflow-hidden">
                         정렬순
                     </button>
                     <ul class="list-member list-none hidden absolute w-full rounded font-medium text-black text-sm  top-16 left-0">
                         <li>
-                            <button value="createDate" type="button">작성 날짜</button>
+                            <button value="createDate" type="button" onclick="updateSort('createDate')">작성 날짜</button>
                         </li>
                         <li>
-                            <button value="title" type="button">제목</button>
+                            <button value="title" type="button" onclick="updateSort('title')">제목</button>
                         </li>
                         <li>
-                            <button type="button">추천</button>
+                            <button type="button" onclick="updateSort('recommend')">추천</button>
                         </li>
                     </ul>
                 </div>
@@ -219,6 +219,33 @@ sortOption.addEventListener('change', function() {
     console.error('dd');
 });
 
+   const sortOptionButton = document.getElementById("sortOption");
+    const searchForm = document.getElementById('searchForm');
+
+    function updateSort(newSort) {
+        // Hidden input에 정렬값 설정
+        document.getElementById('sort').value = newSort;
+
+        // 버튼에 텍스트 업데이트
+        sortOptionButton.innerText = getButtonText(newSort);
+
+        // 폼 제출
+        searchForm.submit();
+    }
+
+    // 정렬값에 따라 버튼 텍스트를 반환하는 함수
+    function getButtonText(sortOption) {
+        switch (sortOption) {
+            case 'createDate':
+                return '작성 날짜';
+            case 'title':
+                return '제목';
+            case 'recommend':
+                return '추천';
+            default:
+                return '정렬순';
+        }
+    }
     </script>
 
 

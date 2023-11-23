@@ -1,9 +1,10 @@
 <html lang="en" layout:decorate="~{/common/layout.html}">
+
 <head>
     <title>login</title>
 </head>
 <main layout:fragment="main">
-    <div class="m-8 flex gap-4">
+    <div class="m-4 flex gap-4">
         <!--    좌측 이미지 레이아웃   -->
         <div class="w-2/5 h-full hidden lg:block">
             <img src="https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2FMjAyMTEyMjlfNDkg%2FMDAxNjQwNzU3MDY4NjI4.KMKJJfEDSMYmO4oo2hpuVNF8FsCX7jODYMPBtzp81VQg.9BRUMzJpUOjgeivtJkduMO24ytYxl5DO8qRzxNE9dOAg.JPEG.p_solej%2FTumblr%25A3%25DFl%25A3%25DF2251323718386081.jpg&type=a340" alt="로그인 이미지" class="h-full w-full object-cover rounded-2xl bg-gradient-to-tl from-zinc-800 to-zinc-700 opacity-70">
@@ -19,7 +20,6 @@
                         <a href="/" class="flex items-center justify-center mb-6 text-2xl font-semibold text-gray-900">
                             <img th:src="@{/img/ssegTextLogo.png}" alt="logo" src="">
                         </a>
-
 
                         <!--로그인 페이지 안내 문구: 그냥 들어왔을 때-->
                         <div class="text-center text-lg font-bold leading-tight tracking-tight text-gray-900 md:text-xl">
@@ -53,8 +53,8 @@
                             </div>
 
                             <!--로그인 버튼-->
-                            <button type="submit" class="relative inline-flex items-center justify-center p-0.5 w-full mb-2 mr-2 overflow-hidden text-sm font-medium text-gray-900 rounded-full group bg-gradient-to-br from-red-200 via-red-300 to-yellow-200 group-hover:from-red-200 group-hover:via-red-300 group-hover:to-yellow-200 focus:ring-4 focus:outline-none focus:ring-red-100">
-                      <span class="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white rounded-full w-full group-hover:bg-opacity-0">
+                            <button type="submit" class="read-btn flex w-full mt-5 justify-center rounded-md p-3 text-sm font-semibold leading-6 shadow-sm relative bg-black text-white">
+                      <span>
                           SIGN IN
                       </span>
                             </button>
@@ -83,11 +83,15 @@
                                 </a>
                             </div>
 
-                    <!--회원가입-->
-                    <p class="text-sm font-light text-gray-500">
-                        아직 계정이 없으신가요? <a href="/signup" class="font-medium text-primary-600 hover:underline">회원가입</a>
-                    </p>
-                </form>
+                            <!--회원가입-->
+                            <p class="text-md font-medium  font-light text-gray-500">
+                                Not registered?
+                                <a href="/signup" class="font-semibold text-primary-600 hover:underline">Create
+                                    account</a>
+                            </p>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

@@ -34,8 +34,22 @@
     </style>
 </head>
 
-<main layout:fragment="main">
+<main layout:fragment="main" class="p-0">
+    <div class="flex flex-col">
+        <div class="relative h-[500px] flex items-center justify-center ">
+            <!-- 상단 이미지 -->
+            <div class="absolute inset-0 overflow-hidden">
+                <img src="https://img1.daumcdn.net/thumb/R1280x0/?fname=http://t1.daumcdn.net/brunch/service/user/9kE1/image/k3uEfFMvJOS81qkiAml4EMnsVzs.jpg"
+                     alt="Background Image" class="w-full h-full object-cover filter grayscale">
+            </div>
 
+            <!-- 상단 이미지 글귀 -->
+            <div class="absolute  bottom-10  left-10 text-white text-left z-10 ">
+                <h1 class="text-5xl font-black  mb-8">PageFlow </h1>
+                <p class="text-3xl font-bold">Dive into a world of diverse stories and authors right now!</p>
+            </div>
+        </div>
+<!-- 리스트 -->
     <div class="mx-auto max-w-2xl px-2 py-12 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
         <div class="flex justify-between mb-16 w-full ">
             <div class="flex grow">
@@ -81,7 +95,7 @@
                 <div th:each="book : ${paging}">
                     <div class="aspect-h-2 aspect-w-1 w-full overflow-hidden rounded xl:aspect-h-8 xl:aspect-w-7 relative">
                         <div>
-                            <a href="@|/book/detail/${book.id}|">
+                            <a th:href="@{|/book/detail/${book.id}|}">
                                 <div class="relative">
                                     <img th:src="@{${book.coverImgUrl}}" alt="Book Image" class="h-full w-full object-cover object-center group-hover:opacity-75">
                                     <div class="whitespace-normal leading-snug	absolute font-black text-xl inset-0 text-center top-60 italic ">
@@ -213,7 +227,7 @@ sortOption.addEventListener('change', function() {
     </script>
 
 
-
+    </div>
 
 </main>
 </html>

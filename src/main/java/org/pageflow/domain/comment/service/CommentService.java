@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
@@ -28,7 +29,8 @@ public class CommentService {
     }// 댓글 작성
 
     public Comment getComment(Long id) {
-        return this.commentRepository.findById(id).orElseThrow(null);
+        return this.commentRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Comment not found with id: " + id));
     }
 
     public void modify(Comment comment, String content) {
@@ -51,7 +53,7 @@ public class CommentService {
     }
 
     public Long countByBookId(Long id) {
-        return commentRepository.findAllByBookId(id);
+        return commentRepository.countByBookId(id);
     }
     // 댓글 개수 가져오기
 }

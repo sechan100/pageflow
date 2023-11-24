@@ -81,7 +81,7 @@ public class CommentController {
     @GetMapping("/delete/{id}")
     public ResponseEntity<List<Comment>> commentDelete(Principal principal, @PathVariable("id") Long id) {
         Comment comment = this.commentService.getComment(id);
-        if (!comment.getAuthor().getAccount().getUsername().equals(principal.getName())) {
+        if (!comment.getAuthor().getAccount().getUsername().equals(rq.getUserSession().getUsername())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "삭제권한이 없습니다.");
         }
 

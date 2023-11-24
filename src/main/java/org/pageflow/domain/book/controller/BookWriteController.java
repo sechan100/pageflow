@@ -15,7 +15,6 @@ public class BookWriteController {
 
     private final AccountService accountService;
 
-
     /**
      * @return react book write form page
      */
@@ -26,3 +25,4 @@ public class BookWriteController {
 
 
 }
+

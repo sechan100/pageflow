@@ -62,7 +62,7 @@ tasks.register('restartRedisServerOnWindow', Exec) {
 
 tasks.register('buildReacts', Exec) {
 	doFirst {
-		["book_write"].each { dir ->
+		["book_write", "book_viewer"].each { dir ->
 			if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
 				commandLine "cmd", "/c", "npm", "run", "build", "--prefix", "src/main/react/$dir"
 			} else {
@@ -74,8 +74,12 @@ tasks.register('buildReacts', Exec) {
 
 
 tasks.register('cleanBookWriteBuildDir', Delete) {
-	dependsOn "buildReactBookWrite"
+	dependsOn "buildReacts"
 	delete file('src/main/resources/static/react/build/book_write')
+}
+tasks.register('cleanBookViewerBuildDir', Delete) {
+	dependsOn "buildReacts"
+	delete file('src/main/resources/static/react/build/book_viewer')
 }
 
 tasks.register('copyReactBookWriteBuildDir', Copy) {
@@ -84,5 +88,10 @@ tasks.register('copyReactBookWriteBuildDir', Copy) {
 	into file('src/main/resources/static/react/build/book_write')
 }
 
+tasks.register('copyBookViewerBuildDir', Copy) {
+	dependsOn "cleanBookViewerBuildDir"
+	from file("src/main/react/book_viewer/build")
+	into file('src/main/resources/static/react/build/book_viewer')
+}
 
 

@@ -38,9 +38,6 @@
     <!--  flowbite js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.8.1/flowbite.min.js"></script>
 
-    <!--  sweetalert.js  -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
     <!-- 버튼 커스텀-->
     <style>
         .read-btn {
@@ -80,7 +77,7 @@
 
 </head>
 
-<body class="bg-[#D2B48C] bg-opacity-10" th:with="user = ${@rq.userSession}">
+<body class="m-0 font-sans antialiased   leading-default bg-gray-50 " th:with="user = ${@rq.userSession}">
 
 
     <nav class="bg-white fixed w-full z-40 top-0 left-0 border-b border-gray-200">
@@ -198,7 +195,11 @@
 
     <div id="alert-container" class="sm:w-1/4 w-full z-50 fixed bottom-5 right-5 flex flex-col-reverse"></div>
 
-    <main layout:fragment="main" class="mt-20  text-black md:p-8 lg:p-12"></main>
+<!--  스크롤 시 올림버튼  -->
+    <div class="goto-tp-btn z-50 fixed rounded-full border-2 opacity-0 cursor-pointer duration-100 text-xl bottom-[5%] right-[5%] w-8 text-center border-black leading-7
+ h-8"><i class="fa-solid fa-arrow-up"></i></div>
+
+    <main layout:fragment="main" class="mt-20  text-black "></main>
 
     <script th:inline="javascript">
         /*<![CDATA[*/
@@ -227,6 +228,27 @@
             }
         });
         /*]]>*/
+
+// 스크롤 시 올림버튼
+        $(window).scroll(function () {
+  var $scrollTop = $(this).scrollTop();
+  if ($scrollTop > 0) {
+    $(".goto-tp-btn").css({ opacity: 1 }, 300);
+  } else {
+    $(".goto-tp-btn").css({ opacity: 0 }, 300);
+  }
+});
+
+$(document).ready(function () {
+  $(".goto-tp-btn").click(function () {
+    $("html, body").animate({ scrollTop: 0 });
+  });
+});
+
+function scrollDown() {
+  window.scrollBy(0, window.innerHeight); // 화면의 높이만큼 스크롤 내림
+}
+
     </script>
 </body>
 </html>

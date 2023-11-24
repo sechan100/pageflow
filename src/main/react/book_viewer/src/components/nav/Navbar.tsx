@@ -40,7 +40,7 @@ export default function Navbar({outline} : NavbarProps) {
 
   const progressPercentage = () => {
     if(outline.chapters){
-      return Math.floor(absolutePage / totalPage() * 100);
+      return Math.floor((absolutePage + 1) / totalPage() * 100);
     }
   }
 
@@ -50,7 +50,7 @@ export default function Navbar({outline} : NavbarProps) {
         <div className="text-center fixed w-full bg-gray-100">
           <span>챕터: {getChapterTitle(outline, location.chapterIdx)}</span> 
           <br />
-          <span>페이지: {getPageTitle(outline, location) + `(${absolutePage}/${totalPage()})`}</span>
+          <span>페이지: {getPageTitle(outline, location) + `(${absolutePage + 1}/${totalPage()})`}</span>
           <ProgressionBar progressPercentage={progressPercentage() as number} />
         </div>
       }

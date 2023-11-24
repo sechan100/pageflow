@@ -27,6 +27,7 @@ public class BookController {
     private final AccountService accountService;
     private final CommentService commentService;
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping(value = "/book/detail/{id}")
     public String bookDetail(Model model, @PathVariable("id") Long id) {
         Outline outline = this.bookService.getOutline(id);

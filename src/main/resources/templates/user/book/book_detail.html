@@ -162,185 +162,206 @@
     <script>
         let commentWrite_submitFormDone = false;
 
-        // 페이지 로드 시 댓글 개수 가져오기
-        $(document).ready(function () {
-            updateCommentCount();
-        });
+   // 페이지 로드 시 댓글 개수 가져오기
+   $(document).ready(function () {
+       updateCommentCount();
+   });
 
-        // 댓글 개수를 가져오고 업데이트하는 함수
-        function updateCommentCount() {
-            var outlineId = [[${outline.id}]];
+   // 댓글 개수를 가져오고 업데이트하는 함수
+   function updateCommentCount() {
+       var bookId = [[${outline.id}]];
 
-            $.ajax({
-                type: 'GET',
-                url: `/comment/list/${outlineId}`,
-                success: function (commentList) {
-                    var count = commentList.length;
-                    console.log("댓글 개수 가져오기 성공: " + count);
-                    $("#getCommentCount").text(count);
-                },
-                error: function (xhr, status, error) {
-                    console.error("댓글 개수 가져오기 실패");
-                }
-            });
-        }
+       $.ajax({
+           type: 'GET',
+           url: `/comment/list/${bookId}`,
+           success: function (commentList) {
+               var count = commentList.length;
+               console.log("댓글 개수 가져오기 성공: " + count);
+               $("#getCommentCount").text(count);
+           },
+           error: function (xhr, status, error) {
+               console.error("댓글 개수 가져오기 실패");
+           }
+       });
+   }
 
-        // 댓글 작성 함수
-        function commentWrite_submitForm(form) {
-            form.content.value = form.content.value.trim();
+     // 댓글 목록을 화면에 표시
+   function displayCommentList(commentList) {
+       var output = "";
+       var userImg = "[[${outline.author.profileImgUrl}]]";
 
-            if (form.content.value.length === 0) {
-                Swal.fire({
-                    icon: 'error',
-                    title: '댓글 입력 오류',
-                    text: '댓글을 입력해주세요',
-                });
+       commentList.sort(function (a, b) {
+           return new Date(b.createDate) - new Date(a.createDate);
+       });
 
-                form.content.focus();
-                return;
-            }
+       for (var i in commentList) {
+           var comment = commentList[i];
 
-            var outlineId = [[${outline.id}]];
+           output += "<div class='flex text-xs mb-2 mt-1'>";
+           output += "<div class='w-10 mr-2 ml-2 flex'>";
+           output += "<div class='w-7 h-7 m-auto justify-items-center'>";
+           output += "<img src='" + userImg + "' alt='프로필이미지' class='rounded-full'>";
+           output += "</div>";
+           output += "</div>";
+           output += "<div class='flex w-full p-1'>";
+           output += `<p id='comment-${comment.id}' class=' w-full flex justify-between'>${comment.content}`;
+           output += `<a href='#'>`;
+           output += `<i onclick='openModal(${comment.id})' class='fa-solid fa-bars modal_btn justify-end text-black text-base'></i>`;
+           output += `</a>`;
+           output += `<dialog id='my_modal_${comment.id}' class='modal'>`;
+           output += `<div class='modal-box bg-white text-black'>`;
+           output += `<form method='dialog'>`;
+           output += `<button class='btn btn-sm btn-circle btn-ghost absolute right-3 top-3' onclick='closeModal(${comment.id})'>✕</button>`;
+           output += `</form>`;
+           output += `<a href='javascript:void(0);' class='recommend mr-2' onclick='recommendComment(${comment.id})'>추천</a>`;
+           output += `<a href='javascript:void(0);' class='edit mr-2' onclick='editComment(${comment.id})'>수정</a>`;
+           output += `<a href='javascript:void(0);' class='delete' onclick='deleteComment(${comment.id})'>삭제</a>`;
+           output += `</div>`;
+           output += `</dialog>`;
+           output += "</div>";
+           output += "</p>";
+           output += "</div>";
+       }
 
-            $.ajax({
-                type: 'POST',
-                url: `/comment/create/${outlineId}`,
-                data: { content: form.content.value },
-                success: function (comment) {
-                    console.log("댓글 생성 완료");
-                    // 댓글 목록 업데이트
-                    commentList(comment);
-                    // 댓글 개수 업데이트
-                    updateCommentCount();
-                    form.content.value = '';
-                },
-                error: function (xhr, status, error) {
-                    console.error("댓글 생성 에러");
-                }
-            });
-        }
+       $("#comment_list").html(output);
+   }
 
-        // 댓글 목록
-        $(document).ready(function () {
-            var outlineId = [[${outline.id}]];
 
-            $.ajax({
-                type: 'GET',
-                url: `/comment/list/${outlineId}`,
-                success: function (comment) {
-                    console.log("댓글 목록 로드 완료");
-                    commentList(comment);
-                    updateCommentCount();
-                },
-                error: function (xhr, status, error) {
-                    console.error("댓글 목록 로드 에러");
-                }
-            });
-        });
+   // 댓글 목록을 가져오고 업데이트하는 함수
+   function updateCommentList(bookId) {
+       $.ajax({
+           type: 'GET',
+           url: `/comment/list/${bookId}`,
+           success: function (commentList) {
+               var count = commentList.length;
+               displayCommentList(commentList);  // 수정된 부분
+           },
+           error: function (xhr, status, error) {
+               console.error("댓글 목록 업데이트 실패");
+           }
+       });
+   }
 
-// 댓글 목록을 화면에 표시
-function commentList(commentList) {
-    var output = "";
-    var userImg = "[[${outline.author.profileImgUrl}]]";
+   // 댓글 작성 함수
+   function commentWrite_submitForm(form) {
+       form.content.value = form.content.value.trim();
 
-    commentList.sort(function (a, b) {
-        return new Date(b.createDate) - new Date(a.createDate);
-    });
+       if (form.content.value.length === 0) {
+           Swal.fire({
+               icon: 'error',
+               title: '댓글 입력 오류',
+               text: '댓글을 입력해주세요',
+           });
 
-    for (var i in commentList) {
-        var comment = commentList[i];
+           form.content.focus();
+           return;
+       }
 
-        output += "<div class='flex text-xs mb-2 mt-1'>";
-        output += "<div class='w-10 mr-2 ml-2 flex'>";
-        output += "<div class='w-7 h-7 m-auto justify-items-center'>";
-        output += "<img src='" + userImg + "' alt='프로필이미지' class='rounded-full'>";
-        output += "</div>";
-        output += "</div>";
-        output += "<div class='flex w-full p-1'>";
-        output += `<p id='comment-${comment.id}' class=' w-full flex justify-between'>${comment.content}`;
-        output += `<a href='#'>`;
-        output += `<i onclick='openModal(${comment.id})' class='fa-solid fa-bars modal_btn justify-end text-black text-base'></i>`;
-        output += `</a>`;
-        output += `<dialog id='my_modal_${comment.id}' class='modal'>`;
-        output += `<div class='modal-box bg-white text-black'>`;
-        output += `<form method='dialog'>`;
-        output += `<button class='btn btn-sm btn-circle btn-ghost absolute right-3 top-3' onclick='closeModal(${comment.id})'>✕</button>`;
-        output += `</form>`;
-        output += `<a href='javascript:void(0);' class='recommend mr-2' onclick='recommendComment(${comment.id})'>추천</a>`;
-        output += `<a href='javascript:void(0);' class='edit mr-2' onclick='editComment(${comment.id})'>수정</a>`;
-        output += `<a href='javascript:void(0);' class='delete' onclick='deleteComment(${comment.id})'>삭제</a>`;
-        output += `</div>`;
-        output += `</dialog>`;
-        output += "</div>";
-        output += "</p>";
-        output += "</div>";
-    }
+       var bookId = [[${outline.id}]];
 
-    $("#comment_list").html(output);
-}
+       $.ajax({
+           type: 'POST',
+           url: `/comment/create/${bookId}`,
+           data: { content: form.content.value },
+           success: function (comment) {
+               console.log("댓글 생성 완료");
+               // 댓글 목록 업데이트
+               updateCommentList(bookId);  // 수정된 부분
+               // 댓글 개수 업데이트
+               updateCommentCount();
+               form.content.value = '';
+           },
+           error: function (xhr, status, error) {
+               console.error("댓글 생성 에러");
+           }
+       });
+   }
+
+
+
 
 // 댓글 삭제
 function deleteComment(commentId) {
-    closeModal(commentId);
+   closeModal(commentId);
 
-    Swal.fire({
-        title: '댓글 삭제',
-        text: '정말로 삭제하시겠습니까?',
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonText: '삭제',
-        cancelButtonText: '취소'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            $.ajax({
-                type: 'GET',
-                url: `/comment/delete/${commentId}`,
-                success: function (comment) {
-                    console.log('댓글 삭제 완료:', comment);
-                    commentList(comment);
-                    // 댓글 개수 업데이트
-                    updateCommentCount();
-                },
-                error: function (xhr, status, error) {
-                    console.error('댓글 삭제 에러:', xhr, status, error);
-                    // 에러 메시지 출력
-                    Swal.fire({
-                        icon: 'error',
-                        title: '댓글 삭제 오류',
-                        text: '댓글 삭제 중 에러가 발생했습니다.'
-                    });
-                }
-            });
-        }
-    });
+   Swal.fire({
+       title: '댓글 삭제',
+       text: '정말로 삭제하시겠습니까?',
+       icon: 'question',
+       showCancelButton: true,
+       confirmButtonText: '삭제',
+       cancelButtonText: '취소'
+   }).then((result) => {
+       if (result.isConfirmed) {
+           $.ajax({
+               type: 'GET',
+               url: `/comment/delete/${commentId}`,
+               success: function (comment) {
+                   console.log('댓글 삭제 완료:', comment);
+                   commentList(comment);
+                   // 댓글 개수 업데이트
+                   updateCommentCount();
+               },
+               error: function (xhr, status, error) {
+                   console.error('댓글 삭제 에러:', xhr, status, error);
+                   // 에러 메시지 출력
+                   Swal.fire({
+                       icon: 'error',
+                       title: '댓글 삭제 오류',
+                       text: '댓글 삭제 중 에러가 발생했습니다.'
+                   });
+               }
+           });
+       }
+   });
 }
+
+// 댓글 수정 저장
+function saveEdit(commentId) {
+   var editedContent = $("#comment-" + commentId).val();
+   $.ajax({
+       type: 'POST',
+       url: `/comment/modify/${commentId}`,
+       data: { content: editedContent },
+       success: function (comment) {
+           console.log('댓글 수정 완료');
+           commentList(comment);
+           // 댓글 개수 업데이트
+           updateCommentCount();
+       },
+       error: function (xhr, status, error) {
+           console.error("댓글 수정 에러");
+       }
+   });
+}
+
 
 // 댓글 수정 버튼 후 화면 표시
 function editComment(commentId) {
-    closeModal(commentId);
+   closeModal(commentId);
 
-    var commentContent = $("#comment-" + commentId).text();
-    var containerHeight = $("#comment-" + commentId).parent().height();
+   var commentContent = $("#comment-" + commentId).text();
+   var containerHeight = $("#comment-" + commentId).parent().height();
 
-    var newContent = `
-        <div class='w-full flex justify-between'>
-            <div id='comment-${commentId}' class='w-full flex justify-between'>
-                <textarea id='comment-${commentId}' autofocus class='textarea textarea-bordered textarea-xs bg-slate-100 mr-2 w-full' style='resize: none; height: ${containerHeight}px;'>${commentContent}</textarea>
-                 <a href='#'>
-                <i onclick='openModal(${commentId})' class='fa-solid fa-bars modal_btn justify-end text-black text-base'></i>
-                </a>
-                <dialog id='my_modal_${commentId}' class='modal'>
-                    <div class='modal-box bg-white text-black'>
-                        <form method='dialog'>
-                            <button class='btn btn-sm btn-circle btn-ghost absolute right-3 top-3' onclick='closeModal(${commentId})'>✕</button>
-                        </form>
-                        <button onclick='saveEdit(${commentId})'>저장</button>
-                        <button  onclick='cancelEdit(${commentId})'>취소</button>
-                    </div>
-                </dialog>
-            </div>
-        </div>
-    `;
+   var newContent = `
+       <div class='w-full flex justify-between'>
+           <div id='comment-${commentId}' class='w-full flex justify-between'>
+               <textarea id='comment-${commentId}' autofocus class='textarea textarea-bordered textarea-xs bg-slate-100 mr-2 w-full' style='resize: none; height: ${containerHeight}px;'>${commentContent}</textarea>
+                <a href='#'>
+               <i onclick='openModal(${commentId})' class='fa-solid fa-bars modal_btn justify-end text-black text-base'></i>
+               </a>
+               <dialog id='my_modal_${commentId}' class='modal'>
+                   <div class='modal-box bg-white text-black'>
+                       <form method='dialog'>
+                           <button class='btn btn-sm btn-circle btn-ghost absolute right-3 top-3' onclick='closeModal(${commentId})'>✕</button>
+                       </form>
+                       <button onclick='saveEdit(${commentId})'>저장</button>
+                       <button  onclick='cancelEdit(${commentId})'>취소</button>
+                   </div>
+               </dialog>
+           </div>
+       </div>
+   `;
 
 if (newContent !== null) {
 $("#comment-" + commentId).replaceWith(newContent);
@@ -348,66 +369,30 @@ $("#comment-" + commentId).next().hide();
 $("#comment-" + commentId).next().next().hide();
 $("#comment-" + commentId).next().next().next().hide();
 }
-        }
-
-   // 댓글 수정 저장
-function deleteComment(commentId) {
-    closeModal(commentId);
-
-    Swal.fire({
-        title: '댓글 삭제',
-        text: '정말로 삭제하시겠습니까?',
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonText: '삭제',
-        cancelButtonText: '취소'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            $.ajax({
-                type: 'GET',
-                url: `/comment/delete/${commentId}`,
-                success: function (comment) {
-                    console.log('댓글 삭제 완료:', comment);
-                    commentList(comment);
-                    // 댓글 개수 업데이트
-                    updateCommentCount();
-                },
-                error: function (xhr, status, error) {
-                    console.error('댓글 삭제 에러:', xhr, status, error);
-                    // 에러 메시지 출력
-                    Swal.fire({
-                        icon: 'error',
-                        title: '댓글 삭제 오류',
-                        text: '댓글 삭제 중 에러가 발생했습니다.'
-                    });
-                }
-            });
-        }
-    });
-}
+       }
 
 // 취소 시 화면 표시
 function cancelEdit(commentId) {
-    var commentContent = $("#comment-" + commentId).text();
-    $("#comment-" + commentId).replaceWith(`<p id='comment-${commentId}'>${commentContent}</p>`);
+   var commentContent = $("#comment-" + commentId).text();
+   $("#comment-" + commentId).replaceWith(`<p id='comment-${commentId}'>${commentContent}</p>`);
 
-    // 해당 댓글의 원래 버튼 표시
-    var buttonsToShow = $("#comment-" + commentId).parent().find('.modal_btn');
-    buttonsToShow.show();
+   // 해당 댓글의 원래 버튼 표시
+   var buttonsToShow = $("#comment-" + commentId).parent().find('.modal_btn');
+   buttonsToShow.show();
 
-    $("#comment-" + commentId).siblings("button").remove();
+   $("#comment-" + commentId).siblings("button").remove();
 }
 
-        // 댓글 관련 버튼 모달 열기
+       // 댓글 관련 버튼 모달 열기
 function openModal(commentId) {
-    var modal = document.getElementById('my_modal_' + commentId);
-    modal.showModal();
+   var modal = document.getElementById('my_modal_' + commentId);
+   modal.showModal();
 }
 
 // 댓글 관련 버튼 모달 열기
 function closeModal(commentId) {
-    var modal = document.getElementById('my_modal_' + commentId);
-    modal.close();
+   var modal = document.getElementById('my_modal_' + commentId);
+   modal.close();
 }
 
     </script>

@@ -48,17 +48,16 @@ public class CommentController {
         return ResponseEntity.ok().body(commentList);
     } // 댓글 리스트 조회
 
-    public Map<String, Object> getCommentListAndCount(@PathVariable("id") Long id) {
+    public ResponseEntity<Map<String, Object>> getCommentListAndCount(@PathVariable("bookid") Long bookid) {
         Map<String, Object> result = new HashMap<>();
 
-        List<Comment> commentList = this.commentService.findAllByOrderByCreateDateDesc(id);
-
-        Long commentCount = this.commentService.countByBookId(id);
+        List<Comment> commentList = this.commentService.findAllByOrderByCreateDateDesc(bookid);
+        Long commentCount = this.commentService.countByBookId(bookid);
 
         result.put("commentList", commentList);
         result.put("commentCount", commentCount);
 
-        return result;
+        return ResponseEntity.ok().body(result);
     }
     // 댓글 개수 가져오기
 

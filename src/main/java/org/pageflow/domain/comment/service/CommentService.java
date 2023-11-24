@@ -47,13 +47,13 @@ public class CommentService {
         return this.commentRepository.findAll();
     }
 
-    public List<Comment> findAllByOrderByCreateDateDesc(Long id) {
+    public List<Comment> findAllByOrderByCreateDateDesc(Long bookId) {
         Sort sort = Sort.by(Sort.Direction.DESC, "createDate");
-        return commentRepository.findAllByBookId(id, sort);
+        return commentRepository.findAllByBookId(bookId, sort);
     }
 
-    public Long countByBookId(Long id) {
-        return commentRepository.countByBookId(id);
+    public Long countByBookId(Long bookId) {
+        return commentRepository.countByBookId(bookId);
     }
     // 댓글 개수 가져오기
 }

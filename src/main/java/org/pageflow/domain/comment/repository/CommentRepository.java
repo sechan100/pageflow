@@ -8,10 +8,10 @@ import java.util.List;
 
 public interface CommentRepository extends JpaRepository<Comment, Long> {
 
-    List<Comment> findAllByBookId(Long id, Sort sort);
+    List<Comment> findAllByBookId(Long bookId, Sort sort);
 
-    Long findAllByBookId(Long id);
+    Long findAllByBookId(Long bookId);
     List<Comment> findAllByOrderByCreateDateDesc();
 
-    Long countByBookId(Long id);
+    Long countByBookId(Long bookId);
 }

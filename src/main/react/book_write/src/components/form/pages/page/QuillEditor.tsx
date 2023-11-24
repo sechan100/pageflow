@@ -1,13 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import ReactQuill from "react-quill";
 import 'react-quill/dist/quill.snow.css';
 
-export default function QuillEditor() {
-  const [quillValue, setQuillValue] = useState("");
-
-  useEffect(() => {
-    console.log(quillValue);
-  }, [quillValue]);
+export default function QuillEditor({quillValue, setContent, viewPortHeight} : {quillValue : string, setContent : any, viewPortHeight : number}) {
 
   const modules = {
     toolbar: [
@@ -33,11 +28,10 @@ export default function QuillEditor() {
         modules={modules}
         formats={formats}
         value={quillValue}
-        onChange={setQuillValue}
+        onChange={setContent}
         preserveWhitespace
-        className="h-1/2 overflow-y-auto"
+        className={`h-[${viewPortHeight}vh] text-lg racking-wide leading-loose`}
       />
-      <div className="border border-8 border-gray-800" dangerouslySetInnerHTML={{__html: quillValue}}></div>
     </>
   );
 }

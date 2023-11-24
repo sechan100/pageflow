@@ -150,13 +150,12 @@ public class ApiBookController {
     /**
      * 책 페이지 정보 수정
      */
-    @PutMapping("/api/book/{bookId}/chapter/page/{pageId}")
-    public void updatePage(
+    @PutMapping("/api/book/{bookId}/chapter/pages")
+    public List<Page> updatePage(
             @PathVariable("bookId") Long bookId,
-            @PathVariable("pageId") Long pageId,
-            @RequestBody PageUpdateRequest updateRequest
+            @Valid @RequestBody List<PageUpdateRequest> updateRequests
     ) {
-        bookWriteService.updatePage(updateRequest);
+        return bookWriteService.updatePages(updateRequests);
     }
     
 }

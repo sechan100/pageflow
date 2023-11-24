@@ -1,8 +1,9 @@
-import { useQuery } from "react-query"
-import { IPage, PageSummary } from "../types/types"
+import { UseMutateAsyncFunction, useMutation, useQuery } from "react-query"
+import { IPage, PageMutation } from "../types/types"
 import axios from "axios";
 import { QueryContext } from "../App";
 import { useContext } from "react";
+import flowAlert from "../etc/flowAlert";
 
 
 const fallback : IPage = {
@@ -11,6 +12,68 @@ const fallback : IPage = {
   content: "페이지가 로딩중입니다...",
 }
 
+
+export const usePageMutation = () => {
+
+  const {queryClient, bookId} = useContext(QueryContext);
+
+  const { mutateAsync, isLoading, isError } = useMutation(
+    async (pageMutations : PageMutation[]) => {
+
+
+      const response = await axios.put(`/api/book/${bookId}/chapter/pages`, pageMutations, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if(response.status !== 200){
+        flowAlert("error", "페이지 정보를 업데이트하는데 실패했습니다.");
+        throw new Error("페이지 정보를 업데이트하는데 실패했습니다.");
+      }
+
+      if(response.data){
+        console.log("Page Update Success!", response.data);
+      }
+    },
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries(['book', bookId]);
+      }
+    }
+  )
+
+  return { mutateAsync, isLoading, isError };
+
+
+}
+
+export const useCreatePageMutation = (bookId : number, chapterId : number) : { mutateAsync: UseMutateAsyncFunction<void, unknown, void, unknown>, isLoading: boolean, isError: boolean} => {
+
+  const {queryClient} = useContext(QueryContext);
+
+  const { mutateAsync, isLoading, isError } = useMutation(
+    async () => {
+
+      const response = await axios.post(`/api/book/${bookId}/chapter/${chapterId}/page`);
+      
+      if(response.status !== 200){
+        throw new Error("페이지를 생성하는데 실패했습니다.");
+      }
+
+      if(response.data){
+        console.log("Sercer Response: create new page", response.data);
+      }
+    },
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries(['book', bookId]);
+      }
+    }
+  )
+
+  return {mutateAsync, isLoading, isError};
+}
 
 
 // 페이지 정보 가져오는 axios api

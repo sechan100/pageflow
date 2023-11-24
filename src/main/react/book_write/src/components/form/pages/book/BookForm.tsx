@@ -84,8 +84,8 @@ export default function BookForm(){
 
 
   return (
-    <>
-      <div className="px-24 mt-16">
+    <div className="mt-16">
+      <div>
         {/* title */}
         <div className="sm:col-span-2">
             <label htmlFor="title" className="block mb-2 text-md font-medium text-gray-900">책 제목</label>
@@ -96,7 +96,7 @@ export default function BookForm(){
         <div className="block mb-2 text-md font-medium text-gray-900">책 커버 이미지</div>
         <ImageCropComponent defaultSrc={outline.coverImgUrl} cropedFilename={`book-${bookId}-coverImg`} setFileDate={localBookDispatch} />
       </div>
-    </>
+    </div>
   );
 
 

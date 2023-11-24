@@ -266,9 +266,8 @@ public class BookWriteService {
         stalePage.setSortPriority(updateRequest.getSortPriority() != null ? updateRequest.getSortPriority() : stalePage.getSortPriority());
         
         // 데이터 커밋
-        Page updatedPage = pageRepository.save(stalePage);
         
-        return updatedPage;
+        return pageRepository.save(stalePage);
     }
     
     
@@ -483,5 +482,15 @@ public class BookWriteService {
         return deleteTargets;
     }
     
+    
+    @Transactional
+    public List<Page> updatePages(List<PageUpdateRequest> updateRequests) {
+            
+        List<Page> updatedPages = new ArrayList<>();
+        
+        updateRequests.forEach(page -> updatedPages.add(updatePage(page)));
+        
+        return updatedPages;
+    }
 }
 

@@ -97,15 +97,15 @@ export default function ChapterForm(){
 
 
   return (
-    <>
-      <div className="px-24 mt-16">
+    <div className="mt-16">
+      <div>
         {/* title */}
         <div className="sm:col-span-2">
             <label htmlFor="title" className="block mb-2 text-md font-medium text-gray-900">챕터 제목</label>
             <input value={localChapter.title ? localChapter.title : ''} onChange={handleTitleChange} type="text" name="title" id="title" className="bg-gray-50 border border-gray-300 text-gray-900 text-xl rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5" placeholder="책 제목을 입력해주세요." />
         </div>
       </div>
-    </>
+    </div>
   );
 
 

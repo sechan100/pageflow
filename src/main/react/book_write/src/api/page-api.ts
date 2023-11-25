@@ -13,6 +13,7 @@ const fallback : IPage = {
 }
 
 
+// 페이지 정보 업데이트
 export const usePageMutation = () => {
 
   const {queryClient, bookId} = useContext(QueryContext);
@@ -48,6 +49,7 @@ export const usePageMutation = () => {
 
 }
 
+// 새로운 페이지 생성
 export const useCreatePageMutation = (bookId : number, chapterId : number) : { mutateAsync: UseMutateAsyncFunction<void, unknown, void, unknown>, isLoading: boolean, isError: boolean} => {
 
   const {queryClient} = useContext(QueryContext);
@@ -75,24 +77,7 @@ export const useCreatePageMutation = (bookId : number, chapterId : number) : { m
   return {mutateAsync, isLoading, isError};
 }
 
-
-// 페이지 정보 가져오는 axios api
-// react query api 훅에서 내부적으로 호출
-async function getPageById(bookId : number, pageId : number) : Promise<IPage> {
-  const response = await axios.get(`/api/book/${bookId}/chapter/page/${pageId}`);
-
-  if(response && response.status === 200 && response.data){
-    console.log("====[ Success to Fetching Page ]====", response.data);
-    return response.data as IPage;
-  } else {
-    console.log("Page 데이터를 가져오는데 실패했습니다.")
-    throw new Error("Page 정보를 가져오는데 실패했습니다.");
-  }
-}
-
-
-
-// 페이지 정보 가져오는 react query api 훅
+// 페이지 정보 가져오기
 export const useGetPageQuery = (pageId : number) => {
 
   const { bookId } = useContext(QueryContext);
@@ -110,5 +95,28 @@ export const useGetPageQuery = (pageId : number) => {
     return data;
   } else {
     return fallback;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+// 페이지 정보 가져오는 axios api
+// react query api 훅에서 내부적으로 호출
+async function getPageById(bookId : number, pageId : number) : Promise<IPage> {
+  const response = await axios.get(`/api/book/${bookId}/chapter/page/${pageId}`);
+
+  if(response && response.status === 200 && response.data){
+    console.log("====[ Success to Fetching Page ]====", response.data);
+    return response.data as IPage;
+  } else {
+    console.log("Page 데이터를 가져오는데 실패했습니다.")
+    throw new Error("Page 정보를 가져오는데 실패했습니다.");
   }
 }

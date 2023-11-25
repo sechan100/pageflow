@@ -38,8 +38,13 @@ export const usePageMutation = () => {
       }
     },
     {
-      onSuccess: () => {
+      onSuccess: (data, pageMutations) => {
         queryClient.invalidateQueries(['book', bookId]);
+        
+        pageMutations.forEach((pageMutation) => {
+          queryClient.invalidateQueries(['page', pageMutation.id]);
+        });
+
       }
     }
   )

@@ -42,6 +42,8 @@ out/
 src/main/resources/application-prod.yml
 src/main/resources/application-secret.yml
 src/main/react/**/node_modules/
+src/main/react/**/build/
+src/main/resources/static/react/build/**
 /caches/
 /daemon/
 /jdks/

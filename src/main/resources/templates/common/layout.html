@@ -38,9 +38,6 @@
     <!--  flowbite js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.8.1/flowbite.min.js"></script>
 
-    <!--  sweetalert.js  -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
     <!-- 버튼 커스텀-->
     <style>
         .read-btn {
@@ -75,19 +72,6 @@
           transition: 800ms ease all;
         }
 
-
-header {
-    height: 80px;
-    position: fixed;
-    top: 0;
-    transition: top 0.2s ease-in-out;
-    width: 100%;
-}
-
-.nav-up {
-    top: -80px;
-}
-
     </style>
 
 
@@ -100,12 +84,16 @@ header {
  h-8"><i class="fa-solid fa-arrow-up"></i></div>
 
     <nav class="bg-white fixed w-full z-40 top-0 left-0 border-b border-gray-200">
+
         <div class="flex flex-wrap items-center justify-between mx-20 p-4">
+
             <!--로고-->
             <a href="/" class="flex items-center">
                 <img width="120%" th:src="@{/img/ssegTextLogo.png}" class="h-8 mr-3" alt="Logo" src="#">
             </a>
+
             <div class="flex md:order-2">
+
                 <!--로그인, 회원가입-->
                 <div class="dropdown dropdown-end " th:unless="${user.login}">
                     <label tabindex="0" class="btn btn-link">
@@ -181,9 +169,6 @@ header {
 
 <div id="alert-container" class="sm:w-1/4 w-full z-50 fixed bottom-5 right-5 flex flex-col-reverse"></div>
 
-    <main layout:fragment="main" class="mt-20 text-black md:p-8 lg:p-12"></main>
-
-
     <main layout:fragment="main" class="mt-20  text-black "></main>
 
     <script th:inline="javascript">
@@ -214,50 +199,6 @@ header {
         });
         /*]]>*/
 
-var didScroll;
-var lastScrollTop = 0;
-var delta = 5;
-var navbarHeight = $('header').outerHeight();
-
-$(window).scroll(function(event) {
-    didScroll = true;
-});
-
-setInterval(function() {
-    if (didScroll) {
-        hasScrolled();
-        didScroll = false;
-    }
-}, 250);
-
-function hasScrolled() {
-    var st = $(this).scrollTop();
-
-    // 스크롤 변화가 일정 이상일 때만 처리
-    if (Math.abs(lastScrollTop - st) <= delta) {
-        return;
-    }
-
-    if (st > lastScrollTop && st > navbarHeight){
-        // Scroll Down
-        $('header').removeClass('nav-down').addClass('nav-up');
-    } else {
-        // Scroll Up
-        if(st + $(window).height() < $(document).height()) {
-            $('header').removeClass('nav-up').addClass('nav-down');
-        }
-    }
-
-    lastScrollTop = st;
-}
-
-// 페이지 하단에 도달했을 때 추가적인 동작 수행
-$(window).scroll(function() {
-    if ($(window).scrollTop() + $(window).height() == $(document).height()) {
-        // 실행할 함수
-    }
-});
-
 // 스크롤 시 올림버튼
         $(window).scroll(function () {
   var $scrollTop = $(this).scrollTop();
@@ -273,11 +214,6 @@ $(document).ready(function () {
     $("html, body").animate({ scrollTop: 0 });
   });
 });
-
-function scrollDown() {
-  window.scrollBy(0, window.innerHeight); // 화면의 높이만큼 스크롤 내림
-}
-
     </script>
 </body>
 </html>

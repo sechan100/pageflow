@@ -12,6 +12,7 @@ import { useChapterMutationStore } from "../form/pages/chapter/ChapterForm";
 import { useCreatePageMutation, usePageMutation } from "../../api/page-api";
 import { useCreatePageStore } from "../outline/newItemBtn/NewPageBtn";
 import { usePageMutationStore } from "../form/pages/page/PageForm";
+import _ from "lodash";
 
 
 
@@ -46,7 +47,7 @@ export default function MutationSaveBtn(){
   }, isMutateds);
 
 
-  // 하나라도 변경사항이 존재할 경우, 사용자에게 변경사항이 있음을 알리는 핑을 띄움
+  // 하나라도 변경사항이 존재할 경우, 사용자에게 변경사항이 있음을 알리는 핑을 띄운다.
   useEffect(() => {
     updateAlertPingHandler();
   }, [isAnyMutation]);
@@ -72,11 +73,24 @@ export default function MutationSaveBtn(){
     };
     // 이벤트 리스너 추가
     document.addEventListener('keydown', handleKeyPress);
+    
     // 컴포넌트가 언마운트될 때 이벤트 리스너 제거
     return () => {
       document.removeEventListener('keydown', handleKeyPress);
     };
   }, [flushMutations, isAnyMutation]);
+
+
+  // 자동 저장 디바운드 등록 이펙트
+  useEffect(() => {
+    const debouncedSave = _.debounce(() => {
+      if(isAnyMutation){
+        flushMutations();
+      }
+    }, 5000);
+    debouncedSave();
+    return () => debouncedSave.cancel();
+  }, [flushMutations]);
 
 
 // ================================================================================

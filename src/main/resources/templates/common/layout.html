@@ -75,6 +75,19 @@
           transition: 800ms ease all;
         }
 
+
+header {
+    height: 80px;
+    position: fixed;
+    top: 0;
+    transition: top 0.2s ease-in-out;
+    width: 100%;
+}
+
+.nav-up {
+    top: -80px;
+}
+
     </style>
 
 
@@ -82,18 +95,19 @@
 
 <body class="bg-[#D2B48C] bg-opacity-10" th:with="user = ${@rq.userSession}">
 
-
-    <nav class="bg-white fixed w-full z-40 top-0 left-0 border-b border-gray-200">
-
-        <div class="flex flex-wrap items-center justify-between mx-20 p-4">
-
-            <!--로고-->
-            <a href="/" class="flex items-center">
-                <img width="120%" th:src="@{/img/ssegTextLogo.png}" class="h-8 mr-3" alt="Logo" src="#">
-            </a>
-
+<header class="navbar bg-inherit bg-opacity-10 z-50 px-16 py-4">
+    <div class="flex-1">
+        <!--로고-->
+        <a href="/" class="flex items-center">
+            <img width="120%" th:src="@{/img/ssegTextLogo.png}" class="h-8 mr-3" alt="Logo" src="#">
+        </a>
+    </div>
+    <div class="flex-none gap-2">
+        <div class="form-control">
+            <input type="text" placeholder="Search" class="input input-bordered w-24 md:w-auto" />
+        </div>
+        <div class="dropdown dropdown-end">
             <div class="flex md:order-2">
-
                 <!--로그인, 회원가입-->
                 <div class="dropdown dropdown-end " th:unless="${user.login}">
                     <label tabindex="0" class="btn btn-link">
@@ -145,6 +159,15 @@
                             </a>
                         </li>
                         <li>
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">
+                                <div class="inline-flex items-center">
+
+                                    <i class="fa-solid fa-phone w-[20px] h-[20px] text-gray-800"></i>
+                                    <span class="ml-2">고객센터</span>
+                                </div>
+                            </a>
+                        </li>
+                        <li>
                             <a href="/logout" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">
                                 <div class="inline-flex items-center">
                                     <svg class="w-[19px] h-[19px] text-gray-800" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 16">
@@ -156,49 +179,21 @@
                         </li>
                     </ul>
                 </div>
-
-
                 <!--반응형 메뉴 드롭다운 버튼-->
-                <button data-collapse-toggle="navbar-sticky" type="button" class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200" aria-controls="navbar-sticky" aria-expanded="false">
+                <button  type="button" class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200"  aria-expanded="false">
                     <span class="sr-only">Open main menu</span>
                     <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 17 14">
                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 1h15M1 7h15M1 13h15"/>
                     </svg>
                 </button>
-
-            </div>
-
-            <!--상단 메뉴바-->
-            <div class="items-center justify-between hidden w-full md:flex md:w-auto md:order-1" id="navbar-sticky">
-                <ul class="flex flex-col p-4 md:p-0 mt-4 font-medium border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 md:mt-0 md:border-0 md:bg-white">
-                    <li>
-                        <a href="/book" class="block py-2 pl-3 pr-4 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0" aria-current="page">
-                            Book
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" class="block py-2 pl-3 pr-4 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0">
-                            APIs
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" class="block py-2 pl-3 pr-4 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0">
-                            Client Libraries
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" class="block py-2 pl-3 pr-4 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0">
-                            Contact
-                        </a>
-                    </li>
-                </ul>
             </div>
         </div>
-    </nav>
+    </div>
+</header>
 
-    <div id="alert-container" class="sm:w-1/4 w-full z-50 fixed bottom-5 right-5 flex flex-col-reverse"></div>
+<div id="alert-container" class="sm:w-1/4 w-full z-50 fixed bottom-5 right-5 flex flex-col-reverse"></div>
 
-    <main layout:fragment="main" class="mt-20  text-black md:p-8 lg:p-12"></main>
+    <main layout:fragment="main" class="mt-20 text-black md:p-8 lg:p-12"></main>
 
     <script th:inline="javascript">
         /*<![CDATA[*/
@@ -227,6 +222,50 @@
             }
         });
         /*]]>*/
+
+var didScroll;
+var lastScrollTop = 0;
+var delta = 5;
+var navbarHeight = $('header').outerHeight();
+
+$(window).scroll(function(event) {
+    didScroll = true;
+});
+
+setInterval(function() {
+    if (didScroll) {
+        hasScrolled();
+        didScroll = false;
+    }
+}, 250);
+
+function hasScrolled() {
+    var st = $(this).scrollTop();
+
+    // 스크롤 변화가 일정 이상일 때만 처리
+    if (Math.abs(lastScrollTop - st) <= delta) {
+        return;
+    }
+
+    if (st > lastScrollTop && st > navbarHeight){
+        // Scroll Down
+        $('header').removeClass('nav-down').addClass('nav-up');
+    } else {
+        // Scroll Up
+        if(st + $(window).height() < $(document).height()) {
+            $('header').removeClass('nav-up').addClass('nav-down');
+        }
+    }
+
+    lastScrollTop = st;
+}
+
+// 페이지 하단에 도달했을 때 추가적인 동작 수행
+$(window).scroll(function() {
+    if ($(window).scrollTop() + $(window).height() == $(document).height()) {
+        // 실행할 함수
+    }
+});
     </script>
 </body>
 </html>

@@ -93,20 +93,18 @@ header {
 
 </head>
 
-<body class="bg-[#D2B48C] bg-opacity-10" th:with="user = ${@rq.userSession}">
+<body class="m-0 font-sans antialiased   leading-default bg-gray-50 " th:with="user = ${@rq.userSession}">
 
-<header class="navbar bg-inherit bg-opacity-10 z-50 px-16 py-4">
-    <div class="flex-1">
-        <!--로고-->
-        <a href="/" class="flex items-center">
-            <img width="120%" th:src="@{/img/ssegTextLogo.png}" class="h-8 mr-3" alt="Logo" src="#">
-        </a>
-    </div>
-    <div class="flex-none gap-2">
-        <div class="form-control">
-            <input type="text" placeholder="Search" class="input input-bordered w-24 md:w-auto" />
-        </div>
-        <div class="dropdown dropdown-end">
+<!--  스크롤 시 올림버튼  -->
+<div class="goto-tp-btn z-50 fixed rounded-full border-2 opacity-0 cursor-pointer duration-100 text-xl bottom-[5%] right-[5%] w-8 text-center border-black leading-7
+ h-8"><i class="fa-solid fa-arrow-up"></i></div>
+
+    <nav class="bg-white fixed w-full z-40 top-0 left-0 border-b border-gray-200">
+        <div class="flex flex-wrap items-center justify-between mx-20 p-4">
+            <!--로고-->
+            <a href="/" class="flex items-center">
+                <img width="120%" th:src="@{/img/ssegTextLogo.png}" class="h-8 mr-3" alt="Logo" src="#">
+            </a>
             <div class="flex md:order-2">
                 <!--로그인, 회원가입-->
                 <div class="dropdown dropdown-end " th:unless="${user.login}">
@@ -118,7 +116,7 @@ header {
                     <ul tabindex="0"
                         class="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-24">
                         <li><a a th:href="@{/login}">LOG IN</a></li>
-                        <li><a href="/signup">SIG NUP</a></li>
+                        <li><a href="/signup">SIGNUP</a></li>
                     </ul>
                 </div>
                 <!--사용자 프로필-->
@@ -159,15 +157,6 @@ header {
                             </a>
                         </li>
                         <li>
-                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">
-                                <div class="inline-flex items-center">
-
-                                    <i class="fa-solid fa-phone w-[20px] h-[20px] text-gray-800"></i>
-                                    <span class="ml-2">고객센터</span>
-                                </div>
-                            </a>
-                        </li>
-                        <li>
                             <a href="/logout" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">
                                 <div class="inline-flex items-center">
                                     <svg class="w-[19px] h-[19px] text-gray-800" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 16">
@@ -188,12 +177,14 @@ header {
                 </button>
             </div>
         </div>
-    </div>
-</header>
+    </nav>
 
 <div id="alert-container" class="sm:w-1/4 w-full z-50 fixed bottom-5 right-5 flex flex-col-reverse"></div>
 
     <main layout:fragment="main" class="mt-20 text-black md:p-8 lg:p-12"></main>
+
+
+    <main layout:fragment="main" class="mt-20  text-black "></main>
 
     <script th:inline="javascript">
         /*<![CDATA[*/
@@ -266,6 +257,27 @@ $(window).scroll(function() {
         // 실행할 함수
     }
 });
+
+// 스크롤 시 올림버튼
+        $(window).scroll(function () {
+  var $scrollTop = $(this).scrollTop();
+  if ($scrollTop > 0) {
+    $(".goto-tp-btn").css({ opacity: 1 }, 300);
+  } else {
+    $(".goto-tp-btn").css({ opacity: 0 }, 300);
+  }
+});
+
+$(document).ready(function () {
+  $(".goto-tp-btn").click(function () {
+    $("html, body").animate({ scrollTop: 0 });
+  });
+});
+
+function scrollDown() {
+  window.scrollBy(0, window.innerHeight); // 화면의 높이만큼 스크롤 내림
+}
+
     </script>
 </body>
 </html>

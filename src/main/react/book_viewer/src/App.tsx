@@ -57,16 +57,6 @@ const dummyOutline =
       sortPriority: 20000,
       pages: [
         {
-          id: 4,
-          title: "페이지4",
-          sortPriority: 10000
-        },
-        {
-          id: 5,
-          title: "페이지5",
-          sortPriority: 20000
-        },
-        {
           id: 6,
           title: "페이지6",
           sortPriority: 60000

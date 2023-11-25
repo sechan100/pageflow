@@ -4,9 +4,9 @@
 
 
 /* viewer의 content container안의 img 태그 설정 */
-#viewer-page-content-container img {
+#carousel-content img {
   margin: 5% auto;
-  width: 90%;
+  width: 85%;
 }
 
 

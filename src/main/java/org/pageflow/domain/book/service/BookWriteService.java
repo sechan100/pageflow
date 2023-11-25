@@ -227,9 +227,7 @@ public class BookWriteService {
         staleChapter.setTitle(updateRequest.getTitle() != null ? updateRequest.getTitle() : staleChapter.getTitle());
         
         // 데이터 커밋
-        Chapter updatedChapter = chapterRepository.save(staleChapter);
-        
-        return updatedChapter;
+        return chapterRepository.save(staleChapter);
     }
     
     
@@ -400,9 +398,8 @@ public class BookWriteService {
         List<Integer> newSortPriorityList = new ArrayList<>();
             
         int staleIdx = 0;
-        for(Integer li : LIS) {
+        for(Integer LISValue : LIS) {
             Integer staleSortPriority = staleSortPriorities.get(staleIdx);
-            Integer LISValue = li;
             
             if(!staleSortPriority.equals(LISValue)) {
                 

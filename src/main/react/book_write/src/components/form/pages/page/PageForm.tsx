@@ -5,7 +5,7 @@ import { IPage, PageMutation} from "../../../../types/types";
 import { create } from "zustand";
 import { useParams } from "react-router-dom";
 import { useGetPageQuery } from "../../../../api/page-api";
-import QuillEditor from "./QuillEditor";
+import QuillEditor, { useQuillFocusStore } from "./QuillEditor";
 import PageViewer from "./viewerComponents/PageViewer";
 
 interface PageMutationStore {
@@ -78,6 +78,7 @@ export default function PageForm(){
   const [localPage, setLocalPage] : [IPage, Dispatch<SetStateAction<IPage>>] = useState<IPage>(page);
   const [isViewMode, setIsViewMode] = useState<boolean>(false);
   const [editMode, setEditMode] = useState<string>("base"); // base, content
+  const {quillFocus} = useQuillFocusStore(); // quill editor의 포커스를 잡기 위한 zustand store
 
 
   // outline 데이터의 변경시, 이미 선언된 state인 ChapterMutation의 상태를 업데이트하기 위함
@@ -88,6 +89,7 @@ export default function PageForm(){
         title: page.title,
         content: page.content,
       });
+      quillFocus();
     }
   }, [page]);
 
@@ -143,10 +145,10 @@ export default function PageForm(){
 
       { editMode === "content" &&
         <div>
-          <button type="button" onClick={() => setIsViewMode(!isViewMode)} className="text-gray-900 hover:text-white border border-gray-800 hover:bg-gray-700 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2">
+          <button type="button" onClick={() => {setIsViewMode(!isViewMode); quillFocus();}} className="text-gray-900 hover:text-white border border-gray-800 hover:bg-gray-700 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2">
             { isViewMode ? "편집 모드" : "미리보기 모드"}
           </button>
-          <div className="h-[75vh]">
+          <div className="h-[75vh] w-[120vh]">
             {isViewMode ? 
               <PageViewer viewPortHeight={65} quillValue={localPage.content} /> : 
               <QuillEditor viewPortHeight={65} quillValue={localPage.content} setContent={handleContentChange} />

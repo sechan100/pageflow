@@ -5,11 +5,21 @@ import 'react-quill/dist/quill.snow.css';
 import { QueryContext } from "../../../../App";
 import { useParams } from "react-router-dom";
 import axios from "axios";
+import { create } from "zustand";
+
+
+export const useQuillFocusStore = create((set : any) => ({
+  reserveFocus: false,
+  quillFocus: () => set({ reserveFocus: true }),
+  resetQuillFocus: () => set({ reserveFocus: false }),
+}));
+
 
 export default function QuillEditor({quillValue, setContent, viewPortHeight} : {quillValue : string, setContent : any, viewPortHeight : number}) {
 
   const {bookId} = useContext(QueryContext);
   const {pageId} = useParams();
+  const {reserveFocus, resetQuillFocus} = useQuillFocusStore();
   const quillRef = React.useRef<ReactQuill>(null);
 
   const modules =  useMemo(() => ({
@@ -25,10 +35,11 @@ export default function QuillEditor({quillValue, setContent, viewPortHeight} : {
   }), []);
 
   useEffect(() => {
-    if(quillRef.current){
+    if(quillRef.current && reserveFocus){
       const editor = quillRef.current.getEditor();
       editor.focus();
       editor.setSelection(editor.getLength(), 0);
+      resetQuillFocus();
     }
   }, [quillValue]);
 
@@ -72,7 +83,7 @@ export default function QuillEditor({quillValue, setContent, viewPortHeight} : {
           if(!range) return;
 
           // 서버에 올려질때까지 표시할 로딩 placeholder 삽입                
-          editor.insertEmbed(range.index, "image", `/img/unloaded_img.jpg`);
+          editor.insertEmbed(range.index, "image", `/img/loading.gif`);
   
           const formData = new FormData();
           formData.append('imgFile', file);

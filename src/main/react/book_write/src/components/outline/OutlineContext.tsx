@@ -40,31 +40,32 @@ export default function OutlineContext({outline: localOutline} : {outline : Outl
   return (
     <OutlineSidebar outline={localOutline}>
       <BookBasicPage outline={localOutline} />
+      <div>
+        {/* 챕터 드롭 영역 */}
+        <Droppable droppableId="chapter-outline" type='CHAPTER'>
+          {(provided : any) => (
+            <div ref={provided.innerRef} {...provided.droppableProps} >
+              {/* Draggable Chapter 설정 */}
+              {localOutline.chapters?.map((chapter, index) => (
+                <Draggable key={chapterDraggablePrefix + chapter.id} draggableId={chapterDraggablePrefix + chapter.id} index={index} >
+                  {(provided : any) => (
+                    <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
 
-      {/* 챕터 드롭 영역 */}
-      <Droppable droppableId="chapter-outline" type='CHAPTER' >
-        {(provided : any) => (
-          <div ref={provided.innerRef} {...provided.droppableProps}>
-            {/* Draggable Chapter 설정 */}
-            {localOutline.chapters?.map((chapter, index) => (
-              <Draggable key={chapterDraggablePrefix + chapter.id} draggableId={chapterDraggablePrefix + chapter.id} index={index} >
-                {(provided : any) => (
-                  <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                      {/* Chapter 컴포넌트 */}
+                      <Chapter chapter={chapter} chapterOpenStatus={chapterOpenStatus} />
 
-                    {/* Chapter 컴포넌트 */}
-                    <Chapter chapter={chapter} chapterOpenStatus={chapterOpenStatus} />
+                    </div>
+                  )}
+                </Draggable>
+              ))}
 
-                  </div>
-                )}
-              </Draggable>
-            ))}
+              {/* 사이즈 줄어드는 것을 방지하기 위한 plcaeholder */}
+              {provided.placeholder}
 
-            {/* 사이즈 줄어드는 것을 방지하기 위한 plcaeholder */}
-            {provided.placeholder}
-
-          </div>
-        )}
-      </Droppable>
+            </div>
+          )}
+        </Droppable>
+      </div>
   </OutlineSidebar>
   );
 }

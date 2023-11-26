@@ -92,7 +92,7 @@ export default function BookEntityDraggableContext() {
         {/* 삭제할 요소를 드롭 */}
         <Droppable droppableId="chapter-delete-drop-area" type="CHAPTER">
           {(provided, snapshot) => (
-            <div className="bg-gray-500 animate-bounce hover:bg-gray-700 w-48 absolute invisible left-1/2 top-5 p-5 px-6 rounded-full" ref={chapterDeleteDropArea}>
+            <div className="bg-gray-500 z-30 animate-bounce hover:bg-gray-700 w-48 absolute invisible left-1/2 top-5 p-5 px-6 rounded-full" ref={chapterDeleteDropArea}>
               <div ref={provided.innerRef} {...provided.droppableProps} className="flex">
                 <svg className="w-6 h-6 text-gray-800 dark:text-white mr-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 20">
                   <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M1 5h16M7 8v8m4-8v8M7 1h4a1 1 0 0 1 1 1v3H6V2a1 1 0 0 1 1-1ZM3 5h12v13a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5Z"/>
@@ -106,7 +106,7 @@ export default function BookEntityDraggableContext() {
         {/* 삭제할 요소를 드롭 */}
         <Droppable droppableId="page-delete-drop-area" type="PAGE">
           {(provided, snapshot) => (
-            <div className="bg-gray-500 animate-bounce hover:bg-gray-700 w-48 absolute invisible left-1/2 top-5 p-5 px-6 rounded-full" ref={pageDeleteDropArea}>
+            <div className="bg-gray-500 z-30 animate-bounce hover:bg-gray-700 w-48 absolute invisible left-1/2 top-5 p-5 px-6 rounded-full" ref={pageDeleteDropArea}>
               <div ref={provided.innerRef} {...provided.droppableProps} className="flex">
                 <svg className="w-6 h-6 text-gray-800 dark:text-white mr-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 20">
                   <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M1 5h16M7 8v8m4-8v8M7 1h4a1 1 0 0 1 1 1v3H6V2a1 1 0 0 1 1-1ZM3 5h12v13a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5Z"/>

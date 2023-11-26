@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.pageflow.domain.user.entity.Account;
 import org.pageflow.domain.user.model.dto.PrincipalContext;
@@ -38,7 +39,8 @@ public class Rq {
     private final HttpServletRequest request;
     private final HttpServletResponse response;
     private final HttpSession session;
-    private final UserSession userSession;
+    @Setter
+    private UserSession userSession;
     private final ApplicationContext context;
     private final AccountService accountService;
 
@@ -86,8 +88,7 @@ public class Rq {
 
         }
     }
-
-
+    
     public void setRequestAttr(String attrName, Object attrValue) {
         request.setAttribute(attrName, attrValue);
     }
@@ -176,4 +177,5 @@ public class Rq {
     public Account getAccount() {
         return accountService.findFetchJoinProfileByUsername(userSession.getUsername());
     }
+    
 }

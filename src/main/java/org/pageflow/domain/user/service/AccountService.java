@@ -10,8 +10,10 @@ import org.pageflow.domain.user.entity.Account;
 import org.pageflow.domain.user.entity.Profile;
 import org.pageflow.domain.user.model.dto.AccountDto;
 import org.pageflow.domain.user.model.dto.AdditionalSignupAccountDto;
+import org.pageflow.domain.user.model.dto.ProfileUpdateForm;
 import org.pageflow.domain.user.repository.AccountRepository;
 import org.pageflow.domain.user.repository.AwaitingVerificationEmailRepository;
+import org.pageflow.domain.user.repository.ProfileRepository;
 import org.pageflow.infra.email.EmailRequest;
 import org.pageflow.infra.email.EmailSender;
 import org.pageflow.infra.file.constants.FileMetadataType;
@@ -37,6 +39,7 @@ public class AccountService {
     private final AwaitingVerificationEmailRepository emailCacheRepository;
     private final FileMetadataRepository fileMetadataRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ProfileRepository profileRepository;
     private final TemplateEngine templateEngine;
     private final EmailSender emailSender;
     private final FileService fileService;
@@ -66,19 +69,19 @@ public class AccountService {
 
         // 프로필 사진 이미지 파일을 등록한 경우
         if (!profileImg.isEmpty() && profileImgUrl.isEmpty()) {
-            setProfileImg(profileImg, savedAccount);
+            setProfileImg(profileImg, savedAccount.getProfile());
 
             // 프로필 사진의 URL을 등록한 경우
         } else if (profileImg.isEmpty() && !profileImgUrl.isEmpty()) {
-            setProfileImg(profileImgUrl, savedAccount);
+            setProfileImgUrl(profileImgUrl, savedAccount.getProfile());
 
             // 둘 다 등록한 경우 -> 파일로 등록한 사진이 우선순위
         } else if (!profileImg.isEmpty() && !profileImgUrl.isEmpty()) {
-            setProfileImg(profileImg, savedAccount);
+            setProfileImg(profileImg, savedAccount.getProfile());
 
             // 프로필 사진을 등록하지 않은 경우
         } else {
-            setProfileImg(customProperties.getDefaults().getDefaultUserProfileImg(), savedAccount);
+            setProfileImgUrl(customProperties.getDefaults().getDefaultUserProfileImg(), savedAccount.getProfile());
         }
     }
 
@@ -95,6 +98,19 @@ public class AccountService {
         account.setEmail(accountDto.getEmail());
     }
 
+    
+    @Transactional
+    public Profile updateProfile(ProfileUpdateForm form) {
+        Profile savedProfile = profileRepository.findById(form.getId()).orElseThrow();
+        savedProfile.setNickname(form.getNickname());
+        
+        if(!form.getProfileImg().isEmpty()){
+            setProfileImg(form.getProfileImg(), savedProfile);
+        }
+        return savedProfile;
+    }
+    
+    
     /**
      * send email for verifying email
      *
@@ -123,18 +139,18 @@ public class AccountService {
      * 프로필 사진을 FileMetadata와 함께 저장하고 uri를 반환
      */
     @Transactional
-    public String setProfileImg(MultipartFile profileImg, Account account) {
-        String staleProfileImgUrl = account.getProfile().getProfileImgUrl();
+    public String setProfileImg(MultipartFile profileImg, Profile profile) {
+        String staleProfileImgUrl = profile.getProfileImgUrl();
         
         // 프로필 이미지가 없거나 기본 이미지가 아닌 경우, 기존에 있던 프로필 사진은 삭제한다.
         if(isDefaultProfileImgOrNull(staleProfileImgUrl)){
             fileService.deleteFile(fileService.getPureFilePath(staleProfileImgUrl));
         }
         
-        FileMetadata profileImgMetadata = fileService.uploadFile(profileImg, account.getProfile(), FileMetadataType.PROFILE_IMG);
+        FileMetadata profileImgMetadata = fileService.uploadFile(profileImg, profile, FileMetadataType.PROFILE_IMG);
         String imgUri = fileService.getImgUri(profileImgMetadata);
-        account.getProfile().setProfileImgUrl(imgUri);
-        accountRepository.save(account);
+        profile.setProfileImgUrl(imgUri);
+        profileRepository.save(profile);
         return imgUri;
     }
 
@@ -144,10 +160,10 @@ public class AccountService {
      * 프로필 사진 URl을 받고, 해당 URL을 Profile 엔티티에 저장
      */
     @Transactional
-    public String setProfileImg(String profileImgUrl, Account account) {
-
-        account.getProfile().setProfileImgUrl(profileImgUrl);
-        accountRepository.save(account);
+    public String setProfileImgUrl(String profileImgUrl, Profile profile) {
+        
+        profile.setProfileImgUrl(profileImgUrl);
+        profileRepository.save(profile);
         return profileImgUrl;
     }
     

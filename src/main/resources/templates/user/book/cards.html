@@ -37,7 +37,7 @@
 <main layout:fragment="main">
 
     <div class="flex flex-col w-full">
-        <div class="relative h-[500px] flex items-center justify-center ">
+        <div class="relative h-[30vh] flex items-center justify-center ">
             <!-- 상단 이미지 -->
             <div class="absolute inset-0 overflow-hidden drop-shadow-2xl shadow-2xl">
                 <img src="https://img1.daumcdn.net/thumb/R1280x0/?fname=http://t1.daumcdn.net/brunch/service/user/9kE1/image/k3uEfFMvJOS81qkiAml4EMnsVzs.jpg"
@@ -50,18 +50,10 @@
                 <p class="text-3xl font-bold">Dive into a world of diverse stories and authors right now!</p>
             </div>
         </div>
-<!-- 리스트 -->
+        <!-- 리스트 -->
         <div class="w-full mx-auto max-w-screen-xl sm:px-6 sm:py-24  ">
             <div class="flex justify-between mb-16 w-full  ">
             <div class="flex grow">
-                <!--  책 등록  -->
-                <div class="max-w-md mr-4  border-2 p-3 border-gray-400 rounded font-semibold text-sm text-gray-600 relative text-center active:top-[3px]">
-                    <div class="w-full h-full">
-                        <a th:href="@{/book/write}">
-                            책 등록
-                        </a>
-                    </div>
-                </div>
                 <!--  정렬순  -->
                 <div class="max-w-md mr-4 w-1/5 z-10  border-2 p-3 border-gray-400 rounded font-semibold text-sm text-gray-600 relative text-center active:top-[3px]">
                     <button id="sortOption" name="sort" th:value="${sort}" data-sort="${sort}"

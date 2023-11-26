@@ -55,6 +55,23 @@ public class UserSession {
             admin = true;
         }
     }
+    
+    public UserSession(Profile profile){
+        this.nickname = profile.getNickname();
+        this.profileImgUrl = profile.getProfileImgUrl();
+        
+        Account account = profile.getAccount();
+        if(account != null){
+            this.id = account.getId();
+            this.username = account.getUsername();
+            this.email = account.getEmail();
+            this.role = account.getRole();
+        }
+        
+        if (this.role.equals(Role.ADMIN)) {
+            admin = true;
+        }
+    }
 
     public static UserSession anonymousUserSession() {
         UserSession anonymousUserSession = new UserSession();

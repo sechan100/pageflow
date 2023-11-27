@@ -89,7 +89,7 @@
                                                     <label class="block text-sm font-medium leading-6 text-gray-900">profile
                                                         Img</label>
                                                     <div class="mt-2 mb-2 flex">
-                                                        <p id="originName" class="border p-3 w-9/12 text-black text-xs rounded" >파일명</p>
+                                                        <p id="originName" class="border border-gray-300 p-3 w-9/12 text-black text-xs rounded" >파일명</p>
                                                         <label class="p-2 text-white bg-gray-300 cursor-pointer ml-2 sm:text-sm sm:leading-6"
                                                                for="profileImg">첨부 파일 </label>
                                                         <input onchange="previewImage();" data-ax-path="file" required
@@ -207,29 +207,6 @@
                  preview.hide();
              }
          }
-
-// p태그에 파일명 확장자 간단하게 보이게 하기
-    window.onload = function () {
-    target = document.getElementById('profileImg');
-    target.addEventListener('change', function () {
-
-        if (target.value.length) {
-            var fileName = target.files[0].name;
-            var lastIndex = fileName.lastIndexOf("\\");
-            var displayFileName = fileName.substring(lastIndex + 1);
-            var fileExtension = displayFileName.split('.').pop();
-
-            // 출력할 파일명 형식: 파일명 (확장자)
-            var displayText = displayFileName.replace('.' + fileExtension, '') + ' (' + fileExtension + ')';
-
-            $('#originName').html(displayText);
-        } else {
-            $('#originName').html("");
-        }
-
-    });
-}
-
 
     </script>
 </main>

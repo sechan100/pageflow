@@ -9,6 +9,10 @@ import { useOutlineMutation } from "../../api/outline-api";
 import { useChapterMutation, useCreateChapterMutation } from "../../api/chapter-api";
 import { useCreateChapterStore } from "../outline/newItemBtn/NewChapterBtn";
 import { useChapterMutationStore } from "../form/pages/chapter/ChapterForm";
+import { useCreatePageMutation, usePageMutation } from "../../api/page-api";
+import { useCreatePageStore } from "../outline/newItemBtn/NewPageBtn";
+import { usePageMutationStore } from "../form/pages/page/PageForm";
+import _ from "lodash";
 
 
 
@@ -18,21 +22,17 @@ export default function MutationSaveBtn(){
   const { bookId } = useContext(QueryContext);
   const updateAlertTooltip = useRef<HTMLDivElement>(null);
 
-  // 서버 요청 메소드를 저장하는 ref 변수.
-  // 이벤트 리스너를 등록시에, 등록 당시에, 클로저를 형성하여 당시 상태의 변수들의 스냅샷에 접근하기 때문에, 최신 상태의 함수를 참조하도록 할 필요가 있다.
-  const flushMutationRef = useRef<() => void>(flushMutations);
-  useEffect(() => {
-    flushMutationRef.current = flushMutations;
-  }, [flushMutations]);
 
   // ##### zustand stores ######
   const bookStore = useBookMutationStore(); // bookForm의 zusatnd store
   const outlineStore = useOutlineMutationStore(); // outlineSidebar의 zustand store
   const createChapterStore = useCreateChapterStore(); // newChapterBtn의 zustand store
+  const createPageStore = useCreatePageStore(); // newPageBtn의 zustand store
   const chapterStore = useChapterMutationStore(); // chapterForm의 zustand store
+  const pageStore = usePageMutationStore(); // pageForm의 zustand store
   // ############################
 
-  const mutationStores = [bookStore, outlineStore, createChapterStore, chapterStore]; // zustand store들을 배열로 저장
+  const mutationStores = [bookStore, outlineStore, createChapterStore, chapterStore, createPageStore, pageStore]; // zustand store들을 배열로 저장
   
   const isMutateds : boolean[] = mutationStores.map((store) => store.isMutated); // store들의 isMutated를 배열로 저장
   const [isAnyMutation, setIsAnyMutation] = useState(false); // outline, book, chapter중 하나라도 변경사항이 있다면 true.
@@ -47,16 +47,17 @@ export default function MutationSaveBtn(){
   }, isMutateds);
 
 
-  // 하나라도 변경사항이 존재할 경우, 사용자에게 변경사항이 있음을 알리는 핑을 띄움
+  // 하나라도 변경사항이 존재할 경우, 사용자에게 변경사항이 있음을 알리는 핑을 띄운다.
   useEffect(() => {
     updateAlertPingHandler();
   }, [isAnyMutation]);
 
 
-  // 새로운 챕터 생성 요청은 바로 서버에 요청한다.
+  // 챕터 생성 요청과 페이지 생성 요청은 바로 서버에 요청한다.
   useEffect(() => {
-    if(createChapterStore.isMutated) flushMutations();
-  }, [createChapterStore.isMutated]);
+    if(createChapterStore.isMutated) flushMutations(false);
+    if(createPageStore.isMutated) flushMutations(false);
+  }, [createChapterStore.isMutated, createPageStore.isMutated]);
 
 
   // 저장 단축키 Ctrl + S 등록
@@ -65,16 +66,31 @@ export default function MutationSaveBtn(){
       if ((event.ctrlKey || event.metaKey) && event.keyCode === 83) {
         // 'Ctrl + s'가 눌렸을 때 실행할 동작
         event.preventDefault();
-        flushMutationRef.current();
+        if(isAnyMutation){
+          flushMutations();
+        }
       }
     };
     // 이벤트 리스너 추가
     document.addEventListener('keydown', handleKeyPress);
+    
     // 컴포넌트가 언마운트될 때 이벤트 리스너 제거
     return () => {
       document.removeEventListener('keydown', handleKeyPress);
     };
-  }, []);
+  }, [flushMutations, isAnyMutation]);
+
+
+  // 자동 저장 디바운드 등록 이펙트
+  useEffect(() => {
+    const debouncedSave = _.debounce(() => {
+      if(isAnyMutation){
+        flushMutations();
+      }
+    }, 5000);
+    debouncedSave();
+    return () => debouncedSave.cancel();
+  }, [flushMutations]);
 
 
 // ================================================================================
@@ -82,24 +98,30 @@ export default function MutationSaveBtn(){
   const bookMutateQuery = useBookMutation(bookId); // book에 관한 변경사항을 서버에 요청하기 위한 react-query custom hook
   const outlineMutateQuery = useOutlineMutation(bookId); // outline에 관한 변경사항을 서버에 요청하기 위한 react-query custom hook
   const createChapterQuery = useCreateChapterMutation(bookId); 
+  const createPageQuery = useCreatePageMutation(bookId, createPageStore.chapterId); 
   const chapterMutateQuery = useChapterMutation(); 
+  const pageMutateQuery = usePageMutation();
 
 
 
   // 변경사항을 서버에 요청 -> Promise.all을 통해서 여러개의 비동기 요청을 하나의 트랜잭션으로 처리한다.
-  function flushMutations(){
+  function flushMutations(isTriggeredByUser : boolean = true){
     // 변경된 데이터들
     const updateOutlinePromise = outlineStore.isMutated ? outlineMutateQuery.mutateAsync(outlineStore.payload) : null;
     const updateBookPromise = bookStore.isMutated ? bookMutateQuery.mutateAsync(bookStore.payload) : null;
     const createChapterPromise = createChapterStore.isMutated ? createChapterQuery.mutateAsync() : null;
+    const createPagePromise = createPageStore.isMutated ? createPageQuery.mutateAsync() : null;
     const updateChapterPromise = chapterStore.isMutated ? chapterMutateQuery.mutateAsync(chapterStore.payload) : null;
+    const updatePagePromise = pageStore.isMutated ? pageMutateQuery.mutateAsync(pageStore.payload) : null;
 
     // 서버에 요청이 필요한 데이터의 mutateAsync에서 반환하는 Promise 배열
     let updateApiPromises : any[] = [
       updateOutlinePromise, 
       updateBookPromise, 
       createChapterPromise,
-      updateChapterPromise
+      createPagePromise,
+      updateChapterPromise,
+      updatePagePromise
     ];
 
     // promise가 null이라면 변경사항이 존재하지 않는 데이터이므로, 배열에서 제거한다.
@@ -111,7 +133,7 @@ export default function MutationSaveBtn(){
     .then((response) => {
       console.log("서버 응답", response);
       resetStoreMutations();
-      flowAlert("success", "변경사항을 저장했습니다.");
+      if(isTriggeredByUser) flowAlert("success", "변경사항을 저장했습니다.");
     })
 
     .catch((error) => {

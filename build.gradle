@@ -74,7 +74,7 @@ tasks.register('buildReacts', Exec) {
 
 
 tasks.register('cleanBookWriteBuildDir', Delete) {
-	dependsOn "buildReactBookWrite"
+	dependsOn "buildReacts"
 	delete file('src/main/resources/static/react/build/book_write')
 }
 

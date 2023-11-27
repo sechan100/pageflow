@@ -71,7 +71,7 @@ export default function flowAlert(alertType, msg) {
 
   setTimeout(() => {
       dismissAlert(currentAlertId);
-  }, 10000);
+  }, 2000);
 
   const alertContainer = document.getElementById('alert-container');
   if (alertContainer) {

@@ -14,7 +14,7 @@ function dismissAlert(flowAlertId){
 
 let alertIdCounter = 1;
 
-export default function flowAlert(alertType, msg) {
+function flowAlert(alertType, msg) {
 
     let color, bgColor, borderColor;
     const currentAlertId = alertIdCounter;

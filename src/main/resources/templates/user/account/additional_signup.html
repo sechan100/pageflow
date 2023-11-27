@@ -119,6 +119,29 @@ function previewImage() {
     }
 }
 
+
+// p태그에 파일명 확장자 간단하게 보이게 하기
+    window.onload = function () {
+    target = document.getElementById('profileImg');
+    target.addEventListener('change', function () {
+
+        if (target.value.length) {
+            var fileName = target.files[0].name;
+            var lastIndex = fileName.lastIndexOf("\\");
+            var displayFileName = fileName.substring(lastIndex + 1);
+            var fileExtension = displayFileName.split('.').pop();
+
+            // 출력할 파일명 형식: 파일명 (확장자)
+            var displayText = displayFileName.replace('.' + fileExtension, '') + ' (' + fileExtension + ')';
+
+            $('#originName').html(displayText);
+        } else {
+            $('#originName').html("");
+        }
+
+    });
+}
+
 </script>
 </main>
 </html>

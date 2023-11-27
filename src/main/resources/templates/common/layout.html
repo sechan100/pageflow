@@ -47,7 +47,7 @@
           background: transparent;
           color: #000;
           box-shadow: -7px -7px 20px 0px #fff9, -4px -4px 5px 0px #fff9,
-            7px 7px 20px 0px #0002, 4px 4px 5px 0px #0001;
+            7px 20px 0px #0002, 4px 5px 0px #0001;
         }
         .read-btn:before,
         .read-btn:after {
@@ -71,22 +71,23 @@
           width: 100%;
           transition: 800ms ease all;
         }
-
     </style>
+    <title layout:title-pattern="$CONTENT_TITLE - $LAYOUT_TITLE">Pageflow</title>
+    <link rel="icon" href="/img/pageflow-logo.png" type="image/x-icon">
 
 
 </head>
 
-<body class="m-0 font-sans antialiased   leading-default bg-gray-50 " th:with="user = ${@rq.userSession}">
+<body class="m-0 font-sans antialiased leading-default bg-gray-50" th:with="user = ${@rq.userSession}">
 
 
     <nav class="bg-white fixed w-full z-40 top-0 left-0 border-b border-gray-200">
 
-        <div class="flex flex-wrap items-center justify-between mx-20 p-4">
+        <div class="flex flex-wrap items-center justify-between mx-16 py-1.5 h-20">
 
             <!--로고-->
-            <a href="/" class="flex items-center">
-                <img width="120%" th:src="@{/img/ssegTextLogo.png}" class="h-8 mr-3" alt="Logo" src="#">
+            <a href="/" class="flex items-center h-full">
+                <img th:src="@{/img/pageflow-banner2.png}" class="h-full" alt="Logo" src="#">
             </a>
 
             <div class="flex md:order-2">
@@ -100,8 +101,8 @@
                     </label>
                     <ul tabindex="0"
                         class="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-24">
-                        <li><a a th:href="@{/login}">LOG IN</a></li>
-                        <li><a href="/signup">SIG NUP</a></li>
+                        <li><a th:href="@{/login}">LOG IN</a></li>
+                        <li><a th:href="@{/signup}">SIG NUP</a></li>
                     </ul>
                 </div>
                 <!--사용자 프로필-->
@@ -153,42 +154,6 @@
                         </li>
                     </ul>
                 </div>
-
-
-                <!--반응형 메뉴 드롭다운 버튼-->
-                <button data-collapse-toggle="navbar-sticky" type="button" class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200" aria-controls="navbar-sticky" aria-expanded="false">
-                    <span class="sr-only">Open main menu</span>
-                    <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 17 14">
-                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 1h15M1 7h15M1 13h15"/>
-                    </svg>
-                </button>
-
-            </div>
-
-            <!--상단 메뉴바-->
-            <div class="items-center justify-between hidden w-full md:flex md:w-auto md:order-1" id="navbar-sticky">
-                <ul class="flex flex-col p-4 md:p-0 mt-4 font-medium border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 md:mt-0 md:border-0 md:bg-white">
-                    <li>
-                        <a href="/book" class="block py-2 pl-3 pr-4 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0" aria-current="page">
-                            Book
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" class="block py-2 pl-3 pr-4 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0">
-                            APIs
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" class="block py-2 pl-3 pr-4 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0">
-                            Client Libraries
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" class="block py-2 pl-3 pr-4 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0">
-                            Contact
-                        </a>
-                    </li>
-                </ul>
             </div>
         </div>
     </nav>
@@ -196,8 +161,7 @@
     <div id="alert-container" class="sm:w-1/4 w-full z-50 fixed bottom-5 right-5 flex flex-col-reverse"></div>
 
 <!--  스크롤 시 올림버튼  -->
-    <div class="goto-tp-btn z-50 fixed rounded-full border-2 opacity-0 cursor-pointer duration-100 text-xl bottom-[5%] right-[5%] w-8 text-center border-black leading-7
- h-8"><i class="fa-solid fa-arrow-up"></i></div>
+    <div class="goto-tp-btn z-50 fixed rounded-full border-2 opacity-0 cursor-pointer duration-100 text-xl bottom-[5%] right-[5%] w-8 text-center border-black leading-7 h-8"><i class="fa-solid fa-arrow-up"></i></div>
 
     <main layout:fragment="main" class="mt-20  text-black "></main>
 
@@ -227,28 +191,27 @@
                 flowAlert(alertType, msg);
             }
         });
-        /*]]>*/
 
-// 스크롤 시 올림버튼
+        // 스크롤 시 올림버튼
         $(window).scroll(function () {
-  var $scrollTop = $(this).scrollTop();
-  if ($scrollTop > 0) {
-    $(".goto-tp-btn").css({ opacity: 1 }, 300);
-  } else {
-    $(".goto-tp-btn").css({ opacity: 0 }, 300);
-  }
-});
+          var $scrollTop = $(this).scrollTop();
+          if ($scrollTop > 0) {
+            $(".goto-tp-btn").css({ opacity: 1 }, 300);
+          } else {
+            $(".goto-tp-btn").css({ opacity: 0 }, 300);
+          }
+        });
 
-$(document).ready(function () {
-  $(".goto-tp-btn").click(function () {
-    $("html, body").animate({ scrollTop: 0 });
-  });
-});
+        $(document).ready(function () {
+          $(".goto-tp-btn").click(function () {
+            $("html, body").animate({ scrollTop: 0 });
+          });
+        });
 
-function scrollDown() {
-  window.scrollBy(0, window.innerHeight); // 화면의 높이만큼 스크롤 내림
-}
-
+        function scrollDown() {
+          window.scrollBy(0, window.innerHeight); // 화면의 높이만큼 스크롤 내림
+        }
+        /*]]>*/
     </script>
 </body>
 </html>

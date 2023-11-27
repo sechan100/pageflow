@@ -11,8 +11,12 @@ import lombok.NoArgsConstructor;
 abstract public class RearrangeRequest {
 
     private String type;
-    @NotEmpty  private Long id;
+    
+    @NotEmpty
+    private Long id;
+    
     private String title;
+    
     private Integer sortPriority;
 
     public RearrangeRequest(String type) {

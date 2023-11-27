@@ -71,9 +71,9 @@ export default function Chapter(props : chapterProps) {
           <div ref={provided.innerRef} {...provided.droppableProps}>
             <div onMouseOver={toggleChapterFormLink} onMouseOut={toggleChapterFormLink} onClick={toggleInnerPageList} className={(snapshot.isDraggingOver ? "bg-gray-700 " : "") + "flex items-center p-1 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 bg-gray-800"}>
               <svg aria-hidden="true" className="w-4 h-4 text-gray-800 dark:text-white" fill="none" viewBox="0 0 16 12"><path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M1 1h14M1 6h14M1 11h7"/></svg>
-              <span className="flex-1 ml-3 text-left whitespace-nowrap">
+              <div className="flex-1 ml-3 text-left whitespace-nowrap truncate">
                 {chapter.title}
-              </span>
+              </div>
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd"></path></svg>
             </div>
           </div>

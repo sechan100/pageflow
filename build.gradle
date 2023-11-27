@@ -63,10 +63,15 @@ tasks.register('restartRedisServerOnWindow', Exec) {
 tasks.register('buildReacts', Exec) {
 	doFirst {
 		["book_write", "book_viewer"].each { dir ->
+			print(dir)
 			if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
+				print(dir)
 				commandLine "cmd", "/c", "npm", "run", "build", "--prefix", "src/main/react/$dir"
+				print(dir)
 			} else {
+				print(dir)
 				commandLine "npm", "run", "build", "--prefix", "src/main/react/$dir"
+				print(dir)
 			}
 		}
 	}

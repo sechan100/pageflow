@@ -226,6 +226,9 @@
             $(".goto-tp-btn").css({ opacity: 0 }, 300);
           }
         });
+           $(".goto-tp-btn").on("click", function() {
+        $("html, body").animate({ scrollTop: 0 }, "slow");
+    });
 
 // 스크롤 시 navbar 사라지고 나타나는 코드
         document.addEventListener("DOMContentLoaded", function() {

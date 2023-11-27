@@ -8,11 +8,11 @@
     <div class="w-full bg-white rounded-lg shadow md:mt-0 sm:max-w-md xl:p-0 flex flex-col items-center justify-center">
 
       <!--로고 및 문구-->
-      <a href="#" class="mb-6 text-2xl font-semibold text-gray-900 pt-8">
-        <img class="mr-2" th:src="@{/img/ssegTextLogo.png}" alt="logo" src="">
+      <div class="mb-6 text-2xl font-semibold text-gray-900 pt-8 text-center cursor-pointer">
+        <img class="mx-auto w-1/2" th:src="@{/img/pageflow-banner.png}" alt="logo" src="#">
         <br>
-        <span>Register in SSEG</span>
-      </a>
+        <span>Sign in Pageflow</span>
+      </div>
 
 
       <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
@@ -29,12 +29,18 @@
           <input type="hidden" th:field="*{password}" />
 
           <!--profile image-->
-          <img src="#" th:src="*{profileImgUrl}" alt="">
           <input type="hidden" th:field="*{profileImgUrl}" />
 
-          <div>
-            <label for="profileImg" class="block mb-2 text-sm font-medium text-gray-900">프로필 사진</label>
-            <input type="file" th:field="*{profileImg}" id="profileImg" class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5" >
+          <label for="profileImg" class="block text-sm font-medium text-gray-900">프로필 사진</label>
+          <div class="flex justify-between items-center">
+            <!--profile image preview-->
+            <div class="avatar p-2 ">
+              <div class="h-[8vh] rounded-full">
+                <img th:if="*{profileImgUrl} != null" src="#" th:src="*{profileImgUrl}" alt="">
+                <img th:unless="*{profileImgUrl} != null" id="profile-img-preview" src="#" alt="">
+              </div>
+            </div>
+            <input type="file" onchange="previewImage()" accept="image/*" th:field="*{profileImg}" id="profileImg" class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5" >
           </div>
 
           <!--email-->
@@ -58,5 +64,23 @@
     </div>
   </div>
 
+<script th:inline="javascript">
+function previewImage() {
+    var file = $("#profileImg").prop('files')[0];
+    var preview = $("#profile-img-preview");
+    var reader = new FileReader();
+
+    reader.onloadend = function () {
+      preview.attr("src", reader.result);
+    }
+
+    if(file) {
+        reader.readAsDataURL(file);
+    } else {
+        preview.hide();
+    }
+}
+
+</script>
 </main>
 </html>

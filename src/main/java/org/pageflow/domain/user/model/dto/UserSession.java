@@ -27,6 +27,7 @@ public class UserSession {
     private String email;
     private String role;
     private String profileImgUrl;
+    private String provider;
     private boolean login = false;
     private boolean admin = false;
 
@@ -44,6 +45,7 @@ public class UserSession {
         this.username = account.getUsername();
         this.email = account.getEmail();
         this.role = account.getRole();
+        this.provider = account.getProvider();
 
         Profile profile = account.getProfile();
         if (profile != null) {
@@ -66,6 +68,7 @@ public class UserSession {
             this.username = account.getUsername();
             this.email = account.getEmail();
             this.role = account.getRole();
+            this.provider = account.getProvider();
         }
         
         if (this.role.equals(Role.ADMIN)) {

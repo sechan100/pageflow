@@ -92,10 +92,10 @@ public class AccountService {
     @Transactional
     public void updateAccount(AccountDto accountDto) {
         Account account = accountRepository.findByUsername(accountDto.getUsername());
-        account.setUsername(accountDto.getUsername());
-        account.setPassword(passwordEncoder.encode(accountDto.getPassword()));
-        account.setProvider(accountDto.getProvider());
-        account.setEmail(accountDto.getEmail());
+        if(accountDto.getUsername() != null) account.setUsername(accountDto.getUsername());
+        if(accountDto.getPassword() != null) account.setPassword(passwordEncoder.encode(accountDto.getPassword()));
+        if(accountDto.getProvider() != null) account.setProvider(accountDto.getProvider());
+        if(accountDto.getEmail() != null) account.setEmail(accountDto.getEmail());
     }
 
     
@@ -143,7 +143,7 @@ public class AccountService {
         String staleProfileImgUrl = profile.getProfileImgUrl();
         
         // 프로필 이미지가 없거나 기본 이미지가 아닌 경우, 기존에 있던 프로필 사진은 삭제한다.
-        if(isDefaultProfileImgOrNull(staleProfileImgUrl)){
+        if(!isDefaultProfileImgOrNull(staleProfileImgUrl)){
             fileService.deleteFile(fileService.getPureFilePath(staleProfileImgUrl));
         }
         

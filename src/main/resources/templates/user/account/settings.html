@@ -13,12 +13,14 @@
                 <div class="relative flex flex-col flex-auto min-w-0 p-4 mx-6 -mt-16 overflow-hidden break-words border-0 shadow-blur rounded-2xl bg-white/50 bg-clip-border backdrop-blur-2xl backdrop-saturate-200">
                     <div class="flex justify-between">
                         <div class="flex w-auto max-w-full px-3">
-                            <div class="avatar p-2 ">
+
+                            <div class="avatar p-2">
                                 <div class="w-12 h-12 rounded-full">
                                     <img id="profile-img-preview" th:src="${account.profile.profileImgUrl}" src="#"
                                         alt="프로필 이미지" >
                                 </div>
                             </div>
+                            
                             <div class="ml-2 p-2 flex flex-col justify-center">
                                 <div class="text-lg	font-semibold">
                                     <span th:text="${user.nickname}"> </span>
@@ -28,37 +30,52 @@
                                 </div>
                             </div>
                         </div>
+
                         <div>
-                          <button class="read-btn flex w-full justify-center rounded-md  px-3 py-1.5 text-sm font-semibold leading-6 shadow-sm relative bg-black	text-white p-1 mt-4 w-full" onclick="my_modal_1.showModal()">비밀번호 변경</button>
+                          <button th:if="${user.provider} == 'pageflow'" class="read-btn flex w-full justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 shadow-sm relative bg-black	text-white p-1 mt-4 w-full" onclick="my_modal_1.showModal()">비밀번호 변경</button>
                           <dialog id="my_modal_1" class="modal">
                               <div class="modal-box">
                                   <h3 class="font-bold text-lg">비밀번호 변경!</h3>
-                                  <form th:action="@{/}">
+                                  <!-- 비밀번호 변경 form -->
+                                  <form id="password-update-form" onsubmit="return updatePassword(this)">
                                       <div>
-                                          <label for="password"
-                                                class="block text-sm font-medium leading-6 text-gray-900">password</label>
+                                        <label for="currentPassword"
+                                              class="block text-sm font-medium leading-6 text-gray-900">Current Password</label>
+                                        <div class="mt-2">
+                                            <input id="currentPassword" name="currentPassword" type="password"
+                                                  autocomplete="password"
+                                                  required placeholder="기존 비밀번호를 입력하세요"
+                                                  class="input w-full focus:outline-0 focus:border focus:ring-0 rounded flex-auto text-black border sm:text-sm sm:leading-6">
+                                        </div>
+                                      </div>
+                                      <div>
+                                          <label for="newPassword"
+                                                class="block text-sm font-medium leading-6 text-gray-900">Password</label>
                                           <div class="mt-2">
-                                              <input id="password" name="password" type="password"
+                                              <input id="newPassword" name="newPassword" type="password"
                                                     autocomplete="password"
                                                     required placeholder="새로운 비밀번호를 입력하세요"
                                                     class="input w-full focus:outline-0 focus:border focus:ring-0 rounded flex-auto text-black border sm:text-sm sm:leading-6">
                                           </div>
                                       </div>
                                       <div>
-                                          <label for="password"
-                                                 class="block text-sm font-medium leading-6 text-gray-900">password</label>
+                                          <label for="newPasswordConfirm"
+                                                class="block text-sm font-medium leading-6 text-gray-900">New Password Confirm</label>
                                           <div class="mt-2">
-                                              <input id="passwordCheck" name="password" type="password"
-                                                    autocomplete="password"
+                                              <input id="newPasswordConfirm" name="newPasswordConfirm" type="password"
                                                     required placeholder="새로운 비밀번호를 다시 입력하세요"
                                                     class="input w-full focus:outline-0 focus:border focus:ring-0 rounded flex-auto text-black border sm:text-sm sm:leading-6">
                                           </div>
                                       </div>
                                   </form>
+
                                   <div class="modal-action">
+                                      <button type="submit" form="password-update-form" class="text-gray-900 hover:text-white border border-gray-800 hover:bg-gray-900 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2">
+                                        변경하기
+                                      </button>
                                       <form method="dialog">
                                           <!-- if there is a button in form, it will close the modal -->
-                                          <button class="btn">Close</button>
+                                          <button id="password-modal-close-btn" class="btn">Close</button>
                                       </form>
                                   </div>
                               </div>
@@ -75,7 +92,7 @@
                                 Change information
                             </h2>
                         </div>
-                        <div class="     flex-auto">
+                        <div class="flex-auto">
                             <div class=" flex flex-wrap m-auto">
                                 <div class=" w-full m-auto max-w-full md:w-6/12 md:flex-none xl:mb-0 xl:w-3/12">
                                     <div class="w-full relative flex flex-col min-w-0">
@@ -158,6 +175,40 @@ function updateProfile(e) {
         }
     })
     .catch(err => console.error(err));
+    return false;
+}
+
+function updatePassword(e){
+    const formData = new FormData(e);
+
+    if(formData.get('newPassword') !== formData.get('newPasswordConfirm')){
+        flowAlert("error", "새로운 비밀번호가 일치하지 않습니다.");
+        const modalCloseBtn = document.getElementById('password-modal-close-btn');
+        modalCloseBtn.click();
+        return false;
+    }
+
+    fetch('/api/account/settings/password', {
+        method: 'PUT',
+        body: formData
+    })
+    .then(res => {
+        if(res.status == 200) {
+            flowAlert("success", "비밀번호가 변경되었습니다.");
+        } else if(res.status == 403){
+            flowAlert("error", "현재 비밀번호가 일치하지 않습니다.");
+        } else if(res.status == 400){
+            flowAlert("error", "새로운 비밀번호가 일치하지 않습니다.");
+        } else {
+            flowAlert("error", "서버 요청에 실패했습니다. <br> 잠시 후 다시 시도해주세요.");
+        }
+    })
+    .catch(err => {
+        console.error(err)
+    });
+
+    const modalCloseBtn = document.getElementById('password-modal-close-btn');
+    modalCloseBtn.click();
     return false;
 }
 

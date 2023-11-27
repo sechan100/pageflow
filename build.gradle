@@ -54,49 +54,62 @@ tasks.register('restartRedisServerOnWindow', Exec) {
 	commandLine 'cmd', '/c', 'taskkill', '/F', '/IM', 'redis-server.exe'
 	println 'Redis Server stopped.'
 	println 'Starting Redis Server...'
-//	commandLine 'cmd', '/c', 'start', '/B', 'C:\\Users\\gsw05\\OneDrive\\tools\\Redis-7.0.14-Windows-x64-with-Service\\redis-server.exe'
+	commandLine 'cmd', '/c', 'start', '/B', 'C:\\Users\\gsw05\\OneDrive\\tools\\Redis-7.0.14-Windows-x64-with-Service\\redis-server.exe'
 	println '##### Started Redis Server #####'
-	commandLine 'cmd', '/c', 'start', '/B', 'C:\\Users\\SBS\\Redis-x64-3.0.504\\redis-server.exe'
+//	commandLine 'cmd', '/c', 'start', '/B', 'C:\\Users\\SBS\\Redis-x64-3.0.504\\redis-server.exe'
 }
 
 
-tasks.register('buildReacts', Exec) {
-	doFirst {
-		["book_write", "book_viewer"].each { dir ->
-			print(dir)
-			if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
-				print(dir)
-				commandLine "cmd", "/c", "npm", "run", "build", "--prefix", "src/main/react/$dir"
-				print(dir)
-			} else {
-				print(dir)
-				commandLine "npm", "run", "build", "--prefix", "src/main/react/$dir"
-				print(dir)
-			}
-		}
+// 리액트 빌드
+tasks.register('buildReact-book_write', Exec) {
+	workingDir("src/main/react/book_write")
+
+	if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
+		commandLine "cmd", "/c", "npm", "run", "build"
+	} else {
+		commandLine "npm", "run", "build"
 	}
+	println("book_write 리엑트를 빌드합니다...")
+}
+tasks.register('buildReact-book_viewer', Exec) {
+	workingDir("src/main/react/book_viewer")
+
+	if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
+		commandLine "cmd", "/c", "npm", "run", "build"
+	} else {
+		commandLine "npm", "run", "build"
+	}
+
+	println("book_viewer 리엑트를 빌드합니다...")
 }
 
 
-tasks.register('cleanBookWriteBuildDir', Delete) {
-	dependsOn "buildReacts"
+// 기존 리액트 빌드 디렉토리 삭제
+tasks.register('clean-book_write', Delete) {
+	dependsOn "buildReact-book_write"
 	delete file('src/main/resources/static/react/build/book_write')
+	println("book_write 빌드 디렉토리를 정리...")
 }
-tasks.register('cleanBookViewerBuildDir', Delete) {
-	dependsOn "buildReacts"
+tasks.register('clean-book_viewer', Delete) {
+	dependsOn "buildReact-book_viewer"
 	delete file('src/main/resources/static/react/build/book_viewer')
+	println("book_viewer 빌드 디렉토리를 정리...")
 }
 
-tasks.register('copyReactBookWriteBuildDir', Copy) {
-	dependsOn "cleanBookWriteBuildDir"
+
+
+tasks.register('copy-book_write', Copy) {
+	dependsOn "clean-book_write"
 	from file("src/main/react/book_write/build")
 	into file('src/main/resources/static/react/build/book_write')
+	println("book_write 빌드 파일을 복사했습니다.")
+}
+tasks.register('copy-book_viewer', Copy) {
+	dependsOn "clean-book_viewer"
+	from file("src/main/react/book_write/build")
+	into file('src/main/resources/static/react/build/book_viewer')
+	println("book_viewer 빌드 파일을 복사했습니다.")
 }
 
-tasks.register('copyBookViewerBuildDir', Copy) {
-	dependsOn "cleanBookViewerBuildDir"
-	from file("src/main/react/book_viewer/build")
-	into file('src/main/resources/static/react/build/book_viewer')
-}
 
 

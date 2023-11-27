@@ -28,7 +28,7 @@ import java.util.Map;
 @RestController
 @RequiredArgsConstructor
 @Transactional
-public class ApiBookController {
+public class ApiBookWriteController {
     
     private final Rq rq;
     private final BookService bookService;

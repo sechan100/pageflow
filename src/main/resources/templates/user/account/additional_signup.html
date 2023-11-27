@@ -39,10 +39,23 @@
                 <input type="hidden" th:field="*{username}" />
                 <input type="hidden" th:field="*{password}" />
 
+          <!--profile image-->
+          <input type="hidden" th:field="*{profileImgUrl}" />
                 <!--profile image-->
                 <img src="#" th:src="*{profileImgUrl}" alt="">
                 <input type="hidden" th:field="*{profileImgUrl}" />
 
+          <label for="profileImg" class="block text-sm font-medium text-gray-900">프로필 사진</label>
+          <div class="flex justify-between items-center">
+            <!--profile image preview-->
+            <div class="avatar p-2 ">
+              <div class="h-[8vh] rounded-full">
+                <img th:if="*{profileImgUrl} != null" src="#" th:src="*{profileImgUrl}" alt="">
+                <img th:unless="*{profileImgUrl} != null" id="profile-img-preview" src="#" alt="">
+              </div>
+            </div>
+            <input type="file" onchange="previewImage()" accept="image/*" th:field="*{profileImg}" id="profileImg" class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5" >
+          </div>
                 <div>
 <!--                  <label for="profileImg" class="block mb-2 text-sm font-medium text-gray-900">프로필 사진</label>-->
 <!--                  <input type="file" th:field="*{profileImg}" id="profileImg" class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5" >-->
@@ -89,5 +102,23 @@
     </div>
   </div>
 
+<script th:inline="javascript">
+function previewImage() {
+    var file = $("#profileImg").prop('files')[0];
+    var preview = $("#profile-img-preview");
+    var reader = new FileReader();
+
+    reader.onloadend = function () {
+      preview.attr("src", reader.result);
+    }
+
+    if(file) {
+        reader.readAsDataURL(file);
+    } else {
+        preview.hide();
+    }
+}
+
+</script>
 </main>
 </html>

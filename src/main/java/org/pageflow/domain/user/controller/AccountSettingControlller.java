@@ -40,7 +40,6 @@ public class AccountSettingControlller {
     @PutMapping("/api/account/settings/profile")
     public ResponseEntity<Profile> updateProfile(@ModelAttribute ProfileUpdateForm form) {
         
-        // TODO: 2021-08-17 1. form validation
         if(!Objects.equals(rq.getAccount().getProfile().getId(), form.getId())) {
             return ResponseEntity.status(403).build();
         }

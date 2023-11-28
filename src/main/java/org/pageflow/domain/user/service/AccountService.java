@@ -146,7 +146,7 @@ public class AccountService {
         String staleProfileImgUrl = profile.getProfileImgUrl();
         
         // 프로필 이미지가 없거나 기본 이미지가 아닌 경우, 기존에 있던 프로필 사진은 삭제한다.
-        if(!isDefaultProfileImgOrNull(staleProfileImgUrl)){
+        if(!isDefaultProfileImgOrNullOrOAuth2ProfileImg(staleProfileImgUrl)){
             fileService.deleteFile(fileService.getPureFilePath(staleProfileImgUrl));
         }
         
@@ -171,8 +171,10 @@ public class AccountService {
     }
     
     
-    public boolean isDefaultProfileImgOrNull(String profileImgUrl) {
-        return profileImgUrl == null || profileImgUrl.equals(customProperties.getDefaults().getDefaultUserProfileImg());
+    public boolean isDefaultProfileImgOrNullOrOAuth2ProfileImg(String profileImgUrl) {
+        return profileImgUrl == null
+                || profileImgUrl.equals(customProperties.getDefaults().getDefaultUserProfileImg())
+                || !profileImgUrl.startsWith(customProperties.getFiles().getImg().getBaseUrl());
     }
 
     // ****************************************************

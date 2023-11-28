@@ -2,7 +2,7 @@
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head>
-    <title>Book</title>
+    <title>[[${outline.title}]]</title>
 
     <!-- 댓글 스크롤바 스타일 -->
     <style>
@@ -22,7 +22,7 @@
 
 <body>
 
-<main layout:fragment="main" class="mt-20">
+<main layout:fragment="main">
 
     <section class="container max-w-[70%] m-auto">
         <div class="mt-10 mb-10 flex flex-col">

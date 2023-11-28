@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.TransientPropertyValueException;
 import org.pageflow.base.constants.CustomProperties;
+import org.pageflow.domain.book.constants.BookStatus;
 import org.pageflow.domain.book.entity.Book;
 import org.pageflow.domain.book.entity.Chapter;
 import org.pageflow.domain.book.entity.Page;
@@ -47,7 +48,7 @@ public class BookWriteService {
         
         Book newBook = Book.builder()
                 .title("제목을 입력해주세요")
-                .isPublished(false)
+                .status(BookStatus.DRAFT)
                 .coverImgUrl(defaultCoverImgUrl)
                 .author(author)
                 .build();

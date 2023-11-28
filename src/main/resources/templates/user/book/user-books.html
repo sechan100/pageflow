@@ -1,0 +1,41 @@
+<html lang="en" layout:decorate="~{/common/layout.html}">
+<head>
+  <title>나의 책</title>
+</head>
+
+<body>
+
+<main layout:fragment="main" class="mt-[10vh]">
+
+  <div class="container mx-auto">
+    <div class="flex flex-wrap -mx-2">
+
+
+      <div class="w-full sm:w-[50vw] md:w-[30vw] lg:w-[20vw] px-2 mb-4" th:each="book : ${books}">
+        <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+          <img th:src="${book.coverImgUrl}" alt="Book Cover">
+          <div class="p-4">
+            <h3 class="font-bold text-xl mb-2">[[${book.title}]]</h3>
+            <p class="text-gray-700 mb-3">최종 수정: [[${#temporals.format(book.createdDate, 'yyyy-MM-dd / h시 mm분')}]]</p>
+            <p class="text-gray-700 mb-3" th:switch="${#strings.toString(book.status)}">
+              상태:
+              <span th:case="'DRAFT'" class="text-blue-500">초안 작성중</span>
+              <span th:case="'REVIEWING'" class="text-yellow-500">출판 검수중</span>
+              <span th:case="'APPROVED'" class="text-green-500">출판 승인됨</span>
+              <span th:case="'SUSPENDED'" class="text-gray-500">출판 중단됨</span>
+              <span th:case="'REJECTED'" class="text-red-500">출판 거절됨</span>
+              <span th:case="*" class="text-gray-800">[[${book.status}]]</span>
+            </p>
+            <a th:href="|/write/${book.id}|" class="btn btn-md">
+              편집하기
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</main>
+</body>
+</html>

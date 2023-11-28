@@ -5,6 +5,7 @@ import jakarta.validation.Valid;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.pageflow.base.constants.CustomProperties;
+import org.pageflow.base.exception.data.NoSuchEntityException;
 import org.pageflow.domain.user.constants.Role;
 import org.pageflow.domain.user.entity.Account;
 import org.pageflow.domain.user.entity.Profile;
@@ -101,7 +102,9 @@ public class AccountService {
     
     @Transactional
     public Profile updateProfile(ProfileUpdateForm form) {
-        Profile savedProfile = profileRepository.findById(form.getId()).orElseThrow();
+        Profile savedProfile = profileRepository.findById(form.getId()).orElseThrow(
+                () -> new NoSuchEntityException(Profile.class)
+        );
         savedProfile.setNickname(form.getNickname());
         
         if(!form.getProfileImg().isEmpty()){

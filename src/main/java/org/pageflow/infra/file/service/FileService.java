@@ -3,6 +3,7 @@ package org.pageflow.infra.file.service;
 import lombok.extern.slf4j.Slf4j;
 import org.pageflow.base.constants.CustomProperties;
 import org.pageflow.base.entity.BaseEntity;
+import org.pageflow.base.exception.data.NoSuchEntityException;
 import org.pageflow.infra.file.constants.FileMetadataType;
 import org.pageflow.infra.file.entity.FileMetadata;
 import org.pageflow.infra.file.repository.FileMetadataRepository;
@@ -95,7 +96,9 @@ public class FileService {
         String managedFilename = filePath.substring(filePath.lastIndexOf("/") + 1);
 
         if (deleteSuccess) {
-            FileMetadata fileMetadataToDelete = fileRepository.findByPathPrefixAndManagedFilename(pathPrefix, managedFilename).orElseThrow();
+            FileMetadata fileMetadataToDelete = fileRepository.findByPathPrefixAndManagedFilename(pathPrefix, managedFilename).orElseThrow(
+                    () -> new NoSuchEntityException(FileMetadata.class)
+            );
             fileRepository.delete(fileMetadataToDelete);
             return true;
         } else {

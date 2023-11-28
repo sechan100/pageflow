@@ -7,16 +7,14 @@ import org.pageflow.base.constants.CustomProperties;
 import org.pageflow.domain.book.entity.Book;
 import org.pageflow.domain.book.entity.Chapter;
 import org.pageflow.domain.book.entity.Page;
-import org.pageflow.domain.book.model.summary.ChapterSummary;
-import org.pageflow.domain.book.model.summary.Outline;
-import org.pageflow.domain.book.model.summary.PageSummary;
-import org.pageflow.domain.book.model.summary.Rearrangeable;
 import org.pageflow.domain.book.model.request.BookUpdateRequest;
 import org.pageflow.domain.book.model.request.ChapterUpdateRequest;
 import org.pageflow.domain.book.model.request.OutlineUpdateRequest;
 import org.pageflow.domain.book.model.request.PageUpdateRequest;
-import org.pageflow.domain.book.repository.ChapterRepository;
-import org.pageflow.domain.book.repository.PageRepository;
+import org.pageflow.domain.book.model.summary.ChapterSummary;
+import org.pageflow.domain.book.model.summary.Outline;
+import org.pageflow.domain.book.model.summary.PageSummary;
+import org.pageflow.domain.book.model.summary.Rearrangeable;
 import org.pageflow.domain.user.entity.Profile;
 import org.pageflow.infra.file.constants.FileMetadataType;
 import org.pageflow.infra.file.entity.FileMetadata;
@@ -33,8 +31,6 @@ import java.util.stream.Collectors;
 @Slf4j
 public class BookWriteService {
     
-    private final ChapterRepository chapterRepository;
-    private final PageRepository pageRepository;
     private final BookService bookService;
     private final FileService fileService;
     private final CustomProperties customProperties;
@@ -91,7 +87,7 @@ public class BookWriteService {
         
         try {
             // 챕터 영속
-            Chapter persistedChapter = chapterRepository.save(defaultChapter);
+            Chapter persistedChapter = bookService.repoSaveChapter(defaultChapter);
             
             // 챕터에 기본 페이지 추가
             Page defaultPage = createBlankPage(persistedChapter);
@@ -107,15 +103,19 @@ public class BookWriteService {
         }
     }
     
+    @Transactional
+    public Chapter createBlankChapter(Long bookId) throws TransientPropertyValueException, NoSuchElementException {
+        return createBlankChapter(bookService.repoFindBookById(bookId));
+    }
     
     @Transactional
     public boolean deleteChapter(Long chapterId) {
             
-            Chapter chapterToDelete = chapterRepository.findById(chapterId).orElseThrow();
+            Chapter chapterToDelete = bookService.repoFindChapterById(chapterId);
             
             try {
                 // Chapter 삭제 + 고아객체 삭제가 ON이므로, 참조를 잃은 Page들을 자동으로 같이 삭제
-                chapterRepository.delete(chapterToDelete);
+                bookService.repoDeleteChapter(chapterToDelete);
                 return true;
             } catch(Exception e) {
                 log.error("챕터 삭제 중 오류가 발생했습니다." + e.getMessage());
@@ -144,7 +144,7 @@ public class BookWriteService {
         
         try {
             // 페이지 영속
-            Page persistedPage = pageRepository.save(newDefaultPage);
+            Page persistedPage = bookService.repoSavePage(newDefaultPage);
             
             // 챕터에 페이지 추가
             ownerChapter.getPages().add(persistedPage);
@@ -161,11 +161,11 @@ public class BookWriteService {
     @Transactional
     public boolean deletePage(Long pageId) {
         
-        Page pageToDelete = pageRepository.findById(pageId).orElseThrow();
+        Page pageToDelete = bookService.repoFindPageById(pageId);
         
         try {
             // page 삭제
-            pageRepository.delete(pageToDelete);
+            bookService.repoDeletePage(pageToDelete);
             return true;
         } catch(Exception e) {
             log.error("페이지 삭제 중 오류가 발생했습니다." + e.getMessage());
@@ -223,11 +223,11 @@ public class BookWriteService {
             throw new IllegalArgumentException("업데이트의 대상인 Chapter 엔티티를 특정할 수 없습니다.");
         }
         
-        Chapter staleChapter = chapterRepository.findById(updateRequest.getId()).orElseThrow();
+        Chapter staleChapter = bookService.repoFindChapterById(updateRequest.getId());
         staleChapter.setTitle(updateRequest.getTitle() != null ? updateRequest.getTitle() : staleChapter.getTitle());
         
         // 데이터 커밋
-        return chapterRepository.save(staleChapter);
+        return bookService.repoSaveChapter(staleChapter);
     }
     
     
@@ -258,14 +258,14 @@ public class BookWriteService {
             throw new IllegalArgumentException("업데이트의 대상인 Page 엔티티를 특정할 수 없습니다.");
         }
         
-        Page stalePage = pageRepository.findById(updateRequest.getId()).orElseThrow();
+        Page stalePage = bookService.repoFindPageById(updateRequest.getId());
         stalePage.setTitle(updateRequest.getTitle() != null ? updateRequest.getTitle() : stalePage.getTitle());
         stalePage.setContent(updateRequest.getContent() != null ? updateRequest.getContent() : stalePage.getContent());
         stalePage.setSortPriority(updateRequest.getSortPriority() != null ? updateRequest.getSortPriority() : stalePage.getSortPriority());
         
         // 데이터 커밋
         
-        return pageRepository.save(stalePage);
+        return bookService.repoSavePage(stalePage);
     }
     
     
@@ -288,9 +288,6 @@ public class BookWriteService {
             allocateNewOwnerChapterId(chapterSummary.getPages(), chapterSummary.getId()); // 소속 Chapter가 바뀐 Page가 있다면 해당 스트림에서 업데이트 예약됨.
             allocateNewSortPriorityOptimally(chapterSummary.getPages());
         });
-        
-        chapterRepository.flush();
-        pageRepository.flush();
         
         return bookService.getOutline(outlineUpdateRequest.getId());
     }
@@ -350,8 +347,8 @@ public class BookWriteService {
             // PageSummary가 필드로 가지고있는 chapterId와 실제 배치되어있는 chapter의 id가 다른 경우
             if(!Objects.equals(pageSummary.getOwnerId(), ownerChapterId)){
                 // Page의 ChapterId FK 업데이트
-                Page rearrangeableEntity = pageRepository.findById(pageSummary.getId()).orElseThrow();
-                rearrangeableEntity.setChapter(chapterRepository.findById(ownerChapterId).orElseThrow());
+                Page rearrangeableEntity = bookService.repoFindPageById(pageSummary.getId());
+                rearrangeableEntity.setChapter(bookService.repoFindChapterById(ownerChapterId));
                 updatedEntity.getAndIncrement();
             }
         });
@@ -370,12 +367,12 @@ public class BookWriteService {
             if(!rearrangeable.getSortPriority().equals(newAscendingSortPriorityList.get(i))){
                 
                 if(rearrangeable instanceof PageSummary stalePage){
-                    Page rearrangeableEntity = pageRepository.findById(stalePage.getId()).orElseThrow();
+                    Page rearrangeableEntity = bookService.repoFindPageById(stalePage.getId());
                     rearrangeableEntity.setSortPriority(newAscendingSortPriorityList.get(i));
                     log.debug("Page {}번의 P가 {} -> {}로 변경되었습니다. 페이지 변경 카운트: {}", rearrangeableEntity.getId(), stalePage.getSortPriority(), newAscendingSortPriorityList.get(i), updatedEntityNum.get() + 1);
                     
                 } else if(rearrangeable instanceof ChapterSummary staleChapter){
-                    Chapter rearrangeableEntity = chapterRepository.findById(staleChapter.getId()).orElseThrow();
+                    Chapter rearrangeableEntity = bookService.repoFindChapterById(staleChapter.getId());
                     rearrangeableEntity.setSortPriority(newAscendingSortPriorityList.get(i));
                     log.debug("Chapter {}번의 SP가 {} -> {}로 변경되었습니다. 챕터 변경 카운트: {}", rearrangeableEntity.getId(), staleChapter.getSortPriority(), newAscendingSortPriorityList.get(i), updatedEntityNum.get() + 1);
                 }

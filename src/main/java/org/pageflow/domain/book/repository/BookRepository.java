@@ -7,6 +7,8 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.Optional;
+
 
 public interface BookRepository extends JpaRepository<Book, Long> {
     
@@ -14,9 +16,9 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     Slice<Book> findAll(Specification<Book> spec, Pageable pageable);
 
     @EntityGraph(attributePaths = {"author"}, type = EntityGraph.EntityGraphType.FETCH)
-    Book findBookWithAuthorById(Long id);
+    Optional<Book> findBookWithAuthorById(Long id);
 
     @EntityGraph(attributePaths = {"author", "author.account", "chapters"}, type = EntityGraph.EntityGraphType.FETCH)
-    Book findBookWithAuthorAndChapterById(Long id);
+    Optional<Book> findBookWithAuthorAndChapterById(Long id);
 
 }

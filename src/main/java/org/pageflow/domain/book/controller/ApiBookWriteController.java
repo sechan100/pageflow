@@ -7,11 +7,11 @@ import org.pageflow.base.request.Rq;
 import org.pageflow.domain.book.entity.Book;
 import org.pageflow.domain.book.entity.Chapter;
 import org.pageflow.domain.book.entity.Page;
-import org.pageflow.domain.book.model.summary.Outline;
 import org.pageflow.domain.book.model.request.BookUpdateRequest;
 import org.pageflow.domain.book.model.request.ChapterUpdateRequest;
 import org.pageflow.domain.book.model.request.OutlineUpdateRequest;
 import org.pageflow.domain.book.model.request.PageUpdateRequest;
+import org.pageflow.domain.book.model.summary.Outline;
 import org.pageflow.domain.book.service.BookService;
 import org.pageflow.domain.book.service.BookWriteService;
 import org.pageflow.domain.user.service.AccountService;
@@ -100,6 +100,7 @@ public class ApiBookWriteController {
         
     }
     
+    
     /**
      * 새로운 Chapter를 생성하여 반환
      * @param bookId 책 아이디
@@ -107,9 +108,9 @@ public class ApiBookWriteController {
      */
     @PostMapping("/api/books/{bookId}/chapters")
     public Chapter createChapter(@PathVariable("bookId") Long bookId) {
-        Book ownerBook = bookService.repoFindBookById(bookId);
-        return bookWriteService.createBlankChapter(ownerBook);
+            return bookWriteService.createBlankChapter(bookId);
     }
+    
     
     /**
      * 챕터 정보 업데이트

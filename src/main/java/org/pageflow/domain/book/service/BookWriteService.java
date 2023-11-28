@@ -206,7 +206,9 @@ public class BookWriteService {
         }
         
         // 제목 업데이트
-        staleBook.setTitle(updateRequest.getTitle());
+        if(updateRequest.getTitle() != null){
+            staleBook.setTitle(updateRequest.getTitle());
+        }
         
         // 데이터 커밋
         return bookService.repoSaveBook(staleBook);

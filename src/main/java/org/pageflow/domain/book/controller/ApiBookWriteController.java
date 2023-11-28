@@ -83,7 +83,7 @@ public class ApiBookWriteController {
     @PutMapping("/api/books/{bookId}")
     public Map<String, String> updateBook(
             @PathVariable("bookId") Long bookId,
-            @Valid @ModelAttribute BookUpdateRequest updateRequest
+            @ModelAttribute BookUpdateRequest updateRequest
     ) {
         
         if(updateRequest.getId() == null){

@@ -13,7 +13,18 @@ import { useCreatePageMutation, usePageMutation } from "../../api/page-api";
 import { useCreatePageStore } from "../outline/newItemBtn/NewPageBtn";
 import { usePageMutationStore } from "../form/pages/page/PageForm";
 import _ from "lodash";
+import { create } from "zustand";
 
+
+
+
+interface UseAutoSaveStroe {isAutoSaveAvailable: {current: boolean};}
+// 자동 저장을 특정시점동안만 비활성화 시키기 위한 zustand store
+// 예를 들어, 챕터 드래깅 중에는 자동저장을 비활성화 시키고, 챕터 드래깅이 끝나면 다시 활성화 시킨다.
+// 이를 위해서 렌더링에 관여하는 상태가 아닌, current를 직접 변경하는 방식을 사용하여, 렌더링 사이클에 포함시키지 않는다.
+export const useAutoSaveStore = create<UseAutoSaveStroe>((set) => ({
+  isAutoSaveAvailable: {current: true}
+}));
 
 
 
@@ -21,9 +32,9 @@ export default function MutationSaveBtn(){
 
   const { bookId } = useContext(QueryContext);
   const updateAlertTooltip = useRef<HTMLDivElement>(null);
+  const { isAutoSaveAvailable } = useAutoSaveStore();
 
-
-  // ##### zustand stores ######
+  // ##### mutation zustand stores ######
   const bookStore = useBookMutationStore(); // bookForm의 zusatnd store
   const outlineStore = useOutlineMutationStore(); // outlineSidebar의 zustand store
   const createChapterStore = useCreateChapterStore(); // newChapterBtn의 zustand store
@@ -78,19 +89,21 @@ export default function MutationSaveBtn(){
     return () => {
       document.removeEventListener('keydown', handleKeyPress);
     };
-  }, [flushMutations, isAnyMutation]);
+  }, [flushMutations, isAnyMutation, isAutoSaveAvailable.current]);
 
 
-  // 자동 저장 디바운드 등록 이펙트
+  // 자동 저장 디바운드 등록
   useEffect(() => {
     const debouncedSave = _.debounce(() => {
-      if(isAnyMutation){
+      // 변경 사항이 존재하고, isAutoSaveAvailable이 true일 경우에만 자동 저장을 실행한다.
+      // isAutoSaveAvailable.current의 값은 다양한 곳에서 실시간으로 변동된다.
+      if(isAnyMutation && isAutoSaveAvailable.current){
         flushMutations();
       }
     }, 5000);
     debouncedSave();
     return () => debouncedSave.cancel();
-  }, [flushMutations]);
+  }, [flushMutations, isAutoSaveAvailable.current]);
 
 
 // ================================================================================

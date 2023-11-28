@@ -60,7 +60,8 @@
 
   // bookId 최초 세팅
   const url = window.location.href;
-  const match = url.match(/\/(\d+)$/);
+  // /write/ 와 / 사이에 있는 정수
+  const match = url.match(/\/write\/([0-9]+)\/?/);
 
   if (match) {
     window.APP_BOOK_ID = match[1];

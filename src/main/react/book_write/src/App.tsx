@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import './App.css';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { useState } from 'react';

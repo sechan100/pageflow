@@ -15,8 +15,7 @@ import org.pageflow.domain.book.model.outline.PageSummary;
 public class PageUpdateRequest extends RearrangeRequest {
 
     private String content;
-
-
+    
     public PageUpdateRequest(Page page) {
         super("page", page.getId(), page.getTitle(), page.getSortPriority());
         this.content = page.getContent();

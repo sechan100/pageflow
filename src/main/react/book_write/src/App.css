@@ -2,37 +2,25 @@
   text-align: center;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+/* 모든 요소의 스크롤바를 숨깁니다 */
+.invisible-scroll {
+  -ms-overflow-style: none;  /* IE와 Edge */
+  scrollbar-width: none;  /* Firefox */
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+/* Webkit 기반 브라우저(Chrome, Safari 등)에서 스크롤바를 숨깁니다 */
+.invisible-scroll::-webkit-scrollbar {
+  display: none;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+
+/* viewer의 content container안의 img 태그 설정 */
+#carousel-content img {
+  margin: 5% auto;
+  width: 70%;
 }
 
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.quill img {
+  margin: 3% auto;
+  width: 50%;
 }

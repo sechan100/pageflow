@@ -31,10 +31,11 @@ export default function ViewerContext({outline}: {outline: Outline}) {
   const { location, metaPage } = useLocationStore();
   const getPageAsync = useGetPage(outline.id, getPageMap(outline));
   const currentPage = getPageAsync(location);
-  const contentContainer = useRef<HTMLDivElement>(null);
+  const carouselContentRef = useRef<HTMLDivElement>(null);
+
 
   // 총 칼럼이 홀수개일 경우, 마지막 칼럼의 오른쪽은 빈 페이지여야한다. 근데 해결 방법이 마땅치 않아서 그냥 줄바꿈태그를 최소 한도로 넣어놓음.
-  const lastColumnOffset = ("<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><p class=''>칼럼 나누기용 텍스트</p>");
+  const lastColumnOffset = ("<p class='invisible h-full'>ㅋㅋㅋ</p>");
 
   return (
     <div className="" onClick={toggle}>
@@ -43,13 +44,14 @@ export default function ViewerContext({outline}: {outline: Outline}) {
           <div className="text-2xl mt-20">{getChapterTitle(outline, location.chapterIdx)}</div>
         }
         <div className="text-justify">
-          <Carousel chaildrenRef={contentContainer}>
+          <Carousel carouselContentRef={carouselContentRef}>
             { !metaPage.isMetaPage &&
               <div
-                id="viewer-page-content-container" 
-                ref={contentContainer}
+                id="carousel-content"
+                ref={carouselContentRef}
                 style={{columnFill: "auto", columnGap: "8%"}} 
                 className="select-none columns-2 h-[79vh] text-lg racking-wide leading-loose"
+                // xss 보안 문제 해결하기 -> 라이브러리
                 dangerouslySetInnerHTML={{__html: currentPage.content + lastColumnOffset}}>
               </div>
             }

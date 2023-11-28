@@ -15,12 +15,14 @@ import org.pageflow.domain.user.service.AccountService;
 import org.pageflow.domain.user.service.AwaitingVerificationEmailService;
 import org.pageflow.infra.util.Ut;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequiredArgsConstructor
+@Transactional
 public class SignupController {
 
     private final Rq rq;

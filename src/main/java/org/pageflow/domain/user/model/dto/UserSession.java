@@ -27,6 +27,7 @@ public class UserSession {
     private String email;
     private String role;
     private String profileImgUrl;
+    private String provider;
     private boolean login = false;
     private boolean admin = false;
 
@@ -44,6 +45,7 @@ public class UserSession {
         this.username = account.getUsername();
         this.email = account.getEmail();
         this.role = account.getRole();
+        this.provider = account.getProvider();
 
         Profile profile = account.getProfile();
         if (profile != null) {
@@ -51,6 +53,24 @@ public class UserSession {
             this.profileImgUrl = profile.getProfileImgUrl();
         }
 
+        if (this.role.equals(Role.ADMIN)) {
+            admin = true;
+        }
+    }
+    
+    public UserSession(Profile profile){
+        this.nickname = profile.getNickname();
+        this.profileImgUrl = profile.getProfileImgUrl();
+        
+        Account account = profile.getAccount();
+        if(account != null){
+            this.id = account.getId();
+            this.username = account.getUsername();
+            this.email = account.getEmail();
+            this.role = account.getRole();
+            this.provider = account.getProvider();
+        }
+        
         if (this.role.equals(Role.ADMIN)) {
             admin = true;
         }

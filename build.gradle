@@ -60,28 +60,55 @@ tasks.register('restartRedisServerOnWindow', Exec) {
 }
 
 
-tasks.register('buildReacts', Exec) {
-	doFirst {
-		["book_write"].each { dir ->
-			if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
-				commandLine "cmd", "/c", "npm", "run", "build", "--prefix", "src/main/react/$dir"
-			} else {
-				commandLine "npm", "run", "build", "--prefix", "src/main/react/$dir"
-			}
-		}
+// 리액트 빌드
+tasks.register('buildReact-book_write', Exec) {
+	workingDir("src/main/react/book_write")
+
+	if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
+		commandLine "cmd", "/c", "npm", "run", "build"
+	} else {
+		commandLine "npm", "run", "build"
 	}
+	println("book_write 리엑트를 빌드합니다...")
+}
+tasks.register('buildReact-book_viewer', Exec) {
+	workingDir("src/main/react/book_viewer")
+
+	if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
+		commandLine "cmd", "/c", "npm", "run", "build"
+	} else {
+		commandLine "npm", "run", "build"
+	}
+
+	println("book_viewer 리엑트를 빌드합니다...")
 }
 
 
-tasks.register('cleanBookWriteBuildDir', Delete) {
-	dependsOn "buildReactBookWrite"
+// 기존 리액트 빌드 디렉토리 삭제
+tasks.register('clean-book_write', Delete) {
+	dependsOn "buildReact-book_write"
 	delete file('src/main/resources/static/react/build/book_write')
+	println("book_write 빌드 디렉토리를 정리...")
+}
+tasks.register('clean-book_viewer', Delete) {
+	dependsOn "buildReact-book_viewer"
+	delete file('src/main/resources/static/react/build/book_viewer')
+	println("book_viewer 빌드 디렉토리를 정리...")
 }
 
-tasks.register('copyReactBookWriteBuildDir', Copy) {
-	dependsOn "cleanBookWriteBuildDir"
+
+
+tasks.register('copy-book_write', Copy) {
+	dependsOn "clean-book_write"
 	from file("src/main/react/book_write/build")
 	into file('src/main/resources/static/react/build/book_write')
+	println("book_write 빌드 파일을 복사했습니다.")
+}
+tasks.register('copy-book_viewer', Copy) {
+	dependsOn "clean-book_viewer"
+	from file("src/main/react/book_write/build")
+	into file('src/main/resources/static/react/build/book_viewer')
+	println("book_viewer 빌드 파일을 복사했습니다.")
 }
 
 

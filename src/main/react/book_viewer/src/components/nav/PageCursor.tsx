@@ -233,7 +233,7 @@ export default function PageCursor() {
     if(carouselIdx !== 0 && !metaPage.isMetaPage){
       prevCarousel();
 
-    } else if(carouselIdx === 0 && !metaPage.isMetaPage){
+    } else if(carouselIdx === 0){
       setReserveMoveLastCarousel(true); // 전 Page로 이동할 때, 마지막 캐러셀로 이동해야한다는 것을 알림.
       prev(); // 전 페이지로 이동.
     }
@@ -253,7 +253,6 @@ export default function PageCursor() {
     }
   }
 
-
   function handleKeyDown(e: KeyboardEvent) {
     if(e.key === "ArrowLeft"){
       goPrev();
@@ -261,6 +260,4 @@ export default function PageCursor() {
       goNext();
     }
   }
-
 }
-

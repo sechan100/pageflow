@@ -15,8 +15,12 @@ import org.pageflow.domain.book.model.request.PageUpdateRequest;
 import org.pageflow.domain.book.service.BookService;
 import org.pageflow.domain.book.service.BookWriteService;
 import org.pageflow.domain.user.service.AccountService;
+import org.pageflow.infra.file.constants.FileMetadataType;
+import org.pageflow.infra.file.entity.FileMetadata;
+import org.pageflow.infra.file.service.FileService;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
@@ -24,12 +28,13 @@ import java.util.Map;
 @RestController
 @RequiredArgsConstructor
 @Transactional
-public class ApiBookController {
+public class ApiBookWriteController {
     
     private final Rq rq;
     private final BookService bookService;
     private final BookWriteService bookWriteService;
     private final AccountService accountService;
+    private final FileService fileService;
     
     
     
@@ -150,13 +155,29 @@ public class ApiBookController {
     /**
      * 책 페이지 정보 수정
      */
-    @PutMapping("/api/book/{bookId}/chapter/page/{pageId}")
-    public void updatePage(
+    @PutMapping("/api/book/{bookId}/chapter/pages")
+    public List<Page> updatePage(
             @PathVariable("bookId") Long bookId,
-            @PathVariable("pageId") Long pageId,
-            @RequestBody PageUpdateRequest updateRequest
+            @Valid @RequestBody List<PageUpdateRequest> updateRequests
     ) {
-        bookWriteService.updatePage(updateRequest);
+        return bookWriteService.updatePages(updateRequests);
+    }
+    
+    
+    @PostMapping("/api/book/{bookId}/chapter/page/{pageId}/img")
+    public String uploadPageImg(
+            @ModelAttribute MultipartFile imgFile,
+            @PathVariable("bookId") Long bookId,
+            @PathVariable("pageId") Long pageId
+    ) {
+        if(imgFile == null){
+            throw new IllegalArgumentException("이미지 파일이 없습니다");
+        }
+    
+        Page ownerPage = bookService.repoFindPageById(pageId);
+        FileMetadata imgMetadata = fileService.uploadFile(imgFile, ownerPage, FileMetadataType.PAGE_IMG);
+        
+        return fileService.getImgUri(imgMetadata);
     }
     
 }

@@ -1,7 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { create } from 'zustand';
-import { metaPageType, useLocationStore } from '../nav/PageCursor';
 import _ from 'lodash';
 
 
@@ -56,7 +55,6 @@ const Carousel = ({ children, carouselContentRef } : CarouselProps) => {
 
   const carouselRef = useRef<HTMLDivElement>(null);
   const carouselBreakPointsRef = useRef<number[] | null>(null); // 캐러셀의 불연속적인 위치를 저장하는 배열 (화면 리사이즈시 업데이트)
-  const { location, metaPage } = useLocationStore();
   const { carouselIdx, setCarouselIdx, setIsLastCarousel, reserveMoveLastCarousel, setReserveMoveLastCarousel, isLastCarousel} = useCarouselStore();
 
 
@@ -104,7 +102,6 @@ const Carousel = ({ children, carouselContentRef } : CarouselProps) => {
     const images = carouselContentRef.current?.querySelectorAll('img') as NodeListOf<HTMLImageElement>;
     // metaPage인 경우.
     if(!images){
-      console.log("메타페이지입니다.");
       carouselBreakPointsRef.current = null;
       setReserveMoveLastCarousel(false);
       return;
@@ -143,7 +140,7 @@ const Carousel = ({ children, carouselContentRef } : CarouselProps) => {
     };
 
 
-  }, [location, metaPage.type, carouselRef.current]);
+  }, [carouselRef.current]);
 
 
 
@@ -218,11 +215,14 @@ const Carousel = ({ children, carouselContentRef } : CarouselProps) => {
 
 
   return (
-    <div>
-      <div ref={carouselRef} style={{ overflowX: 'hidden' }}>
-        {children}
+    <>
+      <div className='absolute right-3 -top-7 text-xl'>{`(${carouselIdx + 1}/${carouselBreakPointsRef.current?.length})`}</div>
+      <div className='border-2 border-gray-300 p-3'>
+        <div ref={carouselRef} style={{ overflowX: 'hidden' }}>
+          {children}
+        </div>
       </div>
-    </div>
+    </>
   );
 
 

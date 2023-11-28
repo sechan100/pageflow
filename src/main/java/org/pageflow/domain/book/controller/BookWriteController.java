@@ -18,7 +18,7 @@ public class BookWriteController {
     /**
      * @return react book write form page
      */
-    @GetMapping("/book/write/**")
+    @GetMapping("/write/**")
     public String bookWriteForm() {
         return "forward:/react/build/book_write/index.html";
     }

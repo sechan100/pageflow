@@ -90,7 +90,7 @@
                 <div class="grid grid-cols-4 gap-x-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 xl:gap-x-8  " >
                     <div th:each="book : ${paging}" class="h-4/5">
                         <div class="h-full w-full shadow-lg">
-                            <a th:href="@{|/book/detail/${book.id}|}"
+                            <a th:href="@{|/books/detail/${book.id}|}"
                                class="relative font-bold text-md text-center text-white">
                                 <div class="h-full w-full overflow-hidden bg-cover bg-center">
                                     <img th:src="@{${book.coverImgUrl}}" alt="Book Image"
@@ -103,7 +103,7 @@
                 </div>
             </div>
 
-            <form th:action="@{/book}" method="get" id="searchForm">
+            <form th:action="@{/books}" method="get" id="searchForm">
             <input type="hidden" id="kw" name="kw" th:value="${kw}">
             <input type="hidden" id="page" name="page" th:value="${paging.number}">
             <input type="hidden" id="sort" name="sort" th:value="${sort}">
@@ -141,7 +141,7 @@ btn.classList.remove("on");
   });
 
   function fetchMoreBooks(page) {
-       fetch(`/api/book/list?page=${page}&kw=${document.getElementById('search_kw').value}&sort=${document.getElementById('sortOption').value}`)
+       fetch(`/api/books/list?page=${page}&kw=${document.getElementById('search_kw').value}&sort=${document.getElementById('sortOption').value}`)
           .then(response => {
               console.log('Server Response:', response); // 서버 응답 로깅
 
@@ -170,7 +170,7 @@ btn.classList.remove("on");
       data.forEach(book => {
           const bookElement = `
                     <div class="card border rounded p-4">
-                <a href="/book/detail/${book.id}">
+                <a href="/books/detail/${book.id}">
                     <img src="${book.coverImgUrl}" alt="Book Image">
                     <h2>${book.title}</h2>
                 </a>

@@ -4,22 +4,16 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
+import org.pageflow.domain.interaction.entity.Comment;
 
 /**
  * @author : sechan
  */
 @Data
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
-public class Interactions {
-    
-    // 댓글들
-    private List<CommentWithPreference> comments;
-    
-    // 선호 통계
+@AllArgsConstructor
+public class CommentWithPreference {
+    private Comment comment;
     private PreferenceStatistics preferenceStatistics;
-    
 }

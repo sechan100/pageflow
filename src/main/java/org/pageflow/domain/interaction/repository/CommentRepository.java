@@ -11,4 +11,6 @@ import java.util.List;
 public interface CommentRepository extends JpaRepository<Comment, Long> {
     
     List<Comment> findAllByTargetTypeAndTargetId(String targetType, Long targetId);
+    
+    void deleteAllByTargetTypeAndTargetId(String targetType, Long targetId);
 }

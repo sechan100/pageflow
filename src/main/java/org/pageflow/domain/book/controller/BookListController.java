@@ -18,7 +18,7 @@ public class BookListController {
 
     private final BookService bookService;
 
-    @GetMapping("/book")
+    @GetMapping("/books")
     public String list(Model model, @RequestParam(value = "page", defaultValue = "0") int page,
                        @RequestParam(value = "kw", defaultValue = "") String kw,
                        @RequestParam(value = "sort", defaultValue = "createDate") String sortOption) {
@@ -29,7 +29,7 @@ public class BookListController {
         return "/user/book/cards";
     }
 
-    @GetMapping("/api/book/list")
+    @GetMapping("/api/books/list")
     @ResponseBody
     public List<Book> getBooksApi(@RequestParam(value = "page", defaultValue = "0") int page,
                                   @RequestParam(value = "kw", defaultValue = "") String kw,

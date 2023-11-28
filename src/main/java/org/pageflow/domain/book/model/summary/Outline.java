@@ -1,4 +1,4 @@
-package org.pageflow.domain.book.model.outline;
+package org.pageflow.domain.book.model.summary;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.pageflow.domain.user.repository.ProfileRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Commit;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -19,6 +20,7 @@ class BookWriteServiceTest {
     private ProfileRepository profileRepository;
     
     @Test
+    @Commit
     void createBlankBook() {
         for(int i = 0; i < 20; i++) {
             bookWriteService.createBlankBook(profileRepository.findById(1L).orElseThrow());

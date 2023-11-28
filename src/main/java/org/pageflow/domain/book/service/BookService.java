@@ -6,6 +6,7 @@ import org.pageflow.base.entity.BaseEntity;
 import org.pageflow.domain.book.entity.Book;
 import org.pageflow.domain.book.entity.Chapter;
 import org.pageflow.domain.book.entity.Page;
+import org.pageflow.domain.book.model.summary.BookSummary;
 import org.pageflow.domain.book.model.summary.ChapterSummary;
 import org.pageflow.domain.book.model.summary.Outline;
 import org.pageflow.domain.book.model.summary.PageSummary;
@@ -28,6 +29,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class BookService {
 
     private final BookRepository bookRepository;
@@ -55,10 +57,11 @@ public class BookService {
     }
 
 
-    public Slice<Book> getList(int page, String kw, String sortOption) {
+    public Slice<BookSummary> getList(int page, String kw, String sortOption) {
         Pageable pageable = PageRequest.of(page, 16, Sort.by(Sort.Direction.DESC, sortOption));
         Specification<Book> spec = search(kw);
-        return this.bookRepository.findAll(spec, pageable);
+        Slice<Book> books = this.bookRepository.findAll(spec, pageable);
+        return books.map(BookSummary::new);
     }
 
 
@@ -118,33 +121,38 @@ public class BookService {
                 .chapters(chapterSummaries)
                 .build();
     }
-    
-    
 
+    
     public Book repoSaveBook(Book book) {
         return bookRepository.save(book);
     }
+    
     
     public Book repoFindBookById(Long id) {
         return bookRepository.findById(id).orElseThrow();
     }
 
+    
     public Chapter repoFindChapterById(Long id) {
         return chapterRepository.findById(id).orElseThrow();
     }
 
+    
     public Page repoFindPageById(Long id) {
         return pageRepository.findById(id).orElseThrow();
     }
 
+    
     public Book repoFindBookWithAuthorById(Long id) {
         return bookRepository.findBookWithAuthorById(id);
     }
+    
     
     public Book repoFindBookWithAuthorAndChapterById(Long id) {
         return bookRepository.findBookWithAuthorAndChapterById(id);
     }
 
+    
     public void delete(Book book) {
         this.bookRepository.delete(book);
     }

@@ -41,7 +41,7 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
 
-                .formLogin(form -> form
+                 .formLogin(form -> form
                         .loginPage("/login")
                         .failureHandler(customLoginFailureHandler)
                         .successHandler(formLoginAuthenticationSuccessHandler)

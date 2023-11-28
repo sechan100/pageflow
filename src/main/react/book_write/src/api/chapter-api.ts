@@ -16,7 +16,7 @@ export const useCreateChapterMutation = (bookId : number) : { mutateAsync: UseMu
   const { mutateAsync, isLoading, isError } = useMutation(
     async () => {
 
-      const response = await axios.post(`/api/book/${bookId}/chapter`);
+      const response = await axios.post(`/api/books/${bookId}/chapters`);
       
       if(response.status !== 200){
         throw new Error("챕터를 생성하는데 실패했습니다.");
@@ -49,7 +49,7 @@ export const useChapterMutation = () : { mutateAsync: UseMutateAsyncFunction<voi
     async (chapterMutations : ChapterMutation[]) => {
 
 
-      const response = await axios.put(`/api/book/${bookId}/chapters`, chapterMutations, {
+      const response = await axios.put(`/api/books/${bookId}/chapters`, chapterMutations, {
         headers: {
           'Content-Type': 'application/json'
         }

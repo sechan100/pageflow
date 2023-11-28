@@ -22,7 +22,7 @@ export const usePageMutation = () => {
     async (pageMutations : PageMutation[]) => {
 
 
-      const response = await axios.put(`/api/book/${bookId}/chapter/pages`, pageMutations, {
+      const response = await axios.put(`/api/books/${bookId}/chapters/pages`, pageMutations, {
         headers: {
           'Content-Type': 'application/json'
         }
@@ -62,7 +62,7 @@ export const useCreatePageMutation = (bookId : number, chapterId : number) : { m
   const { mutateAsync, isLoading, isError } = useMutation(
     async () => {
 
-      const response = await axios.post(`/api/book/${bookId}/chapter/${chapterId}/page`);
+      const response = await axios.post(`/api/books/${bookId}/chapters/${chapterId}/pages`);
       
       if(response.status !== 200){
         throw new Error("페이지를 생성하는데 실패했습니다.");
@@ -115,7 +115,7 @@ export const useGetPageQuery = (pageId : number) => {
 // 페이지 정보 가져오는 axios api
 // react query api 훅에서 내부적으로 호출
 async function getPageById(bookId : number, pageId : number) : Promise<IPage> {
-  const response = await axios.get(`/api/book/${bookId}/chapter/page/${pageId}`);
+  const response = await axios.get(`/api/books/${bookId}/chapters/pages/${pageId}`);
 
   if(response && response.status === 200 && response.data){
     console.log("====[ Success to Fetching Page ]====", response.data);

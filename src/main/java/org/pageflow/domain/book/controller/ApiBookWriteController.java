@@ -41,7 +41,7 @@ public class ApiBookWriteController {
     /**
      * 책 목차정보 조회
      */
-    @GetMapping("/api/book/{bookId}/outline")
+    @GetMapping("/api/books/{bookId}/outline")
     public Outline readOutline(
             @PathVariable("bookId") Long bookId
     ) {
@@ -53,7 +53,7 @@ public class ApiBookWriteController {
      * 새롭게 정렬된 Outline 데이터를 기반으로 서버 데이터를 업데이트하고 반환.
      * Chapter 재정렬, Page 재정렬, Chapter 삭제, Page 삭제를 처리
      */
-    @PutMapping("/api/book/{bookId}/outline")
+    @PutMapping("/api/books/{bookId}/outline")
     public Outline updateOutline(
             @PathVariable("bookId") Long bookId,
             @Valid @RequestBody OutlineUpdateRequest outlineUpdateRequest
@@ -69,7 +69,7 @@ public class ApiBookWriteController {
     /**
      * 새로운 책 생성
      */
-    @PostMapping("/api/book")
+    @PostMapping("/api/books")
     public Book createBook() {
         // 비지니스 요구에 따라, 새 책을 생성하지 못하는 경우를 처리하는 로직 추가 예정(ex. 현재 작성중인 책이 너무 많은경우)
         return bookWriteService.createBlankBook(rq.getAccount().getProfile());
@@ -80,7 +80,7 @@ public class ApiBookWriteController {
      * 책 정보 업데이트
      * isPublished는 수정하지 않음
      */
-    @PutMapping("/api/book/{bookId}")
+    @PutMapping("/api/books/{bookId}")
     public Map<String, String> updateBook(
             @PathVariable("bookId") Long bookId,
             @Valid @ModelAttribute BookUpdateRequest updateRequest
@@ -105,7 +105,7 @@ public class ApiBookWriteController {
      * @param bookId 책 아이디
      * @return 새로 생성된 Chapter
      */
-    @PostMapping("/api/book/{bookId}/chapter")
+    @PostMapping("/api/books/{bookId}/chapters")
     public Chapter createChapter(@PathVariable("bookId") Long bookId) {
         Book ownerBook = bookService.repoFindBookById(bookId);
         return bookWriteService.createBlankChapter(ownerBook);
@@ -114,7 +114,7 @@ public class ApiBookWriteController {
     /**
      * 챕터 정보 업데이트
      */
-    @PutMapping("/api/book/{bookId}/chapters")
+    @PutMapping("/api/books/{bookId}/chapters")
     public List<Map<String, String>> updateChapters(@Valid @RequestBody List<ChapterUpdateRequest> updateRequests) {
 
         List<Chapter> updatedChapters = bookWriteService.updateChapters(updateRequests);
@@ -130,7 +130,7 @@ public class ApiBookWriteController {
      * @param chapterId 챕터 아이디
      * @return 새로 생성된 Page
      */
-    @PostMapping("/api/book/{bookId}/chapter/{chapterId}/page")
+    @PostMapping("/api/books/{bookId}/chapters/{chapterId}/pages")
     public Page createPage(
             @PathVariable("bookId") Long bookId,
             @PathVariable("chapterId") Long chapterId)
@@ -144,7 +144,7 @@ public class ApiBookWriteController {
      * @param pageId 페이지 아이디
      * @return 책 페이지 정보
      */
-    @GetMapping("/api/book/{bookId}/chapter/page/{pageId}")
+    @GetMapping("/api/books/{bookId}/chapters/pages/{pageId}")
     public Page readPage(
             @PathVariable("bookId") Long bookId,
             @PathVariable("pageId") Long pageId
@@ -155,7 +155,7 @@ public class ApiBookWriteController {
     /**
      * 책 페이지 정보 수정
      */
-    @PutMapping("/api/book/{bookId}/chapter/pages")
+    @PutMapping("/api/books/{bookId}/chapters/pages")
     public List<Page> updatePage(
             @PathVariable("bookId") Long bookId,
             @Valid @RequestBody List<PageUpdateRequest> updateRequests
@@ -164,7 +164,7 @@ public class ApiBookWriteController {
     }
     
     
-    @PostMapping("/api/book/{bookId}/chapter/page/{pageId}/img")
+    @PostMapping("/api/books/{bookId}/chapters/pages/{pageId}/img")
     public String uploadPageImg(
             @ModelAttribute MultipartFile imgFile,
             @PathVariable("bookId") Long bookId,

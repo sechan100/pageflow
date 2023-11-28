@@ -1,6 +1,7 @@
 package org.pageflow.domain.book.service;
 
 import jakarta.persistence.criteria.*;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.pageflow.base.entity.BaseEntity;
 import org.pageflow.domain.book.entity.Book;
@@ -23,6 +24,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.Serial;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -39,9 +41,10 @@ public class BookService {
 
     private Specification<Book> search(String kw) {
         return new Specification<>() {
+            @Serial
             private static final long serialVersionUID = 1L;
             @Override
-            public Predicate toPredicate(Root<Book> b, CriteriaQuery<?> query, CriteriaBuilder cb) {
+            public Predicate toPredicate(@NonNull Root<Book> b, @NonNull CriteriaQuery<?> query, @NonNull CriteriaBuilder cb) {
                 // b - 기준을 의미하는 Book 앤티티의 객체(책 제목 검색)
 
                 query.distinct(true); //중복 제거

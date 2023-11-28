@@ -1,6 +1,5 @@
 package org.pageflow.domain.interaction.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.hibernate.Hibernate;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -38,7 +37,7 @@ class BookInteractionTest {
     
     @Test
     @DisplayName("책의 모든 interaction들을 가져온다.")
-    void getAllInteractions() throws JsonProcessingException {
+    void getAllInteractions() {
         Book book = bookService.repoFindBookById(2L);
         Hibernate.initialize(book.getAuthor());
 

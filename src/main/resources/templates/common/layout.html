@@ -47,7 +47,7 @@
           background: transparent;
           color: #000;
           box-shadow: -7px -7px 20px 0px #fff9, -4px -4px 5px 0px #fff9,
-            7px 20px 0px #0002, 4px 5px 0px #0001;
+            7px 7px 20px 0px #0002, 4px 4px 5px 0px #0001;
         }
         .read-btn:before,
         .read-btn:after {
@@ -71,6 +71,16 @@
           width: 100%;
           transition: 800ms ease all;
         }
+
+        .nav-up {
+            transform: translateY(-100%);
+
+        }
+
+        .nav-down{
+           background-color: inherit;
+           box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        }
     </style>
     <title layout:title-pattern="$CONTENT_TITLE - $LAYOUT_TITLE">Pageflow</title>
     <link rel="icon" href="/img/pageflow-logo.png" type="image/x-icon">
@@ -80,8 +90,11 @@
 
 <body class="m-0 font-sans antialiased leading-default bg-gray-50" th:with="user = ${@rq.userSession}">
 
+<!--  스크롤 시 올림버튼  -->
+<div class="goto-tp-btn z-50 fixed rounded-full border-2 opacity-0 cursor-pointer duration-200 text-xl bottom-[5%] right-[5%] w-8 text-center border-black leading-7
+ h-8"><i class="fa-solid fa-arrow-up"></i></div>
 
-    <nav class="bg-white fixed w-full z-40 top-0 left-0 border-b border-gray-200">
+    <header class="nav-down fixed bg-transparent transition-all duration-100 ease-in  w-full z-40 top-0 left-0 border-b border-gray-200">
 
         <div class="flex flex-wrap items-center justify-between mx-16 py-1.5 h-20">
 
@@ -96,13 +109,13 @@
                 <div class="dropdown dropdown-end " th:unless="${user.login}">
                     <label tabindex="0" class="btn btn-link">
                         <div class="w-10">
-                            <i class="text-xl fa-solid fa-user" style="color: #000000;"></i>
+                            <i class="text-xl fa-solid fa-user" style="color: rgb(100 116 139);"></i>
                         </div>
                     </label>
                     <ul tabindex="0"
                         class="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-24">
                         <li><a th:href="@{/login}">LOG IN</a></li>
-                        <li><a th:href="@{/signup}">SIG NUP</a></li>
+                        <li><a th:href="@{/signup}">SIGNUP</a></li>
                     </ul>
                 </div>
                 <!--사용자 프로필-->
@@ -135,6 +148,14 @@
                         <li>
                             <a href="/write" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">
                                 <div class="inline-flex items-center">
+                                    <i class="fa-solid fa-phone" style="color: #0f0f0f;"></i>
+                                    <span class="ml-2">고객 센터</span>
+                                </div>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/book/write" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">
+                                <div class="inline-flex items-center">
                                     <svg class="w-[20px] h-[20px] text-gray-800" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 20">
                                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 17V2a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H3a2 2 0 0 0-2 2Zm0 0a2 2 0 0 0 2 2h12M5 15V1m8 18v-4"/>
                                     </svg>
@@ -154,16 +175,20 @@
                         </li>
                     </ul>
                 </div>
+                <!--반응형 메뉴 드롭다운 버튼-->
+                <button  type="button" class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200"  aria-expanded="false">
+                    <span class="sr-only">Open main menu</span>
+                    <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 17 14">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 1h15M1 7h15M1 13h15"/>
+                    </svg>
+                </button>
             </div>
         </div>
-    </nav>
+    </header>
 
-    <div id="alert-container" class="sm:w-1/4 w-full z-50 fixed bottom-5 right-5 flex flex-col-reverse"></div>
+<div id="alert-container" class="sm:w-1/4 w-full z-50 fixed bottom-5 right-5 flex flex-col-reverse"></div>
 
-<!--  스크롤 시 올림버튼  -->
-    <div class="goto-tp-btn z-50 fixed rounded-full border-2 opacity-0 cursor-pointer duration-100 text-xl bottom-[5%] right-[5%] w-8 text-center border-black leading-7 h-8"><i class="fa-solid fa-arrow-up"></i></div>
-
-    <main layout:fragment="main" class="mt-20  text-black "></main>
+    <main layout:fragment="main" class="text-black "></main>
 
     <script th:inline="javascript">
         /*<![CDATA[*/
@@ -201,16 +226,54 @@
             $(".goto-tp-btn").css({ opacity: 0 }, 300);
           }
         });
+           $(".goto-tp-btn").on("click", function() {
+        $("html, body").animate({ scrollTop: 0 }, "slow");
+    });
 
-        $(document).ready(function () {
-          $(".goto-tp-btn").click(function () {
-            $("html, body").animate({ scrollTop: 0 });
-          });
-        });
+// 스크롤 시 navbar 사라지고 나타나는 코드
+        document.addEventListener("DOMContentLoaded", function() {
+    var didScroll;
+    var lastScrollTop = 0;
+    var delta = 5;
+    var navbar = document.querySelector('header');
+    var navbarHeight = navbar.offsetHeight;
 
-        function scrollDown() {
-          window.scrollBy(0, window.innerHeight); // 화면의 높이만큼 스크롤 내림
+    window.addEventListener('scroll', function() {
+
+        didScroll = true;
+    });
+
+    setInterval(function() {
+        if (didScroll) {
+            hasScrolled();
+            didScroll = false;
         }
+    }, 250);
+
+    function hasScrolled() {
+        var st = window.scrollY;
+
+        if (Math.abs(lastScrollTop - st) <= delta)
+            return;
+
+        if (st > lastScrollTop && st > navbarHeight) {
+            // Scroll Down
+            navbar.classList.remove('nav-down');
+            navbar.classList.add('nav-up');
+        } else {
+            // Scroll Up
+            if (st + window.innerHeight < document.body.offsetHeight) {
+                navbar.classList.remove('nav-up');
+                navbar.classList.add('nav-down');
+            }
+        }
+
+        lastScrollTop = st;
+       console.log("dd");
+
+    }
+});
+
         /*]]>*/
     </script>
 </body>

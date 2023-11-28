@@ -51,15 +51,6 @@
                                     </a>
                                 </div>
                                 <a href="javascript:void(0);" class="recommend"></a>
-                                <div class="mt-4">
-                                    <a th:href="@{|/outline/modify/${outline.id}|}" th:text="수정"
-                                       th:if="${outline.author != null and outline.getAuthor().getNickname() == outline.author.nickname}"
-                                       sec:authorize="isAuthenticated()"></a>
-                                    <a href="javascript:void(0);" class="delete"
-                                       th:data-uri="@{|/outline/delete/${outline.id}|}" th:text="삭제"
-                                       th:if="${outline.author != null and outline.getAuthor().getNickname() == outline.author.nickname}"
-                                       sec:authorize="isAuthenticated()"></a>
-                                </div>
                                 <a href="#"
                                    class="custom-btn read-btn w-52 mt-20 relative rounded-sm font-semibold	leading-10 bg-black	text-white p-1">읽기</a>
                             </div>
@@ -99,8 +90,8 @@
                             <div class="p-2 w-full">
                                 <div class="h-full flex items-center p-3 rounded-lg ">
                                     <div class="flex-grow">
-                                        <ul>
-                                            <li th:each="chapters : ${outline.chapters}" class="flex mb-2">
+                                        <ul class="overflow-auto max-h-96">
+                                            <li th:each="chapters : ${outline.chapters}" class="flex mb-2 ">
                                                 <img th:src="@{${outline.coverImgUrl}}"
                                                      class="w-14 h-16 object-cover object-center flex-shrink-0 mr-4 rounded-lg"
                                                      alt="Book Image">

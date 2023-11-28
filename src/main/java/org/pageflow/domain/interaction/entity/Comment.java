@@ -29,7 +29,7 @@ public class Comment extends Interaction {
     
     
     @PostLoad
-    public void prePersist() {
+    public void postLoadSetPair() {
         this.pair = new InteractionPair<>(super.getInteractor(), this);
     }
 }

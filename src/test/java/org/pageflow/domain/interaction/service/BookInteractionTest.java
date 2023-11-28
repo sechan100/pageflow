@@ -8,7 +8,7 @@ import org.pageflow.domain.book.entity.Book;
 import org.pageflow.domain.book.service.BookService;
 import org.pageflow.domain.interaction.entity.Comment;
 import org.pageflow.domain.interaction.model.InteractionPair;
-import org.pageflow.domain.interaction.model.Interactions;
+import org.pageflow.domain.interaction.model.InteractionsOfTarget;
 import org.pageflow.domain.interaction.repository.CommentRepository;
 import org.pageflow.domain.user.repository.ProfileRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,11 +45,11 @@ class BookInteractionTest {
         
         InteractionPair<Book> pair = new InteractionPair<>(book.getAuthor(), book);
         
-        Interactions interactions = interactionService.getAllInteractionsOfTarget(pair);
-        assert interactions.getComments().get(0).getPreferenceStatistics().getLikes() == 0;
-        assert interactions.getComments().get(0).getPreferenceStatistics().getDislikes() == 1;
-        assert interactions.getPreferenceStatistics().getLikes() == 1;
-        assert interactions.getPreferenceStatistics().getDislikes() == 0;
+        InteractionsOfTarget interactionsOfTarget = interactionService.getAllInteractionsOfTarget(pair);
+        assert interactionsOfTarget.getComments().get(0).getPreferenceStatistics().getLikes() == 0;
+        assert interactionsOfTarget.getComments().get(0).getPreferenceStatistics().getDislikes() == 1;
+        assert interactionsOfTarget.getPreferenceStatistics().getLikes() == 1;
+        assert interactionsOfTarget.getPreferenceStatistics().getDislikes() == 0;
     }
     
     @Test
@@ -76,8 +76,8 @@ class BookInteractionTest {
     void deleteComment(){
         Book book = bookService.repoFindBookById(2L);
         InteractionPair<Book> pair = new InteractionPair<>(book.getAuthor(), book);
-        Interactions interactions = interactionService.getAllInteractionsOfTarget(pair);
-        Long commentId = interactions.getComments().get(0).getComment().getId();
+        InteractionsOfTarget interactionsOfTarget = interactionService.getAllInteractionsOfTarget(pair);
+        Long commentId = interactionsOfTarget.getComments().get(0).getComment().getId();
         
         commentService.deleteComment(commentId);
     }
@@ -89,8 +89,8 @@ class BookInteractionTest {
     void createCommentPreference() {
         Book book = bookService.repoFindBookById(2L);
         InteractionPair<Book> pair = new InteractionPair<>(book.getAuthor(), book);
-        Interactions interactions = interactionService.getAllInteractionsOfTarget(pair);
-        Long commentId = interactions.getComments().get(0).getComment().getId();
+        InteractionsOfTarget interactionsOfTarget = interactionService.getAllInteractionsOfTarget(pair);
+        Long commentId = interactionsOfTarget.getComments().get(0).getComment().getId();
         
         InteractionPair<Comment> commentPair = new InteractionPair<>(profileRepository.findById(1L).orElseThrow(), commentRepository.findById(commentId).orElseThrow());
         preferenceService.createPreference(commentPair, true);
@@ -102,11 +102,11 @@ class BookInteractionTest {
     void toggleCommentPreference(){
         Book book = bookService.repoFindBookById(2L);
         InteractionPair<Book> pair = new InteractionPair<>(book.getAuthor(), book);
-        Interactions interactions = interactionService.getAllInteractionsOfTarget(pair);
-        Long commentId = interactions.getComments().get(0).getComment().getId();
+        InteractionsOfTarget interactionsOfTarget = interactionService.getAllInteractionsOfTarget(pair);
+        Long commentId = interactionsOfTarget.getComments().get(0).getComment().getId();
         
         InteractionPair<Comment> commentPair = new InteractionPair<>(profileRepository.findById(1L).orElseThrow(), commentRepository.findById(commentId).orElseThrow());
-        preferenceService.togglePreferenceIsLiked(commentPair);
+        preferenceService.updatePreferenceIsLiked(commentPair, false);
     }
     
     @Test
@@ -115,8 +115,8 @@ class BookInteractionTest {
     void deleteCommentPreference(){
         Book book = bookService.repoFindBookById(2L);
         InteractionPair<Book> pair = new InteractionPair<>(book.getAuthor(), book);
-        Interactions interactions = interactionService.getAllInteractionsOfTarget(pair);
-        Long commentId = interactions.getComments().get(0).getComment().getId();
+        InteractionsOfTarget interactionsOfTarget = interactionService.getAllInteractionsOfTarget(pair);
+        Long commentId = interactionsOfTarget.getComments().get(0).getComment().getId();
         
         InteractionPair<Comment> commentPair = new InteractionPair<>(profileRepository.findById(1L).orElseThrow(), commentRepository.findById(commentId).orElseThrow());
         preferenceService.deletePreference(commentPair);

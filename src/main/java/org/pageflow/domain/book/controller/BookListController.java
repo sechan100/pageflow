@@ -21,7 +21,7 @@ public class BookListController {
     @GetMapping("/books")
     public String list(Model model, @RequestParam(value = "page", defaultValue = "0") int page,
                        @RequestParam(value = "kw", defaultValue = "") String kw,
-                       @RequestParam(value = "sort", defaultValue = "createDate") String sortOption) {
+                       @RequestParam(value = "sort", defaultValue = "createdDate") String sortOption) {
         Slice<Book> paging = this.bookService.getList(page, kw, sortOption);
         model.addAttribute("paging",paging);
         model.addAttribute("kw", kw);
@@ -33,7 +33,7 @@ public class BookListController {
     @ResponseBody
     public List<Book> getBooksApi(@RequestParam(value = "page", defaultValue = "0") int page,
                                   @RequestParam(value = "kw", defaultValue = "") String kw,
-                                  @RequestParam(value = "sortOption", defaultValue = "createDate") String sortOption) {
+                                  @RequestParam(value = "sortOption", defaultValue = "createdDate") String sortOption) {
         Slice<Book> paging = this.bookService.getList(page, kw, sortOption);
         return paging.getContent();
     }

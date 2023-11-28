@@ -9,8 +9,10 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.pageflow.domain.user.entity.Account;
+import org.pageflow.domain.user.entity.Profile;
 import org.pageflow.domain.user.model.dto.PrincipalContext;
 import org.pageflow.domain.user.model.dto.UserSession;
+import org.pageflow.domain.user.repository.ProfileRepository;
 import org.pageflow.domain.user.service.AccountService;
 import org.springframework.context.ApplicationContext;
 import org.springframework.lang.Nullable;
@@ -43,9 +45,10 @@ public class Rq {
     private UserSession userSession;
     private final ApplicationContext context;
     private final AccountService accountService;
+    private final ProfileRepository profileRepository;
 
 
-    public Rq(ApplicationContext context, AccountService accountService) {
+    public Rq(ApplicationContext context, AccountService accountService, ProfileRepository profileRepository) {
 
         ServletRequestAttributes sessionAttributes = ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes()));
         this.request = sessionAttributes.getRequest();
@@ -53,6 +56,7 @@ public class Rq {
         this.session = request.getSession();
         this.context = context;
         this.accountService = accountService;
+        this.profileRepository = profileRepository;
 
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -176,6 +180,10 @@ public class Rq {
 
     public Account getAccount() {
         return accountService.findFetchJoinProfileByUsername(userSession.getUsername());
+    }
+    
+    public Profile getProfile() {
+        return profileRepository.findById(userSession.getId()).orElseThrow();
     }
     
 }

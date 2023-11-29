@@ -1,11 +1,12 @@
 package org.pageflow.domain.user.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
 import lombok.*;
 import org.pageflow.base.entity.BaseEntity;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Entity
@@ -27,4 +28,5 @@ public class Profile extends BaseEntity {
     )
     @JsonIgnore
     private Account account;
+
 }

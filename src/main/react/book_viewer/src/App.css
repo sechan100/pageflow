@@ -9,7 +9,16 @@
   width: 85%;
 }
 
-
+/* App.css 또는 해당하는 스타일시트 파일 */
+.continue-reading-btn {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  /* 추가적인 스타일링 */
+}
 
 .carousel {
   overflow-x: auto;

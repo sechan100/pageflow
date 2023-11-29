@@ -6,6 +6,8 @@ import { Outline, IPage } from './types/types';
 import axios from 'axios';
 import { useState, useEffect } from 'react';
 import { QueryClient, QueryClientProvider } from 'react-query';
+import { useLocationStore } from './components/nav/PageCursor';
+
 
 
 
@@ -37,6 +39,15 @@ function App() {
     if(outline){
       setIsLoading(false);
     }
+    // 마지막 위치 복원
+    const savedLocation = localStorage.getItem('lastLocation');
+    if (savedLocation && outline) {
+      const { chapterIdx, pageIdx } = JSON.parse(savedLocation);
+      // 여기서 마지막 위치 정보를 'Viewer' 컴포넌트에 전달하는 로직을 추가하거나,
+      // 다른 방식으로 해당 위치로 이동하도록 구현합니다.
+      const locationStore = useLocationStore.getState();
+      locationStore.setLocation({ chapterIdx, pageIdx });
+    }
   }, [outline])
 
 
@@ -64,8 +75,22 @@ function App() {
     }
   });
 
+    // 이어보기 버튼 클릭 핸들러
+    // 해당 버튼은 서버의 detail 페이지에 구현 필요
+    const handleContinueReading = () => {
+      const savedLocation = localStorage.getItem('lastLocation');
+      if (savedLocation) {
+        const { chapterIdx, pageIdx } = JSON.parse(savedLocation);
+        const locationStore = useLocationStore.getState();
+        locationStore.setLocation({ chapterIdx, pageIdx });
+      }
+    };
+
   return (
     <QueryClientProvider client={queryClient}>
+       <button onClick={handleContinueReading} className="continue-reading-btn">
+        이어보기
+      </button> 
       <Viewer outline={outline}></Viewer>
     </QueryClientProvider>
   ); 

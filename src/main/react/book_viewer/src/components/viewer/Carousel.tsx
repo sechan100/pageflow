@@ -49,10 +49,11 @@ export const useCarouselStore = create<UseCarouselStore>((set, get) => ({
 interface CarouselProps {
   children: React.ReactNode;
   carouselContentRef: React.RefObject<HTMLDivElement>;
+  isFallback: boolean;
 }
 
 
-const Carousel = ({ children, carouselContentRef } : CarouselProps) => {
+const Carousel = ({ children, carouselContentRef, isFallback } : CarouselProps) => {
 
   const carouselRef = useRef<HTMLDivElement>(null);
   const carouselBreakPointsRef = useRef<number[] | null>(null); // 캐러셀의 불연속적인 위치를 저장하는 배열 (화면 리사이즈시 업데이트)
@@ -63,6 +64,8 @@ const Carousel = ({ children, carouselContentRef } : CarouselProps) => {
 
   // 캐러셀의 불연속적인 위치를 업데이트한다. (Page 넘어갈 때, Chapter 넘어갈 때, 화면 리사이즈시)
   useEffect(() => {
+
+    if(isFallback) return;
 
     const updateBreakPoints = () => {
       const newBreakPoints = updateCarouselBreakPoints();
@@ -99,7 +102,7 @@ const Carousel = ({ children, carouselContentRef } : CarouselProps) => {
           setReserveMoveLastCarousel(false); // reserveMoveLastCarousel을 reset
         }
 
-      }, 100);
+      }, 200);
     }
 
     const images = carouselContentRef.current?.querySelectorAll('img') as NodeListOf<HTMLImageElement>;
@@ -144,7 +147,7 @@ const Carousel = ({ children, carouselContentRef } : CarouselProps) => {
     };
 
 
-  }, [location, metaPage.type, carouselRef.current]);
+  }, [location, metaPage.type, carouselRef.current, isFallback]);
 
 
 

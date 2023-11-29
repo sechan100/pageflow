@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { Outline } from "../../types/types";
 import { metaPageType, useLocationStore } from "../nav/PageCursor";
 import { getChapterTitle } from "../nav/Navbar";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Carousel from "./Carousel";
 import DOMPurify from 'dompurify';
 import { useGetPage } from "../api/page-api";
@@ -31,7 +31,12 @@ export default function ViewerContext({outline}: {outline: Outline}) {
   const { location, metaPage } = useLocationStore();
   const currentPage = useGetPage(outline.id, getPageMap(outline), location);
   const carouselContentRef = useRef<HTMLDivElement>(null);
+  const [isFallbackPage, setIsFallbackPage] = useState(false); // 현재 페이지가 fallbackPage인지 여부
 
+  useEffect(() => {
+    if(currentPage.id === 0) setIsFallbackPage(true);
+    else setIsFallbackPage(false);
+  }, [currentPage.id]);
 
 
   // 총 칼럼이 홀수개일 경우, 마지막 칼럼의 오른쪽은 빈 페이지여야한다. 근데 해결 방법이 마땅치 않아서 그냥 줄바꿈태그를 최소 한도로 넣어놓음.
@@ -46,7 +51,7 @@ export default function ViewerContext({outline}: {outline: Outline}) {
           <div className="text-2xl mt-20">{getChapterTitle(outline, location.chapterIdx)}</div>
         }
         <div className="text-justify">
-          <Carousel carouselContentRef={carouselContentRef}>
+          <Carousel carouselContentRef={carouselContentRef} isFallback={isFallbackPage}>
             { !metaPage.isMetaPage &&
               <div
                 id="carousel-content"

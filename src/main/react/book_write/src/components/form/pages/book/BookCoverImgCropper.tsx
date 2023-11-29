@@ -1,6 +1,8 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useRef, useState } from 'react';
 import ReactCrop, { Crop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
+import { useAutoSaveStore } from '../../../saveBtn/MutationSaveBtn';
 
 
 interface ImageCropComponentProps {
@@ -14,6 +16,9 @@ function ImageCropComponent({cropedFilename, defaultSrc, setFileDate} : ImageCro
 
   // 원본 이미지 src: 최초 props로 받아온게 없다면 default 이미지로 설정
   const [src, setSrc] = useState<string>(defaultSrc !== undefined ? defaultSrc : "/img/unloaded_img.jpg");
+  const {isAutoSaveAvailable} = useAutoSaveStore();
+
+
   // props로 받아온 defaultSrc가 변경되면 src도 변경
   useEffect(() => {
     setSrc(defaultSrc !== undefined ? defaultSrc : "/img/unloaded_img.jpg");
@@ -28,6 +33,16 @@ function ImageCropComponent({cropedFilename, defaultSrc, setFileDate} : ImageCro
   // 수정상태 여부
   const [isModifyMode, setIsModifyMode] = useState<boolean>(false);
 
+
+  // 편집 상태일 때, 자동저장 off
+  useEffect(() => {
+    if(isModifyMode){
+      isAutoSaveAvailable.current = false;
+    } else {
+      isAutoSaveAvailable.current = true;
+    }
+  }, [isModifyMode]);
+
   // 이미지 드롭 or 선택 input ref
   const sourceImgInput = useRef<HTMLInputElement>(null);
 
@@ -35,8 +50,8 @@ function ImageCropComponent({cropedFilename, defaultSrc, setFileDate} : ImageCro
   const [crop, setCrop] = useState<Crop>({
     x: 0,
     y: 0,
-    width: 200 * 11 / 16,
-    height: 200,
+    width: 20 * 11 / 16,
+    height: 20,
     unit: 'px'
   });
 

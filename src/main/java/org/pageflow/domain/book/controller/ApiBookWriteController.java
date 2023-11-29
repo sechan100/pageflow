@@ -169,7 +169,7 @@ public class ApiBookWriteController {
     }
     
     
-    @PostMapping("/api/books/{bookId}/chapters/pages/{pageId}/img")
+    @PostMapping("/api/books/{bookId}/chapters/pages/{pageId}/imgs")
     public String uploadPageImg(
             @ModelAttribute MultipartFile imgFile,
             @SecuredBookId @PathVariable("bookId") Long bookId,

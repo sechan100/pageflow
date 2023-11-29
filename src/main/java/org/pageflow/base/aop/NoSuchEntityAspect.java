@@ -5,9 +5,9 @@ import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
-import org.pageflow.base.exception.data.ApiNoSuchEntityException;
-import org.pageflow.base.exception.data.NoSuchEntityException;
-import org.pageflow.base.exception.data.WebNoSuchEntityException;
+import org.pageflow.base.exception.nosuchentity.ApiNoSuchEntityException;
+import org.pageflow.base.exception.nosuchentity.NoSuchEntityException;
+import org.pageflow.base.exception.nosuchentity.WebNoSuchEntityException;
 import org.springframework.stereotype.Component;
 
 /**

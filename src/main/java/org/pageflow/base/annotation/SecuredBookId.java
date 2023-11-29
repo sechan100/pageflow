@@ -11,4 +11,5 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface SecuredBookId {
+    boolean adminOnly() default false; // 관리자만 접근 가능한지 여부 -> true라면 아무리 엔티티 주인이라고해도 접근 불가능
 }

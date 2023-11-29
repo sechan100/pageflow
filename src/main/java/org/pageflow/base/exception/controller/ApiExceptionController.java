@@ -1,7 +1,7 @@
 package org.pageflow.base.exception.controller;
 
-import org.pageflow.base.exception.data.ApiNoSuchEntityException;
-import org.pageflow.base.exception.data.ApiEntityAccessDeniedException;
+import org.pageflow.base.exception.nosuchentity.ApiNoSuchEntityException;
+import org.pageflow.base.exception.entityaccessdenied.ApiEntityAccessDeniedException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book review finished mail</title>
+</head>
+
+<body style="font-family: Arial, sans-serif;">
+<div style="width: 100%; max-width: 600px; margin: auto; background-color: #f4f4f4; padding: 20px;">
+  <h1 style="font-size: 24px;">PAGEFLOW</h1>
+  <p style="font-size: 16px;">요청하신 책의 검수가 완료되었습니다.
+    <br> "[[${book.title}]]"의 검수 결과, 책의 출판이
+    <th:block th:switch="${#strings.toString(status)}">
+      <span th:case="'PUBLISHED'" style="color: #00E0D8; font-size: large;">승인</span> 되었습니다.
+      <span th:case="'REJECTED'" style="color: #f46666; font-size: large;">거절</span> 되었습니다.
+    </th:block>
+  </p>
+
+  <th:block th:switch="${#strings.toString(status)}">
+
+
+    <div th:case="'PUBLISHED'" style="font-size: large;">
+      지금부터 바로 작가님의 책을 모든 사용자가 볼 수 있습니다. <br>
+        <a th:href="${baseUrl}" style="color: #00E0D8; font-size: large;">책 보러가기</a>
+      <p>감사합니다.</p>
+    </div>
+
+
+    <div th:case="'REJECTED'">
+      <p>거절 사유: [[${rejectReason}]]</p>
+      <p>해당 책을 출판하기에 미흡한 부분이 있다고 판단하여 출판 요청을 수락하지 못하였습니다.</p>
+      <p>다시 한번 책을 검토하시고, 한번더 출판 요청을 해주시기 바랍니다. 불편을 드려죄송합니다.</p>
+    </div>
+  </th:block>
+</div>
+</body>
+</html>

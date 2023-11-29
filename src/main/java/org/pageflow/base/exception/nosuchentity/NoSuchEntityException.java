@@ -1,4 +1,4 @@
-package org.pageflow.base.exception.data;
+package org.pageflow.base.exception.nosuchentity;
 
 import lombok.Getter;
 
@@ -16,4 +16,8 @@ public class NoSuchEntityException extends RuntimeException {
         this.entityClass = clazz;
     }
     
+    public NoSuchEntityException(Class<?> clazz, String message) {
+        super(message);
+        this.entityClass = clazz;
+    }
 }

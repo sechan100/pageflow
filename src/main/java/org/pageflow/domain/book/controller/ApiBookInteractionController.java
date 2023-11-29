@@ -6,6 +6,7 @@ import org.pageflow.domain.book.entity.Book;
 import org.pageflow.domain.book.service.BookService;
 import org.pageflow.domain.interaction.entity.Comment;
 import org.pageflow.domain.interaction.entity.Preference;
+import org.pageflow.domain.interaction.model.CommentWithPreference;
 import org.pageflow.domain.interaction.model.InteractionPair;
 import org.pageflow.domain.interaction.model.InteractionsOfTarget;
 import org.pageflow.domain.interaction.model.PreferenceStatistics;
@@ -14,6 +15,8 @@ import org.pageflow.domain.interaction.service.InteractionService;
 import org.pageflow.domain.interaction.service.PreferenceService;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * @author : sechan
@@ -37,8 +40,8 @@ public class ApiBookInteractionController {
         InteractionPair<Book> pair = new InteractionPair<>(rq.getProfile(), bookService.repoFindBookById(bookId));
         return interactionService.getAllInteractionsOfTarget(pair);
     }
-    
-    
+
+
     // [CREATE] 댓글 생성
     @PostMapping("/api/books/{bookId}/comments")
     public Comment createComment(

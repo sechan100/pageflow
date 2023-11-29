@@ -1,6 +1,7 @@
 package org.pageflow.domain.book.model.summary;
 
 import lombok.Data;
+import org.pageflow.domain.book.constants.BookStatus;
 import org.pageflow.domain.book.entity.Book;
 import org.pageflow.domain.user.model.dto.UserSession;
 
@@ -20,6 +21,8 @@ public class BookSummary {
     
     private UserSession author;
     
+    private BookStatus status;
+    
     private LocalDateTime createdDate;
     
     private LocalDateTime modifiedDate;
@@ -33,5 +36,6 @@ public class BookSummary {
         this.author = new UserSession(book.getAuthor());
         this.createdDate = book.getCreatedDate();
         this.modifiedDate = book.getModifiedDate();
+        this.status = book.getStatus();
     }
 }

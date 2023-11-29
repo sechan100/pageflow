@@ -9,6 +9,8 @@ import OutlineContext from "./outline/OutlineContext";
 import FormMain from "./form/FormMain";
 import { pageDropAreaPrefix } from "./outline/OutlineContext";
 import { create } from "zustand";
+import flowAlert from "../etc/flowAlert";
+import { useAutoSaveStore } from "./saveBtn/MutationSaveBtn";
 
 
 interface UseOutlineMutationStore {
@@ -57,6 +59,7 @@ export default function BookEntityDraggableContext() {
   const { bookId } = useContext(QueryContext);
   const outline: Outline = useGetOutlineQuery(bookId);
   const [localOutline, localOutlineDispatch] : [Outline, any] = useReducer(localOutlineReducer, outline); // zustand store에 변경사항을 업데이트하기 전에 임시로 저장하는 로컬 상태
+  const { isAutoSaveAvailable } = useAutoSaveStore(); // 자동 저장 비활성화
 
   // outline query data -> localOutline 상태에 동기화
   useEffect(() => {
@@ -126,12 +129,14 @@ export default function BookEntityDraggableContext() {
 
   function onDragStart(start : any) {
     toggleDeleteDropAreaVisibility(start.type);
+    isAutoSaveAvailable.current = false; // 자동 저장 비활성화
   }
 
 
   function onDragEnd(result: any){
     toggleDeleteDropAreaVisibility(result.type);
-
+    isAutoSaveAvailable.current = true; // 자동 저장 활성화
+    
     const {
       destination, // 최종 드롭된 위치(목적지)
       source,     // 기존 위치(출발지)
@@ -170,7 +175,13 @@ export default function BookEntityDraggableContext() {
       // 올바른 드롭 이벤트가 아닌 경우 종료.
       if(!sourceChapter || !destinationChapter) return;
 
+      // 출발지 또는 목적지의 챕터가 페이지를 가지고 있지 않은 경우 종료.
       if(!sourceChapter.pages || !destinationChapter.pages){
+        return;
+      }
+
+      if(sourceChapter.pages.length === 1){
+        flowAlert("warning", '최소 1개의 페이지가 필요합니다.');
         return;
       }
 
@@ -184,6 +195,7 @@ export default function BookEntityDraggableContext() {
         const newSourcePages = Array.from(sourceChapter.pages);
         const newDestinationPages = Array.from(destinationChapter.pages);
         const [removedPage] = newSourcePages.splice(source.index, 1);
+
 
         // re-order: 3-1. 닫혀있는 상태의 챕터로 드롭된 경우 -> 해당 챕터의 제일 마지막 인덱스로 추가.
         if(isInClosingPageDropAreaDropped){
@@ -248,6 +260,11 @@ export default function BookEntityDraggableContext() {
     // 삭제할 챕터의 경우
     if(type === 'CHAPTER' && localOutline.chapters){
 
+      if(localOutline.chapters.length === 1){
+        flowAlert("warning", '최소 1개의 챕터가 필요합니다.');
+        return;
+      }
+
       const newChapters = Array.from(localOutline.chapters);
       newChapters.splice(source.index, 1);
       localOutlineDispatch({type: 'SET_CHAPTERS', payload: newChapters});
@@ -258,6 +275,11 @@ export default function BookEntityDraggableContext() {
       const sourceChapter = localOutline.chapters.find(chapter => pageDropAreaPrefix + chapter.id === source.droppableId); // 드래그 된 페이지가 원래 속한 챕터
 
       if(!sourceChapter) return;
+
+      if(sourceChapter.pages && sourceChapter.pages.length === 1){
+        flowAlert("warning", '최소 1개의 페이지가 필요합니다.');
+        return;
+      }
 
       if(!sourceChapter.pages){
         return;

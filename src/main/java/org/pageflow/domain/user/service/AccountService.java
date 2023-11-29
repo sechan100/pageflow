@@ -5,6 +5,7 @@ import jakarta.validation.Valid;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.pageflow.base.constants.CustomProperties;
+import org.pageflow.base.exception.data.NoSuchEntityException;
 import org.pageflow.domain.user.constants.Role;
 import org.pageflow.domain.user.entity.Account;
 import org.pageflow.domain.user.entity.Profile;
@@ -101,7 +102,9 @@ public class AccountService {
     
     @Transactional
     public Profile updateProfile(ProfileUpdateForm form) {
-        Profile savedProfile = profileRepository.findById(form.getId()).orElseThrow();
+        Profile savedProfile = profileRepository.findById(form.getId()).orElseThrow(
+                () -> new NoSuchEntityException(Profile.class)
+        );
         savedProfile.setNickname(form.getNickname());
         
         if(!form.getProfileImg().isEmpty()){
@@ -143,7 +146,7 @@ public class AccountService {
         String staleProfileImgUrl = profile.getProfileImgUrl();
         
         // 프로필 이미지가 없거나 기본 이미지가 아닌 경우, 기존에 있던 프로필 사진은 삭제한다.
-        if(!isDefaultProfileImgOrNull(staleProfileImgUrl)){
+        if(!isDefaultProfileImgOrNullOrOAuth2ProfileImg(staleProfileImgUrl)){
             fileService.deleteFile(fileService.getPureFilePath(staleProfileImgUrl));
         }
         
@@ -168,8 +171,10 @@ public class AccountService {
     }
     
     
-    public boolean isDefaultProfileImgOrNull(String profileImgUrl) {
-        return profileImgUrl == null || profileImgUrl.equals(customProperties.getDefaults().getDefaultUserProfileImg());
+    public boolean isDefaultProfileImgOrNullOrOAuth2ProfileImg(String profileImgUrl) {
+        return profileImgUrl == null
+                || profileImgUrl.equals(customProperties.getDefaults().getDefaultUserProfileImg())
+                || !profileImgUrl.startsWith(customProperties.getFiles().getImg().getBaseUrl());
     }
 
     // ****************************************************

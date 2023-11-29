@@ -36,7 +36,6 @@ public class AccountSettingControlller {
         return "/user/account/settings";
     }
     
-    
     @PutMapping("/api/account/settings/profile")
     public ResponseEntity<Profile> updateProfile(@ModelAttribute ProfileUpdateForm form) {
         

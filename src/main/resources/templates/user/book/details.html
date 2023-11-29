@@ -1,5 +1,5 @@
 <html lang="en" layout:decorate="~{/common/layout.html}" xmlns:th="http://www.w3.org/1999/xhtml"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security" xmlns:layout="http://www.w3.org/1999/xhtml">
 
 <head>
     <title>[[${outline.title}]]</title>
@@ -50,9 +50,17 @@
                                         <i id="heartIcon" class="far fa-heart" style="color: #000000;"></i>
                                     </a>
                                 </div>
-                                <!--                                onclick="toggleHeart('heart')"-->
                                 <a href="javascript:void(0);" class="recommend"></a>
-                                <a href="#"
+                                <div class="mt-4">
+                                    <a th:href="@{|/outline/modify/${outline.id}|}" th:text="수정"
+                                       th:if="${outline.author != null and outline.getAuthor().getNickname() == outline.author.nickname}"
+                                       sec:authorize="isAuthenticated()"></a>
+                                    <a href="javascript:void(0);" class="delete"
+                                       th:data-uri="@{|/outline/delete/${outline.id}|}" th:text="삭제"
+                                       th:if="${outline.author != null and outline.getAuthor().getNickname() == outline.author.nickname}"
+                                       sec:authorize="isAuthenticated()"></a>
+                                </div>
+                                <a th:href="|/viewer/${outline.id}|"
                                    class="custom-btn read-btn w-52 mt-20 relative rounded-sm font-semibold	leading-10 bg-black	text-white p-1">읽기</a>
                             </div>
                         </div>
@@ -321,26 +329,8 @@
                 });
             }
         }
-
-                // 댓글 수정 저장
-                function saveEdit(commentId) {
-                    var bookId = [[${outline.id}]];
-                    var editedContent = $("#comment-textarea-" + commentId).val().trim(); // 수정된 부분
-                    $.ajax({
-                        type: 'PUT',
-                        url: '/api/books/' + bookId + '/comments/' + commentId,
-                        data: { content: editedContent },
-                        success: function (comment) {
-                            console.log('댓글 수정 완료');
-                            updateCommentList(bookId);
-                            // 댓글 개수 업데이트
-                            updateCommentCount();
-                        },
-                        error: function (xhr, status, error) {
-                            alert('댓글 수정 에러');
-                        }
-                    });
-                }
+    });
+}
 
                 // 댓글 수정 버튼 후 화면 표시
                 function editComment(commentId) {

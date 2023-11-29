@@ -4,7 +4,6 @@ import { Outline } from "../../types/types";
 import Navbar from "../nav/Navbar";
 import PageCursor, { useLocationStore } from "../nav/PageCursor";
 import ViewerContext from "./ViewerContext";
-import { useGetPage } from "../api/page-api";
 
 
 

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.pageflow.base.annotation.SecuredBookId;
 import org.pageflow.base.request.Rq;
 import org.pageflow.domain.book.model.summary.BookSummary;
+import org.pageflow.domain.book.model.summary.Outline;
 import org.pageflow.domain.book.service.BookService;
 import org.pageflow.domain.user.service.AccountService;
 import org.springframework.data.domain.Slice;
@@ -35,6 +36,14 @@ public class BookWebController {
         model.addAttribute("kw", kw);
         model.addAttribute("sort", sortOption);
         return "/user/book/cards";
+    }
+    
+    
+    @GetMapping("/books/{bookId}/details")
+    public String details(@PathVariable Long bookId, Model model) {
+        Outline outline = bookService.getOutline(bookId);
+        model.addAttribute("outline", outline);
+        return "/user/book/details";
     }
     
     

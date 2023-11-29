@@ -177,7 +177,7 @@ public class ApiBookWriteController {
     ) {
         if(imgFile == null){
             throw new IllegalArgumentException("이미지 파일이 없습니다");
-        }경
+        }
     
         Page ownerPage = bookService.repoFindPageById(pageId);
         FileMetadata imgMetadata = fileService.uploadFile(imgFile, ownerPage, FileMetadataType.PAGE_IMG);

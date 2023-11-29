@@ -37,7 +37,7 @@ const metaPageNone = { isMetaPage: false, type: metaPageType.NONE, prevLocation 
 export const useLocationStore = create<UseLocationStore>((set, get) => ({
   totalChapters: 0, // 총 chapter 수
   chapterVolumes: [], // 한 chapter 안에있는 pages의 length
-  metaPage: { isMetaPage: false, type: metaPageType.NONE, prevLocation : {chapterIdx: 0, pageIdx: 0}, nextLocation : {chapterIdx: 0, pageIdx: 0} },
+  metaPage: { isMetaPage: true, type: metaPageType.BOOK_COVER, prevLocation : {chapterIdx: 0, pageIdx: 0}, nextLocation : {chapterIdx: 0, pageIdx: 0} },
   location: { chapterIdx: 0, pageIdx: 0 },
   setLocation: (location : ILocation) => {
     set({

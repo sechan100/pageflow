@@ -151,7 +151,7 @@ public class ApiBookWriteController {
      */
     @GetMapping("/api/books/{bookId}/chapters/pages/{pageId}")
     public Page readPage(
-            @SecuredBookId @PathVariable("bookId") Long bookId,
+            @PathVariable("bookId") Long bookId,
             @PathVariable("pageId") Long pageId
     ) {
         return bookService.repoFindPageById(pageId);

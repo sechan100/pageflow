@@ -31,6 +31,12 @@ export default function ViewerContext({outline}: {outline: Outline}) {
   const { location, metaPage } = useLocationStore();
   const currentPage = useGetPage(outline.id, getPageMap(outline), location);
   const carouselContentRef = useRef<HTMLDivElement>(null);
+  const [isFallbackPage, setIsFallbackPage] = useState(false); // 현재 페이지가 fallbackPage인지 여부
+
+  useEffect(() => {
+    if(currentPage.id === 0) setIsFallbackPage(true);
+    else setIsFallbackPage(false);
+  }, [currentPage.id]);
 
 
 
@@ -42,11 +48,38 @@ export default function ViewerContext({outline}: {outline: Outline}) {
   return (
     <div className="" onClick={toggle}>
       <div className="text-center py-20 sm:px-10 xl:px-52">
+        {/* 책 표지 */}
+        { metaPage.isMetaPage && metaPage.type === metaPageType.BOOK_COVER &&
+        <div className="flex justify-between">
+          <div className="mt-[10vh]">
+            <div className="text-3xl w-[30vw]">{outline.title}</div>
+            <p className="flex justify-center items-center mt-[10vh]">
+              <img className="rounded-full w-[3vw] mr-2" src={outline.author.profileImgUrl} alt="" />
+              {outline.author.nickname} 작가
+            </p>
+          </div>
+          <img className="h-[80vh]" src={outline.coverImgUrl} alt="" />
+        </div>
+        }
+        {/* 챕터 표지 */}
         { metaPage.isMetaPage && metaPage.type === metaPageType.CHAPTER_INIT &&
-          <div className="text-2xl mt-20">{getChapterTitle(outline, location.chapterIdx)}</div>
+        <>
+          <p>CHAPTER: 1</p>
+          <div className="text-3xl mt-20">{getChapterTitle(outline, location.chapterIdx)}</div>
+        </>
+        }
+        {/* 책 끝 표지 */}
+        { metaPage.isMetaPage && metaPage.type === metaPageType.BOOK_END &&
+        <>
+          <p>END</p>
+          <p className="flex justify-center items-center mt-[10vh]">
+              <img className="rounded-full w-[3vw] mr-2" src={outline.author.profileImgUrl} alt="" />
+              {outline.author.nickname} 작가
+          </p>
+        </>
         }
         <div className="text-justify">
-          <Carousel carouselContentRef={carouselContentRef}>
+          <Carousel carouselContentRef={carouselContentRef} isFallback={isFallbackPage}>
             { !metaPage.isMetaPage &&
               <div
                 id="carousel-content"

@@ -85,7 +85,7 @@
             <!--  검색 끝  -->
         </div>
             <!-- 리스트 -->
-            <div style="min-height: 100vh ;" >
+            <div style="min-height: 100vh;">
                 <div class="grid grid-colss-4 gap-x-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 xl:gap-x-8 " >
                     <div th:each="book : ${paging}" class="mb-10 max-h-96">
                        <div class="h-full shadow-lg transition-transform duration-300 transform hover:-translate-y-3 ">
@@ -93,7 +93,7 @@
                                <a th:href="@{|/books/${book.id}/details|}">
                                    <div class="flex flex-col h-full">
                                        <div class="h-4/6 w-full overflow-hidden bg-cover bg-center">
-                                           <img th:src="@{${book.coverImgUrl}}" alt="Book Image" class="w-full ">
+                                           <img th:src="@{${book.coverImgUrl}}" alt="Book Image" class="">
                                        </div>
                                        <div class="h-24 overflow-hidden overflow-ellipsis border-b  border-slate-300 relative">
                                            <h1 th:text="${book.title}" class="px-5 py-3 font-extrabold "></h1>

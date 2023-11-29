@@ -50,7 +50,6 @@
                                         <i id="heartIcon" class="far fa-heart" style="color: #000000;"></i>
                                     </a>
                                 </div>
-                                <a href="javascript:void(0);" class="recommend"></a>
                                 <div class="mt-4">
                                     <a th:href="@{|/outline/modify/${outline.id}|}" th:text="수정"
                                        th:if="${outline.author != null and outline.getAuthor().getNickname() == outline.author.nickname}"
@@ -184,7 +183,7 @@
 <!--  댓글 관련 기능  -->
     <script>
         $(document).ready(function () {
-            var bookId = [[${outline.id}]];
+            var bookId = 3;
             refreshCommentList(bookId);
 
             // 페이지 로드 시 댓글 개수 가져오기
@@ -224,7 +223,7 @@
         // 댓글 목록을 화면에 표시
         function displayCommentList(commentList) {
             var output = "";
-            var userImg = "[[${outline.author.profileImgUrl}]]";
+            var userImg =  "[[${outline.author.profileImgUrl}]]";
 
             if (commentList && commentList.length > 0) {
                 commentList.sort(function (a, b) {
@@ -278,7 +277,7 @@
 
         // 댓글 작성 함수
         function commentWrite_submitForm(form) {
-            var bookId = [[${outline.id}]];
+            var bookId = 3;
             form.content.value = form.content.value.trim();
 
             if (form.content.value.length === 0) {
@@ -307,7 +306,7 @@
 
         // 댓글 삭제
         function deleteComment(commentId) {
-            var bookId = [[${outline.id}]];
+            var bookId = 3;
             closeModal(commentId);
 
             var confirmDelete = confirm('정말로 삭제하시겠습니까?');
@@ -329,91 +328,83 @@
                 });
             }
         }
-    });
-}
 
-                // 댓글 수정 버튼 후 화면 표시
-                function editComment(commentId) {
-                    closeModal(commentId);
+        // 댓글 수정 버튼 후 화면 표시
+        function editComment(commentId) {
+            closeModal(commentId);
 
-                    var containerHeight = $("#comment-" + commentId).parent().height();
+            var containerHeight = $("#comment-" + commentId).parent().height();
 
-                    var newContent = `
-                        <div class='w-full flex justify-between'>
-                            <div id='comment-div-${commentId}' class='w-full flex justify-between'>
-                                <textarea id='comment-textarea-${commentId}' autofocus class='textarea textarea-bordered textarea-xs bg-slate-100 mr-2 w-full' style='resize: none; height: ${containerHeight}px;'></textarea>
-                                <a href='#'>
-                                    <i onclick='openModal(${commentId})' class='fa-solid fa-bars modal_btn justify-end text-black text-base'></i>
-                                </a>
-                                <dialog id='my_modal_${commentId}' class='modal'>
-                                    <div class='modal-box bg-white text-black'>
-                                        <form method='dialog'>
-                                            <button class='btn btn-sm btn-circle btn-ghost absolute right-3 top-3' onclick='closeModal(${commentId})'>✕</button>
-                                        </form>
-                                        <button onclick='saveEdit(${commentId})'>저장</button>
-                                        <button onclick='cancelEdit(${commentId})'>취소</button>
-                                    </div>
-                                </dialog>
+            var newContent = `
+                <div class='w-full flex justify-between'>
+                    <div id='comment-div-${commentId}' class='w-full flex justify-between'>
+                        <textarea id='comment-textarea-${commentId}' autofocus class='textarea textarea-bordered textarea-xs bg-slate-100 mr-2 w-full' style='resize: none; height: ${containerHeight}px;'></textarea>
+                        <a href='#'>
+                            <i onclick='openModal(${commentId})' class='fa-solid fa-bars modal_btn justify-end text-black text-base'></i>
+                        </a>
+                        <dialog id='my_modal_${commentId}' class='modal'>
+                            <div class='modal-box bg-white text-black'>
+                                <form method='dialog'>
+                                    <button class='btn btn-sm btn-circle btn-ghost absolute right-3 top-3' onclick='closeModal(${commentId})'>✕</button>
+                                </form>
+                                <button onclick='saveEdit(${commentId})'>저장</button>
+                                <button onclick='cancelEdit(${commentId})'>취소</button>
                             </div>
-                        </div>
-                    `;
+                        </dialog>
+                    </div>
+                </div>
+            `;
 
-                    if (newContent !== null) {
-                        $("#comment-" + commentId).replaceWith(newContent);
-                        $("#comment-div-" + commentId).next().hide();
-                        $("#comment-div-" + commentId).next().next().hide();
-                        $("#comment-div-" + commentId).next().next().next().hide();
-                    }
-                }
-
-
-                // 취소 시 화면 표시
-                function cancelEdit(commentId) {
-                    var commentContent = $("#comment-" + commentId).text(); // 수정된 부분
-                    $("#comment-div-" + commentId).replaceWith(`<p id='comment-${commentId}'>${commentContent}</p>`);
-
-                    // 해당 댓글의 원래 버튼 표시
-                    var buttonsToShow = $("#comment-" + commentId).next().find('.modal_btn');
-                    buttonsToShow.show();
-                }
-
-                // 댓글 관련 버튼 모달 열기
-                function openModal(commentId) {
-                    var modal = document.getElementById('my_modal_' + commentId);
-                    modal.showModal();
-                }
-
-                // 댓글 관련 버튼 모달 닫기
-                function closeModal(commentId) {
-                    var modal = document.getElementById('my_modal_' + commentId);
-                    modal.close();
-                }
-
-                // 댓글 추천
-                function recommendComment(commentId) {
-                    var bookId = [[${outline.id}]];
-                    // 추천 로직 추가
-                }
-
-                   function updateCommentCount() {
-                var bookId = [[${outline.id}]];
-
-                $.ajax({
-                    type: 'GET',
-                    url: '/api/books/' + bookId + '/interactions',
-                    success: function (interactions) {
-                        var commentCount = interactions.comments ? interactions.comments.length : 0;
-                        $("#getCommentCount").text(commentCount);
-                    },
-                    error: function (xhr, status, error) {
-                        console.error("댓글 개수 업데이트 실패");
-                    }
-                });
+            if (newContent !== null) {
+                $("#comment-" + commentId).replaceWith(newContent);
+                $("#comment-div-" + commentId).next().hide();
+                $("#comment-div-" + commentId).next().next().hide();
+                $("#comment-div-" + commentId).next().next().next().hide();
             }
+        }
+
+        // 취소 시 화면 표시
+        function cancelEdit(commentId) {
+            var commentContent = $("#comment-textarea-" + commentId).val(); // 수정된 부분
+            $("#comment-div-" + commentId).replaceWith(`<p id='comment-${commentId}'>${commentContent}</p>`);
+
+            // 해당 댓글의 원래 버튼 표시
+            var buttonsToShow = $("#comment-" + commentId).next().find('.modal_btn');
+            buttonsToShow.show();
+        }
+
+        // 댓글 관련 버튼 모달 열기
+        function openModal(commentId) {
+            var modal = document.getElementById('my_modal_' + commentId);
+            modal.showModal();
+        }
+
+        // 댓글 관련 버튼 모달 닫기
+        function closeModal(commentId) {
+            var modal = document.getElementById('my_modal_' + commentId);
+            modal.close();
+        }
+
+        function updateCommentCount() {
+            var bookId = 3;
+
+            $.ajax({
+                type: 'GET',
+                url: '/api/books/' + bookId + '/interactions',
+                success: function (interactions) {
+                    var commentCount = interactions.comments ? interactions.comments.length : 0;
+                    $("#getCommentCount").text(commentCount);
+                },
+                error: function (xhr, status, error) {
+                    console.error("댓글 개수 업데이트 실패");
+                }
+            });
+        }
 
     </script>
 
-<!--  댓글 좋아요 싫어요  -->
+
+    <!--  댓글 좋아요 싫어요  -->
     <script>
          function updatePreference(commentId, isLiked) {
              $.ajax({

@@ -102,7 +102,7 @@ const Carousel = ({ children, carouselContentRef, isFallback } : CarouselProps) 
           setReserveMoveLastCarousel(false); // reserveMoveLastCarousel을 reset
         }
 
-      }, 200);
+      }, 0);
     }
 
     const images = carouselContentRef.current?.querySelectorAll('img') as NodeListOf<HTMLImageElement>;
@@ -226,6 +226,9 @@ const Carousel = ({ children, carouselContentRef, isFallback } : CarouselProps) 
       <div ref={carouselRef} style={{ overflowX: 'hidden' }}>
         {children}
       </div>
+      {!metaPage.isMetaPage &&
+        <div className="fixed top-[2%] right-[3%]">{`캐러셀(${carouselIdx+1}/${carouselBreakPointsRef.current?.length})`}</div>
+      }
     </div>
   );
 
@@ -247,12 +250,19 @@ const Carousel = ({ children, carouselContentRef, isFallback } : CarouselProps) 
         // 그리고 0.08은 column-gap만큼의 offset값이다.
         // console.log(`${newContainerScrollLeft} + (${containerWidth} * 1.58) >= ${container.scrollWidth}`);
         if(newBreakPoint + (containerWidth * 0.58) >= carouselContainer.scrollWidth){
+          // 근데 만약 스크롤과 width가 같다면 에초에 1장짜리 페이지인 것이므로 그냥 바로 리턴.
+          if(carouselContainer.scrollWidth === containerWidth){
+            setIsLastCarousel(true);
+            return breakPoints;
+          }
+          setIsLastCarousel(false);
           break;
         } else {
           breakPoints.push(newBreakPoint);
         }
       }
       
+      setIsLastCarousel(false);
       return breakPoints.length > 1 ? breakPoints : null;
     } else {
       return null;

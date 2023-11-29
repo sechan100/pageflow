@@ -14,11 +14,11 @@ public class ChapterUpdateRequest extends RearrangeRequest {
     public ChapterUpdateRequest() {
         super("chapter");
     }
-    
+
     public ChapterUpdateRequest(Chapter chapter) {
         super("chapter", chapter.getId(), chapter.getTitle(), chapter.getSortPriority());
     }
-    
+
     public ChapterUpdateRequest(ChapterSummary chapter) {
         super("chapter", chapter.getId(), chapter.getTitle(), chapter.getSortPriority());
     }

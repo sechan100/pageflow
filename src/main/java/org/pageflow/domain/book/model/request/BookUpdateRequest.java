@@ -16,5 +16,5 @@ public class BookUpdateRequest {
     private String title;
 
     private MultipartFile coverImg;
-    
+
 }

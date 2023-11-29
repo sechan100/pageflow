@@ -8,11 +8,9 @@
 <main layout:fragment="main" class="mt-[10vh]">
 
   <div class="container mx-auto">
-    <div class="flex flex-wrap -mx-2">
-
-
+    <div th:unless="${books.size() == 0}" class="flex flex-wrap -mx-2">
       <div class="w-full sm:w-[50vw] md:w-[30vw] lg:w-[20vw] px-2 mb-4" th:each="book : ${books}">
-        <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+        <div class="shadow-lg rounded-lg overflow-hidden">
           <img th:src="${book.coverImgUrl}" alt="Book Cover">
           <div class="p-4">
             <h3 class="font-bold text-xl mb-2">[[${book.title}]]</h3>
@@ -32,7 +30,20 @@
           </div>
         </div>
       </div>
+    </div>
 
+
+    <div th:if="${books.size() == 0}" class="grid min-h-full place-items-center px-6 py-24 sm:py-32 lg:px-8">
+      <div class="text-center">
+        <h1 class="mt-4 text-sm font-bold tracking-tight text-gray-900 sm:text-xl">
+          와 비엇당..
+        </h1>
+        <p class="mt-6 text-base leading-7 text-gray-600">새로운 책을 작성해보세요!!</p>
+        <div class="mt-10 flex items-center justify-center gap-x-6">
+          <button onclick="history.back()" class="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">&larr; Go back</button>
+          <a href="/books/create-new" class="text-sm font-semibold text-gray-900">바로 책 작성 시작하기!<span aria-hidden="true">&rarr;</span></a>
+        </div>
+      </div>
     </div>
   </div>
 

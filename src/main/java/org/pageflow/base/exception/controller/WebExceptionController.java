@@ -1,5 +1,6 @@
 package org.pageflow.base.exception.controller;
 
+import org.pageflow.base.exception.data.WebEntityAccessDeniedException;
 import org.pageflow.base.exception.data.WebNoSuchEntityException;
 import org.springframework.http.HttpStatus;
 import org.springframework.ui.Model;
@@ -18,5 +19,11 @@ public class WebExceptionController {
     public String HandleWebNoSuchEntityException(WebNoSuchEntityException e, Model model) {
         model.addAttribute("entityName", e.getEntityClass().getSimpleName());
         return "/error/404";
+    }
+    
+    @ExceptionHandler(WebEntityAccessDeniedException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public String HandleEntityAccessDeniedException(WebEntityAccessDeniedException e) {
+        return "/error/403";
     }
 }

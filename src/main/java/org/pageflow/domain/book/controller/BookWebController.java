@@ -1,6 +1,7 @@
 package org.pageflow.domain.book.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.pageflow.base.annotation.SecuredBookId;
 import org.pageflow.base.request.Rq;
 import org.pageflow.domain.book.model.summary.BookSummary;
 import org.pageflow.domain.book.service.BookService;
@@ -53,7 +54,7 @@ public class BookWebController {
      * @return react book write form page
      */
     @GetMapping("/write/{bookId}")
-    public String writeForm(Model model, @PathVariable Long bookId) {
+    public String writeForm(@SecuredBookId @PathVariable Long bookId, Model model) {
         rq.setRequestAttr("bookId", bookId);
         return "forward:/react/build/book_write/index.html";
     }

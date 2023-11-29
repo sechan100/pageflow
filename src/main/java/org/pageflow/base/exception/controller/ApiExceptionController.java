@@ -1,6 +1,7 @@
 package org.pageflow.base.exception.controller;
 
 import org.pageflow.base.exception.data.ApiNoSuchEntityException;
+import org.pageflow.base.exception.data.ApiEntityAccessDeniedException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -21,7 +22,24 @@ public class ApiExceptionController {
                 Map.of(
                 "message", e.getMessage(),
                 "entityName", e.getEntityClass().getSimpleName()
-                ), null, 404
+                ),
+                null,
+                404
         );
     }
+    
+    @ExceptionHandler(ApiEntityAccessDeniedException.class)
+    public ResponseEntity<Map<String, Object>> HandleEntityAccessDeniedException(ApiEntityAccessDeniedException e) {
+        return new ResponseEntity<>(
+                Map.of(
+                        "message", "접근 권한이 없습니다."
+                ),
+                null,
+                403
+        );
+    }
+    
+    
+    
+    
 }

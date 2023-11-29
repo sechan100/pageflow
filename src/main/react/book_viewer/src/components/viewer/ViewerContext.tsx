@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { Outline } from "../../types/types";
 import { metaPageType, useLocationStore } from "../nav/PageCursor";
 import { getChapterTitle } from "../nav/Navbar";
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import Carousel from "./Carousel";
 import DOMPurify from 'dompurify';
 import { useGetPage } from "../api/page-api";

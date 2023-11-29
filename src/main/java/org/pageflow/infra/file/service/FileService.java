@@ -23,7 +23,7 @@ public class FileService {
 
     private final CustomProperties customProperties;
     private final FileMetadataRepository fileRepository;
-    private String uploadDirectoryPath;
+    private final String uploadDirectoryPath;
 
 
     public FileService(CustomProperties customProperties, FileMetadataRepository fileRepository) {

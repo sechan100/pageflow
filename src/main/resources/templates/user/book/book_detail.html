@@ -64,22 +64,13 @@
                     <div class="h-3/5 rounded-lg bg-[#f7f7f7] shadow-md bg-blur container">
                         <div>
                             <!-- 홈/정보 메뉴 -->
-                            <ul class="flex justify-center text-xl font-bold mt-1 menu menu-horizontal rounded-box">
+                            <ul class="flex justify-center text-xl font-bold mt-1 menu menu-horizontal rounded border-b border-slate-400">
                                 <li class="mr-14 p-1 rounded-lg ">
-                                    <a href="#" data-tip="Hom" onclick="showTab('tab1')">
+                                    <a href="#" data-tip="Hom">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
                                              viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                   d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
-                                        </svg>
-                                    </a>
-                                </li>
-                                <li class="p-1 rounded-lg ">
-                                    <a href="#" data-tip="Details" onclick="showTab('tab2')">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
-                                             viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                         </svg>
                                     </a>
                                 </li>
@@ -106,17 +97,13 @@
                                 </div>
                             </div>
                         </div>
-                        <!-- 책 챕터 (정보) -->
-                        <div class="flex flex-wrap -m-2 tab-content hidden" id="tab2">
-                            <h1 th:if="${selectedTab == 'tab2'}">정보페이지</h1>
-                        </div>
                     </div>
                     <!-- 책 챕터 끝 -->
                     <!-- 댓글 레이아웃 -->
-                    <div class="h-3/5 flex flex-col relative rounded-lg mt-5 overflow-hidden bg-[#f7f7f7] shadow-md bg-blur">
-                        <div class="h-10 p-2">
-                            <ul class="mb-4 mt-2 border-b-2 ">
-                                <li >
+                    <div class="h-3/5 flex flex-col relative rounded  mt-5 overflow-hidden bg-[#f7f7f7] shadow-md bg-blur">
+                        <div class="h-10">
+                            <ul class="mb-4 mt-2 rounded border-b border-slate-400 shadow-md">
+                                <li class="p-2">
                                     <i class="fa-regular fa-comment"
                                        style="color: #000000; font-size: 1.2em;"></i>
                                     <span id="getCommentCount"></span>
@@ -131,7 +118,7 @@
                                 <form class="flex " onsubmit="commentWrite_submitForm(this); return false;">
                                     <div class="flex-1 px-2 py-1">
                                         <label for="content"></label>
-                                        <input autofocus name="content" id="content" type="text" placeholder="소중한 의견을 남겨주세요"
+                                        <input  name="content" id="content" type="text" placeholder="소중한 의견을 남겨주세요"
                                                class="input input-bordered px-6 w-full rounded-lg" />
                                     </div>
                                     <div class="w-1/5 px-2 py-1">
@@ -388,25 +375,7 @@ function closeModal(commentId) {
 
     </script>
 
-    <!--  홈/ 정보 비동기 이동  -->
-    <script>
-        function showTab(tabId) {
-          var tabContents = document.querySelectorAll(".tab-content");
 
-          var selectedTab = document.getElementById(tabId);
-          if (!selectedTab) {
-              console.error("Tab with id '" + tabId + "' not found.");
-              return;
-          }
-
-          tabContents.forEach(function (content) {
-              content.style.display = "none";
-          });
-
-          selectedTab.style.display = "block";
-      }
-
-    </script>
 
     <!--  좋아요를 누를 시 하트 색 변화  -->
     <script>

@@ -8,120 +8,6 @@ import { useState, useEffect } from 'react';
 import { QueryClient, QueryClientProvider } from 'react-query';
 
 
-// const dummyOutline =         
-// {
-//   id: 1,
-//   author: {
-//     id: 1,
-//     createDate: "생성일",
-//     modifyDate: "수정일",
-//     nickname: "닉네임",
-//     profileImgUrl: "https://phinf.pstatic.net/contact/20230727_252/1690456995185MmBBn_JPEG/image.jpg"
-//     },
-//   title: "책이 로딩중입니다...",
-//   published: false,
-//   coverImgUrl: "/img/unloaded_img.jpg",
-//   chapters: [
-//     {
-//       id: 1, 
-//       title: "챕터1",
-//       sortPriority: 10000,
-//       pages: [
-//         {
-//           id: 1,
-//           title: "페이지1",
-//           sortPriority: 10000
-//         },
-//         {
-//           id: 2,
-//           title: "페이지2",
-//           sortPriority: 20000
-//         },
-//         {
-//           id: 3,
-//           title: "페이지3",
-//           sortPriority: 30000
-//         },
-//         {
-//           id: 4,
-//           title: "페이지4",
-//           sortPriority: 40000
-//         },
-//         {
-//           id: 5,
-//           title: "페이지5",
-//           sortPriority: 50000
-//         }
-//       ]
-//     },
-//     {
-//       id: 2,
-//       title: "챕터2",
-//       sortPriority: 20000,
-//       pages: [
-//         {
-//           id: 6,
-//           title: "페이지6",
-//           sortPriority: 60000
-//         },
-//         {
-//           id: 7,
-//           title: "페이지7",
-//           sortPriority: 70000
-//         },
-//         {
-//           id: 8,
-//           title: "페이지8",
-//           sortPriority: 80000
-//         },
-//         {
-//           id: 9,
-//           title: "페이지9",
-//           sortPriority: 90000
-//         },
-//       ]
-//     },
-//     {
-//       id: 3,
-//       title: "챕터3",
-//       sortPriority: 30000,
-//       pages: [
-//         {
-//           id: 10,
-//           title: "페이지10",
-//           sortPriority: 100000
-//         },
-//         {
-//           id: 11,
-//           title: "페이지11",
-//           sortPriority: 11000
-//         },
-//         {
-//           id: 12,
-//           title: "페이지12",
-//           sortPriority: 12000
-//         },
-//         {
-//           id: 13,
-//           title: "페이지13",
-//           sortPriority: 130000
-//         },
-//         {
-//           id: 14,
-//           title: "페이지14",
-//           sortPriority: 140000
-//         },
-//         {
-//           id: 15,
-//           title: "페이지15",
-//           sortPriority: 150000
-//         },
-//       ]
-//     }
-//   ]
-// }
-
-
 
 function App() {
   const [outline, setOutline] = useState<Outline | null>(null);
@@ -163,12 +49,16 @@ function App() {
   }
 
 
-  const queryClient = new QueryClient({
+  const queryClient = new QueryClient({ 
+    // React Query 라이브러리의 QueryClient를 초기화하고 구성하는 부분
+    // QueryClient는 React Query에서 데이터 페칭, 캐싱, 상태 관리 등을 수행
+    // 애플리케이션에서 데이터를 요청하고 관리할 수 있다.
+
     defaultOptions: {
       queries: {
-        refetchOnMount: false,
-        refetchOnWindowFocus: false,
-        retry: false,
+        refetchOnMount: false, // 기본값 true, 쿼리가 컴포넌트에 마운트될 때 자동으로 데이터를 다시 가져오는지 여부 결정
+        refetchOnWindowFocus: false, // 기본값 true, 브라우저 창이나 탭이 다시 포커스 될 때 데이터를 자동으로 다시 가져올지 여부를 결정
+        retry: false, //데이터 페칭이 실패했을 때, 자동으로 재시도 횟수를 정한다.
         staleTime: 1000 * 60 * 60 // 1시간
       }
     }
@@ -178,7 +68,10 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <Viewer outline={outline}></Viewer>
     </QueryClientProvider>
-  );
+  ); 
+  // QueryClientProvider 내부에 위치한 컴포넌트들은 useQuery, useMutation 등의 훅을 사용해 서버로부터 데이터 요청, 업데이트
+  // queryClient 인스턴스가 제공하는 설정을 기반으로 동작.
+  // Viewer 내부에서 데이터를 페칭하거나 캐시된 데이터를 사용하는 로직 구현 가능.
 }
 
 export default App;

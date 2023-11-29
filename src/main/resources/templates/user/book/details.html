@@ -47,7 +47,7 @@
                                 <div>
                                     <span class="font-semibold mt-8 mr-3" th:text="${outline.author.nickname}"></span>
                                     <a href="#" id="heart" data-filled="false" onclick="togglePreference()">
-                                        <i id="heartIcon" class="fa-regular fa-heart" style="color: #000000;"></i>
+                                        <i id="heartIcon" class="far fa-heart" style="color: #000000;"></i>
                                     </a>
                                 </div>
 <!--                                onclick="toggleHeart('heart')"-->
@@ -138,49 +138,45 @@
     </section>
 
     <script>
-        var isLiked = false;
-
+    // 좋아요 / 좋아요 취소
         function togglePreference() {
-          var bookId = [[${outline.id}]];
+            var bookId = [[${outline.id}]];
+            var isLiked = $('#heart').data('filled');
 
-          $.ajax({
-            type: 'POST',
-            url: '/api/books/' + bookId + '/preferences',
-            data: { isLiked: !isLiked },
-            success: function (data) {
-              updateUI(!isLiked);
-            },
-            error: function (xhr, status, error) {
-              console.error('처리 중 에러가 발생');
-            }
-          });
+            $.ajax({
+                type: isLiked ? 'DELETE' : 'POST',
+                url: '/api/books/' + bookId + '/preferences',
+                data: { isLiked: isLiked },
+                success: function(data) {
+                    if (isLiked) {
+                        $('#heartIcon').removeClass('fas').addClass('far').css('color', '#000000');
+                        $('#heart').data('filled', false);
+                        console.log('좋아요 취소');
+                    } else {
+                        $('#heartIcon').removeClass('far').addClass('fas').css('color', 'red');
+                        $('#heart').data('filled', true);
+                        console.log('좋아요');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('처리 중 에러가 발생');
+                }
+            });
         }
 
-        function updateUI(newIsLiked) {
-          isLiked = newIsLiked;
-          var heartIcon = $('#heartIcon');
-          var heart = $('#heart');
+        // 페이지 로드 시 초기 설정
+        $(document).ready(function() {
+            var bookId = 1; // Replace with your actual bookId
 
-          if (isLiked) {
-            heartIcon.removeClass('fa-regular').addClass('fa-solid').css('color', 'red');
-            heart.data('filled', true);
-            console.log('좋아요');
-          } else {
-            heartIcon.removeClass('fa-solid').addClass('fa-regular').css('color', '#000000');
-            heart.data('filled', false);
-            console.log('좋아요 취소');
-          }
-        }
-
-        $(document).ready(function () {
-          var bookId = [[${outline.id}]];
-
-          $.get('/api/books/' + bookId + '/preferences', function (data) {
-            // 서버에서 좋아요 상태를 받아와서 UI 초기화
-            updateUI(data.isLiked);
-          });
+            $.get('/api/books/' + bookId + '/preferences', function(data) {
+                if (data.isLiked) {
+                    $('#heartIcon').removeClass('far').addClass('fas').css('color', 'red');
+                    $('#heart').data('filled', true);
+                }
+            });
         });
     </script>
+
     <!--  댓글 관련 js  -->
 <!--    <script>-->
 <!--        let commentWrite_submitFormDone = false;-->

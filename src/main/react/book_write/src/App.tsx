@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import './App.css';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { useState } from 'react';
@@ -22,8 +23,8 @@ export const QueryContext = React.createContext({queryClient, bookId: 0});
 
 function App() {
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [bookId, setBookId] : [number, any] = useState(2);
+  // @ts-ignore
+  const [bookId, setBookId] : [number, any] = useState(window.APP_BOOK_ID);
 
 
   return (

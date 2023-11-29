@@ -3,15 +3,16 @@ package org.pageflow.domain.book.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.pageflow.base.annotation.SecuredBookId;
 import org.pageflow.base.request.Rq;
 import org.pageflow.domain.book.entity.Book;
 import org.pageflow.domain.book.entity.Chapter;
 import org.pageflow.domain.book.entity.Page;
-import org.pageflow.domain.book.model.summary.Outline;
 import org.pageflow.domain.book.model.request.BookUpdateRequest;
 import org.pageflow.domain.book.model.request.ChapterUpdateRequest;
 import org.pageflow.domain.book.model.request.OutlineUpdateRequest;
 import org.pageflow.domain.book.model.request.PageUpdateRequest;
+import org.pageflow.domain.book.model.summary.Outline;
 import org.pageflow.domain.book.service.BookService;
 import org.pageflow.domain.book.service.BookWriteService;
 import org.pageflow.domain.user.service.AccountService;
@@ -55,7 +56,7 @@ public class ApiBookWriteController {
      */
     @PutMapping("/api/books/{bookId}/outline")
     public Outline updateOutline(
-            @PathVariable("bookId") Long bookId,
+            @SecuredBookId @PathVariable("bookId") Long bookId,
             @Valid @RequestBody OutlineUpdateRequest outlineUpdateRequest
     ) {
         outlineUpdateRequest.setId(bookId);
@@ -82,8 +83,8 @@ public class ApiBookWriteController {
      */
     @PutMapping("/api/books/{bookId}")
     public Map<String, String> updateBook(
-            @PathVariable("bookId") Long bookId,
-            @Valid @ModelAttribute BookUpdateRequest updateRequest
+            @SecuredBookId @PathVariable("bookId") Long bookId,
+            @ModelAttribute BookUpdateRequest updateRequest
     ) {
         
         if(updateRequest.getId() == null){
@@ -100,22 +101,26 @@ public class ApiBookWriteController {
         
     }
     
+    
     /**
      * 새로운 Chapter를 생성하여 반환
      * @param bookId 책 아이디
      * @return 새로 생성된 Chapter
      */
     @PostMapping("/api/books/{bookId}/chapters")
-    public Chapter createChapter(@PathVariable("bookId") Long bookId) {
-        Book ownerBook = bookService.repoFindBookById(bookId);
-        return bookWriteService.createBlankChapter(ownerBook);
+    public Chapter createChapter(@SecuredBookId @PathVariable("bookId") Long bookId) {
+            return bookWriteService.createBlankChapter(bookId);
     }
+    
     
     /**
      * 챕터 정보 업데이트
      */
     @PutMapping("/api/books/{bookId}/chapters")
-    public List<Map<String, String>> updateChapters(@Valid @RequestBody List<ChapterUpdateRequest> updateRequests) {
+    public List<Map<String, String>> updateChapters(
+            @SecuredBookId @PathVariable("bookId") Long bookId,
+            @Valid @RequestBody List<ChapterUpdateRequest> updateRequests
+    ) {
 
         List<Chapter> updatedChapters = bookWriteService.updateChapters(updateRequests);
         
@@ -132,7 +137,7 @@ public class ApiBookWriteController {
      */
     @PostMapping("/api/books/{bookId}/chapters/{chapterId}/pages")
     public Page createPage(
-            @PathVariable("bookId") Long bookId,
+            @SecuredBookId @PathVariable("bookId") Long bookId,
             @PathVariable("chapterId") Long chapterId)
     {
         Chapter ownerChapter = bookService.repoFindChapterById(chapterId);
@@ -146,7 +151,7 @@ public class ApiBookWriteController {
      */
     @GetMapping("/api/books/{bookId}/chapters/pages/{pageId}")
     public Page readPage(
-            @PathVariable("bookId") Long bookId,
+            @SecuredBookId @PathVariable("bookId") Long bookId,
             @PathVariable("pageId") Long pageId
     ) {
         return bookService.repoFindPageById(pageId);
@@ -157,7 +162,7 @@ public class ApiBookWriteController {
      */
     @PutMapping("/api/books/{bookId}/chapters/pages")
     public List<Page> updatePage(
-            @PathVariable("bookId") Long bookId,
+            @SecuredBookId @PathVariable("bookId") Long bookId,
             @Valid @RequestBody List<PageUpdateRequest> updateRequests
     ) {
         return bookWriteService.updatePages(updateRequests);
@@ -167,7 +172,7 @@ public class ApiBookWriteController {
     @PostMapping("/api/books/{bookId}/chapters/pages/{pageId}/img")
     public String uploadPageImg(
             @ModelAttribute MultipartFile imgFile,
-            @PathVariable("bookId") Long bookId,
+            @SecuredBookId @PathVariable("bookId") Long bookId,
             @PathVariable("pageId") Long pageId
     ) {
         if(imgFile == null){

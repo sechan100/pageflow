@@ -1,7 +1,7 @@
 <html lang="en" layout:decorate="~{/common/layout.html}" xmlns:th="http://www.w3.org/1999/xhtml">
 
 <head>
-    <title>Books</title>
+    <title>책 목록</title>
 
 <!--  select 정렬순 스타일  -->
     <style>
@@ -179,7 +179,6 @@
             function appendBooksToDOM(data) {
               const bookContainer = document.querySelector('.grid.grid-cols-4.gap-4');
               const fragment = document.createDocumentFragment();
-
               data.forEach(book => {
                 // 각 책에 대한 HTML 요소를 생성하고 컨테이너에 추가
                 const bookElement = createBookElement(book);

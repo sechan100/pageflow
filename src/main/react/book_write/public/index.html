@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -56,6 +56,19 @@
       }, 500);
     }
   }
+
+
+  // bookId 최초 세팅
+  const url = window.location.href;
+  // /write/ 와 / 사이에 있는 정수
+  const match = url.match(/\/write\/([0-9]+)\/?/);
+
+  if (match) {
+    window.APP_BOOK_ID = match[1];
+  } else {
+    window.APP_BOOK_ID = null;
+  }
+
 </script>
 </body>
 </html>

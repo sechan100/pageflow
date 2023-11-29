@@ -49,9 +49,9 @@ public class PreferenceService {
     
     
     // [UPDATE] like 또는 dislike로 변경
-    public Preference togglePreferenceIsLiked(InteractionPair pair) {
+    public Preference updatePreferenceIsLiked(InteractionPair pair, boolean isLiked) {
         Preference preference = preferenceRepository.findByInteractorAndTargetTypeAndTargetId(pair.getInteractor(), pair.getTargetType(), pair.getTargetId());
-        preference.setLiked(!preference.isLiked());
+        preference.setLiked(isLiked);
         return preferenceRepository.save(preference);
     }
     
@@ -69,5 +69,15 @@ public class PreferenceService {
     // [DELETE]
     public void deletePreference(InteractionPair pair) {
         preferenceRepository.deleteByInteractorAndTargetTypeAndTargetId(pair.getInteractor(), pair.getTargetType(), pair.getTargetId());
+    }
+    
+    
+    /**
+     * [READ]
+     * @param pair: 상호작용 쌍
+     * @return 해당 상호작용 쌍을 이어주는 Preference 상호작용 객체가 존재한다면 반환, 없다면 null 반환
+     */
+    public Preference findPreferenceOrElseNull(InteractionPair pair) {
+        return preferenceRepository.findByInteractorAndTargetTypeAndTargetId(pair.getInteractor(), pair.getTargetType(), pair.getTargetId());
     }
 }

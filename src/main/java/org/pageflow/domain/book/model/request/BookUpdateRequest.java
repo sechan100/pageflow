@@ -1,6 +1,5 @@
 package org.pageflow.domain.book.model.request;
 
-import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -9,10 +8,9 @@ import org.springframework.web.multipart.MultipartFile;
  */
 @Data
 public class BookUpdateRequest {
-
+    
     private Long id;
-
-    @NotEmpty
+    
     private String title;
 
     private MultipartFile coverImg;

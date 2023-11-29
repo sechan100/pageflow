@@ -14,7 +14,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Interactions {
+public class InteractionsOfTarget {
     
     // 댓글들
     private List<CommentWithPreference> comments;

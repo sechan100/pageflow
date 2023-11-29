@@ -7,6 +7,7 @@ import { useParams } from "react-router-dom";
 import { useGetPageQuery } from "../../../../api/page-api";
 import QuillEditor, { useQuillFocusStore } from "./QuillEditor";
 import PageViewer from "./viewerComponents/PageViewer";
+import _ from "lodash";
 
 interface PageMutationStore {
   payload: PageMutation[];
@@ -111,7 +112,14 @@ export default function PageForm(){
       }
 
       if(localPage.content !== page.content){
-        pageStore.dispatchs.updatePage(currentPageMutation);
+        const updateContentDebounce = _.debounce(() => {
+          pageStore.dispatchs.updatePage(currentPageMutation);
+        }, 300);
+        updateContentDebounce();
+
+        return () => {
+          updateContentDebounce.cancel();
+        }
       }
     }
   }, [localPage]);

@@ -18,8 +18,8 @@ spring:
     port: 6379
 
   datasource:
-    username: root
-    password:
+    username: sbsst
+    password: sbs123414
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/pageflow
 
@@ -76,6 +76,6 @@ custom:
   files:
     img:
       base-url: /files/img
-#      directory: C:/Users/SBS/local/uploads/img
+      directory: C:/Users/SBS/local/uploads/img
 #      directory: C:/Users/gsw05/local/uploads/img
-      directory: /Users/sechan/local/uploads/img
+#      directory: /Users/sechan/local/uploads/img

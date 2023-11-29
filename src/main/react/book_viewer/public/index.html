@@ -24,7 +24,7 @@
       work correctly both with client-side routing and a non-root public URL.
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
-    <title>React App</title>
+    <title>viewer</title>
       <!--  tailwind  -->
   <script src="https://cdn.tailwindcss.com"></script>
 
@@ -44,5 +44,17 @@
       To begin the development, run `npm start` or `yarn start`.
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
+    <script>
+      // bookId 최초 세팅
+      const url = window.location.href;
+      // /viewer/ 와 / 사이에 있는 정수
+      const match = url.match(/\/viewer\/([0-9]+)\/?/);
+
+      if (match) {
+        window.APP_BOOK_ID = match[1];
+      } else {
+        window.APP_BOOK_ID = null;
+      }
+    </script>
   </body>
 </html>

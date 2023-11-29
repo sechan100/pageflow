@@ -47,7 +47,7 @@ export default function Navbar({outline} : NavbarProps) {
 
   return (<>
       { isVisible &&
-        <div className="text-center fixed w-full bg-gray-100">
+        <div className="text-center fixed w-full bg-gray-100 select-none">
           <span>챕터: {getChapterTitle(outline, location.chapterIdx)}</span> 
           <br />
           <span>페이지: {getPageTitle(outline, location) + `(${absolutePage + 1}/${totalPage()})`}</span>

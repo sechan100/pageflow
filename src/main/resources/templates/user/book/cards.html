@@ -179,7 +179,6 @@
             function appendBooksToDOM(data) {
               const bookContainer = document.querySelector('.grid.grid-cols-4.gap-4');
               const fragment = document.createDocumentFragment();
-
               data.forEach(book => {
                 // 각 책에 대한 HTML 요소를 생성하고 컨테이너에 추가
                 const bookElement = createBookElement(book);

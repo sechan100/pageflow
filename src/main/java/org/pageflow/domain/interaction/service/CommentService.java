@@ -31,13 +31,15 @@ public class CommentService {
                 .targetId(pair.getTargetId())
                 .build();
         
-        return commentRepository.save(comment);
+        Comment persistedComment = commentRepository.save(comment);
+        persistedComment.postLoadSetPair();
+        return persistedComment;
     }
     
     
     // [UPDATE]
     public Comment updateComment(Long commentId, String content) {
-        Comment comment = commentRepository.findById(commentId).orElseThrow();
+        Comment comment = commentRepository.findWithInteractorById(commentId);
         comment.setContent(content);
         return comment;
     }
@@ -66,7 +68,7 @@ public class CommentService {
     
     // [DELETE]
     public void deleteComment(Long commentId) {
-        Comment commentToDelete = commentRepository.findById(commentId).orElseThrow();
+        Comment commentToDelete = commentRepository.findWithInteractorById(commentId);
         // 댓글을 삭제한다.
         commentRepository.delete(commentToDelete);
         // 댓글을 참조하는 모든 preference들을 삭제한다.

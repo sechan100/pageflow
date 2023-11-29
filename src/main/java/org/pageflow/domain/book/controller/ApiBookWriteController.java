@@ -7,7 +7,7 @@ import org.pageflow.base.request.Rq;
 import org.pageflow.domain.book.entity.Book;
 import org.pageflow.domain.book.entity.Chapter;
 import org.pageflow.domain.book.entity.Page;
-import org.pageflow.domain.book.model.outline.Outline;
+import org.pageflow.domain.book.model.summary.Outline;
 import org.pageflow.domain.book.model.request.BookUpdateRequest;
 import org.pageflow.domain.book.model.request.ChapterUpdateRequest;
 import org.pageflow.domain.book.model.request.OutlineUpdateRequest;

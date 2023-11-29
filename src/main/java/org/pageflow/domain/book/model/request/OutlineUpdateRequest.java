@@ -2,7 +2,7 @@ package org.pageflow.domain.book.model.request;
 
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
-import org.pageflow.domain.book.model.outline.ChapterSummary;
+import org.pageflow.domain.book.model.summary.ChapterSummary;
 
 import java.util.List;
 

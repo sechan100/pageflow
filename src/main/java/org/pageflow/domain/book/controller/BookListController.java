@@ -1,7 +1,7 @@
 package org.pageflow.domain.book.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.pageflow.domain.book.entity.Book;
+import org.pageflow.domain.book.model.summary.BookSummary;
 import org.pageflow.domain.book.service.BookService;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Controller;
@@ -22,7 +22,7 @@ public class BookListController {
     public String list(Model model, @RequestParam(value = "page", defaultValue = "0") int page,
                        @RequestParam(value = "kw", defaultValue = "") String kw,
                        @RequestParam(value = "sort", defaultValue = "createdDate") String sortOption) {
-        Slice<Book> paging = this.bookService.getList(page, kw, sortOption);
+        Slice<BookSummary> paging = this.bookService.getList(page, kw, sortOption);
         model.addAttribute("paging",paging);
         model.addAttribute("kw", kw);
         model.addAttribute("sort", sortOption);
@@ -31,10 +31,10 @@ public class BookListController {
 
     @GetMapping("/api/books/list")
     @ResponseBody
-    public List<Book> getBooksApi(@RequestParam(value = "page", defaultValue = "0") int page,
+    public List<BookSummary> getBooksApi(@RequestParam(value = "page", defaultValue = "0") int page,
                                   @RequestParam(value = "kw", defaultValue = "") String kw,
                                   @RequestParam(value = "sortOption", defaultValue = "createdDate") String sortOption) {
-        Slice<Book> paging = this.bookService.getList(page, kw, sortOption);
+        Slice<BookSummary> paging = this.bookService.getList(page, kw, sortOption);
         return paging.getContent();
     }
 }

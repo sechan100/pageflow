@@ -2,6 +2,7 @@ package org.pageflow.domain.user.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.DynamicUpdate;
 import org.pageflow.base.entity.BaseEntity;
 
 @Entity
@@ -11,6 +12,7 @@ import org.pageflow.base.entity.BaseEntity;
 @AllArgsConstructor
 @ToString(callSuper = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@DynamicUpdate
 public class Account extends BaseEntity {
 
     private String provider;

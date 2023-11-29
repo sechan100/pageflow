@@ -1,7 +1,7 @@
-<html lang="en" layout:decorate="~{/common/layout.html}" xmlns:th="http://www.w3.org/1999/xhtml" xmlns:layout="">
+<html lang="en" layout:decorate="~{/common/layout.html}" xmlns:th="http://www.w3.org/1999/xhtml">
 
 <head>
-    <title>Book</title>
+    <title>책 목록</title>
 
 <!--  select 정렬순 스타일  -->
     <style>
@@ -37,7 +37,7 @@
 <main layout:fragment="main">
 
     <div class="flex flex-col w-full">
-        <div class="relative h-[500px] flex items-center justify-center ">
+        <div class="relative h-[35vh] flex items-center justify-center ">
             <!-- 상단 이미지 -->
             <div class="absolute inset-0 overflow-hidden drop-shadow-2xl shadow-2xl">
                 <img src="https://img1.daumcdn.net/thumb/R1280x0/?fname=http://t1.daumcdn.net/brunch/service/user/9kE1/image/k3uEfFMvJOS81qkiAml4EMnsVzs.jpg"
@@ -45,38 +45,29 @@
             </div>
 
             <!-- 상단 이미지 글귀 -->
-            <div class="absolute  bottom-10  left-10 text-white text-left z-10 ">
+            <div class="absolute bottom-10  left-10 text-white text-left z-10 ">
                 <h1 class="text-5xl font-black  mb-8">PageFlow </h1>
                 <p class="text-3xl font-bold">Dive into a world of diverse stories and authors right now!</p>
             </div>
         </div>
-<!-- 리스트 -->
-        <div class="w-full mx-auto max-w-screen-xl sm:px-6 sm:py-24  ">
-            <div class="flex justify-between mb-16 w-full  ">
+        <!-- 리스트 -->
+        <div class="w-full mx-auto max-w-[90%] sm:px-6 sm:py-24 ">
+            <div class="flex justify-between mb-12 w-full  ">
             <div class="flex grow">
-                <!--  책 등록  -->
-                <div class="max-w-md mr-4  border-2 p-3 border-gray-400 rounded font-semibold text-sm text-gray-600 relative text-center active:top-[3px]">
-                    <div class="w-full h-full">
-                        <a th:href="@{/book/write}">
-                            책 등록
-                        </a>
-                    </div>
-                </div>
                 <!--  정렬순  -->
                 <div class="max-w-md mr-4 w-1/5 z-10  border-2 p-3 border-gray-400 rounded font-semibold text-sm text-gray-600 relative text-center active:top-[3px]">
-                    <button id="sortOption" name="sort" th:value="${sort}" data-sort="${sort}"
-                            class="btn-select w-full cursor-pointer  overflow-hidden">
+                    <button id="sortOption" name="sort" th:value="${sort}" data-sort="${sort}" class="btn-select w-full cursor-pointer  overflow-hidden" onclick="toggleSortOptions()">
                         정렬순
                     </button>
-                    <ul class="list-member list-none hidden absolute w-full rounded font-medium text-black text-sm  top-16 left-0">
+                    <ul id="sortOptions" class="list-member list-none hidden absolute w-full rounded font-medium text-black text-sm top-16 left-0">
                         <li>
-                            <button value="createDate" type="button" onclick="updateSort('createDate')">작성 날짜</button>
+                            <button value="createdDate" type="button" onclick="updateSort('createdDate')">작성 날짜</button>
                         </li>
                         <li>
                             <button value="title" type="button" onclick="updateSort('title')">제목</button>
                         </li>
                         <li>
-                            <button type="button" onclick="updateSort('recommend')">추천</button>
+                            <button value="recommend" type="button" onclick="updateSort('recommend')">추천</button>
                         </li>
                     </ul>
                 </div>
@@ -94,162 +85,220 @@
             <!--  검색 끝  -->
         </div>
             <!-- 리스트 -->
-            <div style="min-height: 100vh ;">
-                <div class="grid grid-cols-4 gap-x-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 xl:gap-x-8  " >
-                    <div th:each="book : ${paging}" class="h-4/5">
-                        <div class="h-full w-full shadow-lg">
-                            <a th:href="@{|/book/detail/${book.id}|}"
-                               class="relative font-bold text-md text-center text-white">
-                                <div class="h-full w-full overflow-hidden bg-cover bg-center">
-                                    <img th:src="@{${book.coverImgUrl}}" alt="Book Image"
-                                         class="h-full w-full group-hover:opacity-75  ">
-                                </div>
-                                <h1 th:text="${book.title}" class="absolute inset-x-0 top-0 mt-4 "></h1>
-                            </a>
-                        </div>
+            <div style="min-height: 100vh ;" >
+                <div class="grid grid-colss-4 gap-x-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 xl:gap-x-8 " >
+                    <div th:each="book : ${paging}" class="mb-10 max-h-96">
+                       <div class="h-full shadow-lg transition-transform duration-300 transform hover:-translate-y-3 ">
+                           <div class="w-full h-full ">
+                               <a th:href="@{|/books/${book.id}/details|}">
+                                   <div class="flex flex-col h-full">
+                                       <div class="h-4/6 w-full overflow-hidden bg-cover bg-center">
+                                           <img th:src="@{${book.coverImgUrl}}" alt="Book Image" class="w-full ">
+                                       </div>
+                                       <div class="h-24 overflow-hidden overflow-ellipsis border-b  border-slate-300 relative">
+                                           <h1 th:text="${book.title}" class="px-5 py-3 font-extrabold "></h1>
+                                           <p th:text="${#temporals.format(book.createdDate, 'yyyy년 MM월 dd일')}" class="px-5 py-2 absolute bottom-0 font-medium text-xs text-gray-500"></p>
+                                       </div>
+                                   </div>
+                               </a>
+                           </div>
+                       </div>
                     </div>
                 </div>
             </div>
 
-            <form th:action="@{/book}" method="get" id="searchForm">
+            <form th:action="@{/books}" method="get" id="searchForm">
             <input type="hidden" id="kw" name="kw" th:value="${kw}">
             <input type="hidden" id="page" name="page" th:value="${paging.number}">
             <input type="hidden" id="sort" name="sort" th:value="${sort}">
         </form>
     </div>
-    <script type='text/javascript'>
-        const btn = document.querySelector(".btn-select");
-const list = document.querySelector(".list-member");
-btn.addEventListener("click", () => {
-btn.classList.toggle("on");
-});
-list.addEventListener("click", (event) => {
-if (event.target.nodeName === "BUTTON") {
-btn.innerText = event.target.innerText;
-btn.classList.remove("on");
-}
-});
 
-    </script>
-    <script type='text/javascript'>
-        let currentPage = 0;
-          let isLoading = false;
-          let reachedEnd = false;
+        <script type='text/javascript'>
+            // 현재 페이지, 로딩 상태 및 컨텐츠 끝 도달 여부를 추적하는 변수
+            let currentPage = 0;
+            let isLoading = false;
+            let reachedEnd = false;
 
-  window.addEventListener('scroll', function() {
-    console.log('Scroll event triggered');
-      if (isLoading || reachedEnd) return;
+            // 스크롤 이벤트에 대한 리스너
+            window.addEventListener('scroll', handleScroll);
 
-      if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
-        console.log('Reached bottom');  // 이 로그를 통해 페이지 하단 도달 확인
-          isLoading = true;
-          currentPage++;
-          fetchMoreBooks(currentPage);
-      }
-  });
+            // 스크롤 이벤트 처리 함수
+            function handleScroll() {
+              console.log('Scroll event triggered');
 
-  function fetchMoreBooks(page) {
-       fetch(`/api/book/list?page=${page}&kw=${document.getElementById('search_kw').value}&sort=${document.getElementById('sortOption').value}`)
-          .then(response => {
-              console.log('Server Response:', response); // 서버 응답 로깅
+              // 로딩 중이거나 컨텐츠 끝에 도달했는지 확인
+              if (isLoading || reachedEnd) return;
 
-              return response.json();
-          })
-          .then(data => {
-              console.log('Data:', data); // 데이터 형식 로깅
-              isLoading = false;
-              if (Array.isArray(data)) {
-                  if (data.length === 0) {
+              // 사용자가 페이지 하단으로 스크롤했는지 확인
+              if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
+                console.log('Reached bottom');
+                isLoading = true;
+                currentPage++;
+
+                // fetchMoreBooks 함수 호출하여 더 많은 책을 로드
+                fetchMoreBooks(currentPage);
+              }
+            }
+
+            // 서버에서 더 많은 책을 가져오기 위한 함수
+            function fetchMoreBooks(page) {
+              const search_kw = document.getElementById('search_kw').value;
+              const sortOption = document.getElementById('sortOption').value;
+
+              fetch(`/api/books/list?page=${page}&kw=${search_kw}&sort=${sortOption}`)
+                .then(response => {
+                  console.log('Server Response:', response);
+                  return response.json();
+                })
+                .then(data => {
+                  console.log('Data:', data);
+                  isLoading = false;
+
+                  // 받은 데이터가 배열인지 확인
+                  if (Array.isArray(data)) {
+                    if (data.length === 0) {
+                      // 더 이상의 책이 없으면 reachedEnd를 true로 설정
                       reachedEnd = true;
                       return;
+                    }
+                    // 새로운 책을 DOM에 추가
+                    appendBooksToDOM(data);
+                  } else {
+                    console.error('Received data is not an array.');
                   }
-                  appendBooksToDOM(data);
-              } else {
-                  console.error('Received data is not an array.');
-              }
-          })
-          .catch(error => {
-              console.error('Fetch Error:', error); // 에러 로깅
-          });
-  }
+                })
+                .catch(error => {
+                  console.error('Fetch Error:', error);
+                });
+            }
 
-  function appendBooksToDOM(data) {
-      const bookContainer = document.querySelector('.grid.grid-cols-4.gap-4');
-      data.forEach(book => {
-          const bookElement = `
-                    <div class="card border rounded p-4">
-                <a href="/book/detail/${book.id}">
-                    <img src="${book.coverImgUrl}" alt="Book Image">
-                    <h2>${book.title}</h2>
+            // DOM에 책을 추가하는 함수
+            function appendBooksToDOM(data) {
+              const bookContainer = document.querySelector('.grid.grid-cols-4.gap-4');
+              const fragment = document.createDocumentFragment();
+              data.forEach(book => {
+                // 각 책에 대한 HTML 요소를 생성하고 컨테이너에 추가
+                const bookElement = createBookElement(book);
+                fragment.appendChild(bookElement);
+              });
+
+              bookContainer.appendChild(fragment);
+            }
+
+            // 책 요소를 생성하는 함수
+            function createBookElement(book) {
+              const div = document.createElement('div');
+              div.classList.add('card', 'border', 'rounded', 'p-4');
+              div.innerHTML = `
+                <a href="/books/detail/${book.id}">
+                  <img src="${book.coverImgUrl}" alt="Book Image">
+                  <h2>${book.title}</h2>
                 </a>
-<!--                <a href="javascript:void(0);" class="recommend btn btn-sm btn-outline-secondary">-->
-<!--                    추천-->
-<!--                    <span class="badge rounded-pill bg-success">${book.voters.length}</span>-->
-<!--                </a>-->
                 <p>${book.author.nickname}</p>
-                <p>${book.createDate}</p>
-            </div>
-          `;
-          bookContainer.innerHTML += bookElement;
-      });
-  }
+                <p>${book.createdDate}</p>
+              `;
+              return div;
+            }
 
-  const btn_search = document.getElementById("btn_search");
-  btn_search.addEventListener('click', function() {
-      document.getElementById('kw').value = document.getElementById('search_kw').value;
-      document.getElementById('page').value = 0;  // 검색버튼을 클릭할 경우 0페이지부터 조회한다.
-      document.getElementById('searchForm').submit();
-  });
+            // 검색 버튼에 대한 이벤트 리스너
+            const btn_search = document.getElementById('btn_search');
+            btn_search.addEventListener('click', function() {
+              // 검색어 및 페이지 초기화 후 검색 폼 제출
+              updateSearchParameters();
+            });
 
-          const recommend_elements = document.getElementsByClassName("recommend");
-           Array.from(recommend_elements).forEach(function(element) {
-               element.addEventListener('click', function() {
-                   if(confirm("정말로 추천하시겠습니까?")) {
-                       location.href = this.dataset.uri;
-                   };
-               });
-           });
+            // 검색어 및 페이지를 초기화하는 함수
+            function updateSearchParameters() {
+              document.getElementById('kw').value = document.getElementById('search_kw').value;
+              document.getElementById('page').value = 0;
+              document.getElementById('searchForm').submit();
+            }
 
-           const sortOption = document.getElementById("sortOption");
-sortOption.addEventListener('change', function() {
-    const selectedOption = this.value;
-    document.getElementById('sort').value = selectedOption; // Hidden input에 sort 값 설정
-    console.log('작동중?');
-    document.getElementById('searchForm').submit();  // 폼 제출
-    console.error('dd');
-});
+            // 버튼 및 리스트에 대한 이벤트 리스너
+            const btn = document.querySelector(".btn-select");
+            const list = document.querySelector(".list-member");
+            btn.addEventListener("click", () => {
+              btn.classList.toggle("on");
+            });
+            list.addEventListener("click", (event) => {
+              if (event.target.nodeName === "BUTTON") {
+                btn.innerText = event.target.innerText;
+                btn.classList.remove("on");
+              }
+            });
 
-   const sortOptionButton = document.getElementById("sortOption");
-    const searchForm = document.getElementById('searchForm');
+            // 정렬 옵션 버튼과 드롭다운 관련 요소들
+            const sortOptionButton = document.getElementById('sortOption');
+            const sortOptions = document.getElementById('sortOptions');
+            const sortOption = document.getElementById('sortOption'); // 추가
+            const currentSortOption = sortOption.value; // 변경
 
-    function updateSort(newSort) {
-        // Hidden input에 정렬값 설정
-        document.getElementById('sort').value = newSort;
+            // 정렬 옵션 드롭다운 가시성 전환 함수
+            function toggleSortOptions() {
+              sortOptions.classList.toggle('hidden');
+            }
 
-        // 버튼에 텍스트 업데이트
-        sortOptionButton.innerText = getButtonText(newSort);
+            // 정렬 값을 업데이트하고 검색 폼을 제출하는 함수
+            function updateSort(newSort) {
+              document.getElementById('sort').value = newSort;
+              sortOptionButton.innerText = getButtonText(newSort);
+              searchForm.submit();
+            }
 
-        // 폼 제출
-        searchForm.submit();
-    }
+            // 초기 로딩 시 저장된 정렬 옵션으로 버튼 텍스트 설정
+            sortOptionButton.innerText = getButtonText(currentSortOption);
 
-    // 정렬값에 따라 버튼 텍스트를 반환하는 함수
-    function getButtonText(sortOption) {
-        switch (sortOption) {
-            case 'createDate':
+            // 정렬 옵션 드롭다운 이외의 부분을 클릭하면 드롭다운을 숨깁니다.
+            document.addEventListener('click', function (event) {
+              const isClickInside = sortOptionButton.contains(event.target) || sortOptions.contains(event.target);
+              if (!isClickInside) {
+                sortOptions.classList.add('hidden');
+              }
+            });
+
+            // 정렬 옵션 드롭다운 버튼 클릭 시 드롭다운 상태 변경
+            sortOptionButton.addEventListener('click', function () {
+              toggleSortOptions();
+            });
+
+            // 정렬 옵션 변경 시 버튼 텍스트 업데이트 및 폼 제출
+            sortOption.addEventListener('change', function () {
+              updateSortOption();
+            });
+
+            // 정렬 옵션을 업데이트하고 검색 폼을 제출하는 함수
+            function updateSortOption() {
+              const selectedOption = sortOption.value;
+              document.getElementById('sort').value = selectedOption;
+
+              // 스크롤 위치를 저장
+              const scrollY = window.scrollY;
+
+              // 폼 제출
+              document.getElementById('searchForm').submit();
+
+              // 페이지가 로드된 후 스크롤 위치를 복원
+              window.scrollTo(0, scrollY);
+            }
+
+            // 정렬 값에 따라 버튼 텍스트를 반환하는 함수
+          function getButtonText(sortOption) {
+            switch (sortOption) {
+              case 'createdDate':
+                console.log('실행');
                 return '작성 날짜';
-            case 'title':
+              case 'title':
+                console.log('실행22');
                 return '제목';
-            case 'recommend':
+              case 'recommend':
                 return '추천';
-            default:
+              default:
                 return '정렬순';
-        }
-    }
-    </script>
-
+            }
+          }
+        </script>
 
     </div>
-
 </main>
 </html>

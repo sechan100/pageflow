@@ -57,7 +57,7 @@ export const useGetOutlineQuery = (bookId : number) : Outline => {
 // useGetOutline 내부적으로 호출하는 axios api
 const getOutlineById = async (id : number) => {
 
-  const response = await axios.get(`/api/book/${id}/outline`);
+  const response = await axios.get(`/api/books/${id}/outline`);
 
   if(response && response.status === 200 && response.data){
     console.log("====[ Success to Fetching Outline ]====", response.data);
@@ -75,7 +75,7 @@ export const useOutlineMutation = (bookId : number) : UseOutlineMutationReturn =
     const {queryClient} = useContext(QueryContext);
   
     const { mutateAsync, isLoading, isError } = useMutation(
-      (outlineUpdateBody : OutlineMutation) => axios.put(`/api/book/${bookId}/outline`, outlineUpdateBody),
+      (outlineUpdateBody : OutlineMutation) => axios.put(`/api/books/${bookId}/outline`, outlineUpdateBody),
       {
         onSuccess: () => {
           queryClient.invalidateQueries(['book', bookId]);

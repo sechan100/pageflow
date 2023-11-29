@@ -1,62 +1,148 @@
 <html lang="en" layout:decorate="~{/common/layout.html}">
 <head>
-  <title>signup</title>
+  <title>회원가입(2/2)</title>
+  <style>
+    header {
+      display: none;
+    }
+  </style>
 </head>
 <main layout:fragment="main">
 
-  <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
-    <div class="w-full bg-white rounded-lg shadow md:mt-0 sm:max-w-md xl:p-0 flex flex-col items-center justify-center">
+  <div class="m-4 flex gap-4">
+    <!--    회원가입 레이아웃    -->
+    <div class="w-full lg:w-3/5 flex">
+      <div class="w-full flex-col  ">
+        <div class="w-full md:mt-0 sm:max-w-md xl:p-0 flex flex-col items-center justify-center mx-auto  ">
+          <div class="w-full  ">
+            <!--로고 및 문구-->
+            <ul class="flex flex-col items-center py-8 text-4xl	font-bold">
+              <li class="">
+                <a href="/register" class="">
+                  <span class="text-center">Join PageFlow now</span>
+                </a>
+              </li>
+            </ul>
 
-      <!--로고 및 문구-->
-      <a href="#" class="mb-6 text-2xl font-semibold text-gray-900 pt-8">
-        <img class="mr-2" th:src="@{/img/ssegTextLogo.png}" alt="logo" src="">
-        <br>
-        <span>Register in SSEG</span>
-      </a>
 
+            <div class="p-2 w-full  ">
 
-      <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
+              <div class="text-sm text-center text-gray-900 md:text-md font-bold text-gray-900 md:text-md ">
+                <span >
+                    계정 세부정보를 입력하고 회원가입을 완료해주세요.
+                </span>
+              </div>
+              <form id="registerForm" th:action="@{/signup}" enctype="multipart/form-data" th:object="${registerForm}" method="post" class="space-y-4 md:space-y-6">
 
-        <span class="text-md font-bold leading-tight tracking-tight text-gray-900 md:text-md">
-            계정 세부정보를 입력하고 회원가입을 완료해주세요.
-        </span>
+                <!-- 소셜 로그인 타입 & username & password -->
+                <input type="hidden" th:field="*{provider}" />
+                <input type="hidden" th:field="*{username}" />
+                <input type="hidden" th:field="*{password}" />
 
-        <form id="registerForm" th:action="@{/signup}" enctype="multipart/form-data" th:object="${registerForm}" method="post" class="space-y-4 md:space-y-6">
+<!--            &lt;!&ndash;profile image&ndash;&gt;-->
+                  <!--            <img src="#" th:src="*{profileImgUrl}" alt="">-->
+                  <!--            <input type="hidden" th:field="*{profileImgUrl}" />-->
 
-          <!-- 소셜 로그인 타입 & username & password -->
-          <input type="hidden" th:field="*{provider}" />
-          <input type="hidden" th:field="*{username}" />
-          <input type="hidden" th:field="*{password}" />
 
           <!--profile image-->
-          <img src="#" th:src="*{profileImgUrl}" alt="">
           <input type="hidden" th:field="*{profileImgUrl}" />
-
-          <div>
-            <label for="profileImg" class="block mb-2 text-sm font-medium text-gray-900">프로필 사진</label>
-            <input type="file" th:field="*{profileImg}" id="profileImg" class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5" >
+          <label for="profileImg" class="block text-sm font-medium text-gray-900">프로필 사진</label>
+          <div class="flex justify-between items-center">
+            <!--profile image preview-->
+            <div class="avatar p-2 ">
+              <div class="h-[8vh] rounded-full">
+                <img th:if="*{profileImgUrl} != null" src="#" th:src="*{profileImgUrl}" alt="">
+                <img th:unless="*{profileImgUrl} != null" id="profile-img-preview" src="#" alt="">
+              </div>
+            </div>
+            <input type="file" onchange="previewImage()" accept="image/*" th:field="*{profileImg}" id="profileImg" class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5" >
           </div>
+<!--                <div>-->
+<!--                  <label for="profileImg" class="block mb-2 text-sm font-medium text-gray-900">프로필 사진</label>-->
+<!--                  <input type="file" th:field="*{profileImg}" id="profileImg" class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5" >-->
+<!--                  <div>-->
+<!--                    <label class="block text-sm font-medium leading-6 text-gray-900">프로필 사진</label>-->
+<!--                    <div class="mt-2 mb-2 flex justify-between">-->
+<!--                      <p id="origin Name" for="profileImg" class="border border-gray-300 p-3 w-9/12 text-black text-xs rounded" >파일명</p>-->
+<!--                      <label class="p-2 text-white bg-gray-300 cursor-pointer sm:text-sm sm:leading-6"-->
+<!--                             for="profileImg">첨부 파일 </label>-->
+<!--                      <input onchange="previewImage();" data-ax-path="file" required-->
+<!--                             autocomplete="profileImg" type="file" th:field="*{profileImg}" id="profileImg"-->
+<!--                             class="hidden">-->
+<!--                    </div>-->
+<!--                  </div>-->
+<!--                </div>-->
 
-          <!--email-->
-          <div>
-            <label for="email" class="block mb-2 text-sm font-medium text-gray-900">이메일</label>
-            <input type="email" th:field="*{email}" id="email" class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5" placeholder="name@company.com" readonly required="">
+                <!--email-->
+                <div>
+                  <label for="email" class="block mb-2 text-sm font-medium text-gray-900">이메일</label>
+                  <input type="email" th:field="*{email}" id="email" class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5" placeholder="name@company.com" readonly required="">
+                </div>
+
+                <!--nickname-->
+                <div>
+                  <label for="nickname" class="block mb-2 text-sm font-medium text-gray-900">닉네임</label>
+                  <input type="text" th:field="*{nickname}" id="nickname" class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5" placeholder="sseguser1" required="">
+                </div>
+
+                <button type="submit" class="read-btn flex w-full mt-5 justify-center rounded-md  px-3 py-1.5 text-sm font-semibold leading-6 shadow-sm relative bg-black	text-white p-1">
+                  회원가입
+                </button>
+
+              </form>
+            </div>
           </div>
-
-          <!--nickname-->
-          <div>
-            <label for="nickname" class="block mb-2 text-sm font-medium text-gray-900">닉네임</label>
-            <input type="text" th:field="*{nickname}" id="nickname" class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5" placeholder="sseguser1" required="">
-          </div>
-
-          <button type="submit" class="text-gray-900 w-full bg-gradient-to-r from-teal-200 to-lime-200 hover:bg-gradient-to-l hover:from-teal-200 hover:to-lime-200 focus:ring-4 focus:outline-none focus:ring-lime-200 dark:focus:ring-teal-700 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2">
-            회원가입
-          </button>
-
-        </form>
+        </div>
       </div>
+    </div>
+    <!--    우측 이미지 레이아웃   -->
+    <div class="w-2/5 h-full hidden lg:block">
+      <img src="https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2FMjAyMTEyMjlfNDkg%2FMDAxNjQwNzU3MDY4NjI4.KMKJJfEDSMYmO4oo2hpuVNF8FsCX7jODYMPBtzp81VQg.9BRUMzJpUOjgeivtJkduMO24ytYxl5DO8qRzxNE9dOAg.JPEG.p_solej%2FTumblr%25A3%25DFl%25A3%25DF2251323718386081.jpg&type=a340"
+           alt="로그인 이미지"
+           class="h-full w-full object-cover rounded-2xl bg-gradient-to-tl from-zinc-800 to-zinc-700 opacity-70">
     </div>
   </div>
 
+<script th:inline="javascript">
+function previewImage() {
+    var file = $("#profileImg").prop('files')[0];
+    var preview = $("#profile-img-preview");
+    var reader = new FileReader();
+
+    reader.onloadend = function () {
+      preview.attr("src", reader.result);
+    }
+
+    if(file) {
+        reader.readAsDataURL(file);
+    } else {
+        preview.hide();
+    }
+}
+
+
+// p태그에 파일명 확장자 간단하게 보이게 하기
+    window.onload = function () {
+    target = document.getElementById('profileImg');
+    target.addEventListener('change', function () {
+
+        if (target.value.length) {
+            var fileName = target.files[0].name;
+            var lastIndex = fileName.lastIndexOf("\\");
+            var displayFileName = fileName.substring(lastIndex + 1);
+            var fileExtension = displayFileName.split('.').pop();
+
+            // 출력할 파일명 형식: 파일명 (확장자)
+            var displayText = displayFileName.replace('.' + fileExtension, '') + ' (' + fileExtension + ')';
+
+            $('#originName').html(displayText);
+        } else {
+            $('#originName').html("");
+        }
+
+    });
+}
+
+</script>
 </main>
 </html>

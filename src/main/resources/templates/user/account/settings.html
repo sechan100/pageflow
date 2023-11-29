@@ -1,76 +1,89 @@
 <html lang="en" layout:decorate="~{/common/layout.html}">
 <head>
-    <title>setting</title>
+    <title>회원정보</title>
 </head>
 
 <main layout:fragment="main">
 
-    <div class="mt-0 transition-all duration-200 ease-in-out md:p-8 lg:p-12">
+    <div class="mt-0 transition-all duration-200 pb-[15vh] ease-in-out md:px-8 lg:px-12">
         <section class="min-h-screen">
             <div class="bg-top relative flex items-start pt-32 pb-56 m-4 overflow-hidden bg-cover min-h-60-screen rounded bg-[url('https://img1.daumcdn.net/thumb/R1280x0/?fname=http://t1.daumcdn.net/brunch/service/user/9kE1/image/k3uEfFMvJOS81qkiAml4EMnsVzs.jpg')]">
                 <span class="absolute top-0 left-0 w-full h-full bg-center bg-cover bg-gradient-to-tl from-zinc-800 to-zinc-700 opacity-60"></span>
             </div>
-                <div class="relative flex flex-col flex-auto min-w-0 p-4 mx-6 -mt-16 overflow-hidden break-words border-0 shadow-blur rounded-2xl bg-white/50 bg-clip-border backdrop-blur-2xl backdrop-saturate-200">
-                    <div class="flex flex-wrap -mx-3 ">
-                        <div class="flex w-auto max-w-full px-3">
-                            <div class="avatar p-2 ">
-                                <div class="w-12 h-12 rounded-full">
-                                    <img id="profile-img-preview" th:src="${account.profile.profileImgUrl}" src="#"
-                                         alt="프로필 이미지" >
-                                </div>
-                            </div>
-                            <div class="ml-2 p-2 flex flex-col justify-center">
-                                <div class="text-lg	font-semibold">
-                                    <span th:text="${user.nickname}"> </span>
-                                </div>
-                                <div class="text-base  ">
-                                    <span th:text="${user.email}"> </span>
-                                </div>
+            <div class="relative flex flex-col flex-auto min-w-0 p-4 mx-6 -mt-16 overflow-hidden break-words border-0 shadow-blur rounded-2xl bg-white/50 bg-clip-border backdrop-blur-2xl backdrop-saturate-200">
+                <div class="flex justify-between">
+                    <div class="flex w-auto max-w-full px-3">
+
+                        <div class="avatar p-2">
+                            <div class="w-12 h-12 rounded-full">
+                                <img id="profile-img-preview" th:src="${account.profile.profileImgUrl}" src="#"
+                                     alt="프로필 이미지" >
                             </div>
                         </div>
 
-                        <div class="w-full max-w-full px-1 mx-auto mt-4 sm:my-auto sm:mr-0 md:w-1/2 md:flex-none lg:w-4/12">
-                            <div class="relative right-0">
-                                <ul class="relative flex justify-evenly	 p-1 list-none bg-transparent rounded-xl">
-                                    <li class="z-30 text-center">
-                                        <a href=""
-                                           class="z-30 block w-full px-0 py-1 mb-0 transition-all border-0 rounded-lg ease-soft-in-out bg-inherit text-slate-700">
-                                            <div class="flex">
-                                                <svg class="w-[20px] h-[20px] text-gray-800" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 20">
-                                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 17V2a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H3a2 2 0 0 0-2 2Zm0 0a2 2 0 0 0 2 2h12M5 15V1m8 18v-4"/>
-                                                </svg>
-                                                <span class="text-base font-medium ml-1">책 수정</span>
-                                            </div>
-                                        </a>
-                                    </li>
-                                    <!--                                    <li class="z-30 flex-auto text-center">-->
-                                    <!--                                        <a href=""-->
-                                    <!--                                           class="z-30 block w-full px-0 py-1 mb-0 transition-all border-0 rounded-lg ease-soft-in-out bg-inherit text-slate-700">-->
-                                    <!--                                            <div class="flex">-->
-                                    <!--                                                <svg class="w-[20px] h-[20px] text-gray-800" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 20">-->
-                                    <!--                                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 17V2a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H3a2 2 0 0 0-2 2Zm0 0a2 2 0 0 0 2 2h12M5 15V1m8 18v-4"/>-->
-                                    <!--                                                </svg>-->
-                                    <!--                                                <span class="text-base font-medium ml-1">책 삭제</span>-->
-                                    <!--                                            </div>-->
-                                    <!--                                        </a>-->
-                                    <!--                                    </li>-->
-                                    <li class="z-30 text-center">
-                                        <a href=""
-                                           class="z-30 block w-full px-0 py-1 mb-0 transition-all border-0 rounded-lg ease-soft-in-out bg-inherit text-slate-700">
-                                            <div class="flex">
-                                                <svg class="w-[20px] h-[20px] text-gray-800" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 20">
-                                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 17V2a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H3a2 2 0 0 0-2 2Zm0 0a2 2 0 0 0 2 2h12M5 15V1m8 18v-4"/>
-                                                </svg>
-                                                <span class="text-base font-medium ml-1">내 책 조회</span>
-                                            </div>
-                                        </a>
-                                    </li>
-                                </ul>
+                        <div class="ml-2 p-2 flex flex-col justify-center">
+                            <div class="text-lg	font-semibold">
+                                <span th:text="${user.nickname}"> </span>
+                            </div>
+                            <div class="text-base  ">
+                                <span th:text="${user.email}"> </span>
                             </div>
                         </div>
                     </div>
+
+                    <div>
+                        <button th:if="${user.provider} == 'pageflow'" class="read-btn flex w-full justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 shadow-sm relative bg-black	text-white p-1 mt-4 w-full border border-red-500" onclick="my_modal_1.showModal()">비밀번호 변경</button>
+                        <dialog id="my_modal_1" class="modal">
+                            <div class="modal-box">
+                                <h3 class="font-bold text-lg">비밀번호 변경!</h3>
+                                <!-- 비밀번호 변경 form -->
+                                <form id="password-update-form" onsubmit="return updatePassword(this)">
+                                    <div>
+                                        <label for="currentPassword"
+                                               class="block text-sm font-medium leading-6 text-gray-900">Current Password</label>
+                                        <div class="mt-2">
+                                            <input id="currentPassword" name="currentPassword" type="password"
+                                                   autocomplete="password"
+                                                   required placeholder="기존 비밀번호를 입력하세요"
+                                                   class="input w-full focus:outline-0 focus:border focus:ring-0 rounded flex-auto text-black border sm:text-sm sm:leading-6">
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label for="newPassword"
+                                               class="block text-sm font-medium leading-6 text-gray-900">Password</label>
+                                        <div class="mt-2">
+                                            <input id="newPassword" name="newPassword" type="password"
+                                                   autocomplete="password"
+                                                   required placeholder="새로운 비밀번호를 입력하세요"
+                                                   class="input w-full focus:outline-0 focus:border focus:ring-0 rounded flex-auto text-black border sm:text-sm sm:leading-6">
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label for="newPasswordConfirm"
+                                               class="block text-sm font-medium leading-6 text-gray-900">New Password Confirm</label>
+                                        <div class="mt-2">
+                                            <input id="newPasswordConfirm" name="newPasswordConfirm" type="password"
+                                                   required placeholder="새로운 비밀번호를 다시 입력하세요"
+                                                   class="input w-full focus:outline-0 focus:border focus:ring-0 rounded flex-auto text-black border sm:text-sm sm:leading-6">
+                                        </div>
+                                    </div>
+                                </form>
+
+                                <div class="modal-action">
+                                    <button type="submit" form="password-update-form" class="text-gray-900 hover:text-white border border-gray-800 hover:bg-gray-900 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2">
+                                        변경하기
+                                    </button>
+                                    <form method="dialog">
+                                        <!-- if there is a button in form, it will close the modal -->
+                                        <button id="password-modal-close-btn" class="btn">Close</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </dialog>
+                    </div>
                 </div>
-            <form th:action="@{/account/settings}" method="post" enctype="multipart/form-data" th:object="${account}">
+            </div>
+            <form onsubmit="return updateProfile(this)" enctype="multipart/form-data" th:object="${account}">
                 <div class="flex-none w-full max-w-full px-3 mt-6 ">
                     <div class="relative flex flex-col min-w-0 mb-6 break-words bg-white border-0 shadow-soft-xl rounded bg-clip-border">
                         <div class="p-5 mt-4  text-center">
@@ -79,12 +92,13 @@
                                 Change information
                             </h2>
                         </div>
-                        <div class="     flex-auto">
+                        <div class="flex-auto">
                             <div class=" flex flex-wrap m-auto">
                                 <div class=" w-full m-auto max-w-full md:w-6/12 md:flex-none xl:mb-0 xl:w-3/12">
                                     <div class="w-full relative flex flex-col min-w-0">
                                         <div class="w-full min-h-full mx-auto">
                                             <div class="w-full mt-1 mb-6 sm:mx-auto sm:w-full sm:max-w-sm">
+                                                <input type="hidden" name="id" th:value="*{profile.id}">
                                                 <div>
                                                     <label class="block text-sm font-medium leading-6 text-gray-900">profile
                                                         Img</label>
@@ -92,9 +106,10 @@
                                                         <p id="originName" class="border p-3 w-9/12 text-black text-xs rounded" >파일명</p>
                                                         <label class="p-2 text-white bg-gray-300 cursor-pointer ml-2 sm:text-sm sm:leading-6"
                                                                for="profileImg">첨부 파일 </label>
-                                                        <input onchange="previewImage();" data-ax-path="file" required
+                                                        <input onchange="previewImage()" data-ax-path="file"
                                                                autocomplete="profileImg" type="file" id="profileImg"
-                                                               class="hidden">
+                                                               class="hidden"
+                                                               name="profileImg">
                                                     </div>
                                                 </div>
                                                 <div>
@@ -103,79 +118,13 @@
                                                     <div class="mt-2 mb-2">
                                                         <input id="nickname" name="nickname" type="text"
                                                                autocomplete="nickname"
-                                                               required th:field="*{profile.nickname}"
+                                                               required th:value="*{profile.nickname}"
                                                                class="input w-full focus:outline-0 focus:border focus:ring-0 rounded text-black border sm:text-sm sm:leading-6">
                                                     </div>
                                                 </div>
                                                 <div>
-                                                    <label for="email"
-                                                           class="block text-sm font-medium leading-6 text-gray-900">email</label>
-                                                    <div class="mt-2">
-                                                        <input id="email" name="email" type="email" autocomplete="email"
-                                                               required th:value="${user.email}"
-                                                               class="input w-full focus:outline-0 focus:border focus:ring-0 rounded flex-auto text-black border sm:text-sm sm:leading-6">
-                                                    </div>
-                                                </div>
-                                                <div>
-                                                    <label for="password"
-                                                           class="block text-sm font-medium leading-6 text-gray-900">password</label>
-                                                    <div class="mt-2">
-                                                        <input id="password" name="password" type="password"
-                                                               autocomplete="password"
-                                                               required placeholder="새로운 비밀번호를 입력하세요"
-                                                               class="input w-full focus:outline-0 focus:border focus:ring-0 rounded flex-auto text-black border sm:text-sm sm:leading-6">
-                                                    </div>
-                                                </div>
-                                                <div>
-                                                            <!-- 비밀번호 변경 선택 1 -->
-                                                    <label for="passwordCheck"
-                                                           class="block text-sm font-medium leading-6 text-gray-900">password</label>
-                                                    <div class="mt-2">
-                                                        <input id="passwordCheck" name="passwordCheck" type="password"
-                                                               autocomplete="passwordCheck"
-                                                               required placeholder="새로운 비밀번호를 다시 입력해주세요"
-                                                               class="input w-full focus:outline-0 focus:border focus:ring-0 rounded flex-auto text-black border sm:text-sm sm:leading-6">
-                                                    </div>
-                                                            <!--  비밀번호 변경 선택 2 모달창으로 구현  -->
-<!--                                                    <button class="read-btn flex w-full justify-center rounded-md  px-3 py-1.5 text-sm font-semibold leading-6 shadow-sm relative bg-black	text-white p-1 mt-4 w-full" onclick="my_modal_1.showModal()">비밀번호 변경</button>-->
-<!--                                                    <dialog id="my_modal_1" class="modal">-->
-<!--                                                        <div class="modal-box">-->
-<!--                                                            <h3 class="font-bold text-lg">비밀번호 변경!</h3>-->
-<!--                                                            <form th:action >-->
-<!--                                                                <div>-->
-<!--                                                                    <label for="password"-->
-<!--                                                                           class="block text-sm font-medium leading-6 text-gray-900">password</label>-->
-<!--                                                                    <div class="mt-2">-->
-<!--                                                                        <input id="password" name="password" type="password"-->
-<!--                                                                               autocomplete="password"-->
-<!--                                                                               required placeholder="새로운 비밀번호를 입력하세요"-->
-<!--                                                                               class="input w-full focus:outline-0 focus:border focus:ring-0 rounded flex-auto text-black border sm:text-sm sm:leading-6">-->
-<!--                                                                    </div>-->
-<!--                                                                </div>-->
-<!--                                                                <div>-->
-<!--                                                                    <label for="password"-->
-<!--                                                                           class="block text-sm font-medium leading-6 text-gray-900">password</label>-->
-<!--                                                                    <div class="mt-2">-->
-<!--                                                                        <input id="passwordCheck" name="password" type="password"-->
-<!--                                                                               autocomplete="password"-->
-<!--                                                                               required placeholder="새로운 비밀번호를 다시 입력하세요"-->
-<!--                                                                               class="input w-full focus:outline-0 focus:border focus:ring-0 rounded flex-auto text-black border sm:text-sm sm:leading-6">-->
-<!--                                                                    </div>-->
-<!--                                                                </div>-->
-<!--                                                            </form>-->
-<!--                                                            <div class="modal-action">-->
-<!--                                                                <form method="dialog">-->
-<!--                                                                    &lt;!&ndash; if there is a button in form, it will close the modal &ndash;&gt;-->
-<!--                                                                    <button class="btn">Close</button>-->
-<!--                                                                </form>-->
-<!--                                                            </div>-->
-<!--                                                        </div>-->
-<!--                                                    </dialog>-->
-                                                </div>
-                                                <div>
                                                     <button type="submit"
                                                             class="read-btn flex w-full mt-5 justify-center rounded-md  px-3 py-1.5 text-sm font-semibold leading-6 shadow-sm relative bg-black	text-white p-1">
-
                                                         정보 변경
                                                     </button>
                                                 </div>
@@ -193,45 +142,99 @@
 
     <script type="text/javascript">
         function previewImage() {
-             var file = $("#profileImg").prop('files')[0];
-             var preview = $("#profile-img-preview");
-             var reader = new FileReader();
+            var file = $("#profileImg").prop('files')[0];
+            var preview = $("#profile-img-preview");
+            var reader = new FileReader();
 
-             reader.onloadend = function () {
-                 preview.attr("src", reader.result);
-             }
+            reader.onloadend = function () {
+                preview.attr("src", reader.result);
+            }
 
-             if (file) {
-                 reader.readAsDataURL(file);
-             } else {
-                 preview.hide();
-             }
-         }
-
-// p태그에 파일명 확장자 간단하게 보이게 하기
-    window.onload = function () {
-    target = document.getElementById('profileImg');
-    target.addEventListener('change', function () {
-
-        if (target.value.length) {
-            var fileName = target.files[0].name;
-            var lastIndex = fileName.lastIndexOf("\\");
-            var displayFileName = fileName.substring(lastIndex + 1);
-            var fileExtension = displayFileName.split('.').pop();
-
-            // 출력할 파일명 형식: 파일명 (확장자)
-            var displayText = displayFileName.replace('.' + fileExtension, '') + ' (' + fileExtension + ')';
-
-            $('#originName').html(displayText);
-        } else {
-            $('#originName').html("");
+            if (file) {
+                reader.readAsDataURL(file);
+            } else {
+                preview.hide();
+            }
         }
 
-    });
-}
+        // 프로필 정보 업데이트
+        function updateProfile(e) {
+            const formData = new FormData(e);
+            fetch('/api/account/settings/profile', {
+                method: 'PUT',
+                body: formData
+            })
+            .then(
+              res => res.json()
+            )
+            .then(res => {
+                if (res) {
+                    flowAlert("success", "프로필 정보가 변경되었습니다.");
+                } else {
+                    flowAlert("error", "서버 요청에 실패했습니다. <br> 잠시 후 다시 시도해주세요.");
+                }
+            })
+            .catch(err => console.error(err));
+            return false;
+        }
 
+        function updatePassword(e){
+            const formData = new FormData(e);
+
+            if(formData.get('newPassword') !== formData.get('newPasswordConfirm')){
+                flowAlert("error", "새로운 비밀번호가 일치하지 않습니다.");
+                const modalCloseBtn = document.getElementById('password-modal-close-btn');
+                modalCloseBtn.click();
+                return false;
+            }
+
+            fetch('/api/account/settings/password', {
+                method: 'PUT',
+                body: formData
+            })
+            .then(res => {
+                if(res.status == 200) {
+                    flowAlert("success", "비밀번호가 변경되었습니다.");
+                } else if(res.status == 403){
+                    flowAlert("error", "현재 비밀번호가 일치하지 않습니다.");
+                } else if(res.status == 400){
+                    flowAlert("error", "새로운 비밀번호가 일치하지 않습니다.");
+                } else {
+                    flowAlert("error", "서버 요청에 실패했습니다. <br> 잠시 후 다시 시도해주세요.");
+                }
+            })
+            .catch(err => {
+                console.error(err)
+            });
+
+            const modalCloseBtn = document.getElementById('password-modal-close-btn');
+            modalCloseBtn.click();
+            return false;
+        }
+
+
+        // p태그에 파일명 확장자 간단하게 보이게 하기
+            window.onload = function () {
+            target = document.getElementById('profileImg');
+            target.addEventListener('change', function () {
+
+                if (target.value.length) {
+                    var fileName = target.files[0].name;
+                    var lastIndex = fileName.lastIndexOf("\\");
+                    var displayFileName = fileName.substring(lastIndex + 1);
+                    var fileExtension = displayFileName.split('.').pop();
+
+                    // 출력할 파일명 형식: 파일명 (확장자)
+                    var displayText = displayFileName.replace('.' + fileExtension, '') + ' (' + fileExtension + ')';
+
+                    $('#originName').html(displayText);
+                } else {
+                    $('#originName').html("");
+                }
+
+            });
+        }
 
     </script>
 </main>
 </html>
-

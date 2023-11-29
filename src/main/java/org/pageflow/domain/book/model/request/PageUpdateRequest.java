@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.pageflow.domain.book.entity.Page;
-import org.pageflow.domain.book.model.outline.PageSummary;
+import org.pageflow.domain.book.model.summary.PageSummary;
 
 
 @EqualsAndHashCode(callSuper = true)

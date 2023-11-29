@@ -72,10 +72,10 @@ custom:
     email-verify-sender: verify@pageflow.org
   defaults:
     default-user-profile-img: /img/default_profile_img.png
-    default-book-cover-img: /img/unloaded_img.jpg
+    default-book-cover-img: /img/default-book-cover-img.png
   files:
     img:
       base-url: /files/img
-#      directory: C:/Users/SBS/local/uploads/img
+      directory: C:/Users/SBS/local/uploads/img
 #      directory: C:/Users/gsw05/local/uploads/img
-      directory: /Users/sechan/local/uploads/img
+#      directory: /Users/sechan/local/uploads/img

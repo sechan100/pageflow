@@ -88,7 +88,7 @@ export default function QuillEditor({quillValue, setContent, viewPortHeight} : {
           const formData = new FormData();
           formData.append('imgFile', file);
     
-          const res = await axios.post(`/api/book/${bookId}/chapter/page/${pageId}/img`, formData, {
+          const res = await axios.post(`/api/books/${bookId}/chapters/pages/${pageId}/imgs`, formData, {
             headers: {
               'Content-Type': 'multipart/form-data'
             }

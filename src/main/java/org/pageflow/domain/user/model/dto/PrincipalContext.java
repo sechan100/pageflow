@@ -2,6 +2,7 @@ package org.pageflow.domain.user.model.dto;
 
 
 import lombok.Getter;
+import lombok.Setter;
 import org.pageflow.domain.user.constants.Role;
 import org.pageflow.domain.user.entity.Account;
 import org.springframework.security.core.userdetails.User;
@@ -11,6 +12,7 @@ import java.util.Map;
 
 
 @Getter
+@Setter
 public class PrincipalContext extends User implements OAuth2User {
 
     protected UserSession userSession;

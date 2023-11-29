@@ -1,28 +1,27 @@
 package org.pageflow.domain.book.service;
 
 import jakarta.persistence.criteria.*;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.pageflow.base.entity.BaseEntity;
+import org.pageflow.base.exception.data.NoSuchEntityException;
 import org.pageflow.domain.book.entity.Book;
 import org.pageflow.domain.book.entity.Chapter;
 import org.pageflow.domain.book.entity.Page;
-import org.pageflow.domain.book.model.outline.ChapterSummary;
-import org.pageflow.domain.book.model.outline.Outline;
-import org.pageflow.domain.book.model.outline.PageSummary;
+import org.pageflow.domain.book.model.summary.BookSummary;
+import org.pageflow.domain.book.model.summary.ChapterSummary;
+import org.pageflow.domain.book.model.summary.Outline;
+import org.pageflow.domain.book.model.summary.PageSummary;
 import org.pageflow.domain.book.repository.BookRepository;
 import org.pageflow.domain.book.repository.ChapterRepository;
 import org.pageflow.domain.book.repository.PageRepository;
-import org.pageflow.domain.user.entity.Account;
 import org.pageflow.domain.user.entity.Profile;
-import org.pageflow.infra.file.constants.FileMetadataType;
-import org.pageflow.infra.file.entity.FileMetadata;
 import org.pageflow.infra.file.service.FileService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,18 +32,20 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class BookService {
 
     private final BookRepository bookRepository;
-    private final PageRepository pageRepository;
     private final ChapterRepository chapterRepository;
+    private final PageRepository pageRepository;
     private final FileService fileService;
 
     private Specification<Book> search(String kw) {
         return new Specification<>() {
+            @Serial
             private static final long serialVersionUID = 1L;
             @Override
-            public Predicate toPredicate(Root<Book> b, CriteriaQuery<?> query, CriteriaBuilder cb) {
+            public Predicate toPredicate(@NonNull Root<Book> b, @NonNull CriteriaQuery<?> query, @NonNull CriteriaBuilder cb) {
                 // b - 기준을 의미하는 Book 앤티티의 객체(책 제목 검색)
 
                 query.distinct(true); //중복 제거
@@ -59,19 +60,17 @@ public class BookService {
         };
     }
 
-
-    public Slice<Book> getList(int page, String kw, String sortOption) {
+    public Slice<BookSummary> getList(int page, String kw, String sortOption) {
         Pageable pageable = PageRequest.of(page, 16, Sort.by(Sort.Direction.DESC, sortOption));
         Specification<Book> spec = search(kw);
-        return this.bookRepository.findAll(spec, pageable);
+        Slice<Book> books = this.bookRepository.findAll(spec, pageable);
+        return books.map(BookSummary::new);
     }
-
-
-    @Transactional(readOnly = true)
+    
     public Outline getOutline(Long bookId) {
         
         // Book 엔티티를 author만 fetch join으로 조회.
-        Book book = bookRepository.findBookWithAuthorAndChapterById(bookId);
+        Book book = repoFindBookWithAuthorAndChapterById(bookId);
         
         List<PageSummary> pageSummaries = pageRepository.findAllByChapterIdIn(
                 book.getChapters()
@@ -105,7 +104,9 @@ public class BookService {
                     return new ChapterSummary(
                             book.getChapters().stream().filter( // 해당 chapterId를 가진 Chapter 객체를 찾아온다.
                                     chapter -> Objects.equals(chapter.getId(), chapterId)
-                            ).findAny().orElseThrow(),
+                            ).findAny().orElseThrow(
+                                    () -> new NoSuchEntityException(Chapter.class)
+                            ),
                             pageSummariesInChapter // orderNum 오름차순으로 정렬된 PageSummary 리스트
                     );
                     
@@ -119,38 +120,66 @@ public class BookService {
                 .title(book.getTitle())
                 .author(book.getAuthor())
                 .coverImgUrl(book.getCoverImgUrl())
-                .published(book.isPublished())
+                .status(book.getStatus())
                 .chapters(chapterSummaries)
                 .build();
     }
     
+    public List<BookSummary> getBookSummariesByProfileId(long profileId) {
+        return bookRepository.findAllByAuthorId(profileId).stream().map(BookSummary::new).toList();
+    }
     
-
     public Book repoSaveBook(Book book) {
         return bookRepository.save(book);
     }
     
     public Book repoFindBookById(Long id) {
-        return bookRepository.findById(id).orElseThrow();
+        return bookRepository.findById(id).orElseThrow(
+                () -> new NoSuchEntityException(Book.class)
+        );
     }
-
+    
     public Chapter repoFindChapterById(Long id) {
-        return chapterRepository.findById(id).orElseThrow();
+        return chapterRepository.findById(id).orElseThrow(
+                () -> new NoSuchEntityException(Chapter.class)
+        );
     }
-
+    
     public Page repoFindPageById(Long id) {
-        return pageRepository.findById(id).orElseThrow();
+        return pageRepository.findById(id).orElseThrow(
+                () -> new NoSuchEntityException(Page.class)
+        );
     }
-
+    
     public Book repoFindBookWithAuthorById(Long id) {
-        return bookRepository.findBookWithAuthorById(id);
+        return bookRepository.findBookWithAuthorById(id).orElseThrow(
+                () -> new NoSuchEntityException(Book.class)
+        );
     }
     
     public Book repoFindBookWithAuthorAndChapterById(Long id) {
-        return bookRepository.findBookWithAuthorAndChapterById(id);
+        return bookRepository.findBookWithAuthorAndChapterById(id).orElseThrow(
+                () -> new NoSuchEntityException(Book.class)
+        );
     }
-
-    public void delete(Book book) {
+    
+    public void repoDeleteBook(Book book) {
         this.bookRepository.delete(book);
+    }
+    
+    public Chapter repoSaveChapter(Chapter defaultChapter) {
+        return chapterRepository.save(defaultChapter);
+    }
+    
+    public void repoDeleteChapter(Chapter chapterToDelete) {
+        this.chapterRepository.delete(chapterToDelete);
+    }
+    
+    public Page repoSavePage(Page newDefaultPage) {
+        return pageRepository.save(newDefaultPage);
+    }
+    
+    public void repoDeletePage(Page pageToDelete) {
+        this.pageRepository.delete(pageToDelete);
     }
 }

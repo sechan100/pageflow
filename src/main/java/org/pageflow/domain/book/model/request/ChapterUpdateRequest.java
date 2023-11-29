@@ -4,7 +4,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import org.pageflow.domain.book.entity.Chapter;
-import org.pageflow.domain.book.model.outline.ChapterSummary;
+import org.pageflow.domain.book.model.summary.ChapterSummary;
 
 @EqualsAndHashCode(callSuper = true)
 @Getter

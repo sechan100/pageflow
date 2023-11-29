@@ -5,11 +5,19 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter } from 'react-router-dom';
 
+
+// @ts-ignore
+const bookId = window.APP_BOOK_ID;
+
+
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
+
+if(!bookId) root.render(<div>유효한 접근이 아닙니다.</div>);
+
 root.render(
-  <BrowserRouter basename="/book/write">
+  <BrowserRouter basename={`/write/${bookId}`}>
     <App />
   </BrowserRouter>
 );

@@ -21,7 +21,7 @@ export const useBookMutation = (bookId : number) : UseBookMutationReturn => {
       if(bookMutation.coverImg) formDate.append("coverImg", bookMutation.coverImg);
 
 
-      const response = await axios.put(`/api/book/${bookId}`, formDate, {
+      const response = await axios.put(`/api/books/${bookId}`, formDate, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }

@@ -1,5 +1,5 @@
 <html lang="en" layout:decorate="~{/common/layout.html}" xmlns:th="http://www.w3.org/1999/xhtml"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security" xmlns:layout="http://www.w3.org/1999/xhtml">
 
 <head>
     <title>[[${outline.title}]]</title>
@@ -60,9 +60,9 @@
                                        th:if="${outline.author != null and outline.getAuthor().getNickname() == outline.author.nickname}"
                                        sec:authorize="isAuthenticated()"></a>
                                 </div>
-                                <a href="#"
+                                <a th:href="|/viewer/${outline.id}|"
                                    class="custom-btn read-btn w-52 mt-20 relative rounded-sm font-semibold	leading-10 bg-black	text-white p-1">읽기</a>
-                            </div>
+                            </div>ss
                         </div>
                     </div>
                 </div>

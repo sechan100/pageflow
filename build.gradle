@@ -53,9 +53,10 @@ tasks.register('restartRedisServerOnWindow', Exec) {
 	commandLine 'cmd', '/c', 'taskkill', '/F', '/IM', 'redis-server.exe'
 	println 'Redis Server stopped.'
 	println 'Starting Redis Server...'
-	commandLine 'cmd', '/c', 'start', '/B', 'C:\\Users\\gsw05\\OneDrive\\tools\\Redis-7.0.14-Windows-x64-with-Service\\redis-server.exe'
+//	commandLine 'cmd', '/c', 'start', '/B', 'C:\\Users\\gsw05\\OneDrive\\tools\\Redis-7.0.14-Windows-x64-with-Service\\redis-server.exe'
 	println '##### Started Redis Server #####'
-//	commandLine 'cmd', '/c', 'start', '/B', 'C:\\Users\\SBS\\Redis-x64-3.0.504\\redis-server.exe'
+	commandLine 'cmd', '/c', 'start', '/B', 'C:\\Users\\SBS\\Redis-x64-3.0.504\\redis-server.exe'
+	println('레디스가 실행중입니다.')
 }
 
 

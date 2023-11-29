@@ -1,4 +1,4 @@
-package org.pageflow.domain.book.model.outline;
+package org.pageflow.domain.book.model.summary;
 
 public interface Rearrangeable {
     Long getId();

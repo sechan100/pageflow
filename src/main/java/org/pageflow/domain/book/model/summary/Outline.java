@@ -1,9 +1,10 @@
-package org.pageflow.domain.book.model.outline;
+package org.pageflow.domain.book.model.summary;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.pageflow.domain.book.constants.BookStatus;
 import org.pageflow.domain.user.entity.Profile;
 
 import java.util.List;
@@ -23,7 +24,7 @@ public class Outline {
     private Long id;
     private String title;
     private String coverImgUrl;
-    private boolean published;
+    private BookStatus status;
     private Profile author;
     private List<ChapterSummary> chapters;
 

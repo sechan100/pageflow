@@ -1,8 +1,8 @@
-<html lang="en" layout:decorate="~{/common/layout.html}" xmlns:th="http://www.w3.org/1999/xhtml" xmlns:layout=""
+<html lang="en" layout:decorate="~{/common/layout.html}" xmlns:th="http://www.w3.org/1999/xhtml"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head>
-    <title>Book</title>
+    <title>[[${outline.title}]]</title>
 
     <!-- 댓글 스크롤바 스타일 -->
     <style>
@@ -22,7 +22,7 @@
 
 <body>
 
-<main layout:fragment="main" class="mt-20">
+<main layout:fragment="main">
 
     <section class="container max-w-[70%] m-auto">
         <div class="mt-10 mb-10 flex flex-col">
@@ -98,7 +98,7 @@
                                                 <div class="w-full py-3">
                                                     <div><a href="#" class="font-semibold" th:text="${chapters.title}"></a></div>
                                                     <span class="font-normal"
-                                                          th:text="${#temporals.format(outline.author.createDate, 'yyyy-MM-dd')}"></span>
+                                                          th:text="${#temporals.format(outline.author.createdDate, 'yyyy-MM-dd')}"></span>
                                                 </div>
                                             </li>
                                         </ul>
@@ -181,9 +181,9 @@
        var output = "";
        var userImg = "[[${outline.author.profileImgUrl}]]";
 
-       commentList.sort(function (a, b) {
-           return new Date(b.createDate) - new Date(a.createDate);
-       });
+    commentList.sort(function (a, b) {
+        return new Date(b.createdData) - new Date(a.createdData);
+    });
 
        for (var i in commentList) {
            var comment = commentList[i];
@@ -418,6 +418,7 @@ function closeModal(commentId) {
             heart.setAttribute('data-filled', (!isFilled).toString());
 
             heartIcon.style.color = isFilled ? '#000000' : '#ff0000';
+
         }
     </script>
 

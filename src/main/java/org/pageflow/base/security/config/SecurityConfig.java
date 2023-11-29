@@ -36,12 +36,12 @@ public class SecurityConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/book", "/login", "/signup*", "/verify/email", "/error*", "/common/alertStorage*", "/api/**").permitAll()
+                        .requestMatchers("/", "/books/**", "/login", "/signup*", "/verify/email", "/error*", "/common/alertStorage*", "/api/**").permitAll()
                         .requestMatchers("/css/**", "/js/**", "/img/**", "/files/img/**").permitAll()
                         .anyRequest().authenticated()
                 )
 
-                .formLogin(form -> form
+                 .formLogin(form -> form
                         .loginPage("/login")
                         .failureHandler(customLoginFailureHandler)
                         .successHandler(formLoginAuthenticationSuccessHandler)

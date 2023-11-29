@@ -1,7 +1,7 @@
 <html lang="en" layout:decorate="~{/common/layout.html}" xmlns:th="http://www.w3.org/1999/xhtml">
 
 <head>
-    <title>Books</title>
+    <title>책 목록</title>
 
 <!--  select 정렬순 스타일  -->
     <style>
@@ -61,7 +61,7 @@
                     </button>
                     <ul id="sortOptions" class="list-member list-none hidden absolute w-full rounded font-medium text-black text-sm top-16 left-0">
                         <li>
-                            <button value="createDate" type="button" onclick="updateSort('createDate')">작성 날짜</button>
+                            <button value="createdDate" type="button" onclick="updateSort('createdDate')">작성 날짜</button>
                         </li>
                         <li>
                             <button value="title" type="button" onclick="updateSort('title')">제목</button>
@@ -90,14 +90,14 @@
                     <div th:each="book : ${paging}" class="mb-10 max-h-96">
                        <div class="h-full shadow-lg transition-transform duration-300 transform hover:-translate-y-3 ">
                            <div class="w-full h-full ">
-                               <a th:href="@{|/book/detail/${book.id}|}">
+                               <a th:href="@{|/books/detail/${book.id}|}">
                                    <div class="flex flex-col h-full">
                                        <div class="h-4/6 w-full overflow-hidden bg-cover bg-center">
                                            <img th:src="@{${book.coverImgUrl}}" alt="Book Image" class="w-full ">
                                        </div>
                                        <div class="h-24 overflow-hidden overflow-ellipsis border-b  border-slate-300 relative">
                                            <h1 th:text="${book.title}" class=" px-5 py-3 font-extrabold "></h1>
-                                           <p th:text="${#temporals.format(book.createDate, 'yyyy년 MM월 dd일')}" class="px-5 py-2 absolute bottom-0 font-medium text-xs text-gray-500"></p>
+                                           <p th:text="${#temporals.format(book.createdDate, 'yyyy년 MM월 dd일')}" class="px-5 py-2 absolute bottom-0 font-medium text-xs text-gray-500"></p>
                                        </div>
                                        <div>
                                        </div>
@@ -109,7 +109,7 @@
                 </div>
             </div>
 
-            <form th:action="@{/book}" method="get" id="searchForm">
+            <form th:action="@{/books}" method="get" id="searchForm">
             <input type="hidden" id="kw" name="kw" th:value="${kw}">
             <input type="hidden" id="page" name="page" th:value="${paging.number}">
             <input type="hidden" id="sort" name="sort" th:value="${sort}">
@@ -148,7 +148,7 @@
               const search_kw = document.getElementById('search_kw').value;
               const sortOption = document.getElementById('sortOption').value;
 
-              fetch(`/api/book/list?page=${page}&kw=${search_kw}&sort=${sortOption}`)
+              fetch(`/api/books/list?page=${page}&kw=${search_kw}&sort=${sortOption}`)
                 .then(response => {
                   console.log('Server Response:', response);
                   return response.json();
@@ -179,7 +179,6 @@
             function appendBooksToDOM(data) {
               const bookContainer = document.querySelector('.grid.grid-cols-4.gap-4');
               const fragment = document.createDocumentFragment();
-
               data.forEach(book => {
                 // 각 책에 대한 HTML 요소를 생성하고 컨테이너에 추가
                 const bookElement = createBookElement(book);
@@ -194,12 +193,12 @@
               const div = document.createElement('div');
               div.classList.add('card', 'border', 'rounded', 'p-4');
               div.innerHTML = `
-                <a href="/book/detail/${book.id}">
+                <a href="/books/detail/${book.id}">
                   <img src="${book.coverImgUrl}" alt="Book Image">
                   <h2>${book.title}</h2>
                 </a>
                 <p>${book.author.nickname}</p>
-                <p>${book.createDate}</p>
+                <p>${book.createdDate}</p>
               `;
               return div;
             }
@@ -288,7 +287,7 @@
             // 정렬 값에 따라 버튼 텍스트를 반환하는 함수
           function getButtonText(sortOption) {
             switch (sortOption) {
-              case 'createDate':
+              case 'createdDate':
                 console.log('실행');
                 return '작성 날짜';
               case 'title':

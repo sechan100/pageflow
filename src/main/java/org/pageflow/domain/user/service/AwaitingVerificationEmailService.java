@@ -2,6 +2,7 @@ package org.pageflow.domain.user.service;
 
 
 import lombok.RequiredArgsConstructor;
+import org.pageflow.base.exception.data.NoSuchEntityException;
 import org.pageflow.domain.user.entity.AwaitingEmailVerificationRequest;
 import org.pageflow.domain.user.repository.AwaitingVerificationEmailRepository;
 import org.springframework.stereotype.Service;
@@ -22,7 +23,9 @@ public class AwaitingVerificationEmailService {
     }
 
     public AwaitingEmailVerificationRequest findById(String email) {
-        return emailCacheRepository.findById(email).orElseThrow();
+        return emailCacheRepository.findById(email).orElseThrow(
+                () -> new NoSuchEntityException(AwaitingEmailVerificationRequest.class)
+        );
     }
 
     public void delete(String email) {

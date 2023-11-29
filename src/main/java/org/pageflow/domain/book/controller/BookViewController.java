@@ -19,9 +19,9 @@ public class BookViewController {
     /**
      * @return react book read form page
      */
-    @GetMapping("/book/view/{bookId}")
-    public String bookViewForm( @PathVariable("bookId") Long bookId) {
-        return "forward:/react/build/book_viewer/index.html?bookId=" + bookId;
+    @GetMapping("/viewer/{bookId}")
+    public String bookViewForm(@PathVariable("bookId") Long bookId) {
+        return "forward:/react/build/book_viewer/index.html";
     }
 
 }

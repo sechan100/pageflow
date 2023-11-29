@@ -96,10 +96,8 @@
                                            <img th:src="@{${book.coverImgUrl}}" alt="Book Image" class="w-full ">
                                        </div>
                                        <div class="h-24 overflow-hidden overflow-ellipsis border-b  border-slate-300 relative">
-                                           <h1 th:text="${book.title}" class=" px-5 py-3 font-extrabold "></h1>
+                                           <h1 th:text="${book.title}" class="px-5 py-3 font-extrabold "></h1>
                                            <p th:text="${#temporals.format(book.createdDate, 'yyyy년 MM월 dd일')}" class="px-5 py-2 absolute bottom-0 font-medium text-xs text-gray-500"></p>
-                                       </div>
-                                       <div>
                                        </div>
                                    </div>
                                </a>

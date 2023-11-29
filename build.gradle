@@ -106,7 +106,7 @@ tasks.register('copy-book_write', Copy) {
 }
 tasks.register('copy-book_viewer', Copy) {
 	dependsOn "clean-book_viewer"
-	from file("src/main/react/book_write/build")
+	from file("src/main/react/book_viewer/build")
 	into file('src/main/resources/static/react/build/book_viewer')
 	println("book_viewer 빌드 파일을 복사했습니다.")
 }

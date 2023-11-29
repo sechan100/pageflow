@@ -1,11 +1,11 @@
 import { create } from "zustand";
-import { useGetPage } from "../api/page-api";
 import { Outline } from "../../types/types";
 import { metaPageType, useLocationStore } from "../nav/PageCursor";
 import { getChapterTitle } from "../nav/Navbar";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Carousel from "./Carousel";
 import DOMPurify from 'dompurify';
+import { useGetPage } from "../api/page-api";
 
 
 interface UseNavStore {
@@ -29,9 +29,9 @@ export default function ViewerContext({outline}: {outline: Outline}) {
 
   const { toggle } = useNavStore();
   const { location, metaPage } = useLocationStore();
-  const getPageAsync = useGetPage(outline.id, getPageMap(outline));
-  const currentPage = getPageAsync(location);
+  const currentPage = useGetPage(outline.id, getPageMap(outline), location);
   const carouselContentRef = useRef<HTMLDivElement>(null);
+
 
 
   // 총 칼럼이 홀수개일 경우, 마지막 칼럼의 오른쪽은 빈 페이지여야한다. 근데 해결 방법이 마땅치 않아서 그냥 줄바꿈태그를 최소 한도로 넣어놓음.

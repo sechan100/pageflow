@@ -5,9 +5,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.pageflow.base.entity.BaseEntity;
 
-import java.util.ArrayList;
-import java.util.List;
-
 
 @Entity
 @Getter

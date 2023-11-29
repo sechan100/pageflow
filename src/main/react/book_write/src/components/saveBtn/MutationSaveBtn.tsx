@@ -150,14 +150,17 @@ export default function MutationSaveBtn(){
     })
 
     .catch((error) => {
-      console.log(error);
+      if(error.response.status === 403){
+        flowAlert("error", "해당 작업에 대한 접근권한이 없습니다.");
+        return;
+      }
       flowAlert("error", "서버에 데이터를 저장하지 못했습니다. <br> 잠시후에 다시 시도해주세요.");
     })
   }
 
 
   return (
-    <div onClick={flushMutationsOnClick} className="flex justify-start fixed z-50 right-7 top-7">
+    <div onClick={flushMutationsOnClick} className="flex justify-start fixed z-50 right-[5vw] top-7">
       {isAnyMutation && 
       <div className="relative flex items-center mb-2 mr-3 transition-opacity duration-[1500ms] opacity-0" ref={updateAlertTooltip}>
         <div className="tooltip bg-white text-black border border-gray-300 py-1 px-2 rounded shadow-lg">

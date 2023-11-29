@@ -75,7 +75,10 @@ export default function BookForm(){
   useEffect(() => {
 
     // local의 title 데이터가 존재하면서 outline의 title 데이터와 다를 경우 => title 변경사항이 존재
-    if(localBook.title && isTitleChanged(localBook.title)) bookStore.dispatchs.setTitle(localBook.title);
+    if(localBook.title && localBook.title !== outline.title && outline.title !== "책이 로딩중입니다..."){
+      console.log(`[제목] ${outline.title} -> ${localBook.title}`)
+      bookStore.dispatchs.setTitle(localBook.title);
+    }
     
     // local의 coverImg 데이터가 null이 아니라면 => coverImg 변경사항이 존재
     if(localBook.coverImg) bookStore.dispatchs.setCoverImg(localBook.coverImg);
@@ -118,8 +121,5 @@ export default function BookForm(){
     }
   }
 
-  // 현재 서버 상태에 저장된 데이터와 다른지...
-  function isTitleChanged(title : string) : boolean {
-    return outline.title !== title;
-  }
+
 }

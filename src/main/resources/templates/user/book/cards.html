@@ -126,6 +126,7 @@
 
             // 스크롤 이벤트에 대한 리스너
             window.addEventListener('scroll', handleScroll);
+            console.log('정상작동');
 
             // 스크롤 이벤트 처리 함수
             function handleScroll() {
@@ -133,6 +134,7 @@
 
               // 로딩 중이거나 컨텐츠 끝에 도달했는지 확인
               if (isLoading || reachedEnd) return;
+              console.log('끝 도달');
 
               // 사용자가 페이지 하단으로 스크롤했는지 확인
               if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
@@ -179,7 +181,7 @@
 
             // DOM에 책을 추가하는 함수
             function appendBooksToDOM(data) {
-              const bookContainer = document.querySelector('.grid.grid-cols-4.gap-4');
+              const bookContainer = document.querySelector('.grid.grid-cols-1.sm\\:grid-cols-2.md\\:grid-cols-3.lg\\:grid-cols-5.xl\\:grid-cols-5.gap-x-6.xl\\:gap-x-8');
               const fragment = document.createDocumentFragment();
               data.forEach(book => {
                 // 각 책에 대한 HTML 요소를 생성하고 컨테이너에 추가
@@ -193,15 +195,49 @@
             // 책 요소를 생성하는 함수
             function createBookElement(book) {
               const div = document.createElement('div');
-              div.classList.add('card', 'border', 'rounded', 'p-4');
-              div.innerHTML = `
-                <a href="/books/detail/${book.id}">
-                  <img src="${book.coverImgUrl}" alt="Book Image">
-                  <h2>${book.title}</h2>
-                </a>
-                <p>${book.author.nickname}</p>
-                <p>${book.createdDate}</p>
-              `;
+              div.classList.add('rounded', 'aspect-h-16', 'aspect-w-11', 'xl:aspect-h-11', 'xl:aspect-w-16', 'w-full', 'overflow-hidden', 'shadow-lg', 'transition-transform', 'duration-300', 'transform', 'hover:-translate-y-3', 'mb-8');
+
+              const link = document.createElement('a');
+              link.href = `/books/detail/${book.id}`;
+
+              const relativeDiv = document.createElement('div');
+              relativeDiv.classList.add('relative');
+
+              const img = document.createElement('img');
+              img.src = book.coverImgUrl;
+              img.alt = 'Book Image';
+              img.classList.add('object-cover', 'object-center', 'group-hover:opacity-50');
+
+              const absoluteDiv = document.createElement('div');
+              absoluteDiv.classList.add('absolute', 'bottom-0', 'left-0', 'text-white', 'right-0');
+
+              const innerDiv = document.createElement('div');
+              innerDiv.classList.add('p-4');
+
+              const titleDiv = document.createElement('div');
+              titleDiv.classList.add('mb-4');
+
+              const titleH1 = document.createElement('h1');
+              titleH1.classList.add('font-extrabold', 'text-lg', 'text-center', 'overflow-hidden');
+              titleH1.textContent = book.title;
+
+              const authorDiv = document.createElement('div');
+              authorDiv.classList.add('text-slate-400', 'font-medium');
+
+              const authorH2 = document.createElement('h2');
+              authorH2.textContent = book.author.nickname;
+
+              // 조립
+              titleDiv.appendChild(titleH1);
+              authorDiv.appendChild(authorH2);
+              innerDiv.appendChild(titleDiv);
+              innerDiv.appendChild(authorDiv);
+              absoluteDiv.appendChild(innerDiv);
+              relativeDiv.appendChild(img);
+              relativeDiv.appendChild(absoluteDiv);
+              link.appendChild(relativeDiv);
+              div.appendChild(link);
+
               return div;
             }
 

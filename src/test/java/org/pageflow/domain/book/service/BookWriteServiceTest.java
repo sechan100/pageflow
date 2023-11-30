@@ -22,7 +22,7 @@ class BookWriteServiceTest {
     @Test
     @Commit
     void createBlankBook() {
-        for(int i = 0; i < 20; i++) {
+        for(int i = 0; i < 140; i++) {
             bookWriteService.createBlankBook(profileRepository.findById(1L).orElseThrow());
         }
     }

@@ -70,6 +70,7 @@ custom:
     login-form-uri: '/login'
   email:
     email-verify-sender: verify@pageflow.org
+    no-reply-sender: no-reply@pageflow.org
   defaults:
     default-user-profile-img: /img/default_profile_img.png
     default-book-cover-img: /img/default-book-cover-img.png

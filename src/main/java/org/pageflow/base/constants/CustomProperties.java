@@ -25,6 +25,7 @@ public class CustomProperties {
     @Data
     public static class Email {
         private String emailVerifySender;
+        private String noReplySender;
     }
 
     @Data

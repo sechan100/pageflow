@@ -45,9 +45,9 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         ResourceOwner resourceOwner = convertToResourceOwnerImpl(oAuth2User, clientRegistration);
 
         // 기존 회원정보 존재 -> 회원정보를 업데이트 후, 로그인 진행
-        if (accountService.existsByUsername(resourceOwner.getUsername())) {
+        if (accountService.repoExistsByUsername(resourceOwner.getUsername())) {
             accountService.updateAccount(resourceOwner);
-            Account refrashedAccount = accountService.findFetchJoinProfileByUsername(resourceOwner.getUsername());
+            Account refrashedAccount = accountService.repoFindFetchJoinProfileByUsername(resourceOwner.getUsername());
             return new PrincipalContext(refrashedAccount);
 
             // 회원정보 없음(신규) -> 기본 Account 정보가 포함된 AccountDetilasRegisterForm을 redis에 저장하고 리다이렉트

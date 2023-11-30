@@ -1,4 +1,4 @@
-package org.pageflow.base.exception.data;
+package org.pageflow.base.exception.entityaccessdenied;
 
 import lombok.NoArgsConstructor;
 

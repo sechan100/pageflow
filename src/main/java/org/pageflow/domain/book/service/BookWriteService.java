@@ -17,11 +17,16 @@ import org.pageflow.domain.book.model.summary.Outline;
 import org.pageflow.domain.book.model.summary.PageSummary;
 import org.pageflow.domain.book.model.summary.Rearrangeable;
 import org.pageflow.domain.user.entity.Profile;
+import org.pageflow.domain.user.service.AccountService;
+import org.pageflow.infra.email.EmailRequest;
+import org.pageflow.infra.email.EmailSender;
 import org.pageflow.infra.file.constants.FileMetadataType;
 import org.pageflow.infra.file.entity.FileMetadata;
 import org.pageflow.infra.file.service.FileService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -30,17 +35,20 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional
 public class BookWriteService {
     
     private final BookService bookService;
     private final FileService fileService;
     private final CustomProperties customProperties;
     private final SelectiveLISOptimizer selectiveLISOptimizer;
+    private final EmailSender emailSender;
+    private final TemplateEngine templateEngine;
+    private final AccountService accountService;
     
     /**
      * @return 새로운 책 객체를 반환한다. 작성이 되지 않은 책과, 하나씩의 기본 챕터와 페이지를 가진다.
      */
-    @Transactional
     public Book createBlankBook(Profile author) {
         
         // pp: 프로젝트 디렉토리에 기본 커버 이미지 저장하고 그 경로를 줘야함.
@@ -63,7 +71,6 @@ public class BookWriteService {
         return persistedBook;
     }
     
-    
     /**
      * 매개받은 책의 소속으로 제일 뒤에 새로운 챕터를 생성한다.
      * 추가로, 매개로 받은 Book 엔티티의 Chapters 컬렉션의 참조를 통해서 생성된 Chapter를 추가한다.
@@ -74,7 +81,6 @@ public class BookWriteService {
      *
      * @throws TransientPropertyValueException 소속될 챕터가 영속 상태가 아닌경우 발생
      */
-    @Transactional
     public Chapter createBlankChapter(Book ownerBook) throws TransientPropertyValueException {
         
         if(ownerBook.getId() == null){
@@ -104,12 +110,10 @@ public class BookWriteService {
         }
     }
     
-    @Transactional
     public Chapter createBlankChapter(Long bookId) throws TransientPropertyValueException, NoSuchElementException {
         return createBlankChapter(bookService.repoFindBookById(bookId));
     }
     
-    @Transactional
     public boolean deleteChapter(Long chapterId) {
             
             Chapter chapterToDelete = bookService.repoFindChapterById(chapterId);
@@ -134,7 +138,6 @@ public class BookWriteService {
      *
      * @throws TransientPropertyValueException 소속될 챕터가 영속 상태가 아닌경우 발생
      */
-    @Transactional
     public Page createBlankPage(Chapter ownerChapter) throws TransientPropertyValueException {
         
         Page newDefaultPage = Page.builder()
@@ -158,8 +161,6 @@ public class BookWriteService {
         }
     }
     
-    
-    @Transactional
     public boolean deletePage(Long pageId) {
         
         Page pageToDelete = bookService.repoFindPageById(pageId);
@@ -174,12 +175,10 @@ public class BookWriteService {
         }
     }
     
-    
     /**
      * @param updateRequest 업데이트 변경사항 dto
      * @return update된 책.
      */
-    @Transactional
     public Book updateBook(BookUpdateRequest updateRequest) {
         
         // 유효성 검사
@@ -188,7 +187,7 @@ public class BookWriteService {
         }
         
         // 업데이트의 대상인 Book 데이터를 가져옴
-        Book staleBook = bookService.repoFindBookWithAuthorById(updateRequest.getId());
+        Book staleBook = bookService.repoFindBookById(updateRequest.getId());
         
         /* BookUpdateRequest에 등록할 새로운 coverImg가 존재 && 기존의 이미지가 기본 커버 이미지가 아닌 경우
          * -> 기존의 coverImg를 삭제후 새로운 이미지 등록
@@ -214,12 +213,10 @@ public class BookWriteService {
         return bookService.repoSaveBook(staleBook);
     }
     
-    
     /**
      * @param updateRequest 업데이트 변경사항 dto
      * @return update된 Chapter
      */
-    @Transactional
     public Chapter updateChapter(ChapterUpdateRequest updateRequest) {
         
         if(updateRequest.getId() == null){
@@ -233,13 +230,11 @@ public class BookWriteService {
         return bookService.repoSaveChapter(staleChapter);
     }
     
-    
     /**
      * 여러개 업데이트
      * @param updateRequests 업데이트 변경사항 dto 리스트
      * @return update된 Chapter 리스트
      */
-    @Transactional
     public List<Chapter> updateChapters(List<ChapterUpdateRequest> updateRequests) {
         
         List<Chapter> updatedChapters = new ArrayList<>();
@@ -249,12 +244,10 @@ public class BookWriteService {
         return updatedChapters;
     }
     
-    
     /**
      * @param updateRequest 업데이트 변경사항 dto
      * @return update된 Page
      */
-    @Transactional
     public Page updatePage(PageUpdateRequest updateRequest) {
         
         if(updateRequest.getId() == null){
@@ -271,14 +264,12 @@ public class BookWriteService {
         return bookService.repoSavePage(stalePage);
     }
     
-    
     /**
      * Selctive LIS 알고리즘을 통해서 오름차순이 파괴된 수열에서 필요한 항을 제해가면서 가장 긴 오름차순 배열을 추출해낼 수 있다.
      * 이를 통해서 최소한의 엔트리 업데이트를 통해서도 오름차순 정렬을 유지할 수 있다.
      * @param outlineUpdateRequest 재정렬 변경사항 dto
      * @return update된 Outline
      */
-    @Transactional
     public Outline delegateRearrange(OutlineUpdateRequest outlineUpdateRequest) {
         
         List<ChapterSummary> chapterSummaries = outlineUpdateRequest.getChapters();
@@ -295,7 +286,6 @@ public class BookWriteService {
         return bookService.getOutline(outlineUpdateRequest.getId());
     }
     
-    @Transactional
     public void delegateDeleteRearrangeable(OutlineUpdateRequest outlineUpdateRequest) {
         // 삭제해야하는 Chapter, Page의 id들을 추출
         // { "chapter": set[Long], "page": set[Long] }
@@ -305,12 +295,10 @@ public class BookWriteService {
         deleteTargets.get("page").forEach(this::deletePage);
     }
     
-    
     /**
      * @param rearrangeables 재정렬이 필요한 Rearrangeable 리스트
      * @return update된 엔티티의 개수.
      */
-    @Transactional
     private <T extends Rearrangeable> int allocateNewSortPriorityOptimally(List<T> rearrangeables){
         
         List<Integer> staleSortPriorities = rearrangeables.stream().map(Rearrangeable::getSortPriority).toList();
@@ -338,7 +326,6 @@ public class BookWriteService {
         
     }
     
-    
     /**
      * @param pageSummaries page 리스트
      * @param ownerChapterId outline 상으로 페이지들이 소속된 chapter의 id
@@ -359,8 +346,6 @@ public class BookWriteService {
         return updatedEntity.get();
     }
     
-    
-    @Transactional
     private <T extends Rearrangeable> int updateSortPriority(List<T> rearrangeables, List<Integer> newAscendingSortPriorityList){
         AtomicInteger updatedEntityNum = new AtomicInteger();
         for(int i = 0; i < rearrangeables.size(); i++){
@@ -386,7 +371,6 @@ public class BookWriteService {
         
         return updatedEntityNum.get();
     }
-    
     
     /**
      * @param staleSortPriorities 우선순위가 망가진 챕터들의 sortPriority 배열
@@ -438,7 +422,6 @@ public class BookWriteService {
         return newSortPriorityList;
     }
     
-    
     /**
      * @return {
      *     "chapter": set[Long],
@@ -479,8 +462,6 @@ public class BookWriteService {
         return deleteTargets;
     }
     
-    
-    @Transactional
     public List<Page> updatePages(List<PageUpdateRequest> updateRequests) {
             
         List<Page> updatedPages = new ArrayList<>();
@@ -488,6 +469,64 @@ public class BookWriteService {
         updateRequests.forEach(page -> updatedPages.add(updatePage(page)));
         
         return updatedPages;
+    }
+    
+    public Book updateBookStatus(Long bookId, BookStatus status, String rejectReason) {
+        Book staleBook = bookService.repoFindBookById(bookId);
+        
+        String baseUrl = customProperties.getSite().getBaseUrl();
+        
+        // 상태 업데이트
+        switch(status)
+        {
+            case REVIEW_REQUESTED:
+                if(staleBook.getStatus() == BookStatus.PUBLISHED || staleBook.getStatus() == BookStatus.REVIEWING){
+                    throw new IllegalArgumentException("이미 출판된 상태, 또는 이미 검수중인 책은 책은 검수 요청 상태로 변경 불가능합니다.");
+                }
+                // 인증 코드를 템플릿에 담아서 이메일 내용 생성
+                // 관리자에게 새로운 책 검수 요청을 알리는 이메일
+                Context context1 = new Context();
+                context1.setVariable("book", staleBook);
+                context1.setVariable("baseUrl", baseUrl);
+                String emailText = templateEngine.process("/email/new_book_review_requested", context1);
+                System.out.println(emailText);
+                emailSender.sendMail(
+                        new EmailRequest(customProperties.getEmail().getNoReplySender(), accountService.findAdminAccount().getEmail(), "Pageflow - 새로운 책 검수 요청"),
+                        emailText
+                );
+                break;
+            
+            case PUBLISHED:
+            case REJECTED:
+                if(staleBook.getStatus() != BookStatus.REVIEWING){
+                    throw new IllegalArgumentException("검수 상태(REVIEWING)인 책만 PUBLSIHED, REJECTED 상태로 변경 가능합니다.");
+                }
+                // 인증 코드를 템플릿에 담아서 이메일 내용 생성
+                // 사용자의 책이 출판, 또는 거부 됐음을 알리는 이메일
+                Context context2 = new Context();
+                context2.setVariable("book", staleBook);
+                context2.setVariable("status", status);
+                context2.setVariable("rejectReason", rejectReason);
+                context2.setVariable("baseUrl", baseUrl);
+                String emailText2 = templateEngine.process("/email/book_review_finished", context2);
+                System.out.println(emailText2);
+                emailSender.sendMail(
+                        new EmailRequest(customProperties.getEmail().getNoReplySender(), staleBook.getAuthor().getAccount().getEmail(), "Pageflow - 책 검수완료 알림"),
+                        emailText2
+                );
+                break;
+        }
+        staleBook.setStatus(status);
+        
+        return bookService.repoSaveBook(staleBook);
+    }
+    
+    /**
+     * @param bookId 책 아이디
+     * @param status 변경할 상태. 단, REJECTED가 아닌 경우
+     */
+    public Book updateBookStatus(Long bookId, BookStatus status) {
+        return updateBookStatus(bookId, status, "");
     }
 }
 

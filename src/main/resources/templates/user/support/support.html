@@ -1,8 +1,79 @@
 <html lang="en" layout:decorate="~{/common/layout.html}">
 
 <head>
-    <title>login</title>
+    <title>고객센터</title>
     <style>
+        function toggleAccordion(index) {
+      var itemContent = document.querySelectorAll(".item-content");
+
+      // 모든 아코디언 항목을 닫음
+      for (var i = 0; i < itemContent.length; i++) {
+        if (i + 1 !== index) {
+          itemContent[i].style.display = "none";
+        }
+      }
+
+      // 클릭한 아코디언 항목을 열거나 닫음
+      var selectedContent = itemContent[index - 1];
+      if (selectedContent.style.display === "block") {
+        selectedContent.style.display = "none";
+      } else {
+        selectedContent.style.display = "block";
+      }
+    }
+
+    $(document).ready(function () {
+      $(".item-header").click(function () {
+        const content = $(this).next(".item-content");
+
+        const parent = $(this).parent();
+
+        if (parent.hasClass("active")) {
+          content.css("max-height", "0");
+          parent.removeClass("active");
+        } else {
+          $(".item.active .item-content").css("max-height", "0");
+          $(".item.active").removeClass("active");
+
+          content.css("max-height", content[0].scrollHeight + "px");
+          parent.addClass("active");
+        }
+      });
+    });
+
+    //댓글영역
+
+    function addComment() {
+      // 입력된 댓글 내용 가져오기
+      var commentInput = document.getElementById("comment-input");
+      var commentText = commentInput.value;
+
+      // 댓글 내용이 비어있으면 함수 종료
+      if (!commentText) {
+        alert("댓글을 입력하세요.");
+        return;
+      }
+
+      // 새로운 댓글 엘리먼트 생성
+      var commentList = document.getElementById("comment-list");
+      var newComment = document.createElement("li");
+      newComment.className = "comment";
+      newComment.textContent = commentText;
+
+      // 댓글 리스트에 새로운 댓글 추가
+      commentList.appendChild(newComment);
+
+      // 입력창 초기화
+      commentInput.value = "";
+    }
+
+    // 스크롤 이동 기능
+    // 클래스, 아이디 값을 인자로 받아 offsetTop 밸류 초기화
+    // 초기화된 offsetTop 값을 위치로 이동
+    function goToScroll(name) {
+      var location = document.querySelector("." + name).offsetTop;
+      window.scrollTo({ top: location, behavior: "smooth" });
+    }
 
     </style>
 </head>

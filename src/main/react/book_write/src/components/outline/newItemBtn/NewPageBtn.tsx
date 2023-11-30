@@ -51,7 +51,7 @@ export default function NewPageBtn({outline: localOutline} : {outline : Outline}
     <>
       {
         isNewPageBtnVisible && 
-        <button type="button" onClick={() => requestCreateChapter(chapterIdRef.current)} className="absolute z-20 top-5 px-1 md:px-5 right-[7%] py-2 text-xs font-medium text-center ext-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">
+        <button type="button" onClick={() => requestCreateChapter(chapterIdRef.current)} className="absolute z-20 top-5 px-1 md:px-5 right-[7%] py-2 text-xs font-medium text-center ext-gray-900 focus:outline-none bg-gray-200 rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-gray-700">
           새 페이지
         </button>
       }

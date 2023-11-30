@@ -4,10 +4,12 @@ package org.pageflow.domain.user.model.dto;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.experimental.SuperBuilder;
 import org.pageflow.domain.user.constants.ProviderType;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
+@SuperBuilder
 public class BasicSignupAccountDto extends DefaultAccountDto {
 
     @NotEmpty(message = "비밀번호 확인을 입력해주세요.")

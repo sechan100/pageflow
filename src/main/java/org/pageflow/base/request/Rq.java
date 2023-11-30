@@ -8,7 +8,7 @@ import jakarta.servlet.http.HttpSession;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.pageflow.base.exception.data.NoSuchEntityException;
+import org.pageflow.base.exception.nosuchentity.NoSuchEntityException;
 import org.pageflow.domain.user.entity.Account;
 import org.pageflow.domain.user.entity.Profile;
 import org.pageflow.domain.user.model.dto.PrincipalContext;
@@ -180,7 +180,7 @@ public class Rq {
     }
 
     public Account getAccount() {
-        return accountService.findFetchJoinProfileByUsername(userSession.getUsername());
+        return accountService.repoFindFetchJoinProfileByUsername(userSession.getUsername());
     }
     
     public Profile getProfile() {

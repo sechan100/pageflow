@@ -4,7 +4,7 @@ import jakarta.persistence.criteria.*;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.pageflow.base.entity.BaseEntity;
-import org.pageflow.base.exception.data.NoSuchEntityException;
+import org.pageflow.base.exception.nosuchentity.NoSuchEntityException;
 import org.pageflow.domain.book.entity.Book;
 import org.pageflow.domain.book.entity.Chapter;
 import org.pageflow.domain.book.entity.Page;

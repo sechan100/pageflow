@@ -49,10 +49,11 @@ export const useCarouselStore = create<UseCarouselStore>((set, get) => ({
 interface CarouselProps {
   children: React.ReactNode;
   carouselContentRef: React.RefObject<HTMLDivElement>;
+  isFallback: boolean;
 }
 
 
-const Carousel = ({ children, carouselContentRef } : CarouselProps) => {
+const Carousel = ({ children, carouselContentRef, isFallback } : CarouselProps) => {
 
   const carouselRef = useRef<HTMLDivElement>(null);
   const carouselBreakPointsRef = useRef<number[] | null>(null); // 캐러셀의 불연속적인 위치를 저장하는 배열 (화면 리사이즈시 업데이트)
@@ -63,9 +64,12 @@ const Carousel = ({ children, carouselContentRef } : CarouselProps) => {
 
   // 캐러셀의 불연속적인 위치를 업데이트한다. (Page 넘어갈 때, Chapter 넘어갈 때, 화면 리사이즈시)
   useEffect(() => {
-    
+
+    if(isFallback) return;
+
     const updateBreakPoints = () => {
       const newBreakPoints = updateCarouselBreakPoints();
+
       if(newBreakPoints){ // 새로 계산된 BreakPoints가 null이라면, [0]배열이라는 뜻... 즉, 아직 캐러셀 스크롤 로딩이 안된 상태이다.
         const carouselBreakPoints = carouselBreakPointsRef.current;
         // 이전의 BreakPoints가 null이라면 값이 처음 초기화되는 것으로, 바로 업데이트한다.
@@ -143,7 +147,7 @@ const Carousel = ({ children, carouselContentRef } : CarouselProps) => {
     };
 
 
-  }, [location, metaPage.type, carouselRef.current]);
+  }, [location, metaPage.type, carouselRef.current, isFallback]);
 
 
 
@@ -222,6 +226,9 @@ const Carousel = ({ children, carouselContentRef } : CarouselProps) => {
       <div ref={carouselRef} style={{ overflowX: 'hidden' }}>
         {children}
       </div>
+      {!metaPage.isMetaPage &&
+        <div className="fixed top-[2%] right-[3%]">{`캐러셀(${carouselIdx+1}/${carouselBreakPointsRef.current?.length})`}</div>
+      }
     </div>
   );
 
@@ -233,22 +240,29 @@ const Carousel = ({ children, carouselContentRef } : CarouselProps) => {
     if (carouselContainer) {
       const containerWidth = carouselContainer.getBoundingClientRect().width; // 현재 텍스트가 노출되는 컨테이너의 넓이
       const unitCarousel = (containerWidth * 1.08); // 하나의 캐러셀 단위의 사이즈(column gap이 있기 때문에 containerWidth보다 살짝 크다.) 0.08은 column-gap만큼의 offset
-
+      
       while(true){
         const newBreakPoint = breakPoints[breakPoints.length - 1] + unitCarousel; // 가장 마지막 브레이크 포인트에 unitCarousel만큼을 더한 값 => 다음 캐러셀 페이지
-
+        
         // 만약 "(현재 스크롤 값 + (containerWidth * 1.58)"이 전체 스크롤 길이보다 길다면, isLastInnerPage를 true로 설정한다.
         // 1.58 보정값 의미: 일단 현재 스크롤 값은 가장 왼쪽까지의 스크롤된 width이기에, 현재 스크린 길이만큼을 더해준다.
         // 거기에 페이지 반절 사이즈의 offset(빈페이지 반쪽)이 존재하기 때문에, 이것까지를 더했을 때, 이미 전체 스크롤 길이 이상이라면, 다음 페이지는 존재하지 않는 것이다.
         // 그리고 0.08은 column-gap만큼의 offset값이다.
         // console.log(`${newContainerScrollLeft} + (${containerWidth} * 1.58) >= ${container.scrollWidth}`);
         if(newBreakPoint + (containerWidth * 0.58) >= carouselContainer.scrollWidth){
+          // 근데 만약 스크롤과 width가 같다면 에초에 1장짜리 페이지인 것이므로 그냥 바로 리턴.
+          if(carouselContainer.scrollWidth === containerWidth){
+            setIsLastCarousel(true);
+            return breakPoints;
+          }
+          setIsLastCarousel(false);
           break;
         } else {
           breakPoints.push(newBreakPoint);
         }
       }
-
+      
+      setIsLastCarousel(false);
       return breakPoints.length > 1 ? breakPoints : null;
     } else {
       return null;

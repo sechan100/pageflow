@@ -56,13 +56,15 @@ tasks.register('restartRedisServerOnWindow', Exec) {
 //	commandLine 'cmd', '/c', 'start', '/B', 'C:\\Users\\gsw05\\OneDrive\\tools\\Redis-7.0.14-Windows-x64-with-Service\\redis-server.exe'
 	println '##### Started Redis Server #####'
 	commandLine 'cmd', '/c', 'start', '/B', 'C:\\Users\\SBS\\Redis-x64-3.0.504\\redis-server.exe'
-
+//	commandLine 'cmd', '/c', 'start', '/B', 'C:\\Users\\user\\Redis-x64-3.0.504\\redis-server.exe'
+	println('레디스가 실행중입니다.')
 }
 
 
 // 리액트 빌드
 tasks.register('buildReact-book_write', Exec) {
 	workingDir("src/main/react/book_write")
+	environment 'PUBLIC_URL', '/react/build/book_write'
 
 	if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
 		commandLine "cmd", "/c", "npm", "run", "build"
@@ -71,8 +73,10 @@ tasks.register('buildReact-book_write', Exec) {
 	}
 	println("book_write 리엑트를 빌드합니다...")
 }
+
 tasks.register('buildReact-book_viewer', Exec) {
 	workingDir("src/main/react/book_viewer")
+	environment 'PUBLIC_URL', '/react/build/book_viewer'
 
 	if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
 		commandLine "cmd", "/c", "npm", "run", "build"
@@ -106,7 +110,7 @@ tasks.register('copy-book_write', Copy) {
 }
 tasks.register('copy-book_viewer', Copy) {
 	dependsOn "clean-book_viewer"
-	from file("src/main/react/book_write/build")
+	from file("src/main/react/book_viewer/build")
 	into file('src/main/resources/static/react/build/book_viewer')
 	println("book_viewer 빌드 파일을 복사했습니다.")
 }

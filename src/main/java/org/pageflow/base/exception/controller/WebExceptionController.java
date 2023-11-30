@@ -1,7 +1,7 @@
 package org.pageflow.base.exception.controller;
 
-import org.pageflow.base.exception.data.WebEntityAccessDeniedException;
-import org.pageflow.base.exception.data.WebNoSuchEntityException;
+import org.pageflow.base.exception.entityaccessdenied.WebEntityAccessDeniedException;
+import org.pageflow.base.exception.nosuchentity.WebNoSuchEntityException;
 import org.springframework.http.HttpStatus;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;

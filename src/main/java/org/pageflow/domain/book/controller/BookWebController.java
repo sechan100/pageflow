@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.pageflow.base.annotation.SecuredBookId;
 import org.pageflow.base.request.Rq;
 import org.pageflow.domain.book.model.summary.BookSummary;
+import org.pageflow.domain.book.model.summary.Outline;
 import org.pageflow.domain.book.service.BookService;
 import org.pageflow.domain.user.service.AccountService;
 import org.springframework.data.domain.Slice;
@@ -31,10 +32,19 @@ public class BookWebController {
                        @RequestParam(value = "kw", defaultValue = "") String kw,
                        @RequestParam(value = "sort", defaultValue = "createdDate") String sortOption) {
         Slice<BookSummary> paging = this.bookService.getList(page, kw, sortOption);
+
         model.addAttribute("paging",paging);
         model.addAttribute("kw", kw);
         model.addAttribute("sort", sortOption);
         return "/user/book/cards";
+    }
+    
+    
+    @GetMapping("/books/{bookId}/details")
+        public String details(@PathVariable Long bookId, Model model) {
+            Outline outline = bookService.getOutline(bookId);
+            model.addAttribute("outline", outline);
+            return "/user/book/details";
     }
     
     
@@ -53,7 +63,7 @@ public class BookWebController {
     /**
      * @return react book write form page
      */
-    @GetMapping("/write/{bookId}")
+    @GetMapping("/write/{bookId}/**")
     public String writeForm(@SecuredBookId @PathVariable Long bookId, Model model) {
         rq.setRequestAttr("bookId", bookId);
         return "forward:/react/build/book_write/index.html";

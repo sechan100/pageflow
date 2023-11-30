@@ -27,5 +27,5 @@ public class Outline {
     private BookStatus status;
     private Profile author;
     private List<ChapterSummary> chapters;
-
+    
 }

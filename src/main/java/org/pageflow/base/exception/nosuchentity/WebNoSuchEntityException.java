@@ -1,6 +1,7 @@
-package org.pageflow.base.exception.data;
+package org.pageflow.base.exception.nosuchentity;
 
 import org.pageflow.base.entity.BaseEntity;
+import org.pageflow.base.exception.nosuchentity.NoSuchEntityException;
 
 /**
  * 엔티티 부재 예외 -> ControllerAdvice에서 일괄 처리

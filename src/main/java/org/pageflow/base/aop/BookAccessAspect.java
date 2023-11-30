@@ -6,8 +6,8 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.pageflow.base.annotation.SecuredBookId;
-import org.pageflow.base.exception.data.ApiEntityAccessDeniedException;
-import org.pageflow.base.exception.data.WebEntityAccessDeniedException;
+import org.pageflow.base.exception.entityaccessdenied.ApiEntityAccessDeniedException;
+import org.pageflow.base.exception.entityaccessdenied.WebEntityAccessDeniedException;
 import org.pageflow.base.request.Rq;
 import org.pageflow.domain.book.entity.Book;
 import org.pageflow.domain.book.service.BookService;
@@ -43,6 +43,19 @@ public class BookAccessAspect {
         for (int i = 0; i < parameterAnnotations.length; i++) {
             for (Annotation annotation : parameterAnnotations[i]) {
                 if (annotation instanceof SecuredBookId && parameterTypes[i] == Long.class) {
+                    // 관리자만 접근 가능한지 여부
+                    boolean isAdminOnlyAccessible = ((SecuredBookId) annotation).adminOnly();
+                    if(isAdminOnlyAccessible) {
+                        if(!rq.getUserSession().isAdmin()){
+                            if(isApiClass){
+                                throw new ApiEntityAccessDeniedException();
+                            } else {
+                                throw new WebEntityAccessDeniedException();
+                            }
+                        }
+                    }
+                    
+                    
                     Object arg = joinPoint.getArgs()[i];
                     Long bookId = (Long) arg;
                     Book book = bookService.repoFindBookWithAuthorById(bookId);

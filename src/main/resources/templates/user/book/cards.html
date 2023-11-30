@@ -88,11 +88,11 @@
             <div style="min-height: 100vh;">
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-5 gap-x-6 xl:gap-x-8">
                     <div th:each="book : ${paging}">
-                        <div class="rounded-md aspect-h-16 aspect-w-11 xl:aspect-h-11 xl:aspect-w-16 w-full overflow-hidden shadow-lg transition-transform duration-300 transform hover:-translate-y-3 mb-8">
+                        <div class="rounded-md aspect-h-16 aspect-w-11 xl:aspect-h-11 xl:aspect-w-16 w-full overflow-hidden shadow-lg transition-all duration-150 ease-in-out hover:z-1 hover:transform hover:scale-110 group mb-8">
                             <div>
                                 <a th:href="@{|/books/${book.id}/details|}">
                                     <div class="relative">
-                                        <img th:src="@{${book.coverImgUrl}}" alt="Book Image" class="object-cover object-center group-hover:opacity-50">
+                                        <img th:src="@{${book.coverImgUrl}}" alt="Book Image" class="object-cover transition-all duration-1000 ease-in-out group-hover:transform group-hover:scale-110 rounded-lg" style="backface-visibility: hidden;">
                                         <div class="absolute bottom-0 left-0 text-white right-0">
                                             <div class="  p-4">
                                                 <div class="mb-4">

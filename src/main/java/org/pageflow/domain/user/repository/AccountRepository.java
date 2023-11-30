@@ -5,6 +5,8 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Optional;
+
 public interface AccountRepository extends JpaRepository<Account, Long> {
 
     boolean existsByUsername(String username);
@@ -16,4 +18,6 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
     //    @Query("SELECT a FROM Account a JOIN FETCH a.profile WHERE a.username = :username")
     @EntityGraph(attributePaths = {"profile"})
     Account findFetchJoinProfileByUsername(@Param("username") String username);
+    
+   Optional<Account> findByRole(String role);
 }

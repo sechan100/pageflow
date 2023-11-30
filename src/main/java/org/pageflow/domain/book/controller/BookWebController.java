@@ -32,6 +32,7 @@ public class BookWebController {
                        @RequestParam(value = "kw", defaultValue = "") String kw,
                        @RequestParam(value = "sort", defaultValue = "createdDate") String sortOption) {
         Slice<BookSummary> paging = this.bookService.getList(page, kw, sortOption);
+
         model.addAttribute("paging",paging);
         model.addAttribute("kw", kw);
         model.addAttribute("sort", sortOption);
@@ -40,10 +41,10 @@ public class BookWebController {
     
     
     @GetMapping("/books/{bookId}/details")
-    public String details(@PathVariable Long bookId, Model model) {
-        Outline outline = bookService.getOutline(bookId);
-        model.addAttribute("outline", outline);
-        return "/user/book/details";
+        public String details(@PathVariable Long bookId, Model model) {
+            Outline outline = bookService.getOutline(bookId);
+            model.addAttribute("outline", outline);
+            return "/user/book/details";
     }
     
     
@@ -62,7 +63,7 @@ public class BookWebController {
     /**
      * @return react book write form page
      */
-    @GetMapping("/write/{bookId}")
+    @GetMapping("/write/{bookId}/**")
     public String writeForm(@SecuredBookId @PathVariable Long bookId, Model model) {
         rq.setRequestAttr("bookId", bookId);
         return "forward:/react/build/book_write/index.html";

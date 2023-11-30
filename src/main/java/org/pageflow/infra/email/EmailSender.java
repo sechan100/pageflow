@@ -17,7 +17,7 @@ public class EmailSender {
     private final JavaMailSender javaMailSender;
 
 
-    public void sendMail(EmailRequest request, String template) {
+    public void sendMail(EmailRequest request, String content) {
 
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
 
@@ -26,7 +26,7 @@ public class EmailSender {
             mimeMessageHelper.setTo(request.getTo());
             mimeMessageHelper.setSubject(request.getSubject());
             mimeMessageHelper.setFrom(request.getFrom());
-            mimeMessageHelper.setText(template, true);
+            mimeMessageHelper.setText(content, true);
 
             // ### mail send ###
             javaMailSender.send(mimeMessageHelper.getMimeMessage());

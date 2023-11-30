@@ -5,7 +5,7 @@ import jakarta.validation.Valid;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.pageflow.base.constants.CustomProperties;
-import org.pageflow.base.exception.data.NoSuchEntityException;
+import org.pageflow.base.exception.nosuchentity.NoSuchEntityException;
 import org.pageflow.domain.user.constants.Role;
 import org.pageflow.domain.user.entity.Account;
 import org.pageflow.domain.user.entity.Profile;
@@ -33,6 +33,7 @@ import org.thymeleaf.context.Context;
  */
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class AccountService {
 
     @Getter
@@ -60,7 +61,7 @@ public class AccountService {
                 .username(form.getUsername())
                 .password(passwordEncoder.encode(form.getPassword()))
                 .profile(profile)
-                .role(Role.USER)
+                .role(form.getUsername().equals("admin") ? Role.ADMIN : Role.USER)
                 .build();
 
         Account savedAccount = accountRepository.save(account);
@@ -68,16 +69,19 @@ public class AccountService {
         MultipartFile profileImg = form.getProfileImg();
         String profileImgUrl = form.getProfileImgUrl();
 
+        boolean isProfileImgEmpty = profileImg == null || profileImg.isEmpty();
+        boolean isProfileImgUrlEmpty = profileImgUrl == null || profileImgUrl.isEmpty();
+        
         // 프로필 사진 이미지 파일을 등록한 경우
-        if (!profileImg.isEmpty() && profileImgUrl.isEmpty()) {
+        if (!isProfileImgEmpty && isProfileImgUrlEmpty) {
             setProfileImg(profileImg, savedAccount.getProfile());
 
             // 프로필 사진의 URL을 등록한 경우
-        } else if (profileImg.isEmpty() && !profileImgUrl.isEmpty()) {
+        } else if (isProfileImgEmpty && !isProfileImgUrlEmpty) {
             setProfileImgUrl(profileImgUrl, savedAccount.getProfile());
 
             // 둘 다 등록한 경우 -> 파일로 등록한 사진이 우선순위
-        } else if (!profileImg.isEmpty() && !profileImgUrl.isEmpty()) {
+        } else if (!isProfileImgEmpty) { // && !isProfileImgUrlEmpty
             setProfileImg(profileImg, savedAccount.getProfile());
 
             // 프로필 사진을 등록하지 않은 경우
@@ -177,19 +181,21 @@ public class AccountService {
                 || !profileImgUrl.startsWith(customProperties.getFiles().getImg().getBaseUrl());
     }
 
-    // ****************************************************
-    // *********     JPA Repository service      **********
-    // ****************************************************
-
-    public Account findFetchJoinProfileByUsername(String username) {
+    public Account findAdminAccount() {
+        return accountRepository.findByRole(Role.ADMIN).orElseThrow(
+                () -> new NoSuchEntityException(Account.class, "관리자 계정을 찾을 수 없습니다.")
+        );
+    }
+    
+    public Account repoFindFetchJoinProfileByUsername(String username) {
         return accountRepository.findFetchJoinProfileByUsername(username);
     }
 
-    public boolean existsByUsername(String username) {
+    public boolean repoExistsByUsername(String username) {
         return accountRepository.existsByUsername(username);
     }
 
-    public boolean existsByEmailAndProvider(String email, String provider) {
+    public boolean repoExistsByEmailAndProvider(String email, String provider) {
         return accountRepository.existsByEmailAndProvider(email, provider);
     }
 

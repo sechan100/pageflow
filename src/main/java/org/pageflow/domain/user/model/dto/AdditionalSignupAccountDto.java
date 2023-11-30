@@ -2,17 +2,20 @@ package org.pageflow.domain.user.model.dto;
 
 
 import jakarta.validation.constraints.NotEmpty;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.pageflow.domain.user.constants.ProviderType;
 import org.pageflow.domain.user.entity.AwaitingEmailVerificationRequest;
 import org.springframework.web.multipart.MultipartFile;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
+@SuperBuilder
+@AllArgsConstructor
+@Builder
 public class AdditionalSignupAccountDto extends DefaultAccountDto {
-
-    // profileImg, profileImgUrl 둘 중 하나만 있으면 된다.
+    
+    // 2개 다 설정하면 profileImg를 우선적으로 사용.
     private MultipartFile profileImg;
     private String profileImgUrl;
 

@@ -16,11 +16,11 @@ export default function OutlineSidebar({children, outline: localOutline} : IOutl
 
   return (
     <>
-      <div className={`flex w-[${sidebarRatio}vw]`}>
+      <div className={`h-screen w-[${sidebarRatio}vw] transition-transform -translate-x-full sm:translate-x-0`}>
         <aside id="page-outline-sidebar-placeholder" className="z-50 h-screen w-full transition-transform -translate-x-full sm:translate-x-0"></aside>
       </div>
       <aside id="page-outline-sidebar" className={`fixed z-50 h-screen w-[${sidebarRatio}vw] transition-transform -translate-x-full sm:translate-x-0`}>
-        <div className="invisible-scroll overflow-y-auto relative pt-16 pb-5 px-3 h-full bg-white border-r border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+        <div className="invisible-scroll overflow-y-auto relative pt-16 pb-5 px-3 h-full bg-gray-800 border-r border-gray-200">
           {children}
           <NewChapterBtn outline={localOutline} />
           <NewPageBtn outline={localOutline} />

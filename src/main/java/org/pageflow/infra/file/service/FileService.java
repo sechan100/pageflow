@@ -3,7 +3,7 @@ package org.pageflow.infra.file.service;
 import lombok.extern.slf4j.Slf4j;
 import org.pageflow.base.constants.CustomProperties;
 import org.pageflow.base.entity.BaseEntity;
-import org.pageflow.base.exception.data.NoSuchEntityException;
+import org.pageflow.base.exception.nosuchentity.NoSuchEntityException;
 import org.pageflow.infra.file.constants.FileMetadataType;
 import org.pageflow.infra.file.entity.FileMetadata;
 import org.pageflow.infra.file.repository.FileMetadataRepository;

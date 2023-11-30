@@ -133,48 +133,51 @@
 
 <!--  책 좋아요 싫어요  -->
     <script>
-            function togglePreference() {
-                var bookId = [[${outline.id}]];
-                var isLiked = $('#heart').data('filled');
+        function togglePreference() {
+            var bookId = [[${outline.id}]];
+            var isLiked = $('#heart').data('filled');
 
-                $.ajax({
-                    type: isLiked ? 'DELETE' : 'POST',
-                    url: '/api/books/' + bookId + '/preferences',
-                    data: { isLiked: isLiked },
-                    success: function(data) {
-                        if (isLiked) {
-                            $('#heartIcon').removeClass('fas').addClass('far').css('color', '#000000');
-                            $('#heart').data('filled', false);
-                            console.log('좋아요 취소');
-                        } else {
-                            $('#heartIcon').removeClass('far').addClass('fas').css('color', 'red');
-                            $('#heart').data('filled', true);
-                            console.log('좋아요');
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        console.error('처리 중 에러가 발생');
-                    }
-                });
-            }
-
-            // 페이지 로드 시 초기 설정
-            $(document).ready(function() {
-                var bookId = 1; // Replace with your actual bookId
-
-                $.get('/api/books/' + bookId + '/preferences', function(data) {
-                    if (data.isLiked) {
+            $.ajax({
+                type: isLiked ? 'DELETE' : 'POST',
+                url: '/api/books/' + bookId + '/preferences',
+                data: { isLiked: !isLiked },
+                success: function (data) {
+                    if (!isLiked) {
                         $('#heartIcon').removeClass('far').addClass('fas').css('color', 'red');
                         $('#heart').data('filled', true);
+                        localStorage.setItem('likedBook_' + bookId, 'true');
+                        console.log('좋아요');
+                    } else {
+                        $('#heartIcon').removeClass('fas').addClass('far').css('color', '#000000');
+                        $('#heart').data('filled', false);
+                        localStorage.removeItem('likedBook_' + bookId);
+                        console.log('좋아요 취소');
                     }
-                });
+                },
+                error: function (xhr, status, error) {
+                    console.error('처리 중 에러가 발생');
+                }
             });
+        }
+
+        $(document).ready(function () {
+            var bookId = [[${outline.id}]];
+            var isLiked = localStorage.getItem('likedBook_' + bookId);
+
+            if (isLiked) {
+                $('#heartIcon').removeClass('far').addClass('fas').css('color', 'red');
+                $('#heart').data('filled', true);
+            } else {
+                $('#heartIcon').removeClass('fas').addClass('far').css('color', '#000000');
+                $('#heart').data('filled', false);
+            }
+        });
     </script>
 
 <!--  댓글 관련 기능  -->
     <script>
         $(document).ready(function () {
-            var bookId = 3;
+            var bookId =  [[${outline.id}]];
             refreshCommentList(bookId);
 
             // 페이지 로드 시 댓글 개수 가져오기
@@ -268,11 +271,16 @@
 
         // 댓글 작성 함수
         function commentWrite_submitForm(form) {
-            var bookId = 3;
+            var bookId =  [[${outline.id}]];
             form.content.value = form.content.value.trim();
 
-            if (form.content.value.length === 0) {
-                alert('댓글 입력 오류\n댓글을 입력해주세요');
+            if (form.content.value.length == 0) {
+                flowAlert("warning", "댓글을 입력해주세요");
+                form.content.focus();
+                return;
+            }
+            if (form.content.value.length > 30) {
+                flowAlert("warning", "댓글 30자 이상 적을 수가 없습니다");
                 form.content.focus();
                 return;
             }
@@ -297,8 +305,9 @@
 
         // 댓글 삭제
         function deleteComment(commentId) {
-            var bookId = 3;
+            var bookId =  [[${outline.id}]];
             closeModal(commentId);
+
 
             var confirmDelete = confirm('정말로 삭제하시겠습니까?');
             if (confirmDelete) {
@@ -307,18 +316,23 @@
                     url: '/api/books/' + bookId + '/comments/' + commentId,
                     success: function (comment) {
                         console.log('댓글 삭제 완료:', comment);
+                        flowAlert("success", "댓글이 삭제되었습니다.");
                         updateCommentList(bookId);
                         // 댓글 개수 업데이트
                         updateCommentCount();
+                        // 모달 창 닫기
+                        closeCommentModal();
                     },
                     error: function (xhr, status, error) {
                         console.error('댓글 삭제 에러:', xhr, status, error);
-                        // 에러 메시지 출력
-                        alert('댓글 삭제 중 에러가 발생했습니다.');
+                        flowAlert("error", "댓글 삭제 도중 오류가 발생하였습니다.");
+                        // 모달 창 닫기
+                        closeCommentModal();
                     }
                 });
             }
         }
+
 
         // 댓글 수정 버튼 후 화면 표시
         function editComment(commentId) {
@@ -371,13 +385,13 @@
         }
 
         // 댓글 관련 버튼 모달 닫기
-        function closeModal(commentId) {
+        function closeCommentModal(commentId) {
             var modal = document.getElementById('my_modal_' + commentId);
             modal.close();
         }
 
         function updateCommentCount() {
-            var bookId = 3;
+            var bookId =  [[${outline.id}]];
 
             $.ajax({
                 type: 'GET',
@@ -404,9 +418,10 @@
                  data: { isLiked: isLiked },
                  success: function (data) {
                      updateUI(commentId, data);
+                     console.log('클릭');
                  },
                  error: function () {
-                     console.error('선호도 업데이트에 실패했습니다.');
+                     console.error('업데이트 실패');
                  }
              });
          }
@@ -434,12 +449,14 @@
         function toggleLikeComment(commentId) {
             var isLiked = $('#likeButton_' + commentId).hasClass('active');
             updatePreference(commentId, !isLiked);
+            console.log('좋아요 클릭');
         }
 
         // 댓글에 대한 싫어요 토글
         function toggleDislikeComment(commentId) {
             var isDisliked = $('#dislikeButton_' + commentId).hasClass('active');
             updatePreference(commentId, !isDisliked);
+            console.log('싫어요 클릭');
         }
     </script>
 

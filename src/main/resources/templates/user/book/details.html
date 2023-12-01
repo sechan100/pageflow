@@ -45,10 +45,11 @@
                             <div class="flex flex-col items-center text-center justify-center w-full">
                                 <h2 class="mt-8 mb-8 font-black text-2xl w-full" th:text="${outline.title}"></h2>
                                 <div>
-                                    <span class="font-semibold mt-8 mr-3" th:text="${outline.author.nickname}"></span>
+                                    <span class="font-semibold mt-8 mr-3" th:text="|${outline.author.nickname} 작가|"></span>
                                     <a href="#" id="heart" data-filled="false" onclick="togglePreference()">
                                         <i id="heartIcon" class="far fa-heart" style="color: #000000;"></i>
                                     </a>
+                                    <span>[[${outline.preferenceStatistics.likes}]]</span>
                                 </div>
                                 <a th:href="@{|/viewer/${outline.id}|}"
                                    class="custom-btn read-btn w-52 mt-20 relative rounded-sm font-semibold	leading-10 bg-black	text-white p-1">읽기</a>
@@ -174,7 +175,6 @@
         });
     </script>
 
-<!--  댓글 관련 기능  -->
     <script>
         $(document).ready(function () {
             var bookId =  [[${outline.id}]];
@@ -204,7 +204,7 @@
                     console.log("Interactions from server:", interactions);
 
                     // 댓글 목록 추출
-                    var commentList = Array.isArray(interactions.comments) ? interactions.comments.map(item => item.comment) : [];
+                    const commentList = interactions.comments;
 
                     displayCommentList(commentList);
                 },
@@ -217,7 +217,6 @@
         // 댓글 목록을 화면에 표시
         function displayCommentList(commentList) {
             var output = "";
-            var userImg =  "[[${outline.author.profileImgUrl}]]";
 
             if (commentList && commentList.length > 0) {
                 commentList.sort(function (a, b) {
@@ -225,11 +224,15 @@
                 });
 
                 for (var i in commentList) {
-                    var comment = commentList[i];
+                    const comment = commentList[i];
+                    const profileImgUrl = comment.interactor.profileImgUrl;
+
+
+
                     output += "<div class='flex text-xs p-2 mt-3 border-b-2'>";
                     output += "<div class='w-10 mr-2 ml-2 flex '>";
                     output += "<div class='w-7 h-7 m-auto justify-items-center'>";
-                    output += "<img src='" + userImg + "' alt='프로필이미지' class='rounded-full'>";
+                    output += "<img src='" + profileImgUrl + "' alt='프로필이미지' class='rounded-full'>";
                     output += "</div>";
                     output += "</div>";
                     output += "<div class='flex flex-col w-full p-1'>";
@@ -245,7 +248,7 @@
                     // Like button
                     output += "<div class='mr-2 py-1 px-2 rounded-lg shadow-inner btn btn-ghos'>";
                     output += "<a id='likeButton_" + comment.id + "' href='javascript:void(0);' onclick='toggleLikeComment(" + comment.id + ")'><i class='fas fa-thumbs-up text-xl text-blueGray-500'></i></a>";
-                    output += "<span id='likesCount_" + comment.id + "' class='mr-1 ml-2 text-lg font-medium'>11 </span>";
+                    output += "<span id='likesCount_" + comment.id + "' class='mr-1 ml-2 text-lg font-medium'>" + comment.preferenceStatistics.likes+ "</span>";
                     output += "</div>";
 
                     // Edit button
@@ -413,6 +416,7 @@
         });
     }
     </script>
+    <!--  댓글 관련 기능  -->
 
 
     <!--  댓글 좋아요 싫어요  -->

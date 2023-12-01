@@ -49,5 +49,6 @@ src/main/resources/static/react/build/**
 /jdks/
 /native/
 /wrapper/
+dump.rdb
 src/main/resources/static/js/node_modules/
 /src/main/resources/static/js/node_modules/

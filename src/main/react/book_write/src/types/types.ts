@@ -5,6 +5,7 @@ export interface Outline {
   coverImgUrl: string,
   published: boolean
   chapters: ChapterSummary[] | null,
+  preferenceStatistics: PreferenceStatistics
 }
 
 
@@ -19,6 +20,12 @@ export interface PageSummary {
   id: number,
   title: string,
   sortPriority : number
+}
+
+
+export interface PreferenceStatistics {
+  like: number,
+  dislike: number,
 }
 
 export interface IPage {

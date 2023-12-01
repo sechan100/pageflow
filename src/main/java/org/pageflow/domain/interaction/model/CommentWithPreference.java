@@ -4,7 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.pageflow.domain.interaction.entity.Comment;
+import org.pageflow.domain.user.model.dto.UserSession;
+
+import java.time.LocalDateTime;
 
 /**
  * @author : sechan
@@ -14,6 +16,13 @@ import org.pageflow.domain.interaction.entity.Comment;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CommentWithPreference {
-    private Comment comment;
+    
+    private Long id;
+    private LocalDateTime createdDate;
+    private LocalDateTime modifiedDate;
+    private UserSession interactor;
+    private String targetType;
+    private Long targetId;
+    private String content;
     private PreferenceStatistics preferenceStatistics;
 }

@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { create } from 'zustand';
-import { metaPageType, useLocationStore } from '../nav/PageCursor';
+import { useLocationStore } from '../nav/PageCursor';
 import _ from 'lodash';
 
 

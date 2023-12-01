@@ -10,9 +10,12 @@ import org.pageflow.domain.book.model.request.ChapterUpdateRequest;
 import org.pageflow.domain.book.model.request.PageUpdateRequest;
 import org.pageflow.domain.book.service.BookService;
 import org.pageflow.domain.book.service.BookWriteService;
+import org.pageflow.domain.interaction.entity.Comment;
+import org.pageflow.domain.interaction.model.InteractionPair;
 import org.pageflow.domain.interaction.service.CommentService;
 import org.pageflow.domain.interaction.service.PreferenceService;
 import org.pageflow.domain.user.constants.ProviderType;
+import org.pageflow.domain.user.entity.Profile;
 import org.pageflow.domain.user.model.dto.AdditionalSignupAccountDto;
 import org.pageflow.domain.user.repository.AccountRepository;
 import org.pageflow.domain.user.repository.ProfileRepository;
@@ -21,17 +24,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 @Configuration
 @RequiredArgsConstructor
-@Profile("!prod")
+@org.springframework.context.annotation.Profile("!prod")
 @Slf4j
 public class DummyDataCreator {
 
@@ -48,6 +47,9 @@ public class DummyDataCreator {
     
     private int userN = 100;
     private int bookN = 100;
+    private int maxCommentN = 10;
+    private int maxBookPreferenceN = 10; // 실제 최대 개수는 maxBookPreferenceN를 넘지않는 최대 정수
+    private int maxCommentPreferenceN = 10; // 실제 최대 개수는 maxCommentPreferenceN를 넘지않는 최대 정수
 
     @Bean
     public ApplicationRunner init() {
@@ -105,8 +107,54 @@ public class DummyDataCreator {
         for(int i = 0; i < bookN; i++){
             Book book = bookWriteService.createBlankBook(profileRepository.findById(randomLDownN(userN)).orElseThrow());
             book.setCoverImgUrl(getRamdomCoverImgUrl());
-            book.setTitle("책 제목 " + i);
+            book.setTitle("책 제목 " + (i + 1));
             bookService.repoSaveBook(book);
+            
+            Random random = new Random();
+            
+            // 선호 생성
+            Set<Long> userIds = new HashSet<>(); // 이미 선호를 누른 사용자 집합
+            int currentMaxBookPreferenceN = random.nextInt(maxBookPreferenceN);
+            for(int j = 0; j < currentMaxBookPreferenceN; j++){
+                Long userId;
+                while(true){
+                    userId = randomLDownN(userN);
+                    if(!userIds.contains(userId)){
+                        userIds.add(userId);
+                        break;
+                    }
+                }
+                
+                Profile user = profileRepository.findById(userId).orElseThrow();
+                InteractionPair<Book> pair = new InteractionPair<>(user, book);
+                preferenceService.createPreference(pair, new Random().nextBoolean());
+            }
+            
+            // 댓글 생성
+            int currentMaxCommentN = random.nextInt(maxCommentN);
+            for(int k = 0; k < currentMaxCommentN; k++){
+                
+                Profile user = profileRepository.findById(randomLDownN(userN)).orElseThrow();
+                InteractionPair<Book> pair = new InteractionPair<>(user, book);
+                Comment comment = commentService.createComment(pair, getRandomComment()); // 댓글 생성
+                
+                // 댓글 선호 생성
+                Set<Long> commentUserIds = new HashSet<>(); // 이미 선호를 누른 사용자 집합
+                for(int j = 0; j < random.nextInt(maxCommentPreferenceN); j++){
+                    Long userId;
+                    while(true){
+                        userId = randomLDownN(userN);
+                        if(!commentUserIds.contains(userId)){
+                            commentUserIds.add(userId);
+                            break;
+                        }
+                    }
+                    
+                    InteractionPair<Comment> commentPair = new InteractionPair<>(profileRepository.findById(userId).orElseThrow(), comment);
+                    preferenceService.createPreference(commentPair, new Random().nextBoolean());
+                }
+                
+            }
             
             Chapter defaultChapter = book.getChapters().get(0);
             defaultChapter.setTitle(getRandomTitle());
@@ -360,5 +408,40 @@ public class DummyDataCreator {
         );
         Collections.shuffle(urls);
         return urls.get(0);
+    }
+    
+    public String getRandomComment(){
+        List<String> comments = Arrays.asList(
+            "이야기가 너무 재밌어요!",
+            "이야기가 너무 재미없어요!",
+            "이야기가 너무 슬퍼요!",
+            "이야기가 너무 신기해요!",
+            "이야기가 너무 흥미롭네요!",
+            "이야기가 너무 재미있어요!",
+            "이야기가 너무 재미없어요!",
+            "이야기가 너무 슬퍼요!",
+            "이야기가 너무 신기해요!",
+            "이야기가 너무 흥미롭네요!",
+            "이야기가 너무 재미있어요!",
+            "이야기가 너무 재미없어요!",
+            "이야기가 너무 슬퍼요!",
+            "이야기가 너무 신기해요!",
+            "이야기가 너무 흥미롭네요!",
+            "이야기가 너무 재미있어요!",
+            "이야기가 너무 재미없어요!",
+            "이야기가 너무 슬퍼요!",
+            "이야기가 너무 신기해요!",
+            "이야기가 너무 흥미롭네요!",
+            "이야기가 너무 재미있어요!",
+            "이야기가 너무 재미없어요!",
+            "이야기가 너무 슬퍼요!",
+            "이야기가 너무 신기해요!",
+            "이야기가 너무 흥미롭네요!",
+            "이야기가 너무 재미있어요!",
+            "이야기가 너무 재미없어요!"
+        );
+        
+        Collections.shuffle(comments);
+        return comments.get(0);
     }
 }

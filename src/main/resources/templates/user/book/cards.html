@@ -5,9 +5,9 @@
 
 <!--  select 정렬순 스타일  -->
     <style>
-       .btn-select.on+.list-member {
-                  display: block;
-                }
+                    .btn-select.on+.list-member {
+                        display: block;
+                   }
 
                 // block 성질 중요
                 .list-member li {
@@ -194,10 +194,10 @@
 
 
            // 책 요소를 생성하는 함수
+           // 새로운 책이 추가가 될 때 태그별로 클래스를 추가하여 효과적용 시킴!!
            function createBookElement(book) {
              const div = document.createElement('div');
-             div.classList.add('rounded', 'aspect-h-16', 'aspect-w-11', 'xl:aspect-h-11', 'xl:aspect-w-16', 'w-full', 'overflow-hidden', 'shadow-lg', 'transition-transform', 'duration-300', 'transform', 'hover:-translate-y-3', 'mb-8');
-
+             div.classList.add('rounded-md', 'aspect-h-16', 'aspect-w-11', 'xl:aspect-h-11', 'xl:aspect-w-16', 'w-full', 'overflow-hidden', 'shadow-lg', 'transition-all', 'duration-150', 'ease-in-out', 'hover:z-1' , 'hover:transform' , 'hover:scale-110' ,'group', 'mb-8');
              const link = document.createElement('a');
              link.href = `/books/detail/${book.id}`;
 
@@ -207,8 +207,7 @@
              const img = document.createElement('img');
              img.src = book.coverImgUrl;
              img.alt = 'Book Image';
-             img.classList.add('object-cover', 'object-center', 'group-hover:opacity-50');
-
+             img.classList.add('object-cover', 'transition-all', 'duration-1000', 'ease-in-out', 'group-hover:transform', 'group-hover:scale-110', 'rounded-lg');
              const absoluteDiv = document.createElement('div');
              absoluteDiv.classList.add('absolute', 'bottom-0', 'left-0', 'text-white', 'right-0');
 

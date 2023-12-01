@@ -240,11 +240,11 @@
                     output += "<div class='flex justify-between'>";
                     var formattedDate = new Date(comment.createdDate).toISOString().split('T')[0];
                     output += "<span class='text-gray-500'>" + formattedDate + "</span>";
-                    output += "<div class='flex justify-end'>";
-                    output += "<a id='likeButton_" + comment.id + "' href='javascript:void(0);' onclick='toggleLikeComment(" + comment.id + ")'><i class='fa-regular fa-face-grin-hearts text-2xl text-rose-600'></i></a>";
-                    output += "<span id='likesCount_" + comment.id + "' class='mr-1'>" + comment.likes + "</span>";
-                    output += "<a id='dislikeButton_" + comment.id + "' href='javascript:void(0);' onclick='toggleDislikeComment(" + comment.id + ")'><i class='fa-regular fa-face-tired text-2xl text-rose-600'></i></a>";
-                    output += "<span id='dislikesCount_" + comment.id + "'>" + comment.dislikes  + "</span>";
+                    output += "<div class='flex justify-end border border-slate-400 py-1 px-2 rounded-lg shadow-inner'>";
+                    output += "<a id='likeButton_" + comment.id + "' href='javascript:void(0);' onclick='toggleLikeComment(" + comment.id + ")'><i class='fas fa-thumbs-up text-2xl text-blueGray-500'></i></a>";
+                    output += "<span id='likesCount_" + comment.id + "' class='mr-1 ml-2 text-lg font-medium'>11 </span>";
+<!--                    output += "<a id='dislikeButton_" + comment.id + "' href='javascript:void(0);' onclick='toggleDislikeComment(" + comment.id + ")'><i class='fa-regular fa-face-tired text-2xl text-rose-600'></i></a>";-->
+<!--                    output += "<span id='dislikesCount_" + comment.id + "'>" + comment.dislikes  + "</span>";-->
                     output += "</div>";
                     output += "</div>";
                     output += "</div>";

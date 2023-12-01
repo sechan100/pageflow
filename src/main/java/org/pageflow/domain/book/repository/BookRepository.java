@@ -32,4 +32,5 @@ public interface BookRepository extends JpaRepository<Book, Long> {
             "GROUP BY b " +
             "ORDER BY likeCount DESC")
     Slice<Book> findTopLikedBooks(Pageable pageable);
+
 }

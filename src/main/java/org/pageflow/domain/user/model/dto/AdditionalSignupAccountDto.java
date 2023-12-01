@@ -12,7 +12,6 @@ import org.springframework.web.multipart.MultipartFile;
 @Data
 @SuperBuilder
 @AllArgsConstructor
-@Builder
 public class AdditionalSignupAccountDto extends DefaultAccountDto {
     
     // 2개 다 설정하면 profileImg를 우선적으로 사용.

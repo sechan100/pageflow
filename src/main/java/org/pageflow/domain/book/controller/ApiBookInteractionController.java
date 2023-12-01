@@ -1,12 +1,12 @@
 package org.pageflow.domain.book.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.pageflow.base.annotation.SecuredCommentId;
 import org.pageflow.base.request.Rq;
 import org.pageflow.domain.book.entity.Book;
 import org.pageflow.domain.book.service.BookService;
 import org.pageflow.domain.interaction.entity.Comment;
 import org.pageflow.domain.interaction.entity.Preference;
-import org.pageflow.domain.interaction.model.CommentWithPreference;
 import org.pageflow.domain.interaction.model.InteractionPair;
 import org.pageflow.domain.interaction.model.InteractionsOfTarget;
 import org.pageflow.domain.interaction.model.PreferenceStatistics;
@@ -15,8 +15,6 @@ import org.pageflow.domain.interaction.service.InteractionService;
 import org.pageflow.domain.interaction.service.PreferenceService;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 /**
  * @author : sechan
@@ -37,8 +35,8 @@ public class ApiBookInteractionController {
     // [READ] 책에 관한 모든 interaction 조회
     @GetMapping("/api/books/{bookId}/interactions")
     public InteractionsOfTarget getInteractions(@PathVariable("bookId") Long bookId) {
-        InteractionPair<Book> pair = new InteractionPair<>(rq.getProfile(), bookService.repoFindBookById(bookId));
-        return interactionService.getAllInteractionsOfTarget(pair);
+        Book book = bookService.repoFindBookById(bookId);
+        return interactionService.getAllInteractionsOfTarget(book);
     }
 
 
@@ -57,7 +55,7 @@ public class ApiBookInteractionController {
     @PutMapping("/api/books/{bookId}/comments/{commentId}")
     public Comment updateComment(
             @PathVariable("bookId") Long bookId,
-            @PathVariable("commentId") Long commentId,
+            @SecuredCommentId @PathVariable("commentId") Long commentId,
             @RequestParam String content
     ) {
         return commentService.updateComment(commentId, content);
@@ -68,7 +66,7 @@ public class ApiBookInteractionController {
     @DeleteMapping("/api/books/{bookId}/comments/{commentId}")
     public void deleteComment(
             @PathVariable("bookId") Long bookId,
-            @PathVariable("commentId") Long commentId
+            @SecuredCommentId @PathVariable("commentId") Long commentId
     ) {
         commentService.deleteComment(commentId);
     }
@@ -120,8 +118,8 @@ public class ApiBookInteractionController {
     public PreferenceStatistics getPreference(
             @PathVariable("bookId") Long bookId
     ) {
-        InteractionPair<Book> pair = new InteractionPair<>(rq.getProfile(), bookService.repoFindBookById(bookId));
-        return preferenceService.getPreferenceStatistics(pair);
+        Book book = bookService.repoFindBookById(bookId);
+        return preferenceService.getPreferenceStatistics(book);
     }
 }
 

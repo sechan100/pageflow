@@ -16,6 +16,7 @@ import org.pageflow.domain.book.model.summary.PageSummary;
 import org.pageflow.domain.book.repository.BookRepository;
 import org.pageflow.domain.book.repository.ChapterRepository;
 import org.pageflow.domain.book.repository.PageRepository;
+import org.pageflow.domain.interaction.service.PreferenceService;
 import org.pageflow.domain.interaction.model.InteractionPair;
 import org.pageflow.domain.interaction.service.InteractionService;
 import org.pageflow.domain.interaction.service.PreferenceService;
@@ -138,6 +139,7 @@ public class BookService {
                 .coverImgUrl(book.getCoverImgUrl())
                 .status(book.getStatus())
                 .chapters(chapterSummaries)
+                .preferenceStatistics(preferenceService.getPreferenceStatistics(book))
                 .build();
     }
     

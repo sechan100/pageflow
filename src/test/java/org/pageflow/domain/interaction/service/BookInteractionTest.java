@@ -1,6 +1,5 @@
 package org.pageflow.domain.interaction.service;
 
-import org.hibernate.Hibernate;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.pageflow.domain.book.entity.Book;
@@ -39,12 +38,8 @@ class BookInteractionTest {
     @DisplayName("책의 모든 interaction들을 가져온다.")
     void getAllInteractions() {
         Book book = bookService.repoFindBookById(2L);
-        Hibernate.initialize(book.getAuthor());
-
         
-        InteractionPair<Book> pair = new InteractionPair<>(book.getAuthor(), book);
-        
-        InteractionsOfTarget interactionsOfTarget = interactionService.getAllInteractionsOfTarget(pair);
+        InteractionsOfTarget interactionsOfTarget = interactionService.getAllInteractionsOfTarget(book);
         assert interactionsOfTarget.getComments().get(0).getPreferenceStatistics().getLikes() == 0;
         assert interactionsOfTarget.getComments().get(0).getPreferenceStatistics().getDislikes() == 1;
         assert interactionsOfTarget.getPreferenceStatistics().getLikes() == 1;
@@ -74,9 +69,8 @@ class BookInteractionTest {
     @Commit
     void deleteComment(){
         Book book = bookService.repoFindBookById(2L);
-        InteractionPair<Book> pair = new InteractionPair<>(book.getAuthor(), book);
-        InteractionsOfTarget interactionsOfTarget = interactionService.getAllInteractionsOfTarget(pair);
-        Long commentId = interactionsOfTarget.getComments().get(0).getComment().getId();
+        InteractionsOfTarget interactionsOfTarget = interactionService.getAllInteractionsOfTarget(book);
+        Long commentId = interactionsOfTarget.getComments().get(0).getId();
         
         commentService.deleteComment(commentId);
     }
@@ -87,9 +81,8 @@ class BookInteractionTest {
     @Commit
     void createCommentPreference() {
         Book book = bookService.repoFindBookById(2L);
-        InteractionPair<Book> pair = new InteractionPair<>(book.getAuthor(), book);
-        InteractionsOfTarget interactionsOfTarget = interactionService.getAllInteractionsOfTarget(pair);
-        Long commentId = interactionsOfTarget.getComments().get(0).getComment().getId();
+        InteractionsOfTarget interactionsOfTarget = interactionService.getAllInteractionsOfTarget(book);
+        Long commentId = interactionsOfTarget.getComments().get(0).getId();
         
         InteractionPair<Comment> commentPair = new InteractionPair<>(profileRepository.findById(1L).orElseThrow(), commentRepository.findById(commentId).orElseThrow());
         preferenceService.createPreference(commentPair, true);
@@ -100,9 +93,8 @@ class BookInteractionTest {
     @Commit
     void toggleCommentPreference(){
         Book book = bookService.repoFindBookById(2L);
-        InteractionPair<Book> pair = new InteractionPair<>(book.getAuthor(), book);
-        InteractionsOfTarget interactionsOfTarget = interactionService.getAllInteractionsOfTarget(pair);
-        Long commentId = interactionsOfTarget.getComments().get(0).getComment().getId();
+        InteractionsOfTarget interactionsOfTarget = interactionService.getAllInteractionsOfTarget(book);
+        Long commentId = interactionsOfTarget.getComments().get(0).getId();
         
         InteractionPair<Comment> commentPair = new InteractionPair<>(profileRepository.findById(1L).orElseThrow(), commentRepository.findById(commentId).orElseThrow());
         preferenceService.updatePreferenceIsLiked(commentPair, false);
@@ -113,10 +105,8 @@ class BookInteractionTest {
     @Commit
     void deleteCommentPreference(){
         Book book = bookService.repoFindBookById(2L);
-        InteractionPair<Book> pair = new InteractionPair<>(book.getAuthor(), book);
-        InteractionsOfTarget interactionsOfTarget = interactionService.getAllInteractionsOfTarget(pair);
-        Long commentId = interactionsOfTarget.getComments().get(0).getComment().getId();
-        
+        InteractionsOfTarget interactionsOfTarget = interactionService.getAllInteractionsOfTarget(book);
+        Long commentId = interactionsOfTarget.getComments().get(0).getId();
         InteractionPair<Comment> commentPair = new InteractionPair<>(profileRepository.findById(1L).orElseThrow(), commentRepository.findById(commentId).orElseThrow());
         preferenceService.deletePreference(commentPair);
     }

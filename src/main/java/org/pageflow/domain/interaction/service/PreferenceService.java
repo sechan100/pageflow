@@ -1,6 +1,7 @@
 package org.pageflow.domain.interaction.service;
 
 import lombok.RequiredArgsConstructor;
+import org.pageflow.base.entity.BaseEntity;
 import org.pageflow.domain.interaction.entity.Preference;
 import org.pageflow.domain.interaction.model.InteractionPair;
 import org.pageflow.domain.interaction.model.PreferenceStatistics;
@@ -20,8 +21,8 @@ public class PreferenceService {
     
     private final PreferenceRepository preferenceRepository;
     
-    public PreferenceStatistics getPreferenceStatistics(InteractionPair pair) {
-        List<Preference> preferences = preferenceRepository.findAllByTargetTypeAndTargetId(pair.getTargetType(), pair.getTargetId());
+    public <T extends BaseEntity> PreferenceStatistics getPreferenceStatistics(T entity) {
+        List<Preference> preferences = preferenceRepository.findAllByTargetTypeAndTargetId(entity.getClass().getSimpleName(), entity.getId());
         PreferenceStatistics preferenceStatistics = new PreferenceStatistics();
         preferences.forEach(
                 preference -> {

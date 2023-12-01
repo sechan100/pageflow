@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { create } from 'zustand';
-import { metaPageType, useLocationStore } from '../nav/PageCursor';
+import { useLocationStore } from '../nav/PageCursor';
 import _ from 'lodash';
 
 
@@ -227,7 +227,7 @@ const Carousel = ({ children, carouselContentRef, isFallback } : CarouselProps) 
         {children}
       </div>
       {!metaPage.isMetaPage &&
-        <div className="fixed top-[2%] right-[3%]">{`캐러셀(${carouselIdx+1}/${carouselBreakPointsRef.current?.length})`}</div>
+        <div className="fixed bottom-[5%] right-[3%]">{`캐러셀(${carouselIdx+1}/${carouselBreakPointsRef.current?.length})`}</div>
       }
     </div>
   );

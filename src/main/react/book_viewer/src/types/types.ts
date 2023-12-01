@@ -5,8 +5,13 @@ export interface Outline {
   coverImgUrl: string,
   published: boolean
   chapters: ChapterSummary[],
+  preferenceStatistics: PreferenceStatistics
 }
 
+export interface PreferenceStatistics {
+  like: number,
+  dislike: number,
+}
 
 export interface ChapterSummary {
   id: number,

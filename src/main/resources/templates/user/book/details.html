@@ -117,7 +117,7 @@
                                                class="input input-bordered px-6 w-full rounded-lg"/>
                                     </div>
                                     <div class="w-1/5 px-2 py-1">
-                                        <input type="submit" class="input input-bordered w-full" value="등록"/>
+                                        <input type="submit" class="btn btn-outline input-bordered w-full" value="등록"/>
                                     </div>
                                 </form>
                             </div>
@@ -298,88 +298,106 @@
                     form.content.value = '';
                 },
                 error: function (xhr, status, error) {
-                    alert('댓글 생성 에러');
+                    flowAlert("error", "댓글 작성 도중 오류가 발생하였습니다.");
                 }
             });
         }
 
-        // 댓글 삭제
-        function deleteComment(commentId) {
-            var bookId =  [[${outline.id}]];
-            closeModal(commentId);
+            // 댓글 삭제
+            function deleteComment(commentId) {
+             // 모달 창 닫기
+                closeCommentModal(commentId);
+                var bookId =  [[${outline.id}]];
+                console.log('닫혔니');
+                // 확인 메시지 띄우기
+                var confirmDelete = confirm('정말로 삭제하시겠습니까?');
 
 
-            var confirmDelete = confirm('정말로 삭제하시겠습니까?');
-            if (confirmDelete) {
-                $.ajax({
-                    type: 'DELETE',
-                    url: '/api/books/' + bookId + '/comments/' + commentId,
-                    success: function (comment) {
-                        console.log('댓글 삭제 완료:', comment);
-                        flowAlert("success", "댓글이 삭제되었습니다.");
-                        updateCommentList(bookId);
-                        // 댓글 개수 업데이트
-                        updateCommentCount();
-                        // 모달 창 닫기
-                        closeCommentModal();
-                    },
-                    error: function (xhr, status, error) {
-                        console.error('댓글 삭제 에러:', xhr, status, error);
-                        flowAlert("error", "댓글 삭제 도중 오류가 발생하였습니다.");
-                        // 모달 창 닫기
-                        closeCommentModal();
-                    }
-                });
+                if (confirmDelete) {
+                    $.ajax({
+                        type: 'DELETE',
+                        url: '/api/books/' + bookId + '/comments/' + commentId,
+                        success: function (comment) {
+                            console.log('댓글 삭제 완료:', comment);
+                            flowAlert("success", "댓글이 삭제되었습니다.");
+                            updateCommentList(bookId);
+                            // 댓글 개수 업데이트
+                            updateCommentCount();
+                        },
+                        error: function (xhr, status, error) {
+                            console.error('댓글 삭제 에러:', xhr, status, error);
+                            flowAlert("error", "댓글 삭제 도중 오류가 발생하였습니다.");
+                        }
+                    });
+                }
             }
+
+
+           // 댓글 수정 폼 열기
+    function editComment(commentId) {
+        // 해당 댓글의 내용을 가져와서 폼에 세팅
+        var commentContent = $("#comment-" + commentId).text();
+        var editForm =
+            "<div id='comment-div-" + commentId + "' class='flex flex-col w-full p-1'>" +
+            "<div class='flex flex-col mb-1'>" +
+            "<textarea id='comment-textarea-" + commentId + "' class='w-full mb-2 rounded-lg'>" + commentContent + "</textarea>" +
+            "</div>" +
+            "<div class='flex justify-between'>" +
+            "<button class='btn btn-sm btn-outline' onclick='cancelEdit(" + commentId + ")'>취소</button>" +
+            "<button class='btn btn-sm btn-primary' onclick='submitEditComment(" + commentId + ")'>수정 완료</button>" +
+            "</div>" +
+            "</div>";
+
+        // 해당 댓글의 버튼 숨기기
+        $("#comment-" + commentId).next().find('.modal_btn').hide();
+
+        // 폼 삽입
+        $("#comment-" + commentId).after(editForm);
+    }
+
+    // 댓글 수정 제출
+    function submitEditComment(commentId) {
+        var bookId = [[${outline.id}]];
+        var editedContent = $("#comment-textarea-" + commentId).val();
+
+        // 수정된 내용이 비어있으면 경고
+        if (editedContent.trim() === "") {
+            flowAlert("warning", "댓글을 입력해주세요");
+            return;
         }
 
-
-        // 댓글 수정 버튼 후 화면 표시
-        function editComment(commentId) {
-            closeModal(commentId);
-
-            var containerHeight = $("#comment-" + commentId).parent().height();
-
-            var newContent = `
-                <div class='w-full flex justify-between'>
-                    <div id='comment-div-${commentId}' class='w-full flex justify-between'>
-                        <textarea id='comment-textarea-${commentId}' autofocus class='textarea textarea-bordered textarea-xs bg-slate-100 mr-2 w-full' style='resize: none; height: ${containerHeight}px;'></textarea>
-                        <a href='#'>
-                            <i onclick='openModal(${commentId})' class='fa-solid fa-bars modal_btn justify-end text-black text-base'></i>
-                        </a>
-                        <dialog id='my_modal_${commentId}' class='modal'>
-                            <div class='modal-box bg-white text-black'>
-                                <form method='dialog'>
-                                    <button class='btn btn-sm btn-circle btn-ghost absolute right-3 top-3' onclick='closeModal(${commentId})'>✕</button>
-                                </form>
-                                <button onclick='saveEdit(${commentId})'>저장</button>
-                                <button onclick='cancelEdit(${commentId})'>취소</button>
-                            </div>
-                        </dialog>
-                    </div>
-                </div>
-            `;
-
-            if (newContent !== null) {
-                $("#comment-" + commentId).replaceWith(newContent);
-                $("#comment-div-" + commentId).next().hide();
-                $("#comment-div-" + commentId).next().next().hide();
-                $("#comment-div-" + commentId).next().next().next().hide();
+        $.ajax({
+            type: 'PUT',
+            url: '/api/books/' + bookId + '/comments/' + commentId,
+            data: { content: editedContent },
+            success: function (comment) {
+                console.log("댓글 수정 완료:", comment);
+                // 수정 폼을 일반 댓글로 변경
+                $("#comment-div-" + commentId).replaceWith("<p id='comment-" + commentId + "'>" + editedContent + "</p>");
+                // 해당 댓글의 버튼 표시
+                var buttonsToShow = $("#comment-" + commentId).next().find('.modal_btn');
+                buttonsToShow.show();
+            },
+            error: function (xhr, status, error) {
+                console.error("댓글 수정 실패:", xhr, status, error);
+                flowAlert("error", "댓글 수정 도중 오류가 발생하였습니다.");
             }
-        }
+        });
+    }
 
-        // 취소 시 화면 표시
-        function cancelEdit(commentId) {
-            var commentContent = $("#comment-textarea-" + commentId).val(); // 수정된 부분
-            $("#comment-div-" + commentId).replaceWith(`<p id='comment-${commentId}'>${commentContent}</p>`);
+    // 취소 시 화면 표시
+    function cancelEdit(commentId) {
+        // 해당 댓글의 원래 버튼 표시
+        var buttonsToShow = $("#comment-" + commentId).next().find('.modal_btn');
+        buttonsToShow.show();
 
-            // 해당 댓글의 원래 버튼 표시
-            var buttonsToShow = $("#comment-" + commentId).next().find('.modal_btn');
-            buttonsToShow.show();
-        }
+        // 수정 폼 제거
+        $("#comment-div-" + commentId).remove();
+    }
 
         // 댓글 관련 버튼 모달 열기
         function openModal(commentId) {
+        console.log(commentId + "에 대한 모달을 엽니다.");
             var modal = document.getElementById('my_modal_' + commentId);
             modal.showModal();
         }

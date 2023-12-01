@@ -240,27 +240,26 @@
                     output += "<div class='flex justify-between'>";
                     var formattedDate = new Date(comment.createdDate).toISOString().split('T')[0];
                     output += "<span class='text-gray-500'>" + formattedDate + "</span>";
-                    output += "<div class='flex justify-end border border-slate-400 py-1 px-2 rounded-lg shadow-inner'>";
-                    output += "<a id='likeButton_" + comment.id + "' href='javascript:void(0);' onclick='toggleLikeComment(" + comment.id + ")'><i class='fas fa-thumbs-up text-2xl text-blueGray-500'></i></a>";
+                    output += "<div class='flex justify-evenly text-center'>";
+
+                    // Like button
+                    output += "<div class='mr-2 py-1 px-2 rounded-lg shadow-inner btn btn-ghos'>";
+                    output += "<a id='likeButton_" + comment.id + "' href='javascript:void(0);' onclick='toggleLikeComment(" + comment.id + ")'><i class='fas fa-thumbs-up text-xl text-blueGray-500'></i></a>";
                     output += "<span id='likesCount_" + comment.id + "' class='mr-1 ml-2 text-lg font-medium'>11 </span>";
-<!--                    output += "<a id='dislikeButton_" + comment.id + "' href='javascript:void(0);' onclick='toggleDislikeComment(" + comment.id + ")'><i class='fa-regular fa-face-tired text-2xl text-rose-600'></i></a>";-->
-<!--                    output += "<span id='dislikesCount_" + comment.id + "'>" + comment.dislikes  + "</span>";-->
+                    output += "</div>";
+
+                    // Edit button
+                    output += "<div class='mr-2 py-1 px-2 rounded-lg shadow-inner font-bold text-md btn btn-ghos'>";
+                    output += "<a id='editButton_" + comment.id + "' href='javascript:void(0);' onclick='editComment(" + comment.id + ")' >수정</a>";
+                    output += "</div>";
+
+                    // Delete button
+                    output += "<div class=' py-1 px-2 rounded-lg shadow-inner font-bold text-md btn btn-ghos'>";
+                    output += "<a id='deleteButton_" + comment.id + "' href='javascript:void(0);' onclick='deleteComment(" + comment.id + ")'>삭제</a>";
+                    output += "</div>";
+
                     output += "</div>";
                     output += "</div>";
-                    output += "</div>";
-                    output += "<div class='flex justify-end mr-3 mt-1'>";
-                    output += "<a class='p-1' href='#'>";
-                    output += "<i onclick='openModal(" + comment.id + ")' class='fa-solid fa-bars modal_btn justify-end text-black text-base'></i>";
-                    output += "</a>";
-                    output += "<dialog id='my_modal_" + comment.id + "' class='modal'>";
-                    output += "<div class='modal-box bg-white text-black'>";
-                    output += "<form method='dialog'>";
-                    output += "<button class='btn btn-sm btn-circle btn-ghost absolute right-3 top-3' onclick='closeModal(" + comment.id + ")'>✕</button>";
-                    output += "</form>";
-                    output += "<a href='javascript:void(0);' class='edit mr-2' onclick='editComment(" + comment.id + ")'>수정</a>";
-                    output += "<a href='javascript:void(0);' class='delete' onclick='deleteComment(" + comment.id + ")'>삭제</a>";
-                    output += "</div>";
-                    output += "</dialog>";
                     output += "</div>";
                     output += "</div>";
 

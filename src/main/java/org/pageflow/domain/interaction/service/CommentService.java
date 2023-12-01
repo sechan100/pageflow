@@ -1,10 +1,13 @@
 package org.pageflow.domain.interaction.service;
 
 import lombok.RequiredArgsConstructor;
+import org.pageflow.base.entity.BaseEntity;
+import org.pageflow.base.exception.nosuchentity.WebNoSuchEntityException;
 import org.pageflow.domain.interaction.entity.Comment;
 import org.pageflow.domain.interaction.model.CommentWithPreference;
 import org.pageflow.domain.interaction.model.InteractionPair;
 import org.pageflow.domain.interaction.repository.CommentRepository;
+import org.pageflow.domain.user.model.dto.UserSession;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,19 +52,25 @@ public class CommentService {
      * @param comment 댓글 엔티티
      * @return Comment -> CommentSummary로 가공
      */
-    public CommentWithPreference getCommentWithPreference(Comment comment){
+    public CommentWithPreference getCommentWithPreferenceByComment(Comment comment){
         return CommentWithPreference.builder()
-                .comment(comment)
-                .preferenceStatistics(preferenceService.getPreferenceStatistics(comment.getPair()))
+                .id(comment.getId())
+                .createdDate(comment.getCreatedDate())
+                .modifiedDate(comment.getModifiedDate())
+                .interactor(new UserSession(comment.getInteractor()))
+                .targetType(comment.getTargetType())
+                .targetId(comment.getTargetId())
+                .content(comment.getContent())
+                .preferenceStatistics(preferenceService.getPreferenceStatistics(comment))
                 .build();
         
     }
     
     
-    public List<CommentWithPreference> getCommentsWithPreference(InteractionPair pair) {
-        List<Comment> comments = commentRepository.findAllByTargetTypeAndTargetId(pair.getTargetType(), pair.getTargetId());
+    public <T extends BaseEntity> List<CommentWithPreference> getCommentsWithPreference(T entity) {
+        List<Comment> comments = commentRepository.findAllWithInteractorByTargetTypeAndTargetId(entity.getClass().getSimpleName(), entity.getId());
         return comments.stream()
-                .map(this::getCommentWithPreference)
+                .map(this::getCommentWithPreferenceByComment)
                 .toList();
     }
     
@@ -80,7 +89,7 @@ public class CommentService {
     public void deleteAllCommentByTarget(InteractionPair pair) {
         
         // 타겟에 딸린 모든 댓글을 가져옴
-        List<Comment> commentsToDelete = commentRepository.findAllByTargetTypeAndTargetId(pair.getTargetType(), pair.getTargetId());
+        List<Comment> commentsToDelete = commentRepository.findAllWithInteractorByTargetTypeAndTargetId(pair.getTargetType(), pair.getTargetId());
         
         // 타겟에 참조된 모든 댓글을 삭제.
         commentRepository.deleteAllByTargetTypeAndTargetId(pair.getTargetType(), pair.getTargetId());
@@ -89,5 +98,9 @@ public class CommentService {
         commentsToDelete.forEach(comment -> preferenceService.deleteAllPreferences(comment.getPair()));
     }
     
+    
+    public Comment repoFindCommentById(Long commentId){
+        return commentRepository.findById(commentId).orElseThrow(() -> new WebNoSuchEntityException(Comment.class));
+    }
     
 }

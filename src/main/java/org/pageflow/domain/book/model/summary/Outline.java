@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.pageflow.domain.book.constants.BookStatus;
+import org.pageflow.domain.interaction.model.PreferenceStatistics;
 import org.pageflow.domain.user.entity.Profile;
 
 import java.util.List;
@@ -27,5 +28,6 @@ public class Outline {
     private BookStatus status;
     private Profile author;
     private List<ChapterSummary> chapters;
+    private PreferenceStatistics preferenceStatistics;
     
 }

@@ -1,6 +1,7 @@
 package org.pageflow.domain.user.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToOne;
@@ -18,6 +19,7 @@ public class Profile extends BaseEntity {
 
     private String nickname;
 
+    @Column(columnDefinition = "TEXT")
     private String profileImgUrl;
 
     @OneToOne(

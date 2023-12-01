@@ -24,8 +24,12 @@ public class Comment extends Interaction {
     @Column(columnDefinition = "TEXT")
     private String content;
     
+    
+    
     @Transient
     private InteractionPair pair;
+    
+    
     
     
     @PostLoad

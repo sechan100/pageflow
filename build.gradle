@@ -64,6 +64,7 @@ tasks.register('restartRedisServerOnWindow', Exec) {
 // 리액트 빌드
 tasks.register('buildReact-book_write', Exec) {
 	workingDir("src/main/react/book_write")
+	commandLine "npm", "install"
 	environment 'PUBLIC_URL', '/react/build/book_write'
 
 	if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
@@ -73,8 +74,8 @@ tasks.register('buildReact-book_write', Exec) {
 	}
 	println("book_write 리엑트를 빌드합니다...")
 }
-
 tasks.register('buildReact-book_viewer', Exec) {
+	commandLine "npm", "install"
 	workingDir("src/main/react/book_viewer")
 	environment 'PUBLIC_URL', '/react/build/book_viewer'
 

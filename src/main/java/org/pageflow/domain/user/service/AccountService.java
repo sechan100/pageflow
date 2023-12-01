@@ -89,8 +89,7 @@ public class AccountService {
             setProfileImgUrl(customProperties.getDefaults().getDefaultUserProfileImg(), savedAccount.getProfile());
         }
     }
-
-
+    
     /**
      * Profile은 같이 업데이트 하지 않음
      */
@@ -102,7 +101,6 @@ public class AccountService {
         if(accountDto.getProvider() != null) account.setProvider(accountDto.getProvider());
         if(accountDto.getEmail() != null) account.setEmail(accountDto.getEmail());
     }
-
     
     @Transactional
     public Profile updateProfile(ProfileUpdateForm form) {
@@ -116,7 +114,6 @@ public class AccountService {
         }
         return savedProfile;
     }
-    
     
     /**
      * send email for verifying email
@@ -139,8 +136,7 @@ public class AccountService {
                 emailText
         );
     }
-
-
+    
     /**
      * 프로필 사진 설정
      * 프로필 사진을 FileMetadata와 함께 저장하고 uri를 반환
@@ -160,7 +156,6 @@ public class AccountService {
         profileRepository.save(profile);
         return imgUri;
     }
-
     
     /**
      * 프로필 사진 설정
@@ -174,13 +169,12 @@ public class AccountService {
         return profileImgUrl;
     }
     
-    
     public boolean isDefaultProfileImgOrNullOrOAuth2ProfileImg(String profileImgUrl) {
         return profileImgUrl == null
                 || profileImgUrl.equals(customProperties.getDefaults().getDefaultUserProfileImg())
                 || !profileImgUrl.startsWith(customProperties.getFiles().getImg().getBaseUrl());
     }
-
+    
     public Account findAdminAccount() {
         return accountRepository.findByRole(Role.ADMIN).orElseThrow(
                 () -> new NoSuchEntityException(Account.class, "관리자 계정을 찾을 수 없습니다.")

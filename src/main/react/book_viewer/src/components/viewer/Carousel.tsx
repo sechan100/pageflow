@@ -227,7 +227,7 @@ const Carousel = ({ children, carouselContentRef, isFallback } : CarouselProps) 
         {children}
       </div>
       {!metaPage.isMetaPage &&
-        <div className="fixed top-[2%] right-[3%]">{`캐러셀(${carouselIdx+1}/${carouselBreakPointsRef.current?.length})`}</div>
+        <div className="fixed bottom-[5%] right-[3%]">{`캐러셀(${carouselIdx+1}/${carouselBreakPointsRef.current?.length})`}</div>
       }
     </div>
   );

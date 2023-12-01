@@ -128,69 +128,71 @@
    window.addEventListener('scroll', handleScroll);
    console.log('정상작동');
 
-   // 스크롤 이벤트 처리 함수
-   function handleScroll() {
-       console.log('Scroll event triggered');
+  // 스크롤 이벤트 처리 함수
+function handleScroll() {
+    // 현재 페이지가 로딩 중이거나 컨텐츠 끝에 도달했는지 확인
+    if (isLoading || reachedEnd) return;
 
-       // 로딩 중이거나 컨텐츠 끝에 도달했는지 확인
-       if (isLoading || reachedEnd) return;
-       console.log('끝 도달');
+    // 사용자가 페이지 하단으로 스크롤했는지 확인
+    if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
+        isLoading = true;
+        currentPage++;
 
-       // 사용자가 페이지 하단으로 스크롤했는지 확인
-       if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
-           console.log('Reached bottom');
-           isLoading = true;
-           currentPage++;
+        // fetchMoreBooks 함수 호출하여 더 많은 책을 로드
+        fetchMoreBooks(currentPage);
+    }
+}
 
-           // fetchMoreBooks 함수 호출하여 더 많은 책을 로드
-           fetchMoreBooks(currentPage);
-       }
-   }
+// 서버에서 더 많은 책을 가져오기 위한 함수
+function fetchMoreBooks(page) {
+    const search_kw = document.getElementById('search_kw').value;
+    const sortOption = document.getElementById('sortOption').value;
 
-   // 서버에서 더 많은 책을 가져오기 위한 함수
-   function fetchMoreBooks(page) {
-       const search_kw = document.getElementById('search_kw').value;
-       const sortOption = document.getElementById('sortOption').value;
+    fetch(`/api/books/list?page=${page}&kw=${search_kw}&sort=${sortOption}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Data:', data);
+            isLoading = false;
 
-       fetch(`/api/books/list?page=${page}&kw=${search_kw}&sort=${sortOption}`)
-           .then(response => {
-               console.log('Server Response:', response);
-               return response.json();
-           })
-           .then(data => {
-               console.log('Data:', data);
-               isLoading = false;
+            // 받은 데이터가 배열인지 확인
+            if (Array.isArray(data)) {
+                if (data.length === 0) {
+                    // 더 이상의 책이 없으면 reachedEnd를 true로 설정
+                    reachedEnd = true;
+                    return;
+                }
+                // 새로운 책을 DOM에 추가
+                appendBooksToDOM(data);
+            } else {
+                console.error('Received data is not an array.');
+            }
+        })
+        .catch(error => {
+            console.error('Fetch Error:', error);
+        });
+}
 
-               // 받은 데이터가 배열인지 확인
-               if (Array.isArray(data)) {
-                   if (data.length === 0) {
-                       // 더 이상의 책이 없으면 reachedEnd를 true로 설정
-                       reachedEnd = true;
-                       return;
-                   }
-                   // 새로운 책을 DOM에 추가
-                   appendBooksToDOM(data);
-               } else {
-                   console.error('Received data is not an array.');
-               }
-           })
-           .catch(error => {
-               console.error('Fetch Error:', error);
-           });
-   }
+           // DOM에 책을 추가하는 함수
+        function appendBooksToDOM(data) {
+            const bookContainer = document.querySelector('.grid.grid-cols-1.sm\\:grid-cols-2.md\\:grid-cols-3.lg\\:grid-cols-5.xl\\:grid-cols-5.gap-x-6.xl\\:gap-x-8');
 
-   // DOM에 책을 추가하는 함수
-   function appendBooksToDOM(data) {
-       const bookContainer = document.querySelector('.grid.grid-cols-1.sm\\:grid-cols-2.md\\:grid-cols-3.lg\\:grid-cols-5.xl\\:grid-cols-5.gap-x-6.xl\\:gap-x-8');
-       const fragment = document.createDocumentFragment();
-       data.forEach(book => {
-           // 각 책에 대한 HTML 요소를 생성하고 컨테이너에 추가
-           const bookElement = createBookElement(book);
-           fragment.appendChild(bookElement);
-       });
+            // 이전에 추가된 책 요소들을 모두 삭제
+            bookContainer.innerHTML = '';
 
-       bookContainer.appendChild(fragment);
-   }
+            const fragment = document.createDocumentFragment();
+            data.forEach(book => {
+                // 각 책에 대한 HTML 요소를 생성하고 컨테이너에 추가
+                const bookElement = createBookElement(book);
+                fragment.appendChild(bookElement);
+            });
+
+            bookContainer.appendChild(fragment);
+        }
 
 
            // 책 요소를 생성하는 함수
@@ -199,7 +201,7 @@
              const div = document.createElement('div');
              div.classList.add('rounded-md', 'aspect-h-16', 'aspect-w-11', 'xl:aspect-h-11', 'xl:aspect-w-16', 'w-full', 'overflow-hidden', 'shadow-lg', 'transition-all', 'duration-150', 'ease-in-out', 'hover:z-1' , 'hover:transform' , 'hover:scale-110' ,'group', 'mb-8');
              const link = document.createElement('a');
-             link.href = `/books/detail/${book.id}`;
+             link.href = `/books/${book.id}/details`;
 
              const relativeDiv = document.createElement('div');
              relativeDiv.classList.add('relative');
@@ -282,11 +284,19 @@
            }
 
            // 정렬 값을 업데이트하고 검색 폼을 제출하는 함수
-           function updateSort(newSort) {
-             document.getElementById('sort').value = newSort;
-             sortOptionButton.innerText = getButtonText(newSort);
-             searchForm.submit();
-           }
+            function updateSort(newSort) {
+                // 정렬 기준을 서버에 전달
+                document.getElementById('sortOption').value = newSort;
+
+                // 서버에서 정렬된 데이터를 가져오도록 검색 폼 제출
+                fetchMoreBooks(0);
+            }
+
+            // 정렬 옵션 변경 시 버튼 텍스트 업데이트
+            document.getElementById('sortOption').addEventListener('change', function () {
+                const selectedOption = this.value;
+                updateSort(selectedOption);
+            });
 
            // 초기 로딩 시 저장된 정렬 옵션으로 버튼 텍스트 설정
            sortOptionButton.innerText = getButtonText(currentSortOption);
@@ -328,10 +338,10 @@
          function getButtonText(sortOption) {
            switch (sortOption) {
              case 'createdDate':
-               console.log('실행');
+               console.log('작성날짜순으로 정렬');
                return '작성 날짜';
              case 'title':
-               console.log('실행22');
+               console.log('제목순으로 정렬');
                return '제목';
              case 'recommend':
                return '추천';

@@ -73,10 +73,11 @@ public class BookService {
 
         Specification<Book> spec = search(kw);
 
-        Slice<Book> books = this.bookRepository.findAll(spec, pageable);
+        Slice<Book> books = bookRepository.findAll(spec, pageable);
 
         return books.map(BookSummary::new);
     }
+
     
     public Outline getOutline(Long bookId) {
         

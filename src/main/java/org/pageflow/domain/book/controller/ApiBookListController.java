@@ -21,6 +21,7 @@ public class ApiBookListController {
     public List<BookSummary> getBooksApi(@RequestParam(value = "page", defaultValue = "0") int page,
                                   @RequestParam(value = "kw", defaultValue = "") String kw,
                                   @RequestParam(value = "sortOption", defaultValue = "createdDate") String sortOption) {
+        System.out.println("수신된 정렬 옵션: " + sortOption); // 수신된 정렬 옵션 확인
         Slice<BookSummary> paging = this.bookService.getList(page, kw, sortOption);
         return paging.getContent();
     }

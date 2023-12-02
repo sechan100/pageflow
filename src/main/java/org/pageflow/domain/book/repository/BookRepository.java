@@ -1,5 +1,6 @@
 package org.pageflow.domain.book.repository;
 
+import io.lettuce.core.dynamic.annotation.Param;
 import org.pageflow.domain.book.entity.Book;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -25,4 +26,5 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     
     @EntityGraph(attributePaths = {"author"}, type = EntityGraph.EntityGraphType.FETCH)
     List<Book> findAllByAuthorId(Long profileId);
+
 }

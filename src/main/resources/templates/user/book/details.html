@@ -135,45 +135,59 @@
 
 <!--  책 좋아요 싫어요  -->
     <script>
-        function togglePreference() {
-            var bookId = [[${outline.id}]];
-            var isLiked = $('#heart').data('filled');
+                function togglePreference() {
+              var bookId = [[${outline.id}]];
+              var isLiked = $('#heart').data('filled');
+              var isLoggedIn = /*[[${user.login}]]*/ false;
 
-            $.ajax({
-                type: isLiked ? 'DELETE' : 'POST',
-                url: '/api/books/' + bookId + '/preferences',
-                data: { isLiked: !isLiked },
-                success: function (data) {
-                    if (!isLiked) {
-                        $('#heartIcon').removeClass('far').addClass('fas').css('color', 'red');
-                        $('#heart').data('filled', true);
-                        localStorage.setItem('likedBook_' + bookId, 'true');
-                        console.log('좋아요');
-                    } else {
-                        $('#heartIcon').removeClass('fas').addClass('far').css('color', '#000000');
-                        $('#heart').data('filled', false);
-                        localStorage.removeItem('likedBook_' + bookId);
-                        console.log('좋아요 취소');
-                    }
-                },
-                error: function (xhr, status, error) {
-                    console.error('처리 중 에러가 발생');
-                }
-            });
-        }
+              if (!isLoggedIn) {
+                  // 로그아웃 상태에서 좋아요를 누를 때 처리할 내용
+                  flowAlert("warning", "로그인 후 이용해주세요.");
+                  window.location.href = "/login";
+              } else {
+                  // 로그인 상태일 때만 Ajax 호출
+                  $.ajax({
+                      type: isLiked ? 'DELETE' : 'POST',
+                      url: '/api/books/' + bookId + '/preferences',
+                      data: { isLiked: !isLiked },
+                      success: function (data) {
+                          if (!isLiked) {
+                              $('#heartIcon').removeClass('far').addClass('fas').css('color', 'red');
+                              $('#heart').data('filled', true);
+                              localStorage.setItem('likedBook_' + bookId, 'true');
+                              console.log('좋아요');
+                          } else {
+                              $('#heartIcon').removeClass('fas').addClass('far').css('color', '#000000');
+                              $('#heart').data('filled', false);
+                              localStorage.removeItem('likedBook_' + bookId);
+                              console.log('좋아요 취소');
+                          }
+                      },
+                      error: function (xhr, status, error) {
+                          console.error('처리 중 에러가 발생');
+                      }
+                  });
+              }
+          }
 
-        $(document).ready(function () {
-            var bookId = [[${outline.id}]];
-            var isLiked = localStorage.getItem('likedBook_' + bookId);
+          $(document).ready(function () {
+              var bookId = [[${outline.id}]];
+              var isLiked = localStorage.getItem('likedBook_' + bookId);
 
-            if (isLiked) {
-                $('#heartIcon').removeClass('far').addClass('fas').css('color', 'red');
-                $('#heart').data('filled', true);
-            } else {
-                $('#heartIcon').removeClass('fas').addClass('far').css('color', '#000000');
-                $('#heart').data('filled', false);
-            }
-        });
+              if (isLiked) {
+                  $('#heartIcon').removeClass('far').addClass('fas').css('color', 'red');
+                  $('#heart').data('filled', true);
+              } else {
+                  $('#heartIcon').removeClass('fas').addClass('far').css('color', '#000000');
+                  $('#heart').data('filled', false);
+              }
+
+              // 좋아요 버튼 클릭 이벤트 핸들러 추가
+              $('.likeButton').click(function () {
+                  togglePreference();
+              });
+          });
+
     </script>
 
     <!--  댓글 관련 기능  -->
@@ -277,7 +291,7 @@
             // 댓글 작성 함수
             function commentWrite_submitForm(form) {
                 var bookId = [[${outline.id}]];
-                var isLoggedIn = /*[[${user.login}]]*/;
+                var isLoggedIn = /*[[${user.login}]]*/ false;
                 form.content.value = form.content.value.trim();
 
                 if (!isLoggedIn) {

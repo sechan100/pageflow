@@ -33,12 +33,12 @@
                     <div class="md:w-full h-full rounded-lg bg-[#f6f6f6] shadow-md bg-blur">
                         <div class="flex flex-col">
                             <div class="h-full w-full relative">
-                                <div class="w-full" style="filter: blur(1.5px);">
-                                    <img th:src="@{${outline.coverImgUrl}}" alt="Book Image">
+                                <div class="w-full h-96" style="filter: blur(1.5px);">
+                                    <img th:src="@{${outline.coverImgUrl}}" alt="Book Image" class="object-cover w-full h-full">
                                 </div>
-                                <div class="w-9/12 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+                                <div class="w-9/12 h-4/6 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
                                      style="z-index : 1;">
-                                    <img th:src="@{${outline.coverImgUrl}}" alt="Book Image">
+                                    <img th:src="@{${outline.coverImgUrl}}" alt="Book Image" class="object-cover w-full h-full">
                                 </div>
                             </div>
                         </div>

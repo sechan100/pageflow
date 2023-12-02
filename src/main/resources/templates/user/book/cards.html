@@ -66,9 +66,9 @@
                         <li>
                             <button value="title" type="button" onclick="updateSort('title')">제목</button>
                         </li>
-<!--                        <li>-->
-<!--                            <button value="recommend" type="button" onclick="updateSort('recommend')">추천</button>-->
-<!--                        </li>-->
+                        <li>
+                            <button value="recommend" type="button" onclick="updateSort('recommend')">추천</button>
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -93,7 +93,7 @@
                                 <a th:href="@{|/books/${book.id}/details|}">
                                     <div class="relative">
                                         <img th:src="@{${book.coverImgUrl}}" alt="Book Image" class="object-cover transition-all duration-1000 ease-in-out group-hover:transform group-hover:scale-110 rounded-lg" style="backface-visibility: hidden;">
-                                        <div class="absolute bottom-0 left-0 text-white right-0">
+                                        <div class="absolute bottom-0 left-0 text-red right-0">
                                             <div class="  p-4">
                                                 <div class="mb-4">
                                                     <h1 th:text="${book.title}" class="font-extrabold text-lg text-center overflow-hidden"></h1>
@@ -119,22 +119,27 @@
     </div>
 
         <script type='text/javascript'>
-            // 현재 페이지, 로딩 상태 및 컨텐츠 끝 도달 여부를 추적하는 변수
+   // 현재 페이지, 로딩 상태 및 컨텐츠 끝 도달 여부를 추적하는 변수
    let currentPage = 0;
    let isLoading = false;
    let reachedEnd = false;
 
    // 스크롤 이벤트에 대한 리스너
    window.addEventListener('scroll', handleScroll);
-   console.log('정상작동');
+<!--   console.log('정상작동');-->
 
-  // 스크롤 이벤트 처리 함수
-function handleScroll() {
-    // 현재 페이지가 로딩 중이거나 컨텐츠 끝에 도달했는지 확인
-    if (isLoading || reachedEnd) return;
+     // 스크롤 이벤트 처리 함수
+    function handleScroll() {
+<!--    console.log("스크롤 이벤트 발생", window.innerHeight, window.scrollY, document.body.offsetHeight);-->
 
+       // 현재 페이지가 로딩 중이거나 컨텐츠 끝에 도달했는지 확인
+    if (isLoading || reachedEnd) {
+<!--        console.log("로딩 중이거나 끝에 도달함", isLoading, reachedEnd);-->
+        return;
+    }
     // 사용자가 페이지 하단으로 스크롤했는지 확인
-    if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
+    if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 100) {
+<!--        console.log("페이지 끝에 도달");-->
         isLoading = true;
         currentPage++;
 
@@ -157,32 +162,34 @@ function fetchMoreBooks(page) {
         })
         .then(data => {
             console.log('Data:', data);
+
             isLoading = false;
 
-            // 받은 데이터가 배열인지 확인
+ // 받은 데이터가 배열인지 확인
             if (Array.isArray(data)) {
                 if (data.length === 0) {
                     // 더 이상의 책이 없으면 reachedEnd를 true로 설정
                     reachedEnd = true;
-                    return;
+                } else {
+                    // 새로운 책을 DOM에 추가
+                    appendBooksToDOM(data);
                 }
-                // 새로운 책을 DOM에 추가
-                appendBooksToDOM(data);
             } else {
                 console.error('Received data is not an array.');
             }
         })
         .catch(error => {
             console.error('Fetch Error:', error);
+        })
+        .finally(() => {
+            // 로딩 완료
+            isLoading = false;
         });
 }
 
            // DOM에 책을 추가하는 함수
         function appendBooksToDOM(data) {
             const bookContainer = document.querySelector('.grid.grid-cols-1.sm\\:grid-cols-2.md\\:grid-cols-3.lg\\:grid-cols-5.xl\\:grid-cols-5.gap-x-6.xl\\:gap-x-8');
-
-            // 이전에 추가된 책 요소들을 모두 삭제
-            bookContainer.innerHTML = '';
 
             const fragment = document.createDocumentFragment();
             data.forEach(book => {

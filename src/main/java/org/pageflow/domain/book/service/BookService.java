@@ -69,17 +69,11 @@ public class BookService {
     }
 
     public Slice<BookSummary> getList(int page, String kw, String sortOption) {
-        Pageable pageable = PageRequest.of(page, 16, Sort.by(Sort.Direction.DESC, sortOption));
+        Pageable pageable = PageRequest.of(page, 20, Sort.by(Sort.Direction.DESC, sortOption));
 
         Specification<Book> spec = search(kw);
 
-        Slice<Book> books;
-
-        if (sortOption.equals("recommend")) {
-            books = this.bookRepository.findTopLikedBooks(pageable);
-        } else {
-            books = this.bookRepository.findAll(spec, pageable);
-        }
+        Slice<Book> books = this.bookRepository.findAll(spec, pageable);
 
         return books.map(BookSummary::new);
     }

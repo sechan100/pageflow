@@ -25,12 +25,4 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     
     @EntityGraph(attributePaths = {"author"}, type = EntityGraph.EntityGraphType.FETCH)
     List<Book> findAllByAuthorId(Long profileId);
-
-    @Query("SELECT b, COUNT(p) AS likeCount " +
-            "FROM Book b " +
-            "LEFT JOIN Preference p ON p.targetId = b.id AND p.targetType = 'Book' AND p.isLiked = true " +
-            "GROUP BY b " +
-            "ORDER BY likeCount DESC")
-    Slice<Book> findTopLikedBooks(Pageable pageable);
-
 }

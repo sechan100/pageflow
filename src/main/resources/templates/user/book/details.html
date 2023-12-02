@@ -213,6 +213,7 @@
 
     <!--  댓글 관련 기능  -->
     <script th:inline="javascript">
+        // 페이지 로드 시 유지 함수
         $(document).ready(function () {
             var bookId = [[${outline.id}]];
             refreshCommentList(bookId);
@@ -282,17 +283,16 @@
 
                         // Like button
                         output += "<div class='mr-2 py-1 px-2 rounded-lg shadow-inner btn btn-ghos'>";
-                        output += "<a id='likeButton_" + comment.id + "' href='javascript:void(0);' onclick='toggleLikeComment(" + comment.id + ")'><i class='fas fa-thumbs-up text-xl text-blueGray-500'></i></a>";
+                        output += "<a id='likeButton_" + comment.id + "' href='javascript:void(0);' onclick='toggleCommentLike(" + comment.id + ")'><i class='fa-regular fa-thumbs-up text-xl text-neutral-900'></i></a>";
                         output += "<span id='likesCount_" + comment.id + "' class='mr-1 ml-2 text-lg font-medium'>" + comment.preferenceStatistics.likes+ "</span>";
                         output += "</div>";
 
                         var userName = [[${user.nickname}]];
 
                         if(userName == comment.interactor.nickname){
-
                         // Edit button
                         output += "<div class='mr-2 py-1 px-2 rounded-lg shadow-inner font-bold text-md btn btn-ghos'>";
-                        output += "<a id='editButton_" + comment.id + "' href='javascript:void(0);' onclick='editComment(" + comment.id + ")' >수정</a>";
+                        output += "<a id='editButton_" + comment.id + "' href='javascript:void(0);' onclick='showEditCommentForm(" + comment.id + ", \"" + comment.content + "\")' >수정</a>";
                         output += "</div>";
 
                         // Delete button
@@ -306,6 +306,12 @@
                         output += "</div>";
                         output += "</div>";
                         output += "</div>";
+                        output += "</div>";
+
+                        output += "<div id='editCommentForm' style='display: none;'>";
+                        output += "<textarea id='editedCommentContent'></textarea>";
+                        output += "<button onclick='submitEditedComment()'>수정 완료</button>";
+                        output += "<button onclick='cancelEdit()'>취소</button>"
                         output += "</div>";
                     }
                 }
@@ -361,7 +367,7 @@
 
                 // 확인 메시지 띄우기
                 var confirmDelete = confirm('정말로 삭제하시겠습니까?');
-    1
+
                 if (confirmDelete) {
                     $.ajax({
                         type: 'DELETE',
@@ -384,69 +390,58 @@
                 }
             }
 
-         // 댓글 수정 폼 열기
-        function editComment(commentId) {
-        console.log('왜 안되 시발');
-        console.log('editComment function called with commentId:', commentId);
-            // 해당 댓글의 내용을 가져와서 폼에 세팅
-            var commentContent = $("#comment-" + commentId).text();
-            var editForm =
-                "<div id='comment-div-" + commentId + "' class='flex flex-col w-full p-1'>" +
-                "<div class='flex flex-col mb-1'>" +
-                "<textarea id='comment-textarea-" + commentId + "' class='w-full mb-2 rounded-lg'>" + commentContent + "</textarea>" +
-                "</div>" +
-                "<div class='flex justify-between'>" +
-                "<button class='btn btn-sm btn-outline' onclick='cancelEdit(" + commentId + ")'>취소</button>" +
-                "<button class='btn btn-sm btn-primary' onclick='submitEditComment(" + commentId + ")'>수정 완료</button>" +
-                "</div>" +
-                "</div>";
+        // 댓글 수정 폼 보여주기
+function showEditCommentForm(commentId, currentContent) {
+      console.log('보여주고있니?');
+    // 수정 폼 보이기
+    $("#editedCommentContent").val(currentContent);
+    $("#editCommentForm").show();
+    console.log('보여주고있니!!!!');
 
-            // 해당 댓글의 버튼 숨기기
-            $("#comment-" + commentId).next().find('.btn-ghos').hide();
 
-            // 폼 삽입
-            $("#comment-" + commentId).after(editForm);
+    // 수정 완료 시 호출될 함수에 현재 댓글 ID 전달
+    $("#editCommentForm button:first").attr("onclick", "submitEditedComment(" + commentId + ")");
+}
+
+// 댓글 수정 제출
+function submitEditedComment(commentId) {
+    var bookId = [[${outline.id}]];
+    var editedContent = $("#editedCommentContent").val();
+
+    // 수정된 내용이 비어있으면 경고
+    if (editedContent.trim() === "") {
+        flowAlert("warning", "댓글을 입력해주세요");
+        return;
+    }
+
+    $.ajax({
+        type: 'PUT',
+        url: '/api/books/' + bookId + '/comments/' + commentId,
+        data: { content: editedContent },
+        success: function (comment) {
+            console.log("댓글 수정 완료:", comment);
+
+            // 댓글 목록 업데이트
+            updateCommentList(bookId);
+
+            // 댓글 개수 업데이트
+            updateCommentCount();
+
+            // 수정 폼 감추기
+            $("#editCommentForm").hide();
+        },
+        error: function (xhr, status, error) {
+            console.error("댓글 수정 실패:", xhr, status, error);
+            flowAlert("error", "댓글 수정 도중 오류가 발생하였습니다.");
         }
+    });
+}
 
-        // 댓글 수정 제출
-        function submitEditComment(commentId) {
-            var bookId = [[${outline.id}]];
-            var editedContent = $("#comment-textarea-" + commentId).val();
-
-            // 수정된 내용이 비어있으면 경고
-            if (editedContent.trim() === "") {
-                flowAlert("warning", "댓글을 입력해주세요");
-                return;
-            }
-
-            $.ajax({
-                type: 'PUT',
-                url: '/api/books/' + bookId + '/comments/' + commentId,
-                data: { content: editedContent },
-                success: function (comment) {
-                    console.log("댓글 수정 완료:", comment);
-                    // 수정 폼을 일반 댓글로 변경
-                    $("#comment-div-" + commentId).replaceWith("<p id='comment-" + commentId + "'>" + editedContent + "</p>");
-                    // 해당 댓글의 버튼 표시
-                    var buttonsToShow = $("#comment-" + commentId).next().find('.btn-ghos');
-                    buttonsToShow.show();
-                },
-                error: function (xhr, status, error) {
-                    console.error("댓글 수정 실패:", xhr, status, error);
-                    flowAlert("error", "댓글 수정 도중 오류가 발생하였습니다.");
-                }
-            });
-        }
-
-        // 취소 시 화면 표시
-        function cancelEdit(commentId) {
-            // 해당 댓글의 원래 버튼 표시
-            var buttonsToShow = $("#comment-" + commentId).next().find('.btn-ghos');
-            buttonsToShow.show();
-
-            // 수정 폼 제거
-            $("#comment-div-" + commentId).remove();
-        }
+// 취소 시 화면 표시
+function cancelEdit() {
+    // 수정 폼 감추기
+    $("#editCommentForm").hide();
+}
 
         // 댓글 count 업데이트
         function updateCommentCount() {
@@ -469,53 +464,84 @@
 
     <!--  댓글 좋아요 싫어요  -->
     <script>
-         function updatePreference(commentId, isLiked) {
-             $.ajax({
-                 type: 'POST',
-                 url: '/api/comments/' + commentId + '/preferences',
-                 data: { isLiked: isLiked },
-                 success: function (data) {
-                     updateUI(commentId, data);
-                     console.log('클릭');
-                 },
-                 error: function () {
-                     console.error('업데이트 실패');
-                 }
-             });
-         }
-
-         function updateUI(commentId, preference) {
-             var likeButton = $('#likeButton_' + commentId);
-             var dislikeButton = $('#dislikeButton_' + commentId);
-
-             var isLiked = preference.isLiked;
-
-             $('#likesCount_' + commentId).text(preference.likes);
-             $('#dislikesCount_' + commentId).text(preference.dislikes);
+            // 로드시 실행
+            $(document).ready(function () {
+                var comment = commentList[i];
+                var commentId = comment.id;
+                var bookId = [[${outline.id}]];
+                var isLikedComment = localStorage.getItem('likedComment_' + commentId);
 
 
-             if (isLiked) {
-                 likeButton.addClass('active');
-                 dislikeButton.removeClass('active');
-             } else {
-                 likeButton.removeClass('active');
-                 dislikeButton.addClass('active');
-             }
-         }
 
-        // 댓글에 대한 좋아요 토글
-        function toggleLikeComment(commentId) {
-            var isLiked = $('#likeButton_' + commentId).hasClass('active');
-            updatePreference(commentId, !isLiked);
-            console.log('좋아요 클릭');
-        }
+                // 좋아요 개수 업데이트
+                updateLikesCountFromServer(commentId);
 
-        // 댓글에 대한 싫어요 토글
-        function toggleDislikeComment(commentId) {
-            var isDisliked = $('#dislikeButton_' + commentId).hasClass('active');
-            updatePreference(commentId, !isDisliked);
-            console.log('싫어요 클릭');
-        }
+                // 좋아요 여부에 따라 아이콘 스타일 변경
+                if (isLikedComment) {
+                    $('#likeButton_' + commentId).find('i').removeClass('far').addClass('fas').css('color', 'blue');
+                    $('#likeButton_' + commentId).data('filled', true);
+
+                } else {
+                    $('#likeButton_' + commentId).find('i').removeClass('fas').addClass('far').css('color', '#000000');
+                    $('#likeButton_' + commentId).data('filled', false);
+                }
+
+                // 댓글 좋아요 버튼 클릭 이벤트 핸들러 추가
+                $('#likeButton_' + commentId).click(function () {
+                    toggleCommentLike(commentId);
+                });
+            });
+
+
+       // 좋아요 숫자를 서버에서 가져오는 함수
+           function updateLikesCountFromServer(commentId) {
+           var bookId = [[${outline.id}]];
+           $.ajax({
+               type: 'GET',
+               url: '/api/books/' + bookId + '/interactions',
+               success: function (data) {
+                   console.log(data);
+                   var commentLikesCount   = data.preferenceStatistics.likes || 0
+                  $('#likesCount_').text(commentLikesCount);
+               },
+               error: function (xhr, status, error) {
+                   console.error('좋아요 숫자 가져오기 실패');
+               }
+           });
+       }
+
+
+            // 댓글 좋아요 클릭 시 호출 함수
+           function toggleCommentLike(commentId) {
+               var isLiked = $('#likeButton_' + commentId).data('filled');
+               var isLoggedIn = /*[[${user.login}]]*/ false;
+
+               if (isLoggedIn) {
+                   flowAlert("warning", "로그인 후 이용해주세요.");
+                   window.location.href = "/login";
+               } else {
+                   $.ajax({
+                       type: isLiked ? 'DELETE' : 'POST',
+                     url: '/api/comments/' + commentId + '/preferences',
+                       data: { isLiked: !isLiked },
+                       success: function (data) {
+                           if (!isLiked) {
+                               $('#likeButton_' + commentId + ' i').removeClass('far').addClass('fas').css('color', 'blue');
+                               $('#likeButton_' + commentId).data('filled', true);
+                               console.log('댓글에 좋아요를 눌렀습니다.');
+                           } else {
+                               $('#likeButton_' + commentId + ' i').removeClass('fas').addClass('far').css('color', 'rgb(23 23 23)');
+                               $('#likeButton_' + commentId).data('filled', false);
+                               console.log('댓글에 좋아요를 취소했습니다.');
+                           }
+                           updateLikesCountFromServer(commentId);
+                       },
+                       error: function (xhr, status, error) {
+                           console.error('처리 중 에러가 발생');
+                       }
+                   });
+               }
+           }
     </script>
 
 </main>

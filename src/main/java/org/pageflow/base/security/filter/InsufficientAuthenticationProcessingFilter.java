@@ -35,8 +35,6 @@ public class InsufficientAuthenticationProcessingFilter extends OncePerRequestFi
                 SecurityContextHolder.getContext().setAuthentication(null);
             }
         }
-
-
         filterChain.doFilter(request, response);
     }
 

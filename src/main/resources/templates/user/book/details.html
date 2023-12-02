@@ -62,7 +62,7 @@
                 <!-- 우측 레이아웃 시작 -->
                 <div class="w-full mt-0 ml-0 text-center sm:text-left flex flex-col container">
                     <!-- 책 챕터 표기 -->
-                    <div class="h-3/5 rounded-lg bg-[#f6f6f6] shadow-md bg-blur container">
+                    <div class="h-[475px] rounded-lg bg-[#f6f6f6] shadow-md bg-blur container">
                         <div>
                             <!-- 홈/정보 메뉴 -->
                             <ul class="flex justify-center text-xl font-bold mt-1 menu menu-horizontal rounded border-b border-slate-400">
@@ -102,7 +102,7 @@
                     </div>
                     <!-- 책 챕터 끝 -->
                     <!-- 댓글 레이아웃 -->
-                    <div class="h-4/5 flex flex-col rounded mt-5 overflow-hidden bg-[#f6f6f6] shadow bg-blur">
+                    <div class="h-[610px] flex flex-col rounded mt-5 overflow-hidden bg-[#f6f6f6] shadow bg-blur">
                         <div class="py-2 px-5 w-full h-10  rounded border-b border-slate-400 ">
                             <i class="fa-regular fa-comment" style="color: #000000; font-size: 1.2em;"></i>
                             <span id="getCommentCount"></span>
@@ -243,12 +243,10 @@
                         const comment = commentList[i];
                         const profileImgUrl = comment.interactor.profileImgUrl;
 
-
-
                         output += "<div class='flex text-xs p-2 mt-3 border-b-2'>";
                         output += "<div class='w-10 mr-2 ml-2 flex '>";
                         output += "<div class='w-7 h-7 m-auto justify-items-center'>";
-                        output += "<img src='" + profileImgUrl + "' alt='프로필이미지' class='rounded-full'>";
+                        output += "<img src='" + profileImgUrl + "' alt='프로필이미지' class='rounded-full object-cover w-full h-full'>";
                         output += "</div>";
                         output += "</div>";
                         output += "<div class='flex flex-col w-full p-1'>";
@@ -267,6 +265,10 @@
                         output += "<span id='likesCount_" + comment.id + "' class='mr-1 ml-2 text-lg font-medium'>" + comment.preferenceStatistics.likes+ "</span>";
                         output += "</div>";
 
+                        var userName = [[${user.nickname}]];
+
+                        if(userName == comment.interactor.nickname){
+
                         // Edit button
                         output += "<div class='mr-2 py-1 px-2 rounded-lg shadow-inner font-bold text-md btn btn-ghos'>";
                         output += "<a id='editButton_" + comment.id + "' href='javascript:void(0);' onclick='editComment(" + comment.id + ")' >수정</a>";
@@ -276,13 +278,14 @@
                         output += "<div class=' py-1 px-2 rounded-lg shadow-inner font-bold text-md btn btn-ghos'>";
                         output += "<a id='deleteButton_" + comment.id + "' href='javascript:void(0);' onclick='deleteComment(" + comment.id + ")'>삭제</a>";
 
+                        }
+
                         output += "</div>";
 
                         output += "</div>";
                         output += "</div>";
                         output += "</div>";
                         output += "</div>";
-
                     }
                 }
                 $("#comment_list").html(output);

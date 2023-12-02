@@ -50,8 +50,9 @@
                                     <a href="#" id="heart" data-filled="false" onclick="togglePreference()">
                                         <i id="heartIcon" class="far fa-heart" style="color: #000000;"></i>
                                     </a>
-                                    <span>[[${outline.preferenceStatistics.likes}]]</span>
+                                    <span id="bookLikesCount"></span>
                                 </div>
+<!--                                [[${outline.preferenceStatistics.likes}]]-->
                                 <a th:href="@{|/viewer/${outline.id}|}"
                                    class="custom-btn read-btn w-52 mt-20 relative rounded-sm font-semibold	leading-10 bg-black	text-white p-1">읽기</a>
                             </div>
@@ -135,58 +136,78 @@
 
 <!--  책 좋아요 싫어요  -->
     <script>
-                function togglePreference() {
-              var bookId = [[${outline.id}]];
-              var isLiked = $('#heart').data('filled');
-              var isLoggedIn = /*[[${user.login}]]*/ false;
+        // 로드시 실행
+        $(document).ready(function () {
+            var bookId = [[${outline.id}]];
+            var isLiked = localStorage.getItem('likedBook_' + bookId);
 
-              if (!isLoggedIn) {
-                  // 로그아웃 상태에서 좋아요를 누를 때 처리할 내용
-                  flowAlert("warning", "로그인 후 이용해주세요.");
-                  window.location.href = "/login";
-              } else {
-                  // 로그인 상태일 때만 Ajax 호출
-                  $.ajax({
-                      type: isLiked ? 'DELETE' : 'POST',
-                      url: '/api/books/' + bookId + '/preferences',
-                      data: { isLiked: !isLiked },
-                      success: function (data) {
-                          if (!isLiked) {
-                              $('#heartIcon').removeClass('far').addClass('fas').css('color', 'red');
-                              $('#heart').data('filled', true);
-                              localStorage.setItem('likedBook_' + bookId, 'true');
-                              console.log('좋아요');
-                          } else {
-                              $('#heartIcon').removeClass('fas').addClass('far').css('color', '#000000');
-                              $('#heart').data('filled', false);
-                              localStorage.removeItem('likedBook_' + bookId);
-                              console.log('좋아요 취소');
-                          }
-                      },
-                      error: function (xhr, status, error) {
-                          console.error('처리 중 에러가 발생');
-                      }
-                  });
-              }
-          }
+            getLikesCountFromServer(bookId);
 
-          $(document).ready(function () {
-              var bookId = [[${outline.id}]];
-              var isLiked = localStorage.getItem('likedBook_' + bookId);
+            if (isLiked) {
+                $('#heartIcon').removeClass('far').addClass('fas').css('color', 'red');
+                $('#heart').data('filled', true);
+            } else {
+                $('#heartIcon').removeClass('fas').addClass('far').css('color', '#000000');
+                $('#heart').data('filled', false);
+            }
 
-              if (isLiked) {
-                  $('#heartIcon').removeClass('far').addClass('fas').css('color', 'red');
-                  $('#heart').data('filled', true);
-              } else {
-                  $('#heartIcon').removeClass('fas').addClass('far').css('color', '#000000');
-                  $('#heart').data('filled', false);
-              }
+            // 좋아요 버튼 클릭 이벤트 핸들러 추가
+            $('.likeButton').click(function () {
+                togglePreference();
+            });
+        });
 
-              // 좋아요 버튼 클릭 이벤트 핸들러 추가
-              $('.likeButton').click(function () {
-                  togglePreference();
-              });
-          });
+        // 좋아요 숫자를 서버에서 가져오는 함수
+            function getLikesCountFromServer(bookId) {
+            $.ajax({
+                type: 'GET',
+                url: '/api/books/' + bookId + '/interactions',
+                success: function (data) {
+                    console.log(data);
+                    var likesCount  = data.preferenceStatistics.likes || 0
+                   $('#bookLikesCount').text(likesCount);
+                },
+                error: function (xhr, status, error) {
+                    console.error('좋아요 숫자 가져오기 실패');
+                }
+            });
+        }
+
+
+        // 좋아요 클릭 시 호출 함수
+        function togglePreference() {
+            var bookId = [[${outline.id}]];
+            var isLiked = $('#heart').data('filled');
+            var isLoggedIn = /*[[${user.login}]]*/ false;
+
+            if (isLoggedIn) {
+                flowAlert("warning", "로그인 후 이용해주세요.");
+                window.location.href = "/login";
+            } else {
+                $.ajax({
+                    type: isLiked ? 'DELETE' : 'POST',
+                    url: '/api/books/' + bookId + '/preferences',
+                    data: { isLiked: !isLiked },
+                    success: function (data) {
+                        if (!isLiked) {
+                            $('#heartIcon').removeClass('far').addClass('fas').css('color', 'red');
+                            $('#heart').data('filled', true);
+                            localStorage.setItem('likedBook_' + bookId, 'true');
+                            console.log('좋아요를 눌렀습니다.');
+                        } else {
+                            $('#heartIcon').removeClass('fas').addClass('far').css('color', '#000000');
+                            $('#heart').data('filled', false);
+                            localStorage.removeItem('likedBook_' + bookId);
+                            console.log('좋아요를 취소했습니다.');
+                        }
+                        getLikesCountFromServer(bookId);
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('처리 중 에러가 발생');
+                    }
+                });
+            }
+        }
 
     </script>
 
@@ -313,9 +334,6 @@
                     form.content.focus();
                     return;
                 }
-
-                // 여기에 로그인 여부 확인 코드 추가
-
 
                 $.ajax({
                     type: 'POST',

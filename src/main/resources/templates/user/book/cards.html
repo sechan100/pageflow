@@ -5,9 +5,9 @@
 
 <!--  select 정렬순 스타일  -->
     <style>
-                    .btn-select.on+.list-member {
-                        display: block;
-                   }
+       .btn-select.on+.list-member {
+         display: block;
+    }
 
                 // block 성질 중요
                 .list-member li {
@@ -117,7 +117,7 @@
     </div>
 
         <script type='text/javascript'>
-<!--   // 현재 페이지, 로딩 상태 및 컨텐츠 끝 도달 여부를 추적하는 변수-->
+<!--   // 현재 페이지, 로딩 상태 및 컨텐츠 끝 도달 여부를 추적하는 변수 -->
 <!--   let currentPage = 0;-->
 <!--   let isLoading = false;-->
 <!--   let reachedEnd = false;-->
@@ -263,6 +263,7 @@
            btn.addEventListener("click", () => {
              btn.classList.toggle("on");
            });
+
            list.addEventListener("click", (event) => {
              if (event.target.nodeName === "BUTTON") {
                btn.innerText = event.target.innerText;

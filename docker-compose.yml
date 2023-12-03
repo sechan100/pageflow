@@ -1,0 +1,42 @@
+version: '3.1'
+
+services:
+  redis:
+    image: "redis:latest"
+    ports:
+      - "6379:6379"
+
+  db:
+    image: "mysql:latest"
+    environment:
+      MYSQL_ROOT_PASSWORD: dlqhfka
+      MYSQL_DATABASE: pageflow
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: dlqhfka
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_volume:/var/lib/mysql
+
+  jenkins:
+    image: "sechan100/jenkins:v1"
+    ports:
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - jenkins_volume:/var/jenkins_home
+
+  was:
+    build:
+      context: ./.
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - db
+      - redis
+      - jenkins
+
+volumes:
+  mysql_volume:
+  jenkins_volume:

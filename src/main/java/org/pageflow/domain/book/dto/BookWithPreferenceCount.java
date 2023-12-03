@@ -1,4 +1,4 @@
-package org.pageflow.domain.book.entity;
+package org.pageflow.domain.book.dto;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -6,14 +6,14 @@ import jakarta.persistence.ManyToOne;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 import org.pageflow.base.entity.BaseEntity;
+import org.pageflow.domain.book.entity.Book;
 
-@Entity
+
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@DynamicUpdate
 public class BookWithPreferenceCount extends BaseEntity {
-    @ManyToOne(fetch = FetchType.LAZY)
+
     private Book book;
     private Long preferenceCount;
 

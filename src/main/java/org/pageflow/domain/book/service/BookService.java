@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.pageflow.base.entity.BaseEntity;
 import org.pageflow.base.exception.nosuchentity.NoSuchEntityException;
 import org.pageflow.base.request.Rq;
+import org.pageflow.domain.book.dto.BookWithCommentCount;
+import org.pageflow.domain.book.dto.BookWithPreferenceCount;
 import org.pageflow.domain.book.entity.*;
 import org.pageflow.domain.book.model.summary.BookSummary;
 import org.pageflow.domain.book.model.summary.ChapterSummary;

@@ -1,7 +1,8 @@
 package org.pageflow.domain.book.repository;
 
-import io.lettuce.core.dynamic.annotation.Param;
 import org.pageflow.domain.book.entity.Book;
+import org.pageflow.domain.book.entity.BookWithCommentCount;
+import org.pageflow.domain.book.entity.BookWithPreferenceCount;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.domain.Specification;
@@ -27,4 +28,15 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     @EntityGraph(attributePaths = {"author"}, type = EntityGraph.EntityGraphType.FETCH)
     List<Book> findAllByAuthorId(Long profileId);
 
+    @Query("SELECT new org.pageflow.domain.book.entity.BookWithPreferenceCount(b AS book, COUNT(p) AS preferenceCount) " +
+            "FROM Book b LEFT JOIN Preference p ON b.id = p.targetId AND p.targetType = 'Book' AND p.isLiked = true " +
+            "GROUP BY b.id " +
+            "ORDER BY COUNT(p) DESC")
+    Slice<BookWithPreferenceCount> findAllBooksOrderByPreferenceCount(Specification<Book> spec, Pageable pageable);
+
+    @Query("SELECT new org.pageflow.domain.book.entity.BookWithCommentCount(b AS book, COUNT(p) AS commentCount) " +
+            "FROM Book b LEFT JOIN Comment p ON b.id = p.targetId AND p.targetType = 'Book'" +
+            "GROUP BY b.id " +
+            "ORDER BY COUNT(p) DESC")
+    Slice<BookWithCommentCount> findAllBooksOrderByCommentCount(Specification<Book> spec, Pageable pageable);
 }

@@ -26,8 +26,9 @@ public class BookSummary {
     private LocalDateTime createdDate;
     
     private LocalDateTime modifiedDate;
-    
-    
+
+    private Long preferenceCount; // 추가된 필드
+
     
     public BookSummary(Book book) {
         this.id = book.getId();
@@ -37,5 +38,16 @@ public class BookSummary {
         this.createdDate = book.getCreatedDate();
         this.modifiedDate = book.getModifiedDate();
         this.status = book.getStatus();
+    }
+    // Book 객체와 preferenceCount를 모두 받는 생성자 추가
+    public BookSummary(Book book, Long preferenceCount) {
+        this.id = book.getId();
+        this.title = book.getTitle();
+        this.coverImgUrl = book.getCoverImgUrl();
+        this.author = new UserSession(book.getAuthor());
+        this.createdDate = book.getCreatedDate();
+        this.modifiedDate = book.getModifiedDate();
+        this.status = book.getStatus();
+        this.preferenceCount = preferenceCount; // 새로운 필드 할당
     }
 }

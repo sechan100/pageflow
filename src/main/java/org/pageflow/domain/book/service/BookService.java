@@ -5,9 +5,10 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.pageflow.base.entity.BaseEntity;
 import org.pageflow.base.exception.nosuchentity.NoSuchEntityException;
-import org.pageflow.domain.book.entity.Book;
-import org.pageflow.domain.book.entity.Chapter;
-import org.pageflow.domain.book.entity.Page;
+import org.pageflow.base.request.Rq;
+import org.pageflow.domain.book.dto.BookWithCommentCount;
+import org.pageflow.domain.book.dto.BookWithPreferenceCount;
+import org.pageflow.domain.book.entity.*;
 import org.pageflow.domain.book.model.summary.BookSummary;
 import org.pageflow.domain.book.model.summary.ChapterSummary;
 import org.pageflow.domain.book.model.summary.Outline;
@@ -16,6 +17,7 @@ import org.pageflow.domain.book.repository.BookRepository;
 import org.pageflow.domain.book.repository.ChapterRepository;
 import org.pageflow.domain.book.repository.PageRepository;
 import org.pageflow.domain.interaction.service.PreferenceService;
+import org.pageflow.domain.interaction.service.InteractionService;
 import org.pageflow.domain.user.entity.Profile;
 import org.pageflow.infra.file.service.FileService;
 import org.springframework.data.domain.PageRequest;
@@ -39,7 +41,9 @@ public class BookService {
     private final BookRepository bookRepository;
     private final ChapterRepository chapterRepository;
     private final PageRepository pageRepository;
+    private final Rq rq;
     private final FileService fileService;
+    private final InteractionService interactionService;
     private final PreferenceService preferenceService;
 
     private Specification<Book> search(String kw) {
@@ -63,11 +67,33 @@ public class BookService {
     }
 
     public Slice<BookSummary> getList(int page, String kw, String sortOption) {
-        Pageable pageable = PageRequest.of(page, 16, Sort.by(Sort.Direction.DESC, sortOption));
+        Pageable pageable;
+
         Specification<Book> spec = search(kw);
-        Slice<Book> books = this.bookRepository.findAll(spec, pageable);
-        return books.map(BookSummary::new);
+
+        //'좋아요'순 정렬을 선택했을 경우의 처리
+        if("preferenceCount".equals(sortOption)) {
+            //'좋아요' 순으로 정렬하기 위해 Pageable을 구성.
+            //이 경우 'preferenceCount'는 실제 필드가 아니므로, Sort.by를 사용하지 않음.
+            pageable = PageRequest.of(page, 20);
+            Slice<BookWithPreferenceCount> bookWithPrefs = bookRepository.findAllBooksOrderByPreferenceCount(spec, pageable);
+            return bookWithPrefs.map(bwp -> new BookSummary(bwp.getBook(), bwp.getPreferenceCount(), null));
+
+        } else if("commentCount".equals(sortOption)) {
+            //'댓글' 순으로 정렬하기 위해 Pageable을 구성.
+            //이 경우 'commentCount'는 실제 필드가 아니므로, Sort.by를 사용하지 않음.
+            pageable = PageRequest.of(page, 20);
+            Slice<BookWithCommentCount> bookWithcomments = bookRepository.findAllBooksOrderByCommentCount(spec, pageable);
+            return bookWithcomments.map(bwc -> new BookSummary(bwc.getBook(),null, bwc.getCommentCount()));
+
+        } else {
+            //기존 정렬 옵션에 따른 처리
+            pageable = PageRequest.of(page, 20, Sort.by(Sort.Direction.DESC, sortOption));
+            Slice<Book> books = bookRepository.findAll(spec, pageable);
+            return books.map(BookSummary::new);
+        }
     }
+
     
     public Outline getOutline(Long bookId) {
         

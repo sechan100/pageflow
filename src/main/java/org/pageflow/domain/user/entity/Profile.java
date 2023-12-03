@@ -29,4 +29,5 @@ public class Profile extends BaseEntity {
     )
     @JsonIgnore
     private Account account;
+
 }

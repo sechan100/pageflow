@@ -25,21 +25,4 @@ import org.hibernate.annotations.DynamicUpdate;
 public class Preference extends Interaction {
 
     private boolean isLiked;
-    
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

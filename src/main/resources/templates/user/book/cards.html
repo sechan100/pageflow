@@ -47,12 +47,11 @@ select {
             <div class="flex justify-between mb-12 w-full  ">
             <div class="flex grow ">
                 <!--  정렬순  -->
-                    <select name="fruits" id="sortOption" class="select font-semibold text-sm text-gray-700  focus:border-double focus:border-gray-500 focus:ring-0 border-gray-400 sm:text-sm sm:leading-6">
+                    <select id="sortOption" class="select font-semibold text-sm text-gray-700  focus:border-double focus:border-gray-500 focus:ring-0 border-gray-400 sm:text-sm sm:leading-6">
                         <option disabled selected>정렬순 🍊</option>
                         <option value="createdDate">작성 날짜 </option>
-                        <option value="preferenceCount">추천수</option>
-                        <option value="grape">헤헤 </option>
-                        <option value="melon">하하</option>
+                        <option value="preferenceCount">추천순</option> <!-- JPA에서 지원하는 함수나 필드를 이용 -->
+                        <option value="commentCount">댓글순</option>
                     </select>
             </div>
             <!--  검색 시작  -->

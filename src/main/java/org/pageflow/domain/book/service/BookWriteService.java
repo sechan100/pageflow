@@ -58,6 +58,7 @@ public class BookWriteService {
                 .title("제목을 입력해주세요")
                 .status(BookStatus.DRAFT)
                 .coverImgUrl(defaultCoverImgUrl)
+                .chapters(new ArrayList<>())
                 .author(author)
                 .build();
         

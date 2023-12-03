@@ -52,3 +52,5 @@ src/main/resources/static/react/build/**
 dump.rdb
 src/main/resources/static/js/node_modules/
 /src/main/resources/static/js/node_modules/
+.gitsecret/keys/random_seed
+!*.secret

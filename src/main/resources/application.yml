@@ -11,11 +11,11 @@ spring:
 logging:
   level:
     org:
-      pageflow:
-        domain:
-          book:
-            service: DEBUG
-#    org:
+#    root: DEBUG
+#      pageflow:
+#        domain:
+#          book:
+#            service: DEBUG
 #      springframework:
 #        security: DEBUG
 #        jdbc:

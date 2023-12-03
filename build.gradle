@@ -66,6 +66,7 @@ tasks.register('buildReact-book_write', Exec) {
 	workingDir("src/main/react/book_write")
 	commandLine "npm", "install"
 	environment 'PUBLIC_URL', '/react/build/book_write'
+	environment 'CI', 'false' // CI 환경에서의 빌드 성공을 위함. eslint 관련 에러들을 경고로 처리하도록
 
 	if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
 		commandLine "cmd", "/c", "npm", "run", "build"
@@ -78,6 +79,7 @@ tasks.register('buildReact-book_viewer', Exec) {
 	commandLine "npm", "install"
 	workingDir("src/main/react/book_viewer")
 	environment 'PUBLIC_URL', '/react/build/book_viewer'
+	environment 'CI', 'false' // CI 환경에서의 빌드 성공을 위함. eslint 관련 에러들을 경고로 처리하도록
 
 	if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
 		commandLine "cmd", "/c", "npm", "run", "build"

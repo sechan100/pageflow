@@ -30,7 +30,11 @@ const fallback : Outline = {
         }
       ]
     }
-  ]
+  ],
+  preferenceStatistics: {
+    like: 0,
+    dislike: 0
+  }
 }
 
 

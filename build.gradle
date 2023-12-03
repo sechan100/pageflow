@@ -118,5 +118,11 @@ tasks.register('copy-book_viewer', Copy) {
 	println("book_viewer 빌드 파일을 복사했습니다.")
 }
 
+// processResources의 실행 전에 리액트가 모두 빌드되어 복사까지 되도록 의존성 설정.
+tasks.named('processResources') {
+	dependsOn ':copy-book_viewer'
+	dependsOn ':copy-book_write'
+}
+
 
 

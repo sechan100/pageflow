@@ -45,10 +45,11 @@
                             <div class="flex flex-col items-center text-center justify-center w-full">
                                 <h2 class="mt-8 mb-8 font-black text-2xl w-full" th:text="${outline.title}"></h2>
                                 <div>
-                                    <span class="font-semibold mt-8 mr-3" th:text="${outline.author.nickname}"></span>
+                                    <span class="font-semibold mt-8 mr-3" th:text="|${outline.author.nickname} 작가|"></span>
                                     <a href="#" id="heart" data-filled="false" onclick="togglePreference()">
                                         <i id="heartIcon" class="far fa-heart" style="color: #000000;"></i>
                                     </a>
+                                    <span>[[${outline.preferenceStatistics.likes}]]</span>
                                 </div>
                                 <a th:href="@{|/viewer/${outline.id}|}"
                                    class="custom-btn read-btn w-52 mt-20 relative rounded-sm font-semibold	leading-10 bg-black	text-white p-1">읽기</a>
@@ -117,7 +118,7 @@
                                                class="input input-bordered px-6 w-full rounded-lg"/>
                                     </div>
                                     <div class="w-1/5 px-2 py-1">
-                                        <input type="submit" class="input input-bordered w-full" value="등록"/>
+                                        <input type="submit" class="btn btn-outline input-bordered w-full" value="등록"/>
                                     </div>
                                 </form>
                             </div>
@@ -174,7 +175,6 @@
         });
     </script>
 
-<!--  댓글 관련 기능  -->
     <script>
         $(document).ready(function () {
             var bookId =  [[${outline.id}]];
@@ -204,7 +204,7 @@
                     console.log("Interactions from server:", interactions);
 
                     // 댓글 목록 추출
-                    var commentList = Array.isArray(interactions.comments) ? interactions.comments.map(item => item.comment) : [];
+                    const commentList = interactions.comments;
 
                     displayCommentList(commentList);
                 },
@@ -217,7 +217,6 @@
         // 댓글 목록을 화면에 표시
         function displayCommentList(commentList) {
             var output = "";
-            var userImg =  "[[${outline.author.profileImgUrl}]]";
 
             if (commentList && commentList.length > 0) {
                 commentList.sort(function (a, b) {
@@ -225,11 +224,15 @@
                 });
 
                 for (var i in commentList) {
-                    var comment = commentList[i];
+                    const comment = commentList[i];
+                    const profileImgUrl = comment.interactor.profileImgUrl;
+
+
+
                     output += "<div class='flex text-xs p-2 mt-3 border-b-2'>";
                     output += "<div class='w-10 mr-2 ml-2 flex '>";
                     output += "<div class='w-7 h-7 m-auto justify-items-center'>";
-                    output += "<img src='" + userImg + "' alt='프로필이미지' class='rounded-full'>";
+                    output += "<img src='" + profileImgUrl + "' alt='프로필이미지' class='rounded-full'>";
                     output += "</div>";
                     output += "</div>";
                     output += "<div class='flex flex-col w-full p-1'>";
@@ -240,27 +243,26 @@
                     output += "<div class='flex justify-between'>";
                     var formattedDate = new Date(comment.createdDate).toISOString().split('T')[0];
                     output += "<span class='text-gray-500'>" + formattedDate + "</span>";
-                    output += "<div class='flex justify-end'>";
-                    output += "<a id='likeButton_" + comment.id + "' href='javascript:void(0);' onclick='toggleLikeComment(" + comment.id + ")'><i class='fa-regular fa-face-grin-hearts text-2xl text-rose-600'></i></a>";
-                    output += "<span id='likesCount_" + comment.id + "' class='mr-1'>" + comment.likes + "</span>";
-                    output += "<a id='dislikeButton_" + comment.id + "' href='javascript:void(0);' onclick='toggleDislikeComment(" + comment.id + ")'><i class='fa-regular fa-face-tired text-2xl text-rose-600'></i></a>";
-                    output += "<span id='dislikesCount_" + comment.id + "'>" + comment.dislikes  + "</span>";
+                    output += "<div class='flex justify-evenly text-center'>";
+
+                    // Like button
+                    output += "<div class='mr-2 py-1 px-2 rounded-lg shadow-inner btn btn-ghos'>";
+                    output += "<a id='likeButton_" + comment.id + "' href='javascript:void(0);' onclick='toggleLikeComment(" + comment.id + ")'><i class='fas fa-thumbs-up text-xl text-blueGray-500'></i></a>";
+                    output += "<span id='likesCount_" + comment.id + "' class='mr-1 ml-2 text-lg font-medium'>" + comment.preferenceStatistics.likes+ "</span>";
+                    output += "</div>";
+
+                    // Edit button
+                    output += "<div class='mr-2 py-1 px-2 rounded-lg shadow-inner font-bold text-md btn btn-ghos'>";
+                    output += "<a id='editButton_" + comment.id + "' href='javascript:void(0);' onclick='editComment(" + comment.id + ")' >수정</a>";
+                    output += "</div>";
+
+                    // Delete button
+                    output += "<div class=' py-1 px-2 rounded-lg shadow-inner font-bold text-md btn btn-ghos'>";
+                    output += "<a id='deleteButton_" + comment.id + "' href='javascript:void(0);' onclick='deleteComment(" + comment.id + ")'>삭제</a>";
+                    output += "</div>";
+
                     output += "</div>";
                     output += "</div>";
-                    output += "</div>";
-                    output += "<div class='flex justify-end mr-3 mt-1'>";
-                    output += "<a class='p-1' href='#'>";
-                    output += "<i onclick='openModal(" + comment.id + ")' class='fa-solid fa-bars modal_btn justify-end text-black text-base'></i>";
-                    output += "</a>";
-                    output += "<dialog id='my_modal_" + comment.id + "' class='modal'>";
-                    output += "<div class='modal-box bg-white text-black'>";
-                    output += "<form method='dialog'>";
-                    output += "<button class='btn btn-sm btn-circle btn-ghost absolute right-3 top-3' onclick='closeModal(" + comment.id + ")'>✕</button>";
-                    output += "</form>";
-                    output += "<a href='javascript:void(0);' class='edit mr-2' onclick='editComment(" + comment.id + ")'>수정</a>";
-                    output += "<a href='javascript:void(0);' class='delete' onclick='deleteComment(" + comment.id + ")'>삭제</a>";
-                    output += "</div>";
-                    output += "</dialog>";
                     output += "</div>";
                     output += "</div>";
 
@@ -298,18 +300,19 @@
                     form.content.value = '';
                 },
                 error: function (xhr, status, error) {
-                    alert('댓글 생성 에러');
+                    flowAlert("error", "댓글 작성 도중 오류가 발생하였습니다.");
                 }
             });
         }
 
-        // 댓글 삭제
-        function deleteComment(commentId) {
+
+            // 댓글 삭제
+            function deleteComment(commentId) {
             var bookId =  [[${outline.id}]];
-            closeModal(commentId);
 
-
+            // 확인 메시지 띄우기
             var confirmDelete = confirm('정말로 삭제하시겠습니까?');
+1
             if (confirmDelete) {
                 $.ajax({
                     type: 'DELETE',
@@ -317,96 +320,103 @@
                     success: function (comment) {
                         console.log('댓글 삭제 완료:', comment);
                         flowAlert("success", "댓글이 삭제되었습니다.");
+
+                        // 댓글 목록 업데이트
                         updateCommentList(bookId);
+
                         // 댓글 개수 업데이트
                         updateCommentCount();
-                        // 모달 창 닫기
-                        closeCommentModal();
                     },
                     error: function (xhr, status, error) {
                         console.error('댓글 삭제 에러:', xhr, status, error);
                         flowAlert("error", "댓글 삭제 도중 오류가 발생하였습니다.");
-                        // 모달 창 닫기
-                        closeCommentModal();
                     }
                 });
             }
         }
 
+     // 댓글 수정 폼 열기
+    function editComment(commentId) {
+    console.log('왜 안되 시발');
+    console.log('editComment function called with commentId:', commentId);
+        // 해당 댓글의 내용을 가져와서 폼에 세팅
+        var commentContent = $("#comment-" + commentId).text();
+        var editForm =
+            "<div id='comment-div-" + commentId + "' class='flex flex-col w-full p-1'>" +
+            "<div class='flex flex-col mb-1'>" +
+            "<textarea id='comment-textarea-" + commentId + "' class='w-full mb-2 rounded-lg'>" + commentContent + "</textarea>" +
+            "</div>" +
+            "<div class='flex justify-between'>" +
+            "<button class='btn btn-sm btn-outline' onclick='cancelEdit(" + commentId + ")'>취소</button>" +
+            "<button class='btn btn-sm btn-primary' onclick='submitEditComment(" + commentId + ")'>수정 완료</button>" +
+            "</div>" +
+            "</div>";
 
-        // 댓글 수정 버튼 후 화면 표시
-        function editComment(commentId) {
-            closeModal(commentId);
+        // 해당 댓글의 버튼 숨기기
+        $("#comment-" + commentId).next().find('.btn-ghos').hide();
 
-            var containerHeight = $("#comment-" + commentId).parent().height();
+        // 폼 삽입
+        $("#comment-" + commentId).after(editForm);
+    }
 
-            var newContent = `
-                <div class='w-full flex justify-between'>
-                    <div id='comment-div-${commentId}' class='w-full flex justify-between'>
-                        <textarea id='comment-textarea-${commentId}' autofocus class='textarea textarea-bordered textarea-xs bg-slate-100 mr-2 w-full' style='resize: none; height: ${containerHeight}px;'></textarea>
-                        <a href='#'>
-                            <i onclick='openModal(${commentId})' class='fa-solid fa-bars modal_btn justify-end text-black text-base'></i>
-                        </a>
-                        <dialog id='my_modal_${commentId}' class='modal'>
-                            <div class='modal-box bg-white text-black'>
-                                <form method='dialog'>
-                                    <button class='btn btn-sm btn-circle btn-ghost absolute right-3 top-3' onclick='closeModal(${commentId})'>✕</button>
-                                </form>
-                                <button onclick='saveEdit(${commentId})'>저장</button>
-                                <button onclick='cancelEdit(${commentId})'>취소</button>
-                            </div>
-                        </dialog>
-                    </div>
-                </div>
-            `;
+    // 댓글 수정 제출
+    function submitEditComment(commentId) {
+        var bookId = [[${outline.id}]];
+        var editedContent = $("#comment-textarea-" + commentId).val();
 
-            if (newContent !== null) {
-                $("#comment-" + commentId).replaceWith(newContent);
-                $("#comment-div-" + commentId).next().hide();
-                $("#comment-div-" + commentId).next().next().hide();
-                $("#comment-div-" + commentId).next().next().next().hide();
+        // 수정된 내용이 비어있으면 경고
+        if (editedContent.trim() === "") {
+            flowAlert("warning", "댓글을 입력해주세요");
+            return;
+        }
+
+        $.ajax({
+            type: 'PUT',
+            url: '/api/books/' + bookId + '/comments/' + commentId,
+            data: { content: editedContent },
+            success: function (comment) {
+                console.log("댓글 수정 완료:", comment);
+                // 수정 폼을 일반 댓글로 변경
+                $("#comment-div-" + commentId).replaceWith("<p id='comment-" + commentId + "'>" + editedContent + "</p>");
+                // 해당 댓글의 버튼 표시
+                var buttonsToShow = $("#comment-" + commentId).next().find('.btn-ghos');
+                buttonsToShow.show();
+            },
+            error: function (xhr, status, error) {
+                console.error("댓글 수정 실패:", xhr, status, error);
+                flowAlert("error", "댓글 수정 도중 오류가 발생하였습니다.");
             }
-        }
+        });
+    }
 
-        // 취소 시 화면 표시
-        function cancelEdit(commentId) {
-            var commentContent = $("#comment-textarea-" + commentId).val(); // 수정된 부분
-            $("#comment-div-" + commentId).replaceWith(`<p id='comment-${commentId}'>${commentContent}</p>`);
+    // 취소 시 화면 표시
+    function cancelEdit(commentId) {
+        // 해당 댓글의 원래 버튼 표시
+        var buttonsToShow = $("#comment-" + commentId).next().find('.btn-ghos');
+        buttonsToShow.show();
 
-            // 해당 댓글의 원래 버튼 표시
-            var buttonsToShow = $("#comment-" + commentId).next().find('.modal_btn');
-            buttonsToShow.show();
-        }
+        // 수정 폼 제거
+        $("#comment-div-" + commentId).remove();
+    }
 
-        // 댓글 관련 버튼 모달 열기
-        function openModal(commentId) {
-            var modal = document.getElementById('my_modal_' + commentId);
-            modal.showModal();
-        }
+    // 댓글 count 업데이트
+    function updateCommentCount() {
+        var bookId = [[${outline.id}]];
 
-        // 댓글 관련 버튼 모달 닫기
-        function closeCommentModal(commentId) {
-            var modal = document.getElementById('my_modal_' + commentId);
-            modal.close();
-        }
-
-        function updateCommentCount() {
-            var bookId =  [[${outline.id}]];
-
-            $.ajax({
-                type: 'GET',
-                url: '/api/books/' + bookId + '/interactions',
-                success: function (interactions) {
-                    var commentCount = interactions.comments ? interactions.comments.length : 0;
-                    $("#getCommentCount").text(commentCount);
-                },
-                error: function (xhr, status, error) {
-                    console.error("댓글 개수 업데이트 실패");
-                }
-            });
-        }
-
+        $.ajax({
+            type: 'GET',
+            url: '/api/books/' + bookId + '/interactions',
+            success: function (interactions) {
+                var commentCount = interactions.comments ? interactions.comments.length : 0;
+                $("#getCommentCount").text(commentCount);
+            },
+            error: function (xhr, status, error) {
+                console.error("댓글 개수 업데이트 실패");
+            }
+        });
+    }
     </script>
+    <!--  댓글 관련 기능  -->
 
 
     <!--  댓글 좋아요 싫어요  -->

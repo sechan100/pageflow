@@ -15,7 +15,6 @@ import java.util.Objects;
 @Entity
 @Getter
 @Builder
-@AllArgsConstructor
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED) //접근 수준. 상속관계에 있는 클래스에서만 생성자에 접근 가능
 @DynamicUpdate
@@ -39,13 +38,14 @@ public class Book extends BaseEntity {
 
 
     // AllArgsConstructor: chapters 값을 초기화하기위해서 하드코딩
-    protected Book(String title, String coverImgUrl, Profile author, List<Chapter> chapters, BookStatus status) {
+    protected Book(String title, String coverImgUrl, Profile author, List<Chapter> chapters, BookStatus status, LocalDateTime publishedDate) {
         super();
         this.title = title;
         this.coverImgUrl = coverImgUrl;
         this.author = author;
         this.chapters = Objects.requireNonNullElseGet(chapters, ArrayList::new);
         this.status = status;
+        this.publishedDate = publishedDate;
     }
 
 

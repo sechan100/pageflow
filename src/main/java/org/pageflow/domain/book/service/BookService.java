@@ -15,6 +15,7 @@ import org.pageflow.domain.book.model.summary.PageSummary;
 import org.pageflow.domain.book.repository.BookRepository;
 import org.pageflow.domain.book.repository.ChapterRepository;
 import org.pageflow.domain.book.repository.PageRepository;
+import org.pageflow.domain.interaction.service.PreferenceService;
 import org.pageflow.domain.user.entity.Profile;
 import org.pageflow.infra.file.service.FileService;
 import org.springframework.data.domain.PageRequest;
@@ -39,6 +40,7 @@ public class BookService {
     private final ChapterRepository chapterRepository;
     private final PageRepository pageRepository;
     private final FileService fileService;
+    private final PreferenceService preferenceService;
 
     private Specification<Book> search(String kw) {
         return new Specification<>() {
@@ -122,6 +124,7 @@ public class BookService {
                 .coverImgUrl(book.getCoverImgUrl())
                 .status(book.getStatus())
                 .chapters(chapterSummaries)
+                .preferenceStatistics(preferenceService.getPreferenceStatistics(book))
                 .build();
     }
     

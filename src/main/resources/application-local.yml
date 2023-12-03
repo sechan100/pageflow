@@ -1,31 +1,32 @@
 server:
-  port: 8888
+  port: 80
 
 spring:
   config:
     activate:
-      on-profile: dev
+      on-profile: local
 
   thymeleaf:
-    cache: false
+    cache: true
     mode: HTML
     encoding: UTF-8
     prefix: classpath:templates
     suffix: .html
 
   redis:
-    host: localhost
+    host: redis
     port: 6379
 
   datasource:
     username: root
-    password:
+    password: dlqhfka
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/pageflow
+#    url: jdbc:mysql://host.docker.internal:3307/pageflow?useSSL=false&autoReconnect=true
+    url: jdbc:mysql://db:3306/pageflow?autoReconnect=true
 
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     properties:
       hibernate:
         show_sql: true
@@ -77,6 +78,6 @@ custom:
   files:
     img:
       base-url: /files/img
-      directory: C:/Users/SBS/local/uploads/img
+#      directory: C:/Users/SBS/local/uploads/img
 #      directory: C:/Users/gsw05/local/uploads/img
-#      directory: /Users/sechan/local/uploads/img
+      directory: /Users/sechan/local/uploads/img

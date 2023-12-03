@@ -12,7 +12,7 @@ import java.util.List;
 public interface CommentRepository extends JpaRepository<Comment, Long> {
     
     @EntityGraph(attributePaths = {"interactor"}, type = EntityGraph.EntityGraphType.LOAD)
-    List<Comment> findAllByTargetTypeAndTargetId(String targetType, Long targetId);
+    List<Comment> findAllWithInteractorByTargetTypeAndTargetId(String targetType, Long targetId);
     
     @EntityGraph(attributePaths = {"interactor"}, type = EntityGraph.EntityGraphType.LOAD)
     Comment findWithInteractorById(long commentId);

@@ -88,9 +88,6 @@ function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-       <button onClick={handleContinueReading} className="continue-reading-btn">
-        이어보기
-      </button> 
       <Viewer outline={outline}></Viewer>
     </QueryClientProvider>
   ); 

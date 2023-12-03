@@ -18,14 +18,6 @@ services:
     volumes:
       - mysql_volume:/var/lib/mysql
 
-  jenkins:
-    image: "sechan100/jenkins:v1"
-    ports:
-      - "8080:8080"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - jenkins_volume:/var/jenkins_home
-
   was:
     build:
       context: ./.

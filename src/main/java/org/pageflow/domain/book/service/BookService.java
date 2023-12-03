@@ -81,8 +81,8 @@ public class BookService {
             //'댓글' 순으로 정렬하기 위해 Pageable을 구성.
             //이 경우 'commentCount'는 실제 필드가 아니므로, Sort.by를 사용하지 않음.
             pageable = PageRequest.of(page, 20);
-            Slice<BookWithCommentCount> bookWithPrefs = bookRepository.findAllBooksOrderByCommentCount(spec, pageable);
-            return bookWithPrefs.map(bwp -> new BookSummary(bwp.getBook(),null, bwp.getCommentCount()));
+            Slice<BookWithCommentCount> bookWithcomments = bookRepository.findAllBooksOrderByCommentCount(spec, pageable);
+            return bookWithcomments.map(bwc -> new BookSummary(bwc.getBook(),null, bwc.getCommentCount()));
 
         } else {
             //기존 정렬 옵션에 따른 처리

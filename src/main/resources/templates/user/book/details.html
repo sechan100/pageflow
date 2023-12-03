@@ -3,29 +3,12 @@
 
 <head>
     <title>[[${outline.title}]]</title>
-
-    <!-- 댓글 스크롤바 스타일 -->
-    <style>
-        .scroll::-webkit-scrollbar {
-          width: 5px;
-        }
-
-        .scroll::-webkit-scrollbar-thumb {
-          background: #c8c8c8;
-          border-radius: 10px;
-        }
-
-    </style>
-
-
 </head>
 
 <body>
 
 <main layout:fragment="main">
-
-
-    <section class="container max-w-[70%] m-auto">
+    <section class="container max-w-[75%] m-auto">
         <div class="mt-10 mb-10 flex flex-col">
             <div class="flex flex-col md:flex-row justify-center sm:h-full">
                 <!-- 좌측 레이아웃 시작 -->
@@ -34,11 +17,13 @@
                         <div class="flex flex-col">
                             <div class="h-full w-full relative">
                                 <div class="w-full h-96" style="filter: blur(1.5px);">
-                                    <img th:src="@{${outline.coverImgUrl}}" alt="Book Image" class="object-cover w-full h-full">
+                                    <img th:src="@{${outline.coverImgUrl}}" alt="Book Image"
+                                         class="object-cover w-full h-full">
                                 </div>
                                 <div class="w-9/12 h-4/6 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
                                      style="z-index : 1;">
-                                    <img th:src="@{${outline.coverImgUrl}}" alt="Book Image" class="object-cover w-full h-full">
+                                    <img th:src="@{${outline.coverImgUrl}}" alt="Book Image"
+                                         class="object-cover w-full h-full">
                                 </div>
                             </div>
                         </div>
@@ -46,13 +31,14 @@
                             <div class="flex flex-col items-center text-center justify-center w-full">
                                 <h2 class="mt-8 mb-8 font-black text-2xl w-full" th:text="${outline.title}"></h2>
                                 <div>
-                                    <span class="font-semibold mt-8 mr-3" th:text="|${outline.author.nickname} 작가|"></span>
+                                    <span class="font-semibold mt-8 mr-3"
+                                          th:text="|${outline.author.nickname} 작가|"></span>
                                     <a href="#" id="heart" data-filled="false" onclick="togglePreference()">
                                         <i id="heartIcon" class="far fa-heart" style="color: #000000;"></i>
                                     </a>
                                     <span id="bookLikesCount"></span>
                                 </div>
-<!--                                [[${outline.preferenceStatistics.likes}]]-->
+                                <!--                                [[${outline.preferenceStatistics.likes}]]-->
                                 <a th:href="@{|/viewer/${outline.id}|}"
                                    class="custom-btn read-btn w-52 mt-20 relative rounded-sm font-semibold	leading-10 bg-black	text-white p-1">읽기</a>
                             </div>
@@ -134,7 +120,7 @@
 
     </section>
 
-<!--  책 좋아요 싫어요  -->
+    <!--  책 좋아요 싫어요  -->
     <script>
         // 로드시 실행
         $(document).ready(function () {
@@ -161,10 +147,10 @@
             function getLikesCountFromServer(bookId) {
             $.ajax({
                 type: 'GET',
-                url: '/api/books/' + bookId + '/interactions',
+                url: '/api/books/' + bookId + '/preferences',
                 success: function (data) {
                     console.log(data);
-                    var likesCount  = data.preferenceStatistics.likes || 0
+                    var likesCount  = data.likes || 0
                    $('#bookLikesCount').text(likesCount);
                 },
                 error: function (xhr, status, error) {
@@ -181,8 +167,7 @@
             var isLoggedIn = /*[[${user.login}]]*/ false;
 
             if (isLoggedIn) {
-                flowAlert("warning", "로그인 후 이용해주세요.");
-                window.location.href = "/login";
+                flowAlert("warning", '로그인 후 이용해주세요.');
             } else {
                 $.ajax({
                     type: isLiked ? 'DELETE' : 'POST',
@@ -308,9 +293,9 @@
                         output += "</div>";
                         output += "</div>";
 
-                        output += "<div id='editCommentForm' style='display: none;'>";
+                        output += "<div id='editCommentForm_" + comment.id + "' style='display: none;'>"; // 폼 ID를 댓글 ID와 연결
                         output += "<textarea id='editedCommentContent'></textarea>";
-                        output += "<button onclick='submitEditedComment()'>수정 완료</button>";
+                        output += "<button onclick='submitEditedComment(" + comment.id + ")'>수정 완료</button>";
                         output += "<button onclick='cancelEdit()'>취소</button>"
                         output += "</div>";
                     }
@@ -390,23 +375,22 @@
                 }
             }
 
-        // 댓글 수정 폼 보여주기
+// 댓글 수정 폼 보여주기
 function showEditCommentForm(commentId, currentContent) {
-      console.log('보여주고있니?');
+    console.log('보여주고있니?');
     // 수정 폼 보이기
-    $("#editedCommentContent").val(currentContent);
-    $("#editCommentForm").show();
+    var editForm = $("#editCommentForm_" + commentId);
+    editForm.find("#editedCommentContent").val(currentContent);
+    editForm.show().data('commentId', commentId);
     console.log('보여주고있니!!!!');
-
-
-    // 수정 완료 시 호출될 함수에 현재 댓글 ID 전달
-    $("#editCommentForm button:first").attr("onclick", "submitEditedComment(" + commentId + ")");
 }
+
 
 // 댓글 수정 제출
 function submitEditedComment(commentId) {
-    var bookId = [[${outline.id}]];
-    var editedContent = $("#editedCommentContent").val();
+ var bookId = [[${outline.id}]];
+    var editedContent = $("#editCommentForm_" + commentId).find("#editedCommentContent").val();
+
 
     // 수정된 내용이 비어있으면 경고
     if (editedContent.trim() === "") {
@@ -420,7 +404,7 @@ function submitEditedComment(commentId) {
         data: { content: editedContent },
         success: function (comment) {
             console.log("댓글 수정 완료:", comment);
-
+             flowAlert("success", "댓글을 수정했습니다");
             // 댓글 목록 업데이트
             updateCommentList(bookId);
 
@@ -464,84 +448,91 @@ function cancelEdit() {
 
     <!--  댓글 좋아요 싫어요  -->
     <script>
-            // 로드시 실행
-            $(document).ready(function () {
-                var comment = commentList[i];
-                var commentId = comment.id;
-                var bookId = [[${outline.id}]];
-                var isLikedComment = localStorage.getItem('likedComment_' + commentId);
+         // 페이지 로드 시 댓글 좋아요 정보 초기화
+        $(document).ready(function () {
+            initializeCommentLikes();
+        });
 
+        // 댓글 좋아요 초기화
+        function initializeCommentLikes() {
+            var commentList = interactions.comments;
+            for (var i = 0; i < commentList.length; i++) {
+                var commentId = commentList[i].id;
+                var isCommentLiked = localStorage.getItem('likedComment_' + commentId);
 
-
-                // 좋아요 개수 업데이트
-                updateLikesCountFromServer(commentId);
-
-                // 좋아요 여부에 따라 아이콘 스타일 변경
-                if (isLikedComment) {
-                    $('#likeButton_' + commentId).find('i').removeClass('far').addClass('fas').css('color', 'blue');
+                // 댓글 좋아요 여부에 따라 아이콘 스타일 변경
+                if (isCommentLiked) {
+                    $('#likeButton_' + commentId + ' i').removeClass('far').addClass('fas').css('color', 'blue');
                     $('#likeButton_' + commentId).data('filled', true);
-
+                    console.log(isCommentLiked);
                 } else {
-                    $('#likeButton_' + commentId).find('i').removeClass('fas').addClass('far').css('color', '#000000');
+                    $('#likeButton_' + commentId + ' i').removeClass('fas').addClass('far').css('color', '#000000');
                     $('#likeButton_' + commentId).data('filled', false);
+                    console.log(!isCommentLiked);
                 }
 
                 // 댓글 좋아요 버튼 클릭 이벤트 핸들러 추가
                 $('#likeButton_' + commentId).click(function () {
                     toggleCommentLike(commentId);
                 });
+
+                // 댓글 좋아요 숫자를 서버에서 가져오기
+                getCommentLikesCountFromServer(commentId);
+            }
+        }
+
+        // 댓글 좋아요 클릭 시 호출하는 함수
+        function toggleCommentLike(commentId) {
+            var isCommentLiked = $('#likeButton_' + commentId).data('filled');
+            var isLoggedIn = /*[[${user.login}]]*/ false;
+
+            if (isLoggedIn) {
+                flowAlert("warning", "로그인 후 이용해주세요.");
+            } else {
+                $.ajax({
+                    type: isCommentLiked ? 'DELETE' : 'POST',
+                    url: '/api/comments/' + commentId + '/preferences',
+                    data: { isLiked: !isCommentLiked },
+                    success: function (data) {
+                        if (!isCommentLiked) {
+                            $('#likeButton_' + commentId + ' i').removeClass('far').addClass('fas').css('color', 'blue');
+                            $('#likeButton_' + commentId).data('filled', true);
+                            console.log('댓글에 좋아요를 눌렀습니다.');
+                            console.log(data);
+                            localStorage.setItem('likedComment_' + commentId, true); // 좋아요 상태 로컬 스토리지에 저장
+                        } else {
+                            $('#likeButton_' + commentId + ' i').removeClass('fas').addClass('far').css('color', 'rgb(23 23 23)');
+                            $('#likeButton_' + commentId).data('filled', false);
+                            console.log('댓글에 좋아요를 취소했습니다.');
+                            console.log(data);
+                            localStorage.removeItem('likedComment_' + commentId); // 좋아요 상태 로컬 스토리지에서 제거
+                        }
+                        getCommentLikesCountFromServer(commentId);
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('처리 중 에러가 발생');
+                    }
+                });
+            }
+        }
+
+        // 댓글 좋아요 숫자를 서버에서 가져오는 함수
+        function getCommentLikesCountFromServer(commentId) {
+            var bookId = [[${outline.id}]];
+            $.ajax({
+                type: 'GET',
+                url: '/api/books/' + bookId + '/interactions',
+                success: function (data) {
+                    console.log(data);
+                    var commentLikesCount = data.preferenceStatistics.likes || 0;
+                    $('#likesCount_' + commentId).text(commentLikesCount);
+                },
+                error: function (xhr, status, error) {
+                    console.error('댓글 좋아요 숫자 가져오기 실패');
+                }
             });
+        }
 
-
-       // 좋아요 숫자를 서버에서 가져오는 함수
-           function updateLikesCountFromServer(commentId) {
-           var bookId = [[${outline.id}]];
-           $.ajax({
-               type: 'GET',
-               url: '/api/books/' + bookId + '/interactions',
-               success: function (data) {
-                   console.log(data);
-                   var commentLikesCount   = data.preferenceStatistics.likes || 0
-                  $('#likesCount_').text(commentLikesCount);
-               },
-               error: function (xhr, status, error) {
-                   console.error('좋아요 숫자 가져오기 실패');
-               }
-           });
-       }
-
-
-            // 댓글 좋아요 클릭 시 호출 함수
-           function toggleCommentLike(commentId) {
-               var isLiked = $('#likeButton_' + commentId).data('filled');
-               var isLoggedIn = /*[[${user.login}]]*/ false;
-
-               if (isLoggedIn) {
-                   flowAlert("warning", "로그인 후 이용해주세요.");
-                   window.location.href = "/login";
-               } else {
-                   $.ajax({
-                       type: isLiked ? 'DELETE' : 'POST',
-                     url: '/api/comments/' + commentId + '/preferences',
-                       data: { isLiked: !isLiked },
-                       success: function (data) {
-                           if (!isLiked) {
-                               $('#likeButton_' + commentId + ' i').removeClass('far').addClass('fas').css('color', 'blue');
-                               $('#likeButton_' + commentId).data('filled', true);
-                               console.log('댓글에 좋아요를 눌렀습니다.');
-                           } else {
-                               $('#likeButton_' + commentId + ' i').removeClass('fas').addClass('far').css('color', 'rgb(23 23 23)');
-                               $('#likeButton_' + commentId).data('filled', false);
-                               console.log('댓글에 좋아요를 취소했습니다.');
-                           }
-                           updateLikesCountFromServer(commentId);
-                       },
-                       error: function (xhr, status, error) {
-                           console.error('처리 중 에러가 발생');
-                       }
-                   });
-               }
-           }
     </script>
 
 </main>

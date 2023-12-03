@@ -5,32 +5,24 @@
 
 <!--  select 정렬순 스타일  -->
     <style>
-       .btn-select.on+.list-member {
-         display: block;
-    }
+select::-ms-expand {
+  display: none;
+}
 
-                // block 성질 중요
-                .list-member li {
-                  width: 100%;
-                  height: 40px;
-                  box-sizing: border-box;
-                }
+select {
+  -o-appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
 
-                .list-member li button {
-                  width: 100%;
-                  padding: 7px 10px;
-                  background-color: #fff;
-                  cursor: pointer;
-                  text-align: left;
-                  white-space: nowrap;
-                  text-overflow: ellipsis;
-                  overflow: hidden;
-                }
+.select option {
+  margin-top :10px ;
+  color: black;
+  padding: 5px 5px;
+  font : 14px ;
+}
 
-                .list-member li button:hover,
-                .list-member li button:focus {
-                  background-color: rgb(203 213 225);
-                }
     </style>
 </head>
 
@@ -51,26 +43,17 @@
             </div>
         </div>
         <!-- 리스트 -->
-        <div class="w-full mx-auto max-w-[75%] sm:px-6 sm:py-24 ">
+        <div class="w-full mx-auto max-w-[90%] sm:px-6 sm:py-24 ">
             <div class="flex justify-between mb-12 w-full  ">
-            <div class="flex grow">
+            <div class="flex grow ">
                 <!--  정렬순  -->
-                <div class="max-w-md mr-4 w-1/5 z-10  border-2 p-3 border-gray-400 rounded font-semibold text-sm text-gray-700 relative text-center active:top-[3px]">
-                    <button id="sortOption" name="sort" th:value="${sort}" data-sort="${sort}" class="btn-select w-full cursor-pointer  overflow-hidden" onclick="toggleSortOptions()">
-                        정렬순
-                    </button>
-                    <ul id="sortOptions" class="list-member list-none hidden absolute w-full rounded font-medium text-black text-sm top-16 left-0">
-                        <li>
-                            <button value="createdDate" type="button" onclick="updateSort('createdDate')">작성 날짜</button>
-                        </li>
-                        <li>
-                            <button value="title" type="button" onclick="updateSort('title')">제목</button>
-                        </li>
-<!--                        <li>-->
-<!--                            <button value="recommend" type="button" onclick="updateSort('recommend')">추천</button>-->
-<!--                        </li>-->
-                    </ul>
-                </div>
+                    <select name="fruits" class="select font-semibold text-sm text-gray-700  focus:border-double focus:border-gray-500 focus:ring-0 border-gray-400 sm:text-sm sm:leading-6">
+                        <option disabled selected>정렬순 🍊</option>
+                        <option value="apple">작성 날짜 </option>
+                        <option value="orange">추천수</option>
+                        <option value="grape">헤헤 </option>
+                        <option value="melon">하하</option>
+                    </select>
             </div>
             <!--  검색 시작  -->
             <div class="w-full flex justify-between max-w-md">
@@ -256,98 +239,6 @@
                 document.getElementById('page').value = 0;
                 document.getElementById('searchForm').submit();
             }
-
-           // 버튼 및 리스트에 대한 이벤트 리스너
-           const btn = document.querySelector(".btn-select");
-           const list = document.querySelector(".list-member");
-           btn.addEventListener("click", () => {
-             btn.classList.toggle("on");
-           });
-
-           list.addEventListener("click", (event) => {
-             if (event.target.nodeName === "BUTTON") {
-               btn.innerText = event.target.innerText;
-               btn.classList.remove("on");
-             }
-           });
-
-           // 정렬 옵션 버튼과 드롭다운 관련 요소들
-           const sortOptionButton = document.getElementById('sortOption');
-           const sortOptions = document.getElementById('sortOptions');
-           const sortOption = document.getElementById('sortOption'); // 추가
-           const currentSortOption = sortOption.value; // 변경
-
-           // 정렬 옵션 드롭다운 가시성 전환 함수
-           function toggleSortOptions() {
-             sortOptions.classList.toggle('hidden');
-           }
-
-           // 정렬 값을 업데이트하고 검색 폼을 제출하는 함수
-            function updateSort(newSort) {
-                // 정렬 기준을 서버에 전달
-                document.getElementById('sortOption').value = newSort;
-
-                // 서버에서 정렬된 데이터를 가져오도록 검색 폼 제출
-                fetchMoreBooks(0);
-            }
-
-            // 정렬 옵션 변경 시 버튼 텍스트 업데이트
-            document.getElementById('sortOption').addEventListener('change', function () {
-                const selectedOption = this.value;
-                updateSort(selectedOption);
-            });
-
-           // 초기 로딩 시 저장된 정렬 옵션으로 버튼 텍스트 설정
-           sortOptionButton.innerText = getButtonText(currentSortOption);
-
-           // 정렬 옵션 드롭다운 이외의 부분을 클릭하면 드롭다운을 숨깁니다.
-           document.addEventListener('click', function (event) {
-             const isClickInside = sortOptionButton.contains(event.target) || sortOptions.contains(event.target);
-             if (!isClickInside) {
-               sortOptions.classList.add('hidden');
-             }
-           });
-
-           // 정렬 옵션 드롭다운 버튼 클릭 시 드롭다운 상태 변경
-           sortOptionButton.addEventListener('click', function () {
-             toggleSortOptions();
-           });
-
-           // 정렬 옵션 변경 시 버튼 텍스트 업데이트 및 폼 제출
-           sortOption.addEventListener('change', function () {
-             updateSortOption();
-           });
-
-           // 정렬 옵션을 업데이트하고 검색 폼을 제출하는 함수
-           function updateSortOption() {
-             const selectedOption = sortOption.value;
-             document.getElementById('sort').value = selectedOption;
-
-             // 스크롤 위치를 저장
-             const scrollY = window.scrollY;
-
-             // 폼 제출
-             document.getElementById('searchForm').submit();
-
-             // 페이지가 로드된 후 스크롤 위치를 복원
-             window.scrollTo(0, scrollY);
-           }
-
-           // 정렬 값에 따라 버튼 텍스트를 반환하는 함수
-         function getButtonText(sortOption) {
-           switch (sortOption) {
-             case 'createdDate':
-               console.log('작성날짜순으로 정렬');
-               return '작성 날짜';
-             case 'title':
-               console.log('제목순으로 정렬');
-               return '제목';
-             case 'recommend':
-               return '추천';
-             default:
-               return '정렬순';
-           }
-         }
         </script>
 
         <script>

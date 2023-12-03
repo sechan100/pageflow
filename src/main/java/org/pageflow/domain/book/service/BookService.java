@@ -75,17 +75,16 @@ public class BookService {
             //이 경우 'preferenceCount'는 실제 필드가 아니므로, Sort.by를 사용하지 않음.
             pageable = PageRequest.of(page, 20);
             Slice<BookWithPreferenceCount> bookWithPrefs = bookRepository.findAllBooksOrderByPreferenceCount(spec, pageable);
-            return bookWithPrefs.map(bwp -> new BookSummary(bwp.getBook(), bwp.getPreferenceCount()));
+            return bookWithPrefs.map(bwp -> new BookSummary(bwp.getBook(), bwp.getPreferenceCount(), null));
 
         } else if("commentCount".equals(sortOption)) {
-            //'좋아요' 순으로 정렬하기 위해 Pageable을 구성.
+            //'댓글' 순으로 정렬하기 위해 Pageable을 구성.
             //이 경우 'commentCount'는 실제 필드가 아니므로, Sort.by를 사용하지 않음.
             pageable = PageRequest.of(page, 20);
             Slice<BookWithCommentCount> bookWithPrefs = bookRepository.findAllBooksOrderByCommentCount(spec, pageable);
-            return bookWithPrefs.map(bwp -> new BookSummary(bwp.getBook(), bwp.getCommentCount()));
+            return bookWithPrefs.map(bwp -> new BookSummary(bwp.getBook(),null, bwp.getCommentCount()));
 
-        }
-        else {
+        } else {
             //기존 정렬 옵션에 따른 처리
             pageable = PageRequest.of(page, 20, Sort.by(Sort.Direction.DESC, sortOption));
             Slice<Book> books = bookRepository.findAll(spec, pageable);

@@ -1,195 +1,234 @@
-<html lang="en" layout:decorate="~{/common/layout.html}" xmlns:th="http://www.w3.org/1999/xhtml" xmlns:layout="">
+<html lang="en" layout:decorate="~{/common/layout.html}" xmlns:th="http://www.w3.org/1999/xhtml">
+
 <head>
-    <title>Book</title>
+    <title>책 목록</title>
+
+<!--  select 정렬순 스타일  -->
+    <style>
+select::-ms-expand {
+  display: none;
+}
+
+select {
+  -o-appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+.select option {
+  margin-top :10px ;
+  color: black;
+  padding: 5px 5px;
+  font : 14px ;
+}
+
+    </style>
 </head>
 
 <main layout:fragment="main">
-    <!--  정렬순  -->
-    <select id="sortOption">
-        <option value="createDate">등록일순</option>
-        <option value="preferenceCount">추천순</option> <!-- JPA에서 지원하는 함수나 필드를 이용 -->
-        <option value="commentCount">댓글순</option> <!-- JPA에서 지원하는 함수나 필드를 이용 -->
-    </select>
-    <!--  검색 시작  -->
-    <div class="row my-3">
-        <div class="col-6">
-            <div class="input-group">
-                <input type="text" id="search_kw" class="form-control" th:value="${kw}">
-                <button class="btn btn-outline-secondary" type="button" id="btn_search">찾기</button>
+
+    <div class="flex flex-col w-full">
+        <div class="relative h-[35vh] flex items-center justify-center ">
+            <!-- 상단 이미지 -->
+            <div class="sm:mb-5 absolute inset-0 overflow-hidden drop-shadow-2xl shadow-2xl">
+                <img src="https://img1.daumcdn.net/thumb/R1280x0/?fname=http://t1.daumcdn.net/brunch/service/user/9kE1/image/k3uEfFMvJOS81qkiAml4EMnsVzs.jpg"
+                     alt="Background Image" class="w-full h-full object-cover filter grayscale">
+            </div>
+
+            <!-- 상단 이미지 글귀 -->
+            <div class="absolute bottom-10  left-10 text-white text-left z-10 ">
+                <h1 class="sm:text-x1 text-5xl font-black  mb-8">PageFlow </h1>
+                <p class="text-3xl font-bold">Dive into a world of diverse stories and authors right now!</p>
             </div>
         </div>
-    </div>
-    <!--  검색 끝  -->
-<!--    <div class="container mx-auto" style="min-height: 101vh;">-->
-<!--        <div class="grid grid-cols-4 gap-4">-->
-<!--            &lt;!&ndash; Thymeleaf loop to iterate over the questions &ndash;&gt;-->
-<!--            <div th:each="book : ${paging}">-->
-<!--                <div class="card border rounded p-4">-->
-<!--                    <a href="|/books/${book.id}/details|">-->
-<!--                        <img th:src="@{${book.coverImgUrl}}" alt="Book Image">-->
-<!--                        <h2 th:text="${book.title}"></h2>-->
-<!--                    </a>-->
-<!--                    &lt;!&ndash;                    <a href="javascript:void(0);" class="recommend btn btn-sm btn-outline-secondary"&ndash;&gt;-->
-<!--                    &lt;!&ndash;                       th:data-uri="@{|/book/vote/${book.id}|}">&ndash;&gt;-->
-<!--                    &lt;!&ndash;                        추천&ndash;&gt;-->
-<!--                    &lt;!&ndash;                        <span class="badge rounded-pill bg-success" th:text="${#lists.size(book.voters)}"></span>&ndash;&gt;-->
-<!--                    &lt;!&ndash;                    </a>&ndash;&gt;-->
-<!--                    <p th:text="${book.author.nickname}"></p>-->
-<!--                    <p th:text="${book.createDate}"></p>-->
-<!--                </div>-->
-<!--            </div>-->
-<!--        </div>-->
-<!--    </div>-->
 
-    <div style="min-height: 100vh;">
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-5 gap-x-6 xl:gap-x-8">
-            <div th:each="book : ${paging}">
-                <div class="rounded-md aspect-h-16 aspect-w-11 xl:aspect-h-11 xl:aspect-w-16 w-full overflow-hidden shadow-lg transition-all duration-150 ease-in-out hover:z-1 hover:transform hover:scale-110 group mb-8">
-                    <div>
-                        <a th:href="@{|/books/${book.id}/details|}">
-                            <div class="relative">
-                                <img th:src="@{${book.coverImgUrl}}" alt="Book Image" class="object-cover transition-all duration-1000 ease-in-out group-hover:transform group-hover:scale-110 rounded-lg" style="backface-visibility: hidden;">
-                                <div class="absolute bottom-0 left-0 text-red right-0">
-                                    <div class="  p-4">
-                                        <div class="mb-4">
-                                            <h1 th:text="${book.title}" class="font-extrabold text-lg text-center overflow-hidden"></h1>
-                                        </div>
-                                        <div class="text-slate-400	font-medium">
-                                            <h2 th:text="${book.author.nickname}" ></h2>
+        <div class="w-full mx-auto max-w-[75%] sm:px-6 sm:py-24   ">
+            <div class="flex justify-between mb-12 w-full  ">
+            <div class="flex grow ">
+                <!--  정렬순  -->
+                    <select id="sortOption" class="select font-semibold text-sm text-gray-700  focus:border-double focus:border-gray-500 focus:ring-0 border-gray-400 sm:text-sm sm:leading-6">
+                        <option disabled selected>정렬순 🍊</option>
+                        <option value="createdDate">작성 날짜 </option>
+                        <option value="preferenceCount">추천순</option> <!-- JPA에서 지원하는 함수나 필드를 이용 -->
+                        <option value="commentCount">댓글순</option>
+                    </select>
+            </div>
+            <!--  검색 시작  -->
+            <div class="w-full flex justify-between max-w-md">
+                    <input id="search_kw" th:value="${kw}" name="search_kw" type="text" autocomplete="search_kw"
+                           placeholder="검색어를 입력해주세요" required
+                           class="input w-2/3 focus:border-double focus:border-gray-500 focus:ring-0 rounded max-w-xs flex-auto text-black border-gray-400 sm:text-sm sm:leading-6 ">
+                    <button id="btn_search" type="button"
+                            class="font-semibold rounded border-2 p-3 border-gray-400 text-sm text-gray-700 relative text-center active:top-[3px]   w-1/4 ">
+                    검색
+                </button>
+            </div>
+            <!--  검색 끝  -->
+        </div>
+            <!-- 리스트 J-->
+            <div >
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-5 gap-x-6 xl:gap-x-8">
+                    <div th:each="book : ${paging}" class="w-full">
+                        <div class="rounded-md overflow-hidden shadow-lg transition-all duration-150 ease-in-out hover:z-1 hover:transform hover:scale-110 group mb-8">
+                            <a th:href="@{|/books/${book.id}/details|}">
+                                <div class="relative w-full h-96">
+                                    <img th:src="@{${book.coverImgUrl}}" alt="Book Image" class="contrast-75 object-cover w-full h-full transition-all duration-1000 ease-in-out group-hover:transform group-hover:scale-110 rounded-lg" style="backface-visibility: hidden;">
+                                    <div class="absolute bottom-0 left-0 text-white right-0">
+                                        <div >
+                                            <div >
+                                                <h1 th:text="${book.title}" class="font-extrabold text-3xl text-center overflow-hidden text-white"></h1>
+                                            </div>
+                                            <div class="p-4 mb-4 text-black font-semibold">
+                                                <h2 th:text="${book.author.nickname}"></h2>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </a>
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+
+            <form th:action="@{/books}" method="get" id="searchForm">
+                <input type="hidden" id="kw" name="kw" th:value="${kw}">
+                <input type="hidden" id="page" name="page" th:value="${paging.number}">
+                <input type="hidden" id="sort" name="sort" th:value="${sort}">
+            </form>
+
     </div>
 
-    <form th:action="@{/books}" method="get" id="searchForm">
-        <input type="hidden" id="kw" name="kw" th:value="${kw}">
-        <input type="hidden" id="page" name="page" th:value="${paging.number}">
-        <input type="hidden" id="sort" name="sort" th:value="${sort}">
-    </form>
+        <script type='text/javascript'>
+            let currentPage = 0;
+              let isLoading = false;
+              let reachedEnd = false;
 
-    <script type='text/javascript'>
-        let currentPage = 0;
-          let isLoading = false;
-          let reachedEnd = false;
+      window.addEventListener('scroll', function() {
+        console.log('Scroll event triggered');
+          if (isLoading || reachedEnd) return;
 
-  window.addEventListener('scroll', function() {
-    console.log('Scroll event triggered');
-      if (isLoading || reachedEnd) return;
+          if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 100) {
+            console.log('Reached bottom');  // 이 로그를 통해 페이지 하단 도달 확인
+              isLoading = true;
+              currentPage++;
+              fetchMoreBooks(currentPage);
+          }
+      });
 
-      if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 100) {
-        console.log('Reached bottom');  // 이 로그를 통해 페이지 하단 도달 확인
-          isLoading = true;
-          currentPage++;
-          fetchMoreBooks(currentPage);
-      }
-  });
+      function fetchMoreBooks(page) {
+           fetch(`/api/books/list?page=${page}&kw=${document.getElementById('search_kw').value}&sort=${document.getElementById('sortOption').value}`)
+              .then(response => {
+                  console.log('Server Response:', response); // 서버 응답 로깅
 
-  function fetchMoreBooks(page) {
-       fetch(`/api/books/list?page=${page}&kw=${document.getElementById('search_kw').value}&sort=${document.getElementById('sortOption').value}`)
-          .then(response => {
-              console.log('Server Response:', response); // 서버 응답 로깅
-
-              return response.json();
-          })
-          .then(data => {
-              console.log('Data:', data); // 데이터 형식 로깅
-              isLoading = false;
-              if (Array.isArray(data)) {
-                  if (data.length === 0) {
-                      reachedEnd = true;
-                      return;
+                  return response.json();
+              })
+              .then(data => {
+                  console.log('Data:', data); // 데이터 형식 로깅
+                  isLoading = false;
+                  if (Array.isArray(data)) {
+                      if (data.length === 0) {
+                          reachedEnd = true;
+                          return;
+                      }
+                      appendBooksToDOM(data);
+                  } else {
+                      console.error('Received data is not an array.');
                   }
-                  appendBooksToDOM(data);
-              } else {
-                  console.error('Received data is not an array.');
-              }
-          })
-          .catch(error => {
-              console.error('Fetch Error:', error); // 에러 로깅
-          });
-  }
+              })
+              .catch(error => {
+                  console.error('Fetch Error:', error); // 에러 로깅
+              });
+      }
 
-  function appendBooksToDOM(data) {
-            const bookContainer = document.querySelector('.grid.grid-cols-1.sm\\:grid-cols-2.md\\:grid-cols-3.lg\\:grid-cols-5.xl\\:grid-cols-5.gap-x-6.xl\\:gap-x-8');
+      function appendBooksToDOM(data) {
+                const bookContainer = document.querySelector('.grid.grid-cols-1.sm\\:grid-cols-2.md\\:grid-cols-3.lg\\:grid-cols-5.xl\\:grid-cols-5.gap-x-6.xl\\:gap-x-8');
 
-            const fragment = document.createDocumentFragment();
-            data.forEach(book => {
-                // 각 책에 대한 HTML 요소를 생성하고 컨테이너에 추가
-                const bookElement = createBookElement(book);
-                fragment.appendChild(bookElement);
+                const fragment = document.createDocumentFragment();
+                data.forEach(book => {
+                    // 각 책에 대한 HTML 요소를 생성하고 컨테이너에 추가
+                    const bookElement = createBookElement(book);
+                    fragment.appendChild(bookElement);
+                });
+
+                bookContainer.appendChild(fragment);
+            }
+
+      // 책 요소를 생성하는 함수
+      // 새로운 책이 추가가 될 때 태그별로 클래스를 추가하여 효과적용 시킴!!
+      function createBookElement(book) {
+                 const div = document.createElement('div');
+                 div.classList.add('rounded-md', 'aspect-h-16', 'aspect-w-11', 'xl:aspect-h-11', 'xl:aspect-w-16', 'w-full', 'overflow-hidden', 'shadow-lg', 'transition-all', 'duration-150', 'ease-in-out', 'hover:z-1' , 'hover:transform' , 'hover:scale-110' ,'group', 'mb-8');
+                 const link = document.createElement('a');
+                 link.href = `/books/${book.id}/details`;
+
+                 const relativeDiv = document.createElement('div');
+                 relativeDiv.classList.add('relative', 'w-full', 'h-96');
+
+                 const img = document.createElement('img');
+                 img.src = book.coverImgUrl;
+                 img.alt = 'Book Image';
+                 img.classList.add('contrast-75', 'w-full', 'h-full', 'object-cover', 'transition-all', 'duration-1000', 'ease-in-out', 'group-hover:transform', 'group-hover:scale-110', 'rounded-lg');
+                 const absoluteDiv = document.createElement('div');
+                 absoluteDiv.classList.add('absolute', 'bottom-0', 'left-0', 'text-white', 'right-0');
+
+                 const innerDiv = document.createElement('div');
+
+
+                 const titleDiv = document.createElement('div');
+                 titleDiv.classList.add('mb-4');
+
+                 const titleH1 = document.createElement('h1');
+                 titleH1.classList.add('font-extrabold', 'text-3xl', 'text-center', 'overflow-hidden');
+                 titleH1.textContent = book.title;
+                 const authorDiv = document.createElement('div');
+                 authorDiv.classList.add('text-black', 'font-semibold', 'p-4', 'mb-4');
+
+                 const authorH2 = document.createElement('h2');
+                 authorH2.textContent = book.author.nickname;
+
+                 // 조립
+                 titleDiv.appendChild(titleH1);
+                 authorDiv.appendChild(authorH2);
+                 innerDiv.appendChild(titleDiv);
+                 innerDiv.appendChild(authorDiv);
+                 absoluteDiv.appendChild(innerDiv);
+                 relativeDiv.appendChild(img);
+                 relativeDiv.appendChild(absoluteDiv);
+                 link.appendChild(relativeDiv);
+                 div.appendChild(link);
+
+                 return div;
+               }
+
+
+      const btn_search = document.getElementById("btn_search");
+      btn_search.addEventListener('click', function() {
+          document.getElementById('kw').value = document.getElementById('search_kw').value;
+          document.getElementById('page').value = 0;  // 검색버튼을 클릭할 경우 0페이지부터 조회한다.
+          document.getElementById('searchForm').submit();
+      });
+
+               const sortOption = document.getElementById("sortOption");
+    sortOption.addEventListener('change', function() {
+        const selectedOption = this.value;
+        document.getElementById('sort').value = selectedOption; // Hidden input에 sort 값 설정
+        document.getElementById('searchForm').submit();  // 폼 제출
+    });
+        </script>
+
+
+        <script>
+            document.getElementById('btn_search').addEventListener('click', function () {
+                var searchKeyword = document.getElementById('search_kw').value;
+
+                if (searchKeyword.trim() === '') {
+                    flowAlert("warning",'검색어를 입력하세요!');
+                    // 또는 원하는 방식으로 에러 메시지를 표시하도록 수정할 수 있습니다.
+                }
             });
+        </script>
 
-            bookContainer.appendChild(fragment);
-        }
-
-  // 책 요소를 생성하는 함수
-  // 새로운 책이 추가가 될 때 태그별로 클래스를 추가하여 효과적용 시킴!!
-  function createBookElement(book) {
-             const div = document.createElement('div');
-             div.classList.add('rounded-md', 'aspect-h-16', 'aspect-w-11', 'xl:aspect-h-11', 'xl:aspect-w-16', 'w-full', 'overflow-hidden', 'shadow-lg', 'transition-all', 'duration-150', 'ease-in-out', 'hover:z-1' , 'hover:transform' , 'hover:scale-110' ,'group', 'mb-8');
-             const link = document.createElement('a');
-             link.href = `/books/${book.id}/details`;
-
-             const relativeDiv = document.createElement('div');
-             relativeDiv.classList.add('relative');
-
-             const img = document.createElement('img');
-             img.src = book.coverImgUrl;
-             img.alt = 'Book Image';
-             img.classList.add('object-cover', 'transition-all', 'duration-1000', 'ease-in-out', 'group-hover:transform', 'group-hover:scale-110', 'rounded-lg');
-             const absoluteDiv = document.createElement('div');
-             absoluteDiv.classList.add('absolute', 'bottom-0', 'left-0', 'text-white', 'right-0');
-
-             const innerDiv = document.createElement('div');
-             innerDiv.classList.add('p-4');
-
-             const titleDiv = document.createElement('div');
-             titleDiv.classList.add('mb-4');
-
-             const titleH1 = document.createElement('h1');
-             titleH1.classList.add('font-extrabold', 'text-lg', 'text-center', 'overflow-hidden');
-             titleH1.textContent = book.title;
-
-             const authorDiv = document.createElement('div');
-             authorDiv.classList.add('text-slate-400', 'font-medium');
-
-             const authorH2 = document.createElement('h2');
-             authorH2.textContent = book.author.nickname;
-
-             // 조립
-             titleDiv.appendChild(titleH1);
-             authorDiv.appendChild(authorH2);
-             innerDiv.appendChild(titleDiv);
-             innerDiv.appendChild(authorDiv);
-             absoluteDiv.appendChild(innerDiv);
-             relativeDiv.appendChild(img);
-             relativeDiv.appendChild(absoluteDiv);
-             link.appendChild(relativeDiv);
-             div.appendChild(link);
-
-             return div;
-           }
-
-
-  const btn_search = document.getElementById("btn_search");
-  btn_search.addEventListener('click', function() {
-      document.getElementById('kw').value = document.getElementById('search_kw').value;
-      document.getElementById('page').value = 0;  // 검색버튼을 클릭할 경우 0페이지부터 조회한다.
-      document.getElementById('searchForm').submit();
-  });
-
-           const sortOption = document.getElementById("sortOption");
-sortOption.addEventListener('change', function() {
-    const selectedOption = this.value;
-    document.getElementById('sort').value = selectedOption; // Hidden input에 sort 값 설정
-    document.getElementById('searchForm').submit();  // 폼 제출
-});
-    </script>
+    </div>
 </main>
 </html>

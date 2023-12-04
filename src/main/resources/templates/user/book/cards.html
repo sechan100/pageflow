@@ -43,7 +43,7 @@ select {
             </div>
         </div>
 
-        <div class="w-full mx-auto max-w-[90%] sm:px-6 sm:py-24   ">
+        <div class="w-full mx-auto max-w-[75%] sm:px-6 sm:py-24   ">
             <div class="flex justify-between mb-12 w-full  ">
             <div class="flex grow ">
                 <!--  정렬순  -->
@@ -77,9 +77,9 @@ select {
                                     <div class="absolute bottom-0 left-0 text-white right-0">
                                         <div >
                                             <div >
-                                                <h1 th:text="${book.title}" class="font-extrabold text-lg text-center overflow-hidden text-white"></h1>
+                                                <h1 th:text="${book.title}" class="font-extrabold text-3xl text-center overflow-hidden text-white"></h1>
                                             </div>
-                                            <div class="p-4 mb-4 text-black font-medium">
+                                            <div class="p-4 mb-4 text-black font-semibold">
                                                 <h2 th:text="${book.author.nickname}"></h2>
                                             </div>
                                         </div>
@@ -163,25 +163,26 @@ select {
                  link.href = `/books/${book.id}/details`;
 
                  const relativeDiv = document.createElement('div');
-                 relativeDiv.classList.add('relative','w-full', 'h-96');
+                 relativeDiv.classList.add('relative', 'w-full', 'h-96');
 
                  const img = document.createElement('img');
                  img.src = book.coverImgUrl;
                  img.alt = 'Book Image';
-                 img.classList.add('contrast-75','object-cover', 'w-full','h-full','transition-all', 'duration-1000', 'ease-in-out', 'group-hover:transform', 'group-hover:scale-110', 'rounded-lg');
+                 img.classList.add('contrast-75', 'w-full', 'h-full', 'object-cover', 'transition-all', 'duration-1000', 'ease-in-out', 'group-hover:transform', 'group-hover:scale-110', 'rounded-lg');
                  const absoluteDiv = document.createElement('div');
                  absoluteDiv.classList.add('absolute', 'bottom-0', 'left-0', 'text-white', 'right-0');
 
                  const innerDiv = document.createElement('div');
 
+
                  const titleDiv = document.createElement('div');
+                 titleDiv.classList.add('mb-4');
 
                  const titleH1 = document.createElement('h1');
-                 titleH1.classList.add('font-extrabold', 'text-lg', 'text-center', 'overflow-hidden', 'text-white');
+                 titleH1.classList.add('font-extrabold', 'text-3xl', 'text-center', 'overflow-hidden');
                  titleH1.textContent = book.title;
-
                  const authorDiv = document.createElement('div');
-                 authorDiv.classList.add('text-black', 'font-medium', 'mb-4', 'p-4');
+                 authorDiv.classList.add('text-black', 'font-semibold', 'p-4', 'mb-4');
 
                  const authorH2 = document.createElement('h2');
                  authorH2.textContent = book.author.nickname;
@@ -208,13 +209,12 @@ select {
           document.getElementById('searchForm').submit();
       });
 
-        const sortOption = document.getElementById("sortOption");
-        sortOption.addEventListener('change', function() {
-            const selectedOption = this.value;
-            document.getElementById('sort').value = selectedOption; // Hidden input에 sort 값 설정
-            document.getElementById('searchForm').submit();  // 폼 제출
-        });
-
+               const sortOption = document.getElementById("sortOption");
+    sortOption.addEventListener('change', function() {
+        const selectedOption = this.value;
+        document.getElementById('sort').value = selectedOption; // Hidden input에 sort 값 설정
+        document.getElementById('searchForm').submit();  // 폼 제출
+    });
         </script>
 
 

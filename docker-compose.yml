@@ -24,6 +24,11 @@ services:
       dockerfile: Dockerfile
     ports:
       - "80:80"
+    deploy:
+      restart_policy:
+          condition: on-failure
+          delay: 5s
+          max_attempts: 3
     depends_on:
       - db
       - redis

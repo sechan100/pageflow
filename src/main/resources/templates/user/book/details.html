@@ -166,7 +166,7 @@
             var isLiked = $('#heart').data('filled');
             var isLoggedIn = /*[[${user.login}]]*/ false;
 
-            if (isLoggedIn) {
+            if (!isLoggedIn) {
                 flowAlert("warning", '로그인 후 이용해주세요.');
             } else {
                 $.ajax({
@@ -486,7 +486,7 @@ function cancelEdit() {
             var isCommentLiked = $('#likeButton_' + commentId).data('filled');
             var isLoggedIn = /*[[${user.login}]]*/ false;
 
-            if (isLoggedIn) {
+            if (!isLoggedIn) {
                 flowAlert("warning", "로그인 후 이용해주세요.");
             } else {
                 $.ajax({

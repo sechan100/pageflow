@@ -27,7 +27,6 @@ services:
     depends_on:
       - db
       - redis
-      - jenkins
 
 volumes:
   mysql_volume:

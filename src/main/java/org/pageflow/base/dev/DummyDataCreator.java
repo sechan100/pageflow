@@ -84,8 +84,7 @@ public class DummyDataCreator {
                 .profileImgUrl("https://www.google.com/url?sa=i&url=https%3A%2F%2Fkr.123rf.com%2Fphoto_107114571_%25ED%2583%2590%25EC%25A0%2595-%25EB%25A1%259C%25EA%25B3%25A0-%25EB%2594%2594%25EC%259E%2590%25EC%259D%25B8-%25EC%259D%25BC%25EB%259F%25AC%25EC%258A%25A4%25ED%258A%25B8%25EB%25A0%2588%25EC%259D%25B4%25EC%2585%2598.html&psig=AOvVaw1c6JBpvbzgvDgoQEKaB_sn&ust=1701416385626000&source=images&cd=vfe&opi=89978449&ved=0CBEQjRxqFwoTCNDV-Iuc64IDFQAAAAAdAAAAABAR")
                 .build();
         accountService.register(admin);
-        System.out.println("관리자 생성 완료");
-        
+
         
         // 사용자 생성
         for(int i = 0; i < n; i++){
@@ -98,7 +97,6 @@ public class DummyDataCreator {
                     .profileImgUrl(getRandomProfileImgUrl())
                     .build();
             accountService.register(user);
-            System.out.println("============ Account: user" + (i + 1) + " ============");
         }
     }
     
@@ -191,7 +189,6 @@ public class DummyDataCreator {
                     );
                 }
             }
-            System.out.println("============ Book: " + book.getTitle() + " ============");
         }
     }
     

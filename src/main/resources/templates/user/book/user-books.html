@@ -10,8 +10,10 @@
   <div class="container mx-auto">
     <div th:unless="${books.size() == 0}" class="flex flex-wrap -mx-2">
       <div class="w-full sm:w-[50vw] md:w-[30vw] lg:w-[20vw] px-2 mb-4" th:each="book : ${books}">
-        <div class="shadow-lg rounded-lg overflow-hidden">
-          <img th:src="${book.coverImgUrl}" alt="Book Cover">
+        <div class="shadow-lg rounded-lg overflow-hidden aspect-w-[16] aspect-h-[9]">
+         <div class=" w-full h-[50vh] ">
+           <img th:src="${book.coverImgUrl}" alt="Book Cover" class="object-cover w-full h-full">
+         </div>
           <div class="p-4">
             <h3 class="font-bold text-xl mb-2">[[${book.title}]]</h3>
             <p class="text-gray-700 mb-3">최종 수정: [[${#temporals.format(book.createdDate, 'yyyy-MM-dd / h시 mm분')}]]</p>
@@ -31,6 +33,7 @@
         </div>
       </div>
     </div>
+  </div>
 
 
     <div th:if="${books.size() == 0}" class="grid min-h-full place-items-center px-6 py-24 sm:py-32 lg:px-8">
@@ -50,10 +53,6 @@
       </div>
     </div>
   </div>
-
-
-
-
 </main>
 </body>
 </html>

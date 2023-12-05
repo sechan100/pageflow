@@ -3,6 +3,33 @@
 
 <head>
     <title>[[${outline.title}]]</title>
+
+    <style>
+        @media (max-width: 575px) {
+
+            .left-box{
+                height: 800px  ;
+                margin-bottom : 20px ;
+            }
+
+            .home-box{
+                margin-left: 0.625rem; /* 10px */
+            }
+
+            .home_title-box{
+              font-size: 0.875rem;
+              line-height: 1.25rem;
+            }
+
+            .comment-box
+            .comment_count-box
+            .home-title_date-box
+            {
+                 text-align: left;
+            }
+        }
+    </style>
+
 </head>
 
 <body>
@@ -12,7 +39,7 @@
         <div class="mt-10 mb-10 flex flex-col">
             <div class="flex flex-col md:flex-row justify-center sm:h-full">
                 <!-- 좌측 레이아웃 시작 -->
-                <div class="sm:max-w-[250px] h-[1100px]  mr-6 container">
+                <div class="md:w-[250px] md:h-[1100px]  mr-6 container left-box">
                     <div class="md:w-full h-full rounded-lg bg-[#f6f6f6] shadow-md bg-blur">
                         <div class="flex flex-col">
                             <div class="h-full w-full relative">
@@ -53,7 +80,7 @@
                         <div>
                             <!-- 홈/정보 메뉴 -->
                             <ul class="flex justify-center text-xl font-bold mt-1 menu menu-horizontal rounded border-b border-slate-400">
-                                <li class="mr-14 p-1 rounded-lg ">
+                                <li class="home-box  ma-auto p-1 rounded-lg ">
                                     <a href="#" data-tip="Hom">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
                                              viewBox="0 0 24 24" stroke="currentColor">
@@ -70,12 +97,12 @@
                                 <div class="h-full flex items-center p-3 rounded-lg ">
                                     <div class="flex-grow">
                                         <ul class="overflow-auto max-h-96">
-                                            <li th:each="chapters : ${outline.chapters}" class="flex mb-2 ">
+                                            <li th:each="chapters : ${outline.chapters}" class="flex mb-2 home-title_date-box">
                                                 <img th:src="@{${outline.coverImgUrl}}"
                                                      class="w-14 h-16 object-cover object-center flex-shrink-0 mr-4 rounded-lg"
                                                      alt="Book Image">
                                                 <div class="w-full py-3">
-                                                    <div><a href="#" class="font-semibold"
+                                                    <div><a href="#" class="font-semibold home_title-box"
                                                             th:text="${chapters.title}"></a></div>
                                                     <span class="font-normal"
                                                           th:text="${#temporals.format(outline.author.modifiedDate, 'yyyy-MM-dd')}"></span>
@@ -90,11 +117,11 @@
                     <!-- 책 챕터 끝 -->
                     <!-- 댓글 레이아웃 -->
                     <div class="h-[610px] flex flex-col rounded mt-5 overflow-hidden bg-[#f6f6f6] shadow bg-blur">
-                        <div class="py-2 px-5 w-full h-10  rounded border-b border-slate-400 ">
+                        <div class="comment_count-box py-2 px-5 w-full h-10  rounded border-b border-slate-400 ">
                             <i class="fa-regular fa-comment" style="color: #000000; font-size: 1.2em;"></i>
                             <span id="getCommentCount"></span>
                         </div>
-                        <div class="overflow-auto flex-1">
+                        <div class="overflow-auto flex-1 comment-box">
                             <div id="comment_list" class="h-full"></div>
                         </div>
                         <div class="w-full border">
@@ -103,7 +130,7 @@
                                     <div class="flex-1 px-2 py-1">
                                         <label for="content"></label>
                                         <input name="content" id="content" type="text" placeholder="소중한 의견을 남겨주세요"
-                                               class="input input-bordered px-6 w-full rounded-lg"/>
+                                               class="h-full focus:ring-0 outline-0 focus:outline-0 disabled:bg-blue-gray-50 disabled:border-0  bg-gray-50 border focus:border-2  relative  border-blue-gray-200 focus:border-gray-900  text-gray-900 sm:text-sm rounded focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"/>
                                     </div>
                                     <div class="w-1/5 px-2 py-1">
                                         <input type="submit" class="btn btn-outline w-full" value="등록"/>

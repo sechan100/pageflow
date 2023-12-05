@@ -12,7 +12,9 @@
     <div class="m-4 flex gap-4">
         <!--    좌측 이미지 레이아웃   -->
         <div class="w-2/5 h-full hidden lg:block">
-            <img src="https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2FMjAyMTEyMjlfNDkg%2FMDAxNjQwNzU3MDY4NjI4.KMKJJfEDSMYmO4oo2hpuVNF8FsCX7jODYMPBtzp81VQg.9BRUMzJpUOjgeivtJkduMO24ytYxl5DO8qRzxNE9dOAg.JPEG.p_solej%2FTumblr%25A3%25DFl%25A3%25DF2251323718386081.jpg&type=a340" alt="로그인 이미지" class="h-full w-full object-cover rounded-2xl bg-gradient-to-tl from-zinc-800 to-zinc-700 opacity-70">
+            <img src="https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2FMjAyMTEyMjlfNDkg%2FMDAxNjQwNzU3MDY4NjI4.KMKJJfEDSMYmO4oo2hpuVNF8FsCX7jODYMPBtzp81VQg.9BRUMzJpUOjgeivtJkduMO24ytYxl5DO8qRzxNE9dOAg.JPEG.p_solej%2FTumblr%25A3%25DFl%25A3%25DF2251323718386081.jpg&type=a340"
+                 alt="로그인 이미지"
+                 class="h-full w-full object-cover rounded-2xl bg-gradient-to-tl from-zinc-800 to-zinc-700 opacity-70">
         </div>
 
         <!--    로그인 레이아웃    -->
@@ -29,28 +31,35 @@
                         </div>
 
                         <!-- 로그인 form-->
-                        <form class="space-y-4 md:space-y-6" action="#" th:action="@{/login}" method="POST" onsubmit="LoginForm__submit(this); return false;">
+                        <form class="space-y-4 md:space-y-6" action="#" th:action="@{/login}" method="POST"
+                              onsubmit="LoginForm__submit(this); return false;">
 
                             <!--username-->
                             <div>
-                                <label for="username" class="block mb-2 text-sm font-medium text-gray-900">Username</label>
-                                <input id="username" type="text" name="username" class="focus:ring-0 outline-0 focus:outline-0 disabled:bg-blue-gray-50 disabled:border-0  bg-gray-50 border focus:border-2   border-blue-gray-200 focus:border-gray-900  text-gray-900 sm:text-sm rounded focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                                <label for="username"
+                                       class="block mb-2 text-sm font-medium text-gray-900">Username</label>
+                                <input id="username" type="text" name="username"
+                                       class="focus:ring-0 outline-0 focus:outline-0 disabled:bg-blue-gray-50 disabled:border-0  bg-gray-50 border focus:border-2   border-blue-gray-200 focus:border-gray-900  text-gray-900 sm:text-sm rounded focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
                                        placeholder="아이디를 입력해주세요" required="" autofocus>
                             </div>
 
                             <!--password-->
                             <div>
-                                <label for="password" class="block mb-2 text-sm font-medium text-gray-900 ">Password</label>
-                                <input type="password" name="password" id="password" placeholder="••••••••" class="focus:ring-0 outline-0 focus:outline-0 disabled:bg-blue-gray-50 disabled:border-0  bg-gray-50 border focus:border-2   border-blue-gray-200 focus:border-gray-900  text-gray-900 sm:text-sm rounded focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5" required="">
+                                <label for="password"
+                                       class="block mb-2 text-sm font-medium text-gray-900 ">Password</label>
+                                <input type="password" name="password" id="password" placeholder="••••••••"
+                                       class="focus:ring-0 outline-0 focus:outline-0 disabled:bg-blue-gray-50 disabled:border-0  bg-gray-50 border focus:border-2   border-blue-gray-200 focus:border-gray-900  text-gray-900 sm:text-sm rounded focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                                       required="">
                             </div>
 
                             <!--비밀번호 찾기-->
                             <div class="flex items-center justify-end">
-                                <a href="/find" class="text-sm font-medium text-primary-600 hover:underline">비밀번호를 잊으셨나요?</a>
+                                <a href="/find" class="text-sm font-medium text-primary-600 hover:underline">비밀번호를
+                                    잊으셨나요?</a>
                             </div>
 
                             <!--로그인 버튼-->
-                            <button type="submit" class="read-btn flex w-full mt-5 justify-center rounded-md p-3 text-sm font-semibold leading-6 shadow-sm relative bg-black text-white">
+                            <button class="submit read-btn flex w-full mt-5 justify-center rounded-md p-3 text-sm font-semibold leading-6 shadow-sm relative bg-black text-white">
                               <span>
                                   SIGN IN
                               </span>
@@ -59,22 +68,30 @@
 
                             <!--소셜 로그인-->
                             <div class="flex flex-col font-medium">
-                                <a href="/oauth2/authorization/google" class="align-middle select-none uppercase transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-sm  bg-white text-blue-gray-900 shadow-blue-gray-500/10 hover:shadow-lg hover:shadow-blue-gray-500/20 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none w-full flex items-center gap-2 shadow-md rounded-lg px-5 py-2.5 mr-2 mb-2">
-                                    <svg class="w-4 h-4 mr-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 19">
-                                        <path fill-rule="evenodd" d="M8.842 18.083a8.8 8.8 0 0 1-8.65-8.948 8.841 8.841 0 0 1 8.8-8.652h.153a8.464 8.464 0 0 1 5.7 2.257l-2.193 2.038A5.27 5.27 0 0 0 9.09 3.4a5.882 5.882 0 0 0-.2 11.76h.124a5.091 5.091 0 0 0 5.248-4.057L14.3 11H9V8h8.34c.066.543.095 1.09.088 1.636-.086 5.053-3.463 8.449-8.4 8.449l-.186-.002Z" clip-rule="evenodd"/>
+                                <a href="/oauth2/authorization/google"
+                                   class="align-middle select-none uppercase transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-sm  bg-white text-blue-gray-900 shadow-blue-gray-500/10 hover:shadow-lg hover:shadow-blue-gray-500/20 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none w-full flex items-center gap-2 shadow-md rounded-lg px-5 py-2.5 mr-2 mb-2">
+                                    <svg class="w-4 h-4 mr-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                         fill="currentColor" viewBox="0 0 18 19">
+                                        <path fill-rule="evenodd"
+                                              d="M8.842 18.083a8.8 8.8 0 0 1-8.65-8.948 8.841 8.841 0 0 1 8.8-8.652h.153a8.464 8.464 0 0 1 5.7 2.257l-2.193 2.038A5.27 5.27 0 0 0 9.09 3.4a5.882 5.882 0 0 0-.2 11.76h.124a5.091 5.091 0 0 0 5.248-4.057L14.3 11H9V8h8.34c.066.543.095 1.09.088 1.636-.086 5.053-3.463 8.449-8.4 8.449l-.186-.002Z"
+                                              clip-rule="evenodd"/>
                                     </svg>
                                     Sign in with Google
                                 </a>
-                                <a href="/oauth2/authorization/naver" class="shadow-md shadow-blue-gray-500/10 gap-2 hover:shadow-lg hover:shadow-blue-gray-500/20 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none align-middle select-none uppercase transition-all text-white bg-green-500 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center mr-2 mb-2">
-                                    <svg class="w-4 h-4 mr-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                                <a href="/oauth2/authorization/naver"
+                                   class="shadow-md shadow-blue-gray-500/10 gap-2 hover:shadow-lg hover:shadow-blue-gray-500/20 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none align-middle select-none uppercase transition-all text-white bg-green-500 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center mr-2 mb-2">
+                                    <svg class="w-4 h-4 mr-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                         fill="currentColor" viewBox="0 0 24 24">
                                         <path d="M4,4 L4,20 L8,20 L8,10 L16,20 L20,20 L20,4 L16,4 L16,14 L8,4 L4,4 Z"></path>
                                     </svg>
                                     Sign in with Naver
                                 </a>
 
-                                <a href="/oauth2/authorization/github" class="shadow-md shadow-blue-gray-500/10 gap-2 hover:shadow-lg hover:shadow-blue-gray-500/20 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none align-middle select-none uppercase transition-all text-white bg-black font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center mr-2 mb-2">
+                                <a href="/oauth2/authorization/github"
+                                   class="shadow-md shadow-blue-gray-500/10 gap-2 hover:shadow-lg hover:shadow-blue-gray-500/20 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none align-middle select-none uppercase transition-all text-white bg-black font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center mr-2 mb-2">
                                     <svg class="w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                                        <path fill="currentColor" d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6 .111 .82-.261 .82-.577 0-.285-.01-1.04-.015-2.04-3.338 .725-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744 .084-.729 .084-.729 1.205 .084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495 1 .108-.776 .417-1.305 .76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31 .467-2.38 1.235-3.22-.135-.303-.54-1.523 .105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02 .006 2.04 .138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23 .645 1.653 .24 2.873 .12 3.176 .765 .84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42 .36 .81 1.096 .81 2.22 0 1.605-.015 2.89-.015 3.285 0 .319 .21 .694 .825 .577C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"></path>
+                                        <path fill="currentColor"
+                                              d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6 .111 .82-.261 .82-.577 0-.285-.01-1.04-.015-2.04-3.338 .725-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744 .084-.729 .084-.729 1.205 .084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495 1 .108-.776 .417-1.305 .76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31 .467-2.38 1.235-3.22-.135-.303-.54-1.523 .105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02 .006 2.04 .138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23 .645 1.653 .24 2.873 .12 3.176 .765 .84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42 .36 .81 1.096 .81 2.22 0 1.605-.015 2.89-.015 3.285 0 .319 .21 .694 .825 .577C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"></path>
                                     </svg>
                                     Sign in with GitHub
                                 </a>
@@ -98,5 +115,42 @@
             </div>
         </div>
     </div>
+
+    <script>
+        let LoginForm__submitDone = false;
+        function LoginForm__submit(form){
+            if(LoginForm__submitDone) return;
+
+            form.username.value = form.username.value.trim();
+         if (form.username.value.length == 0) {
+             form.username.focus();
+              flowAlert("warning", '아이디를 입력해주세요');
+                return;
+         }
+
+         if (form.username.value.length < 4) {
+             form.username.focus();
+             flowAlert("warning", '아이디를 5자 이상 입력해주세요');
+                return;
+         }
+
+             form.password.value = form.password.value.trim();
+         if (form.password.value.length == 0) {
+             form.password.focus();
+             flowAlert("warning", '비밀번호를 입력해주세요');
+                return;
+         }
+
+           if (form.password.value.length < 4) {
+             form.password.focus();
+             flowAlert("warning", '비밀번호를 5자 이상 입력해주세요');
+                return;
+         }
+             form.submit();
+         LoginForm__submitDone = true;
+        }
+
+    </script>
+
 </main>
 </html>

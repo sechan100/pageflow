@@ -23,6 +23,56 @@
           font : 14px ;
         }
 
+        @media (max-width: 575px) {
+            .small-card-h1 {
+            font-size: 1.875rem; /* 30px */
+            line-height: 2rem;
+          }
+
+          .small-card-p{
+            font-size: 1.25rem;
+            line-height: 1.75rem;
+          }
+
+
+          .se_se-box{
+            width: 100%;
+            display : flex ;
+            flex-direction: column;
+
+          }
+
+          .select-box{
+            width: 100%;
+            margin-top: 0.75rem;
+            margin-bottom: 0.75rem;
+          }
+
+
+          select{
+            width: 100%;
+          }
+
+          .search-box{
+            width: 100%;
+          }
+
+          .input{
+            margin-right : 10px  ;
+            font-size: 0.75rem;
+            line-height: 1rem;
+          }
+
+          .title-h1{
+            font-size: 1.5rem;
+            line-height: 2rem;
+          }
+
+          .nickname-h2{
+            font-size: 0.875rem;
+            line-height: 1.25rem;
+          }
+        }
     </style>
 </head>
 
@@ -31,60 +81,57 @@
     <div class="flex flex-col w-full">
         <div class="relative h-[35vh] flex items-center justify-center ">
             <!-- 상단 이미지 -->
-            <div class="sm:mb-5 absolute inset-0 overflow-hidden drop-shadow-2xl shadow-2xl">
+            <div class=" absolute inset-0 overflow-hidden drop-shadow-2xl shadow-2xl">
                 <img src="https://img1.daumcdn.net/thumb/R1280x0/?fname=http://t1.daumcdn.net/brunch/service/user/9kE1/image/k3uEfFMvJOS81qkiAml4EMnsVzs.jpg"
                      alt="Background Image" class="w-full h-full object-cover filter grayscale">
             </div>
 
             <!-- 상단 이미지 글귀 -->
-            <div class="absolute bottom-10  left-10 text-white text-left z-10 ">
-                <h1 class="sm:text-x1 text-5xl font-black  mb-8">PageFlow </h1>
-                <p class="text-3xl font-bold">Dive into a world of diverse stories and authors right now!</p>
+            <div class=" absolute bottom-10  left-10 text-white text-left z-10 ">
+                <h1 class="small-card-h1 md:text-5xl font-black  mb-8">PageFlow </h1>
+                <p class="small-card-p md:text-3xl font-bold">Dive into a world of diverse stories and authors right now!</p>
             </div>
         </div>
 
-        <div class="w-full mx-auto max-w-[75%] sm:px-6 sm:py-24   ">
-            <div class="flex justify-between mb-12 w-full  ">
-                <div class="flex grow ">
-                    <!--  정렬순  -->
-                    <select id="sortOption"
-                            class="select font-semibold text-sm text-gray-700  focus:border-double focus:border-gray-500 focus:ring-0 border-gray-400 sm:text-sm sm:leading-6">
-                        <option disabled selected>정렬기준 🍊</option>
-                        <option value="createdDate">작성 날짜</option>
-                        <option value="preferenceCount">추천순</option> <!-- JPA에서 지원하는 함수나 필드를 이용 -->
+        <div class="se_se-box w-full mx-auto max-w-[75%] sm:px-6 sm:py-24   ">
+            <div class="md:flex md:justify-between mb-12 w-full  ">
+                <div class="flex grow select-box"> <!-- sm 및 md 클래스를 추가하여 모바일에서도 잘 작동하도록 함 -->
+                    <!-- 정렬순 셀렉트 박스 -->
+                    <select id="sortOption" class="select font-semibold text-sm text-gray-700 focus:border-double focus:border-gray-500 focus:ring-0 border-gray-400 sm:text-sm sm:leading-6">
+                        <option disabled selected value="createdDate">작성 날짜 </option>
+                        <option value="preferenceCount">추천순</option>
                         <option value="commentCount">댓글순</option>
                     </select>
                 </div>
-                <!--  검색 시작  -->
-                <div class="w-full flex justify-between max-w-md">
-                    <input id="search_kw" onkeydown="searchInputKeydown()" th:value="${kw}" name="search_kw" type="text"
-                           autocomplete="search_kw"
-                           placeholder="책 제목 또는 작가 이름으로 검색" required
-                           class="mr-3 flex-auto w-2/3 focus:ring-0 outline-0 focus:outline-0 disabled:bg-blue-gray-50 disabled:border-0  bg-gray-50 border focus:border-2   border-blue-gray-200 focus:border-gray-900  text-gray-900 sm:text-sm rounded focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5">
+
+                <div class="search-box w-full flex justify-between md:max-w-md">
+                    <!-- 검색 입력창 및 버튼 -->
+                    <input id="search_kw" th:value="${kw}" name="search_kw" type="text" autocomplete="search_kw"
+                           placeholder="검색어를 입력해주세요" required
+                           class="p-2.5 focus:ring-primary-600 focus:border-primary-600 focus:ring-0 outline-0 focus:outline-0 disabled:border-0 border focus:border-2 input w-2/3 focus:border-double border-blue-gray-200 focus:border-gray-900 text-gray-900 sm:text-sm rounded max-w-xs flex-auto text-black border-gray-400 sm:leading-6">
+
                     <button id="btn_search" type="button"
-                            class=" btn btn-outline font-semibold rounded border-2 p-3 border-gray-400 text-sm text-gray-700 relative text-center active:top-[3px]   w-1/4 ">
+                            class="btn btn-outline font-semibold rounded border-2 border-gray-400 text-sm text-gray-700 relative text-center active:top-[3px] w-1/4">
                         검색
                     </button>
                 </div>
-                <!--  검색 끝  -->
             </div>
-            <!-- 리스트 J-->
-            <div>
+            <!-- 리스트 -->
+            <div >
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-5 gap-x-6 xl:gap-x-8">
                     <div th:each="book : ${paging}" class="w-full">
                         <div class="rounded-md overflow-hidden shadow-lg transition-all duration-150 ease-in-out hover:z-1 hover:transform hover:scale-110 group mb-8">
                             <a th:href="@{|/books/${book.id}/details|}">
                                 <div class="relative w-full h-96">
-                                    <img th:src="@{${book.coverImgUrl}}" alt="Book Image"
-                                         class="contrast-75 object-cover w-full h-full transition-all duration-1000 ease-in-out group-hover:transform group-hover:scale-110 rounded-lg"
-                                         style="backface-visibility: hidden;">
+                                    <img th:src="@{${book.coverImgUrl}}" alt="Book Image" class="contrast-75 object-cover w-full h-full transition-all duration-1000 ease-in-out group-hover:transform group-hover:scale-110 rounded-lg" style="backface-visibility: hidden;">
                                     <div class="absolute bottom-0 left-0 text-white right-0">
-                                        <div>
-                                            <h1 th:text="${book.title}"
-                                                class="font-extrabold text-3xl text-center truncate text-white"></h1>
-                                        </div>
-                                        <div class="p-4 mb-4 text-black font-semibold">
-                                            <h2 class="shadow-2xl truncate" th:text="|${book.author.nickname} 작가|"></h2>
+                                        <div >
+                                            <div >
+                                                <h1 th:text="${book.title}" class="title-h1 font-extrabold md:text-3xl text-center overflow-hidden text-white"></h1>
+                                            </div>
+                                            <div class="nickname-h2 p-4 mb-4 text-black font-semibold">
+                                                <h2 th:text="${book.author.nickname}"></h2>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -182,13 +229,13 @@
                  titleDiv.classList.add('mb-4');
 
                  const titleH1 = document.createElement('h1');
-                 titleH1.classList.add('font-extrabold', 'text-3xl', 'text-center', 'truncate');
+                 titleH1.classList.add('font-extrabold', 'text-3xl', 'text-center', 'overflow-hidden');
                  titleH1.textContent = book.title;
                  const authorDiv = document.createElement('div');
-                 authorDiv.classList.add('text-black', 'font-semibold', 'p-4', 'mb-4', 'truncate');
+                 authorDiv.classList.add('text-black', 'font-semibold', 'p-4', 'mb-4');
 
                  const authorH2 = document.createElement('h2');
-                 authorH2.textContent = book.author.nickname + " 작가";
+                 authorH2.textContent = book.author.nickname;
 
                  // 조립
                  titleDiv.appendChild(titleH1);
@@ -204,22 +251,15 @@
                  return div;
                }
 
-      const searchByKeyWord = () => {
+
+      const btn_search = document.getElementById("btn_search");
+      btn_search.addEventListener('click', function() {
           document.getElementById('kw').value = document.getElementById('search_kw').value;
           document.getElementById('page').value = 0;  // 검색버튼을 클릭할 경우 0페이지부터 조회한다.
           document.getElementById('searchForm').submit();
-      };
+      });
 
-      const btn_search = document.getElementById("btn_search");
-      btn_search.addEventListener('click', searchByKeyWord);
-
-    function searchInputKeydown() {
-        if (event.keyCode === 13) {
-            searchByKeyWord();
-        }
-    }
-
-    const sortOption = document.getElementById("sortOption");
+               const sortOption = document.getElementById("sortOption");
     sortOption.addEventListener('change', function() {
         const selectedOption = this.value;
         document.getElementById('sort').value = selectedOption; // Hidden input에 sort 값 설정

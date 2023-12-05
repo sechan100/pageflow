@@ -151,13 +151,13 @@
             username.val($.trim(username.val()));
 
             if (username.val().length === 0) {
-                alert('아이디를 입력해주세요.');
+                flowAlert("warning",'아이디를 입력해주세요.');
                 username.focus();
                 return;
             }
 
             if (username.val().length < 4) {
-                alert('최소 아이디 길이는 5자리 입니다.');
+                flowAlert("warning",'최소 아이디 길이는 5자리 입니다.');
                 username.focus();
                 return;
             }
@@ -166,14 +166,20 @@
 
             if (password.val().length === 0) {
                 password.focus();
-                alert('비밀번호를 입력해주세요.');
+                flowAlert("warning",'비밀번호를 입력해주세요.');
+                return;
+            }
+
+               if (password.val().length < 5) {
+                password.focus();
+                flowAlert("warning",'비밀번호를 5자 이상 입력해주세요.');
                 return;
             }
 
             passwordConfirm.val($.trim(passwordConfirm.val()));
 
             if (password.val() != passwordConfirm.val()) {
-                alert('비밀번호 확인이 일치하지 않습니다.');
+                flowAlert("warning",'비밀번호 확인이 일치하지 않습니다.');
                 passwordConfirm.focus();
                 return;
             }

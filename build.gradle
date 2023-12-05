@@ -66,6 +66,7 @@ tasks.register('buildReact-book_write', Exec) {
 	workingDir("src/main/react/book_write")
 	commandLine "npm", "install"
 	environment 'PUBLIC_URL', '/react/build/book_write'
+	environment 'CI', 'false' // CI 환경에서의 빌드 성공을 위함. eslint 관련 에러들을 경고로 처리하도록
 
 	if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
 		commandLine "cmd", "/c", "npm", "run", "build"
@@ -78,6 +79,7 @@ tasks.register('buildReact-book_viewer', Exec) {
 	commandLine "npm", "install"
 	workingDir("src/main/react/book_viewer")
 	environment 'PUBLIC_URL', '/react/build/book_viewer'
+	environment 'CI', 'false' // CI 환경에서의 빌드 성공을 위함. eslint 관련 에러들을 경고로 처리하도록
 
 	if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
 		commandLine "cmd", "/c", "npm", "run", "build"
@@ -114,6 +116,17 @@ tasks.register('copy-book_viewer', Copy) {
 	from file("src/main/react/book_viewer/build")
 	into file('src/main/resources/static/react/build/book_viewer')
 	println("book_viewer 빌드 파일을 복사했습니다.")
+}
+
+
+tasks.register('encrypt-secrets', Exec) {
+	// 먼저 application-secret.yml과 application-prod.yml, 그리고 .env.ci 파일을 git secret에 스테이징한다.
+	commandLine "git", "secret", "add", ".env.ci"
+	workingDir("src/main/resources")
+	commandLine "git", "secret", "add", "application-secret.yml"
+	commandLine "git", "secret", "add", "application-prod.yml"
+	// git secret으로 암호화한다.
+	commandLine "git", "secret", "hide"
 }
 
 

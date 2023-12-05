@@ -78,7 +78,7 @@
                                                     <div><a href="#" class="font-semibold"
                                                             th:text="${chapters.title}"></a></div>
                                                     <span class="font-normal"
-                                                          th:text="${#temporals.format(outline.author.createdDate, 'yyyy-MM-dd')}"></span>
+                                                          th:text="${#temporals.format(outline.author.modifiedDate, 'yyyy-MM-dd')}"></span>
                                                 </div>
                                             </li>
                                         </ul>
@@ -164,7 +164,7 @@
         function togglePreference() {
             var bookId = [[${outline.id}]];
             var isLiked = $('#heart').data('filled');
-            var isLoggedIn = /*[[${user.login}]]*/ false;
+            var isLoggedIn = [[${user.login}]];
 
             if (isLoggedIn) {
                 flowAlert("warning", '로그인 후 이용해주세요.');
@@ -267,8 +267,8 @@
                         output += "<div class='flex justify-evenly text-center'>";
 
                         // Like button
-                        output += "<div class='mr-2 py-1 px-2 rounded-lg shadow-inner btn btn-ghos'>";
-                        output += "<a id='likeButton_" + comment.id + "' href='javascript:void(0);' onclick='toggleCommentLike(" + comment.id + ")'><i class='fa-regular fa-thumbs-up text-xl text-neutral-900'></i></a>";
+                        output += "<div class='mr-2 py-1 px-2 rounded-lg shadow-inner btn btn-ghos' onclick='toggleCommentLike(" + comment.id + ")'>";
+                        output += "<a id='likeButton_" + comment.id + "' href='javascript:void(0);'><i class='fa-regular fa-thumbs-up text-xl text-neutral-900'></i></a>";
                         output += "<span id='likesCount_" + comment.id + "' class='mr-1 ml-2 text-lg font-medium'>" + comment.preferenceStatistics.likes+ "</span>";
                         output += "</div>";
 
@@ -276,13 +276,13 @@
 
                         if(userName == comment.interactor.nickname){
                         // Edit button
-                        output += "<div class='mr-2 py-1 px-2 rounded-lg shadow-inner font-bold text-md btn btn-ghos'>";
-                        output += "<a id='editButton_" + comment.id + "' href='javascript:void(0);' onclick='showEditCommentForm(" + comment.id + ", \"" + comment.content + "\")' >수정</a>";
+                        output += "<div class='mr-2 py-1 px-2 rounded-lg shadow-inner font-bold text-md btn btn-ghos' onclick='showEditCommentForm(" + comment.id + ", \"" + comment.content + "\")'>";
+                        output += "<a id='editButton_" + comment.id + "' href='javascript:void(0);'>수정</a>";
                         output += "</div>";
 
                         // Delete button
-                        output += "<div class=' py-1 px-2 rounded-lg shadow-inner font-bold text-md btn btn-ghos'>";
-                        output += "<a id='deleteButton_" + comment.id + "' href='javascript:void(0);' onclick='deleteComment(" + comment.id + ")'>삭제</a>";
+                        output += "<div class='py-1 px-2 rounded-lg shadow-inner font-bold text-md btn btn-ghos' onclick='deleteComment(" + comment.id + ")'>";
+                        output += "<a id='deleteButton_" + comment.id + "' href='javascript:void(0);'>삭제</a>";
 
                         }
 
@@ -306,12 +306,11 @@
             // 댓글 작성 함수
             function commentWrite_submitForm(form) {
                 var bookId = [[${outline.id}]];
-                var isLoggedIn = /*[[${user.login}]]*/ false;
+                var isLoggedIn = [[${user.login}]];
                 form.content.value = form.content.value.trim();
 
                 if (!isLoggedIn) {
                     flowAlert("warning", "로그인 후 이용해주세요.");
-                    window.location.href = "/login";
                     return false; // 폼 제출 취소
                 }
 
@@ -482,7 +481,7 @@ function cancelEdit() {
         // 댓글 좋아요 클릭 시 호출하는 함수
         function toggleCommentLike(commentId) {
             var isCommentLiked = $('#likeButton_' + commentId).data('filled');
-            var isLoggedIn = /*[[${user.login}]]*/ false;
+            var isLoggedIn = [[${user.login}]];
 
             if (isLoggedIn) {
                 flowAlert("warning", "로그인 후 이용해주세요.");

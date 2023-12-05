@@ -1,0 +1,510 @@
+<html lang="en" layout:decorate="~{/common/layout.html}">
+
+<head>
+    <title>고객센터</title>
+    <style>
+.top {
+  background-color: none;
+  opacity: 0.8;
+}
+
+.img1 {
+  margin-top: -15%;
+  margin-left: 50%;
+  width: 35%;
+  height: 35%;
+}
+
+.quickMove1 {
+  width: 180px;
+  margin-left: 30%;
+  margin-top: 5%;
+}
+
+.quickMove2 {
+  width: 180px;
+  margin-left: 5%;
+}
+
+.quickMove3 {
+  width: 180px;
+  margin-left: 5%;
+}
+
+.container {
+  max-width: 70%;
+  margin-left: 15%;
+  margin-top: 10%;
+}
+
+.accordion {
+  width: 60%;
+  text-align: center;
+  margin-left: 20%;
+  margin-top: 2%;
+  border-top-style: solid;
+  border-top-color: silver;
+}
+
+.item {
+  border: 3px solid #696969;
+  opacity: 90%;
+  border-radius: 5px;
+  margin-bottom: 1%;
+}
+
+.item-header {
+  background-color: white;
+  color: black;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 18px;
+  padding: 12px;
+  text-align: left;
+  text-indent: 3%;
+}
+
+.item-header:hover {
+  background-color: #3e3b3f;
+  color: white;
+}
+
+.item-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-in-out;
+  font-size: 18px;
+  text-align: left;
+  padding-left: 50px;
+  padding-right: 50px;
+  line-height: 50px;
+}
+.item.active .item-content {
+  max-height: 1000px; /* 적절한 최대 높이 설정 */
+}
+
+.greeting {
+  margin-top: 10%;
+  font-size: 25px;
+  font-weight: normal;
+  margin-bottom: -10px;
+  margin-left: 15%;
+  line-height: 70px;
+}
+
+.normalTitle {
+  font-size: 23px;
+  font-weight: bold;
+  text-align: center;
+  margin-left: -5%;
+  margin-bottom: 5%;
+  margin-top: 7%;
+}
+
+.search {
+  background-color: none;
+  opacity: 80%;
+  margin-top: 4%;
+  margin-bottom: 7%;
+  margin-left: 15%;
+  margin-right: 15%;
+  height: 160px;
+  border-radius: 5px;
+  transition: max-height 0.3s ease-in-out;
+  max-height: 4000px; /* 적절한 최대 높이 설정 */
+}
+
+.search.active {
+  max-height: 4000px; /* 적절한 최대 높이 설정 */
+}
+
+button {
+  height: 45px;
+  width: 100px;
+  margin-left: 40%;
+  border-radius: 5px;
+  background-color: gray;
+  top: 100px;
+  color: white;
+  font-size: 15px;
+}
+
+button:hover {
+  background-color: gray;
+}
+
+.chat {
+  margin-top: 17%;
+  border-top-style: solid;
+  border-top-color: silver;
+  margin-bottom: 10%;
+}
+
+.question {
+  margin-top: 10%;
+}
+
+.askBoard {
+  border-style: solid;
+  border-color: gray;
+}
+
+h4 {
+  font-size: 20px;
+  text-align: center;
+  margin-top: 10%;
+  margin-left: 2%;
+  margin-bottom: 5%;
+}
+
+.ask {
+  width: 170px;
+  height: 45px;
+  margin-left: 80%;
+  font-size: 18px;
+  border-radius: 5px;
+}
+
+.askBoard {
+  margin-top: 3%;
+  border-radius: 5px;
+}
+
+h5 {
+  font-size: 20px;
+}
+
+.loginToAsk {
+  font-size: 18px;
+  background-color: #b0c4de;
+  height: 40px;
+  width: 120px;
+  margin-top: 50px;
+  margin-bottom: 100px;
+}
+
+.loginToAsk:hover {
+  background-color: #696969;
+}
+
+.loginNotice {
+  margin-top: 10%;
+}
+
+.askNotice {
+  font-size: 18px;
+  margin-top: 20%;
+}
+
+.comment-container {
+  margin-top: 10%;
+  text-align: left;
+  border-color: black;
+}
+
+.comment-input {
+  height: 60px;
+  width: 500px;
+  border-radius: 5px;
+  margin-top: 10%;
+  margin-left: 27%;
+  font-size: 18px;
+}
+
+.comment-button {
+  height: 40px;
+  width: 80px;
+  font-size: 18px;
+}
+
+.comment-list {
+  border-radius: 5px;
+  border-color: solid 1px;
+}
+
+.chatContainer{
+ bottom-top: 10%;
+}
+
+.goToTop {
+  left: 90%;
+  top: 45%;
+  background-color: #4f4f4f;
+  position: fixed;
+}
+
+.goToBottom {
+  left: 90%;
+  top: 53%;
+  background-color: #4f4f4f;
+  position: fixed;
+}
+
+.remoteControl:hover {
+  background-color: #3e3b3f;
+}
+
+
+        </style>
+    <style>
+        /* 간단한 스타일링 */
+        body {
+          font-family: Arial, sans-serif;
+          padding: 20px;
+        }
+
+        #comment-container {
+          max-width: 400px;
+          margin: 20px auto;
+        }
+
+        #comment-list {
+          list-style-type: none;
+          font-size: 18px;
+          border-radius: 5px;
+          border-color: solid 1px;
+          padding: 0;
+        }
+
+        .comment {
+          margin-bottom: 10px;
+          padding: 10px;
+          border: 1px solid #ddd;
+          border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+<main layout:fragment="main">
+    <div class= "top">
+        <h2 class="greeting">고객님 안녕하세요, </br> <b>PageFlow 고객센터</b>입니다!</h2>
+       <img class="img1" src="https://kashmirscanmagazine.com/wp-content/uploads/2020/08/Book-Reading.jpg" alt="Background">
+
+    </div>
+
+    <div class="buttonToMove">
+        <button class="quickMove1" onclick="goToScroll('container')" style="border: 2px solid gray" > 공지사항</button>
+        <button class="quickMove2" onclick="goToScroll('accordion')" style="border: 2px solid gray"> 자주 물어보는 질문</button>
+        <button class="quickMove3" onclick="goToScroll('chatContainer')" style="border: 2px solid gray"> 건의하기</button>
+    </div>
+
+    <div class="container">
+
+        <h3 class = "normalTitle">공지사항</h3>
+        <div class="item">
+            <div class="item-header"><b>개인정보 처리방침 변경 안내 (12/02)</b></div>
+            <div class="item-content">안녕하세요. PageFlow 입니다.<br>
+                개인정보 처리방침이 다음과 같이 개정 될 예정으로 변경내용을 사전 공지하오니
+                서비스 이용에 참조하시기 바랍니다.
+                <br> 가. 제공하는 행태 정보 추가 : 제공 받는 자, 제공하는 항목, 제공받는 자의 이용목적
+                <br> 나. 서비스 이용시 수집유형 추가 및 삭제 :   - 제4조 개인정보 수집·이용 목적, 수집하는 개인정보의 항목 및 수집방법 > 4. 서비스 이용 시 추가 수집 유형
+                <br> 다. 위탁업체 추가 : AWS(Amazon Web Service Korea LLC)
+                <br> 라. 개인정보 유효기간제 사전 고지 내용 삭제
+                <br> 마. 개인정보의 기술적/관리적 보호 대책 내용 보완
+
+            </div>
+        </div>
+
+        <div class="item">
+            <div class="item-header"><b>23년 12월 신용카드 결제 무이자 할부 안내 </b></div>
+            <div class="item-content">안녕하세요. PageFlow 입니다.<br>
+                다음과 같이 2023년 12월 신용카드 무이자 할부 행사를 시행하오니 많은 관심과 참여 부탁드립니다.
+                <br> 아래 무이자할부는 결제시 신용카드를 선택했을 때에만 적용되며, 세이페이, 네이버페이, 카카오페이, 페이코 등 간편결제는 해당 간편결제별 자체 무이자 할부가 적용되니 참고 부탁드립니다.
+                <br> ▶  BC카드 2~6개월 무이자 할부 (~12월 31일까지, 결제금액 5만원 이상인 경우)
+                <br> ▶  신한카드 2~3개월 무이자 할부 (~12월 31일까지, 결제금액 5만원 이상인 경우)
+                <br> ▶ 현대카드 2~3개월 무이자 할부 (~12월 31일까지, 결제금액 5만원 이상인 경우)
+
+
+            </div>
+        </div>
+
+        <div class="item">
+            <div class="item-header"><b>공지사항3</b></div>
+            <div class="item-content">Hello.<br>
+                Lorem ipsum dolor sit amet
+                <br>Lorem ipsum dolor sit amet consectetur adipisicing elit. Suscipit dolore a corporis alias debitis numquam unde reprehenderit. Illum libero illo beatae, iure, maxime veritatis iste fuga sint, nam doloribus blanditiis.
+            </div>
+        </div>
+    </div>
+
+    <div class="accordion">
+        <h3 class = "normalTitle">자주 물어보는 질문 BEST 5</h3>
+        <div class="item">
+            <div class="item-header"><b>전자책의 인쇄 및 출판이 가능한가요?</b></div>
+            <div class="item-content">죄송합니다.<br>
+                eBook에서 제공되는 서비스는 저작권보호에 의해 자료 유출을 막기 위한 불법복제방지기술(DRM)이 적용된 PDF파일이므로, 프린트 및 복사 기능을 제공해드리지 못하고 있습니다.
+                <br> 이 점 양해부탁드립니다.
+            </div>
+        </div>
+        <div class="item">
+            <div class="item-header"><b>구매한 컨텐츠는 어디에서 열람이 가능하나요?</b> </div>
+            <div class="item-content">[마이 -> e-라이브러리 -> 보유도서] 또는 도서 상세페이지에서 [바로보기] 또는 [다운로드]를 클릭하여 콘텐츠를 실행합니다.
+
+                <br>[바로보기]는 별도의 eBook 앱을 설치하지 않고 웹에서 바로 열람 가능합니다.
+                [다운로드]는 eBook 앱을 통해 실행되므로 앱을 설치하신 후 이용해 주시기 바랍니다.
+            </div>
+        </div>
+
+        <div class="item">
+            <div class="item-header"><b> 내 서재는 무슨 기능인가요?</b> </div>
+            <div class="item-content">내 서재는 고객께서 구매하신 모든 디지털콘텐츠를 관리하는 서재입니다.
+                어떠한 환경에서도 쉽고, 간편하게 이용하실 수 있습니다.
+                PC / iOS / Android앱을 통해서 이용이 가능합니다.
+            </div>
+        </div>
+
+        <div class="item">
+            <div class="item-header"><b> eBook은 무슨 기능인가요?</b> </div>
+            <div class="item-content">eBook 이란 PDF와 ePub 형태의 파일을 다운로드 받아 eBook 전용 뷰어를 통해서만 이용하는 콘텐츠입니다.
+                (기존에 종이책으로만 보던 책들을 PC에서 편리하게 이용하실 수 있습니다.)
+                <br> eBook에서 서비스하는 eBook 콘텐츠는 PDF 파일과 ePUB 파일로 콘텐츠의 본문내용에 대해 검색이 가능할 뿐 아니라 뷰어의 다양한 기능을 통해서 더욱 편리하게 콘텐츠를 열람하실 수 있습니다.
+                <br>eBook에서 서비스되고 있는 콘텐츠는 불법적인 복제와 유통을 막기 위해 디지털 저작권 관리기술(DRM)에 의해 적절한 요금을 지불하거나 적법한 권한을 가진 사용자만이 콘텐츠를 사용할 수 있습니다.
+            </div>
+        </div>
+
+        <div class="item">
+            <div class="item-header"><b> eBook의 환불은 가능한가요?</b> </div>
+            <div class="item-content">eBOOK 상품은 구매 후 바로보기 또는 다운로드를 하지 않은 경우에 한해 구매일로부터 7일 이내 주문 취소가 가능합니다.
+            </div>
+        </div>
+    </div>
+
+    <div>
+        <div class="chat flex flex-col ">
+            <h3 class="normalTitle ">건의하기</h3>
+
+            <div class = "chatContainer">
+                <h4>건의할 내용이 있으신가요? 자유롭게 적어주세요! </h4>
+
+                <div class="comment-container">
+                    <ul id="comment-list"></ul>
+                    <form id="question-form" onsubmit="return createQuestion()">
+                        <input name="title" type="text" id="comment-input" class="comment-input" placeholder="제목을 입력하세요">
+                        <textarea name="content" id="question-content" class="comment-input" placeholder="내용을 입력하세요"></textarea>
+                        <button type="submit" style="border: 2px solid gray">등록</button>
+                    </form>
+                </div>
+                <div class="mt-[10vh]" id="question-list"></div>
+            </div>
+        </div>
+    </div>
+
+
+<script>
+    const createQuestion = () => {
+        const questionList = document.getElementById("question-list");
+        const questionForm = document.getElementById("question-form");
+
+        const title = questionForm.title.value;
+        const content = questionForm.content.value;
+
+        const question = {
+            title,
+            content,
+        };
+
+        fetch("/api/question", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(question),
+        })
+        .then((res) => res.json())
+        .then((data) => {
+            const questionData = `제목: ${data.title} \n 내용: ${data.content} \n 작성자: ${data.questioner.nickname}`;
+            questionList.innerHTML = questionData;
+        });
+
+        return false;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function toggleAccordion(index) {
+    let itemContent = document.querySelectorAll(".item-content");
+
+  // 모든 아코디언 항목을 닫음
+  for (let i = 0; i < itemContent.length; i++) {
+    if (i + 1 !== index) {
+      itemContent[i].style.display = "none";
+    }
+  }
+
+  // 클릭한 아코디언 항목을 열거나 닫음
+  var selectedContent = itemContent[index - 1];
+  if (selectedContent.style.display === "block") {
+    selectedContent.style.display = "none";
+  } else {
+    selectedContent.style.display = "block";
+  }
+}
+
+$(document).ready(function () {
+  $(".item-header").click(function () {
+    const content = $(this).next(".item-content");
+
+    const parent = $(this).parent();
+
+    if (parent.hasClass("active")) {
+      content.css("max-height", "0");
+      parent.removeClass("active");
+    } else {
+      $(".item.active .item-content").css("max-height", "0");
+      $(".item.active").removeClass("active");
+
+      content.css("max-height", content[0].scrollHeight + "px");
+      parent.addClass("active");
+    }
+  });
+});
+
+//댓글영역
+
+function addComment() {
+  // 입력된 댓글 내용 가져오기
+  var commentInput = document.getElementById("comment-input");
+  var commentText = commentInput.value;
+
+  // 댓글 내용이 비어있으면 함수 종료
+  if (!commentText) {
+    alert("댓글을 입력하세요.");
+    return;
+  }
+
+  // 새로운 댓글 엘리먼트 생성
+  var commentList = document.getElementById("comment-list");
+  var newComment = document.createElement("li");
+  newComment.className = "comment";
+  newComment.textContent = commentText;
+
+  // 댓글 리스트에 새로운 댓글 추가
+  commentList.appendChild(newComment);
+
+  // 입력창 초기화
+  commentInput.value = "";
+}
+
+// 스크롤 이동 기능
+// 클래스, 아이디 값을 인자로 받아 offsetTop 밸류 초기화
+// 초기화된 offsetTop 값을 위치로 이동
+function goToScroll(name) {
+  var location = document.querySelector("." + name).offsetTop;
+  window.scrollTo({ top: location, behavior: "smooth" });
+}
+
+</script>
+</main>
+</body>
+</html>

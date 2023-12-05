@@ -9,10 +9,10 @@ services:
   db:
     image: "mysql:latest"
     environment:
-      MYSQL_ROOT_PASSWORD: dlqhfka
-      MYSQL_DATABASE: pageflow
-      MYSQL_USER: admin
-      MYSQL_PASSWORD: dlqhfka
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     ports:
       - "3307:3306"
     volumes:
@@ -22,12 +22,20 @@ services:
     build:
       context: ./.
       dockerfile: Dockerfile
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
     ports:
       - "80:80"
+    deploy:
+      restart_policy:
+          condition: on-failure
+          delay: 5s
+          max_attempts: 3
+    volumes:
+      - /var/pageflow_volume:/var/pageflow_volume
     depends_on:
       - db
       - redis
-      - jenkins
 
 volumes:
   mysql_volume:

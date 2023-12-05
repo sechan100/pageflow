@@ -48,7 +48,7 @@ select {
             <div class="flex grow ">
                 <!--  정렬순  -->
                     <select id="sortOption" class="select font-semibold text-sm text-gray-700  focus:border-double focus:border-gray-500 focus:ring-0 border-gray-400 sm:text-sm sm:leading-6">
-                        <option disabled selected>정렬순 🍊</option>
+                        <option disabled selected>정렬기준 🍊</option>
                         <option value="createdDate">작성 날짜 </option>
                         <option value="preferenceCount">추천순</option> <!-- JPA에서 지원하는 함수나 필드를 이용 -->
                         <option value="commentCount">댓글순</option>
@@ -56,8 +56,8 @@ select {
             </div>
             <!--  검색 시작  -->
             <div class="w-full flex justify-between max-w-md">
-                    <input id="search_kw" th:value="${kw}" name="search_kw" type="text" autocomplete="search_kw"
-                           placeholder="검색어를 입력해주세요" required
+                    <input id="search_kw" onkeydown="searchInputKeydown()" th:value="${kw}" name="search_kw" type="text" autocomplete="search_kw"
+                           placeholder="책 제목 또는 작가 이름으로 검색" required
                            class="input w-2/3 focus:border-double focus:border-gray-500 focus:ring-0 rounded max-w-xs flex-auto text-black border-gray-400 sm:text-sm sm:leading-6 ">
                     <button id="btn_search" type="button"
                             class="font-semibold rounded border-2 p-3 border-gray-400 text-sm text-gray-700 relative text-center active:top-[3px]   w-1/4 ">
@@ -75,13 +75,11 @@ select {
                                 <div class="relative w-full h-96">
                                     <img th:src="@{${book.coverImgUrl}}" alt="Book Image" class="contrast-75 object-cover w-full h-full transition-all duration-1000 ease-in-out group-hover:transform group-hover:scale-110 rounded-lg" style="backface-visibility: hidden;">
                                     <div class="absolute bottom-0 left-0 text-white right-0">
-                                        <div >
-                                            <div >
-                                                <h1 th:text="${book.title}" class="font-extrabold text-3xl text-center overflow-hidden text-white"></h1>
-                                            </div>
-                                            <div class="p-4 mb-4 text-black font-semibold">
-                                                <h2 th:text="${book.author.nickname}"></h2>
-                                            </div>
+                                        <div>
+                                            <h1 th:text="${book.title}" class="font-extrabold text-3xl text-center truncate text-white"></h1>
+                                        </div>
+                                        <div class="p-4 mb-4 text-black font-semibold">
+                                            <h2 class="shadow-2xl truncate" th:text="|${book.author.nickname} 작가|"></h2>
                                         </div>
                                     </div>
                                 </div>
@@ -179,13 +177,13 @@ select {
                  titleDiv.classList.add('mb-4');
 
                  const titleH1 = document.createElement('h1');
-                 titleH1.classList.add('font-extrabold', 'text-3xl', 'text-center', 'overflow-hidden');
+                 titleH1.classList.add('font-extrabold', 'text-3xl', 'text-center', 'truncate');
                  titleH1.textContent = book.title;
                  const authorDiv = document.createElement('div');
-                 authorDiv.classList.add('text-black', 'font-semibold', 'p-4', 'mb-4');
+                 authorDiv.classList.add('text-black', 'font-semibold', 'p-4', 'mb-4', 'truncate');
 
                  const authorH2 = document.createElement('h2');
-                 authorH2.textContent = book.author.nickname;
+                 authorH2.textContent = book.author.nickname + " 작가";
 
                  // 조립
                  titleDiv.appendChild(titleH1);
@@ -201,15 +199,22 @@ select {
                  return div;
                }
 
-
-      const btn_search = document.getElementById("btn_search");
-      btn_search.addEventListener('click', function() {
+      const searchByKeyWord = () => {
           document.getElementById('kw').value = document.getElementById('search_kw').value;
           document.getElementById('page').value = 0;  // 검색버튼을 클릭할 경우 0페이지부터 조회한다.
           document.getElementById('searchForm').submit();
-      });
+      };
 
-               const sortOption = document.getElementById("sortOption");
+      const btn_search = document.getElementById("btn_search");
+      btn_search.addEventListener('click', searchByKeyWord);
+
+    function searchInputKeydown() {
+        if (event.keyCode === 13) {
+            searchByKeyWord();
+        }
+    }
+
+    const sortOption = document.getElementById("sortOption");
     sortOption.addEventListener('change', function() {
         const selectedOption = this.value;
         document.getElementById('sort').value = selectedOption; // Hidden input에 sort 값 설정

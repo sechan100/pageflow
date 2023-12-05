@@ -14,6 +14,7 @@ public class CustomProperties {
     private final Email email = new Email();
     private final Files files = new Files();
     private final Defaults defaults = new Defaults();
+    private final Admin admin = new Admin();
 
 
     @Data
@@ -60,5 +61,12 @@ public class CustomProperties {
     public static class Defaults {
         private String defaultUserProfileImg;
         private String defaultBookCoverImg;
+    }
+    
+    @Data
+    public static class Admin{
+        private String password;
+        private String email;
+        private String nickname;
     }
 }

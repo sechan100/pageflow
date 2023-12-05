@@ -46,6 +46,8 @@ public class UserSession {
         this.email = account.getEmail();
         this.role = account.getRole();
         this.provider = account.getProvider();
+        this.login = true;
+        
 
         Profile profile = account.getProfile();
         if (profile != null) {
@@ -61,6 +63,7 @@ public class UserSession {
     public UserSession(Profile profile){
         this.nickname = profile.getNickname();
         this.profileImgUrl = profile.getProfileImgUrl();
+        this.login = true;
         
         Account account = profile.getAccount();
         if(account != null){

@@ -12,9 +12,9 @@ import java.util.List;
  */
 @Data
 public class OutlineUpdateRequest {
-    
+
     private Long id;
-    
+
     @NotEmpty
     private List<ChapterSummary> chapters;
 }

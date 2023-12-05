@@ -66,7 +66,7 @@
                     </div>
 
                     <div>
-                        <button  class="read-btn flex w-full justify-center rounded-md px-3 py-1.5 md:text-sm font-semibold leading-6 shadow-sm relative bg-black text-white p-1 mt-4 w-full  " onclick="my_modal_1.showModal()">비밀번호 변경</button>
+                        <button th:if="${user.provider} == 'pageflow'" class="read-btn flex w-full justify-center rounded-md px-3 py-1.5 md:text-sm font-semibold leading-6 shadow-sm relative bg-black text-white p-1 mt-4 w-full  " onclick="my_modal_1.showModal()">비밀번호 변경</button>
                         <dialog id="my_modal_1" class="modal">
                             <div class="modal-box">
                                 <h3 class="font-bold text-lg">비밀번호 변경!</h3>

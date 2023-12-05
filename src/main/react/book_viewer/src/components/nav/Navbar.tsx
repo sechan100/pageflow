@@ -4,6 +4,7 @@ import { Outline } from "../../types/types";
 import ProgressionBar from "./ProgressionBar";
 import { useNavStore } from "../viewer/ViewerContext";
 import { ILocation, metaPageType, useLocationStore } from "./PageCursor";
+import { ToMainBtn } from "./ToMainBtn";
 
 
 
@@ -47,7 +48,8 @@ export default function Navbar({outline} : NavbarProps) {
 
   return (<>
       { isVisible &&
-        <div className="text-center fixed w-full bg-gray-100 select-none">
+        <div className="text-center fixed w-full bg-gray-100 select-none pt-3">
+          <ToMainBtn />
           <span>챕터: {getChapterTitle(outline, location.chapterIdx)}</span> 
           <br />
           <span>{
@@ -59,7 +61,7 @@ export default function Navbar({outline} : NavbarProps) {
                     : metaPage.type === metaPageType.BOOK_END
                     ? "마치며"
                     : "메타 페이지")
-                : '페이지: ' + `${absolutePage + 1}/${totalPage()}`}
+                : `페이지: ${absolutePage + 1}/${totalPage()}`}
           </span>
           <ProgressionBar progressPercentage={progressPercentage() as number} />
         </div>

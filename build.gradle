@@ -119,4 +119,15 @@ tasks.register('copy-book_viewer', Copy) {
 }
 
 
+tasks.register('encrypt-secrets', Exec) {
+	// 먼저 application-secret.yml과 application-prod.yml, 그리고 .env.ci 파일을 git secret에 스테이징한다.
+	commandLine "git", "secret", "add", ".env.ci"
+	workingDir("src/main/resources")
+	commandLine "git", "secret", "add", "application-secret.yml"
+	commandLine "git", "secret", "add", "application-prod.yml"
+	// git secret으로 암호화한다.
+	commandLine "git", "secret", "hide"
+}
+
+
 

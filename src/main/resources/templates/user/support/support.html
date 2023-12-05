@@ -86,7 +86,7 @@
   max-height: 1000px; /* 적절한 최대 높이 설정 */
 }
 
-h2 {
+.greeting {
   margin-top: 10%;
   font-size: 25px;
   font-weight: normal;
@@ -95,10 +95,11 @@ h2 {
   line-height: 70px;
 }
 
-h3 {
+.normalTitle {
   font-size: 23px;
   font-weight: bold;
   text-align: center;
+  margin-left: -5%;
   margin-bottom: 5%;
   margin-top: 7%;
 }
@@ -123,7 +124,7 @@ h3 {
 button {
   height: 45px;
   width: 100px;
-  border-style: none;
+  margin-left: 40%;
   border-radius: 5px;
   background-color: gray;
   top: 100px;
@@ -132,7 +133,7 @@ button {
 }
 
 button:hover {
-  background-color: black;
+  background-color: gray;
 }
 
 .chat {
@@ -153,10 +154,10 @@ button:hover {
 
 h4 {
   font-size: 20px;
-  text-align: left;
+  text-align: center;
   margin-top: 10%;
-  margin-left: 5%;
-  margin-bottom: -3%;
+  margin-left: 2%;
+  margin-bottom: 5%;
 }
 
 .ask {
@@ -204,12 +205,12 @@ h5 {
   border-color: black;
 }
 
-input {
-  height: 40px;
+.comment-input {
+  height: 60px;
   width: 500px;
   border-radius: 5px;
   margin-top: 10%;
-  margin-left: 20%;
+  margin-left: 27%;
   font-size: 18px;
 }
 
@@ -222,6 +223,10 @@ input {
 .comment-list {
   border-radius: 5px;
   border-color: solid 1px;
+}
+
+.chatContainer{
+ bottom-top: 10%;
 }
 
 .goToTop {
@@ -241,6 +246,8 @@ input {
 .remoteControl:hover {
   background-color: #3e3b3f;
 }
+
+
         </style>
 
     <style>
@@ -281,29 +288,40 @@ input {
 
     </div>
 
-    <div class="bottonToMove">
-        <button class="quickMove1" onclick="goToScroll('container')"> 공지사항</button>
-        <button class="quickMove2" onclick="goToScroll('accordion')"> 자주 물어보는 질문</button>
-        <button class="quickMove3" onclick="goToScroll('question')"> 건의하기</button>
+    <div class="buttonToMove">
+        <button class="quickMove1" onclick="goToScroll('container')" style="border: 2px solid gray" > 공지사항</button>
+        <button class="quickMove2" onclick="goToScroll('accordion')" style="border: 2px solid gray"> 자주 물어보는 질문</button>
+        <button class="quickMove3" onclick="goToScroll('chatContainer')" style="border: 2px solid gray"> 건의하기</button>
     </div>
 
 
     <div class="container">
 
-        <h3>공지사항</h3>
+        <h3 class = "normalTitle">공지사항</h3>
         <div class="item">
-            <div class="item-header"><b>공지사항1</b></div>
-            <div class="item-content">Hello.<br>
-                Lorem ipsum dolor sit amet
-                <br>Lorem ipsum dolor sit amet consectetur adipisicing elit. Fugiat repellendus ducimus sapiente quasi alias non maiores neque officia molestias mollitia, enim ipsum deserunt a nulla repellat expedita libero, sequi quod.
+            <div class="item-header"><b>개인정보 처리방침 변경 안내 (12/02)</b></div>
+            <div class="item-content">안녕하세요. PageFlow 입니다.<br>
+                개인정보 처리방침이 다음과 같이 개정 될 예정으로 변경내용을 사전 공지하오니
+                서비스 이용에 참조하시기 바랍니다.
+                <br> 가. 제공하는 행태 정보 추가 : 제공 받는 자, 제공하는 항목, 제공받는 자의 이용목적
+                <br> 나. 서비스 이용시 수집유형 추가 및 삭제 :   - 제4조 개인정보 수집·이용 목적, 수집하는 개인정보의 항목 및 수집방법 > 4. 서비스 이용 시 추가 수집 유형
+                <br> 다. 위탁업체 추가 : AWS(Amazon Web Service Korea LLC)
+                <br> 라. 개인정보 유효기간제 사전 고지 내용 삭제
+                <br> 마. 개인정보의 기술적/관리적 보호 대책 내용 보완
+
             </div>
         </div>
 
         <div class="item">
-            <div class="item-header"><b>공지사항2</b></div>
-            <div class="item-content">Hello.<br>
-                Lorem ipsum dolor sit amet
-                <br>Lorem ipsum dolor sit amet consectetur adipisicing elit. Suscipit dolore a corporis alias debitis numquam unde reprehenderit. Illum libero illo beatae, iure, maxime veritatis iste fuga sint, nam doloribus blanditiis.
+            <div class="item-header"><b>23년 12월 신용카드 결제 무이자 할부 안내 </b></div>
+            <div class="item-content">안녕하세요. PageFlow 입니다.<br>
+                다음과 같이 2023년 12월 신용카드 무이자 할부 행사를 시행하오니 많은 관심과 참여 부탁드립니다.
+                <br> 아래 무이자할부는 결제시 신용카드를 선택했을 때에만 적용되며, 세이페이, 네이버페이, 카카오페이, 페이코 등 간편결제는 해당 간편결제별 자체 무이자 할부가 적용되니 참고 부탁드립니다.
+                <br> ▶  BC카드 2~6개월 무이자 할부 (~12월 31일까지, 결제금액 5만원 이상인 경우)
+                <br> ▶  신한카드 2~3개월 무이자 할부 (~12월 31일까지, 결제금액 5만원 이상인 경우)
+                <br> ▶ 현대카드 2~3개월 무이자 할부 (~12월 31일까지, 결제금액 5만원 이상인 경우)
+
+
             </div>
         </div>
 
@@ -317,7 +335,7 @@ input {
     </div>
 
     <div class="accordion">
-        <h3>자주 물어보는 질문 BEST 5</h3>
+        <h3 class = "normalTitle">자주 물어보는 질문 BEST 5</h3>
         <div class="item">
             <div class="item-header"><b>전자책의 인쇄 및 출판이 가능한가요?</b></div>
             <div class="item-content">죄송합니다.<br>
@@ -357,17 +375,17 @@ input {
             </div>
         </div>
 
-        <div class="chat">
-            <h3 class="question">건의하기</h3>
+        <div class="chat flex flex-col  ">
+            <h3 class="normalTitle ">건의하기</h3>
 
             <div class = "chatContainer">
-            <h4>건의할 내용이 있으신가요? 자유롭게 적어주세요! > </h4>
+            <h4>건의할 내용이 있으신가요? 자유롭게 적어주세요! </h4>
             <title>댓글창</title>
 
             <div class="comment-container">
                 <ul id="comment-list"></ul>
-                <input type="text" id="comment-input" class = "commentHolder" placeholder="댓글을 입력하세요">
-                <button onclick="addComment()">등록</button>
+                <input type="text" id="comment-input" class = "comment-input" placeholder="내용을 입력하세요">
+                <button onclick="addComment()" style="border: 2px solid gray">등록</button>
             </div>
 
 
@@ -375,11 +393,7 @@ input {
         </div>
     </div>
 
-    <div class="remoteControl">
 
-        <button class="goToTop" onclick="goToScroll('greeting')">▲</button>
-        <button class="goToBottom" onclick="goToScroll('remoteControl')">▼</button>
-    </div>
 
     <script >
         function toggleAccordion(index) {

@@ -267,8 +267,8 @@
                         output += "<div class='flex justify-evenly text-center'>";
 
                         // Like button
-                        output += "<div class='mr-2 py-1 px-2 rounded-lg shadow-inner btn btn-ghos'>";
-                        output += "<a id='likeButton_" + comment.id + "' href='javascript:void(0);' onclick='toggleCommentLike(" + comment.id + ")'><i class='fa-regular fa-thumbs-up text-xl text-neutral-900'></i></a>";
+                        output += "<div class='mr-2 py-1 px-2 rounded-lg shadow-inner btn btn-ghos' onclick='toggleCommentLike(" + comment.id + ")'>";
+                        output += "<a id='likeButton_" + comment.id + "' href='javascript:void(0);'><i class='fa-regular fa-thumbs-up text-xl text-neutral-900'></i></a>";
                         output += "<span id='likesCount_" + comment.id + "' class='mr-1 ml-2 text-lg font-medium'>" + comment.preferenceStatistics.likes+ "</span>";
                         output += "</div>";
 
@@ -311,7 +311,6 @@
 
                 if (!isLoggedIn) {
                     flowAlert("warning", "로그인 후 이용해주세요.");
-                    window.location.href = "/login";
                     return false; // 폼 제출 취소
                 }
 

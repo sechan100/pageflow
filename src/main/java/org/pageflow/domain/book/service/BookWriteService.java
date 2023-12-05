@@ -58,6 +58,7 @@ public class BookWriteService {
                 .title("제목을 입력해주세요")
                 .status(BookStatus.DRAFT)
                 .coverImgUrl(defaultCoverImgUrl)
+                .chapters(new ArrayList<>())
                 .author(author)
                 .build();
         
@@ -489,7 +490,6 @@ public class BookWriteService {
                 context1.setVariable("book", staleBook);
                 context1.setVariable("baseUrl", baseUrl);
                 String emailText = templateEngine.process("/email/new_book_review_requested", context1);
-                System.out.println(emailText);
                 emailSender.sendMail(
                         new EmailRequest(customProperties.getEmail().getNoReplySender(), accountService.findAdminAccount().getEmail(), "Pageflow - 새로운 책 검수 요청"),
                         emailText
@@ -509,7 +509,6 @@ public class BookWriteService {
                 context2.setVariable("rejectReason", rejectReason);
                 context2.setVariable("baseUrl", baseUrl);
                 String emailText2 = templateEngine.process("/email/book_review_finished", context2);
-                System.out.println(emailText2);
                 emailSender.sendMail(
                         new EmailRequest(customProperties.getEmail().getNoReplySender(), staleBook.getAuthor().getAccount().getEmail(), "Pageflow - 책 검수완료 알림"),
                         emailText2

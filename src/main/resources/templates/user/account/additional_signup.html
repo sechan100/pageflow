@@ -1,4 +1,4 @@
-<html lang="en" layout:decorate="~{/common/layout.html}">
+<html lang="en" layout:decorate="~{/common/layout.html}" >
 <head>
   <title>회원가입(2/2)</title>
   <style>
@@ -39,11 +39,6 @@
                 <input type="hidden" th:field="*{username}" />
                 <input type="hidden" th:field="*{password}" />
 
-<!--            &lt;!&ndash;profile image&ndash;&gt;-->
-                  <!--            <img src="#" th:src="*{profileImgUrl}" alt="">-->
-                  <!--            <input type="hidden" th:field="*{profileImgUrl}" />-->
-
-
           <!--profile image-->
           <input type="hidden" th:field="*{profileImgUrl}" />
           <label for="profileImg" class="block text-sm font-medium text-gray-900">프로필 사진</label>
@@ -57,22 +52,6 @@
             </div>
             <input type="file" onchange="previewImage()" accept="image/*" th:field="*{profileImg}" id="profileImg" class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5" >
           </div>
-<!--                <div>-->
-<!--                  <label for="profileImg" class="block mb-2 text-sm font-medium text-gray-900">프로필 사진</label>-->
-<!--                  <input type="file" th:field="*{profileImg}" id="profileImg" class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5" >-->
-<!--                  <div>-->
-<!--                    <label class="block text-sm font-medium leading-6 text-gray-900">프로필 사진</label>-->
-<!--                    <div class="mt-2 mb-2 flex justify-between">-->
-<!--                      <p id="origin Name" for="profileImg" class="border border-gray-300 p-3 w-9/12 text-black text-xs rounded" >파일명</p>-->
-<!--                      <label class="p-2 text-white bg-gray-300 cursor-pointer sm:text-sm sm:leading-6"-->
-<!--                             for="profileImg">첨부 파일 </label>-->
-<!--                      <input onchange="previewImage();" data-ax-path="file" required-->
-<!--                             autocomplete="profileImg" type="file" th:field="*{profileImg}" id="profileImg"-->
-<!--                             class="hidden">-->
-<!--                    </div>-->
-<!--                  </div>-->
-<!--                </div>-->
-
                 <!--email-->
                 <div>
                   <label for="email" class="block mb-2 text-sm font-medium text-gray-900">이메일</label>

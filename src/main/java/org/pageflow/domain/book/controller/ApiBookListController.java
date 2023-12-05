@@ -13,7 +13,6 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@Transactional
 public class ApiBookListController {
 
     private final BookService bookService;

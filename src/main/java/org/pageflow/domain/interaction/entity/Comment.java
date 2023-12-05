@@ -23,33 +23,12 @@ public class Comment extends Interaction {
     
     @Column(columnDefinition = "TEXT")
     private String content;
-    
-    
-    
+
     @Transient
     private InteractionPair pair;
-    
-    
-    
-    
+
     @PostLoad
     public void postLoadSetPair() {
         this.pair = new InteractionPair<>(super.getInteractor(), this);
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -1,251 +1,256 @@
 <html lang="en" layout:decorate="~{/common/layout.html}">
 
+
 <head>
     <title>고객센터</title>
+    <meta charset="UTF-8">
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <style>
-.top {
-  background-color: none;
-  opacity: 0.8;
-}
+        .top {
+          background-color: none;
+          opacity: 0.8;
+        }
 
-.img1 {
-  margin-top: -15%;
-  margin-left: 50%;
-  width: 35%;
-  height: 35%;
-}
+        .img1 {
+          margin-top: -15%;
+          margin-left: 50%;
+          width: 35%;
+          height: 35%;
+        }
 
-.quickMove1 {
-  width: 180px;
-  margin-left: 30%;
-  margin-top: 5%;
-}
+        .quickMove1 {
+          width: 180px;
+          margin-left: 30%;
+          margin-top: 5%;
+        }
 
-.quickMove2 {
-  width: 180px;
-  margin-left: 5%;
-}
+        .quickMove2 {
+          width: 180px;
+          margin-left: 5%;
+        }
 
-.quickMove3 {
-  width: 180px;
-  margin-left: 5%;
-}
+        .quickMove3 {
+          width: 180px;
+          margin-left: 5%;
+        }
 
-.container {
-  max-width: 70%;
-  margin-left: 15%;
-  margin-top: 10%;
-}
+        .container {
+          max-width: 70%;
+          margin-left: 15%;
+          margin-top: 10%;
+        }
 
-.accordion {
-  width: 60%;
-  text-align: center;
-  margin-left: 20%;
-  margin-top: 2%;
-  border-top-style: solid;
-  border-top-color: silver;
-}
+        .accordion {
+          width: 60%;
+          text-align: center;
+          margin-left: 20%;
+          margin-top: 2%;
+          border-top-style: solid;
+          border-top-color: silver;
+        }
 
-.item {
-  border: 3px solid #696969;
-  opacity: 90%;
-  border-radius: 5px;
-  margin-bottom: 1%;
-}
+        .item {
+          border: 3px solid #696969;
+          opacity: 90%;
+          border-radius: 5px;
+          margin-bottom: 1%;
+        }
 
-.item-header {
-  background-color: white;
-  color: black;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 18px;
-  padding: 12px;
-  text-align: left;
-  text-indent: 3%;
-}
+        .item-header {
+          background-color: white;
+          color: black;
+          border-radius: 5px;
+          cursor: pointer;
+          font-size: 18px;
+          padding: 12px;
+          text-align: left;
+          text-indent: 3%;
+        }
 
-.item-header:hover {
-  background-color: #3e3b3f;
-  color: white;
-}
+        .item-header:hover {
+          background-color: #3e3b3f;
+          color: white;
+        }
 
-.item-content {
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.3s ease-in-out;
-  font-size: 18px;
-  text-align: left;
-  padding-left: 50px;
-  padding-right: 50px;
-  line-height: 50px;
-}
-.item.active .item-content {
-  max-height: 1000px; /* 적절한 최대 높이 설정 */
-}
+        .item-content {
+          max-height: 0;
+          overflow: hidden;
+          transition: max-height 0.3s ease-in-out;
+          font-size: 18px;
+          text-align: left;
+          padding-left: 50px;
+          padding-right: 50px;
+          line-height: 50px;
+        }
+        .item.active .item-content {
+          max-height: 1000px; /* 적절한 최대 높이 설정 */
+        }
 
-.greeting {
-  margin-top: 10%;
-  font-size: 25px;
-  font-weight: normal;
-  margin-bottom: -10px;
-  margin-left: 15%;
-  line-height: 70px;
-}
+        .greeting {
+          margin-top: 10%;
+          font-size: 25px;
+          font-weight: normal;
+          margin-bottom: -10px;
+          margin-left: 15%;
+          line-height: 70px;
+        }
 
-.normalTitle {
-  font-size: 23px;
-  font-weight: bold;
-  text-align: center;
-  margin-left: -5%;
-  margin-bottom: 5%;
-  margin-top: 7%;
-}
+        .normalTitle {
+          font-size: 23px;
+          font-weight: bold;
+          text-align: center;
+          margin-left: -5%;
+          margin-bottom: 5%;
+          margin-top: 7%;
+        }
 
-.search {
-  background-color: none;
-  opacity: 80%;
-  margin-top: 4%;
-  margin-bottom: 7%;
-  margin-left: 15%;
-  margin-right: 15%;
-  height: 160px;
-  border-radius: 5px;
-  transition: max-height 0.3s ease-in-out;
-  max-height: 4000px; /* 적절한 최대 높이 설정 */
-}
+        .search {
+          background-color: none;
+          opacity: 80%;
+          margin-top: 4%;
+          margin-bottom: 7%;
+          margin-left: 15%;
+          margin-right: 15%;
+          height: 160px;
+          border-radius: 5px;
+          transition: max-height 0.3s ease-in-out;
+          max-height: 4000px; /* 적절한 최대 높이 설정 */
+        }
 
-.search.active {
-  max-height: 4000px; /* 적절한 최대 높이 설정 */
-}
+        .search.active {
+          max-height: 4000px; /* 적절한 최대 높이 설정 */
+        }
 
-button {
-  height: 45px;
-  width: 100px;
-  margin-left: 40%;
-  border-radius: 5px;
-  background-color: gray;
-  top: 100px;
-  color: white;
-  font-size: 15px;
-}
+        button {
+          height: 45px;
+          width: 100px;
+          margin-left: 40%;
+          border-radius: 5px;
+          background-color: gray;
+          top: 100px;
+          color: white;
+          font-size: 15px;
+        }
 
-button:hover {
-  background-color: gray;
-}
+        button:hover {
+          background-color: gray;
+        }
 
-.chat {
-  margin-top: 17%;
-  border-top-style: solid;
-  border-top-color: silver;
-  margin-bottom: 10%;
-}
+        .chat {
+          margin-top: 17%;
+          border-top-style: solid;
+          border-top-color: silver;
+          margin-bottom: 10%;
+        }
 
-.question {
-  margin-top: 10%;
-}
+        .question {
+          margin-top: 10%;
+        }
 
-.askBoard {
-  border-style: solid;
-  border-color: gray;
-}
+        .askBoard {
+          border-style: solid;
+          border-color: gray;
+        }
 
-h4 {
-  font-size: 20px;
-  text-align: center;
-  margin-top: 10%;
-  margin-left: 2%;
-  margin-bottom: 5%;
-}
+        h4 {
+          font-size: 20px;
+          text-align: center;
+          margin-top: 10%;
+          margin-left: 2%;
+          margin-bottom: 5%;
+        }
 
-.ask {
-  width: 170px;
-  height: 45px;
-  margin-left: 80%;
-  font-size: 18px;
-  border-radius: 5px;
-}
+        .ask {
+          width: 170px;
+          height: 45px;
+          margin-left: 80%;
+          font-size: 18px;
+          border-radius: 5px;
+        }
 
-.askBoard {
-  margin-top: 3%;
-  border-radius: 5px;
-}
+        .askBoard {
+          margin-top: 3%;
+          border-radius: 5px;
+        }
 
-h5 {
-  font-size: 20px;
-}
+        h5 {
+          font-size: 20px;
+        }
 
-.loginToAsk {
-  font-size: 18px;
-  background-color: #b0c4de;
-  height: 40px;
-  width: 120px;
-  margin-top: 50px;
-  margin-bottom: 100px;
-}
+        .loginToAsk {
+          font-size: 18px;
+          background-color: #b0c4de;
+          height: 40px;
+          width: 120px;
+          margin-top: 50px;
+          margin-bottom: 100px;
+        }
 
-.loginToAsk:hover {
-  background-color: #696969;
-}
+        .loginToAsk:hover {
+          background-color: #696969;
+        }
 
-.loginNotice {
-  margin-top: 10%;
-}
+        .loginNotice {
+          margin-top: 10%;
+        }
 
-.askNotice {
-  font-size: 18px;
-  margin-top: 20%;
-}
+        .askNotice {
+          font-size: 18px;
+          margin-top: 20%;
+        }
 
-.comment-container {
-  margin-top: 10%;
-  text-align: left;
-  border-color: black;
-}
+        .comment-container {
+          margin-top: 10%;
+          text-align: left;
+          border-color: black;
+        }
 
-.comment-input {
-  height: 60px;
-  width: 500px;
-  border-radius: 5px;
-  margin-top: 10%;
-  margin-left: 27%;
-  font-size: 18px;
-}
+        .comment-input {
+          height: 60px;
+          width: 500px;
+          border-radius: 5px;
+          margin-top: 10%;
+          margin-left: 23%;
+          margin-right: -38%;
+          font-size: 18px;
+        }
 
-.comment-button {
-  height: 40px;
-  width: 80px;
-  font-size: 18px;
-}
+        .comment-button {
+          height: 40px;
+          width: 80px;
+          font-size: 18px;
+          margin-left: -60%;
+        }
 
-.comment-list {
-  border-radius: 5px;
-  border-color: solid 1px;
-}
+        .comment-list {
+          border-radius: 5px;
+          border-color: solid 1px;
+        }
 
-.chatContainer{
- bottom-top: 10%;
-}
+        .chatContainer{
+          bottom-top: 10%;
+        }
 
-.goToTop {
-  left: 90%;
-  top: 45%;
-  background-color: #4f4f4f;
-  position: fixed;
-}
+        .goToTop {
+          left: 90%;
+          top: 45%;
+          background-color: #4f4f4f;
+          position: fixed;
+        }
 
-.goToBottom {
-  left: 90%;
-  top: 53%;
-  background-color: #4f4f4f;
-  position: fixed;
-}
+        .goToBottom {
+          left: 90%;
+          top: 53%;
+          background-color: #4f4f4f;
+          position: fixed;
+        }
 
-.remoteControl:hover {
-  background-color: #3e3b3f;
-}
+        .remoteControl:hover {
+          background-color: #3e3b3f;
+        }
 
 
-        </style>
+    </style>
     <style>
         /* 간단한 스타일링 */
         body {
@@ -273,13 +278,14 @@ h5 {
           border-radius: 5px;
         }
     </style>
+
 </head>
 <body>
+<meta charset="UTF-8">
 <main layout:fragment="main">
     <div class= "top">
         <h2 class="greeting">고객님 안녕하세요, </br> <b>PageFlow 고객센터</b>입니다!</h2>
-       <img class="img1" src="https://kashmirscanmagazine.com/wp-content/uploads/2020/08/Book-Reading.jpg" alt="Background">
-
+        <img class="img1" src="https://kashmirscanmagazine.com/wp-content/uploads/2020/08/Book-Reading.jpg" alt="Background">
     </div>
 
     <div class="buttonToMove">
@@ -306,7 +312,7 @@ h5 {
         </div>
 
         <div class="item">
-            <div class="item-header"><b>23년 12월 신용카드 결제 무이자 할부 안내 </b></div>
+            <div class="item-header"><b>23년 12월 신용카드 결제 무이자 할부 안내 (12/01)</b></div>
             <div class="item-content">안녕하세요. PageFlow 입니다.<br>
                 다음과 같이 2023년 12월 신용카드 무이자 할부 행사를 시행하오니 많은 관심과 참여 부탁드립니다.
                 <br> 아래 무이자할부는 결제시 신용카드를 선택했을 때에만 적용되며, 세이페이, 네이버페이, 카카오페이, 페이코 등 간편결제는 해당 간편결제별 자체 무이자 할부가 적용되니 참고 부탁드립니다.
@@ -319,10 +325,17 @@ h5 {
         </div>
 
         <div class="item">
-            <div class="item-header"><b>공지사항3</b></div>
-            <div class="item-content">Hello.<br>
-                Lorem ipsum dolor sit amet
-                <br>Lorem ipsum dolor sit amet consectetur adipisicing elit. Suscipit dolore a corporis alias debitis numquam unde reprehenderit. Illum libero illo beatae, iure, maxime veritatis iste fuga sint, nam doloribus blanditiis.
+            <div class="item-header"><b>안드로이드 앱 스크롤 이용 오류 안내 (Android System Webview 오류) (11/28)</b></div>
+            <div class="item-content">안녕하세요, 페이지 플로우입니다.<br>
+                현재 페이지 플로우 앱 이용 중 스크롤 오류가 발생 하고 있습니다. 불편을 드려 먼저 사과드립니다.
+                <br>해당 오류는 구글에서 배포된 Android System Webview v99.0.4844.48에서 발생하는 것으로 보입니다.
+                <br>현재 구글에서 해당 오류를 보완 하여, 안내드린 앱 업데이트 후 재접속 시
+                <br>정상적으로 PageFlow 서비스를 이용하실 수 있습니다.
+                <br>1. Android 시스템 Webview : Play 스토어 > 'Android 시스템 Webview 검색' > 업데이트
+                <br>2. Chrome: Play 스토어 > 'Chrome' 검색 > 업데이트
+                <br> 이용에 불편을 드려 죄송합니다.
+                <br> 고객님께 보다 더 편리하고 안정적인 서비스를 제공하기 위해 노력하겠습니다.
+                <br> 감사합니다.
             </div>
         </div>
     </div>
@@ -367,89 +380,49 @@ h5 {
             <div class="item-content">eBOOK 상품은 구매 후 바로보기 또는 다운로드를 하지 않은 경우에 한해 구매일로부터 7일 이내 주문 취소가 가능합니다.
             </div>
         </div>
-    </div>
 
-    <div>
-        <div class="chat flex flex-col ">
+        <div class="chat flex flex-col  ">
             <h3 class="normalTitle ">건의하기</h3>
 
-            <div class = "chatContainer">
-                <h4>건의할 내용이 있으신가요? 자유롭게 적어주세요! </h4>
+            <div class = "chatContainer"></div>
+            <h4>건의할 내용이 있으신가요? 자유롭게 적어주세요! </h4>
+            <title>댓글창</title>
 
-                <div class="comment-container">
-                    <ul id="comment-list"></ul>
-                    <form id="question-form" onsubmit="return createQuestion()">
-                        <input name="title" type="text" id="comment-input" class="comment-input" placeholder="제목을 입력하세요">
-                        <textarea name="content" id="question-content" class="comment-input" placeholder="내용을 입력하세요"></textarea>
-                        <button type="submit" style="border: 2px solid gray">등록</button>
-                    </form>
-                </div>
-                <div class="mt-[10vh]" id="question-list"></div>
+            <div class="comment-container">
+                <ul id="comment-list"></ul>
+                <input type="text" id="comment-input" class = "comment-input" placeholder="내용을 입력하세요">
+                <button onclick="addComment()" style="border: 2px solid gray">등록</button>
             </div>
         </div>
     </div>
 
 
-<script>
-    const createQuestion = () => {
-        const questionList = document.getElementById("question-list");
-        const questionForm = document.getElementById("question-form");
 
-        const title = questionForm.title.value;
-        const content = questionForm.content.value;
+    <script >
+        function toggleAccordion(index)
+        {
+            var itemContent = document.querySelectorAll(".item-content");
 
-        const question = {
-            title,
-            content,
-        };
+            // 모든 아코디언 항목을 닫음
+            for (var i = 0; i < itemContent.length; i++)
+            {
+                if (i + 1 !== index)
+                {
+                itemContent[i].style.display = "none";
+                }
+            }
 
-        fetch("/api/question", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(question),
-        })
-        .then((res) => res.json())
-        .then((data) => {
-            const questionData = `제목: ${data.title} \n 내용: ${data.content} \n 작성자: ${data.questioner.nickname}`;
-            questionList.innerHTML = questionData;
-        });
-
-        return false;
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-function toggleAccordion(index) {
-    let itemContent = document.querySelectorAll(".item-content");
-
-  // 모든 아코디언 항목을 닫음
-  for (let i = 0; i < itemContent.length; i++) {
-    if (i + 1 !== index) {
-      itemContent[i].style.display = "none";
-    }
-  }
-
-  // 클릭한 아코디언 항목을 열거나 닫음
-  var selectedContent = itemContent[index - 1];
-  if (selectedContent.style.display === "block") {
-    selectedContent.style.display = "none";
-  } else {
-    selectedContent.style.display = "block";
-  }
-}
+            // 클릭한 아코디언 항목을 열거나 닫음
+            var selectedContent = itemContent[index - 1];
+            if (selectedContent.style.display === "block")
+            {
+                selectedContent.style.display = "none";
+            }
+            else
+            {
+                selectedContent.style.display = "block";
+            }
+        }
 
 $(document).ready(function () {
   $(".item-header").click(function () {
@@ -504,7 +477,7 @@ function goToScroll(name) {
   window.scrollTo({ top: location, behavior: "smooth" });
 }
 
-</script>
+    </script>
 </main>
 </body>
 </html>

@@ -2,12 +2,16 @@ package org.pageflow.domain.book.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.pageflow.base.annotation.SecuredBookId;
+import org.pageflow.base.request.AlertType;
 import org.pageflow.base.request.Rq;
+import org.pageflow.domain.book.entity.Book;
 import org.pageflow.domain.book.model.summary.BookSummary;
 import org.pageflow.domain.book.model.summary.Outline;
 import org.pageflow.domain.book.service.BookService;
+import org.pageflow.domain.book.service.BookWriteService;
 import org.pageflow.domain.user.service.AccountService;
 import org.springframework.data.domain.Slice;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
@@ -25,6 +29,7 @@ public class BookWebController {
     private final Rq rq;
     private final BookService bookService;
     private final AccountService accountService;
+    private final BookWriteService bookWriteService;
 
     
     @GetMapping("/books")
@@ -52,6 +57,7 @@ public class BookWebController {
      * 나의 책 페이지
      */
     @GetMapping("/account/books")
+    @PreAuthorize("isAuthenticated()")
     public String listOfAccount(Model model){
         List<BookSummary> bookSummaries = bookService.getBookSummariesByProfileId(rq.getProfile().getId());
         model.addAttribute("books", bookSummaries);
@@ -59,11 +65,21 @@ public class BookWebController {
     }
     
     
+    /**
+     * @return 새로운 책을 생성하고 write 페이지로 넘겨버린다.
+     */
+    @GetMapping("/books/create-new")
+    @PreAuthorize("isAuthenticated()")
+    public String createNewBookForm() {
+        Book newBook = bookWriteService.createBlankBook(rq.getProfile());
+        return rq.alert(AlertType.SUCCESS, "새로운 책을 만들었습니다. <br> " + rq.getUserSession().getNickname() + "님의 멋진 책을 기대하고 있겠습니다!", String.format("/write/%d", newBook.getId()));
+    }
     
     /**
      * @return react book write form page
      */
     @GetMapping("/write/{bookId}/**")
+    @PreAuthorize("isAuthenticated()")
     public String writeForm(@SecuredBookId @PathVariable Long bookId, Model model) {
         rq.setRequestAttr("bookId", bookId);
         return "forward:/react/build/book_write/index.html";

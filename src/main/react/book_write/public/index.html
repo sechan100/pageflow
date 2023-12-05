@@ -60,6 +60,21 @@
     }
   }
 
+  $(window).on('pageshow', () => {
+
+    // alert storage(redirect or history back)
+    const alertStorageKey = "alertStorageKey";
+    const alertStorage = localStorage.getItem(alertStorageKey);
+
+    if (alertStorage != null) {
+        const alertType = alertStorage.split(":")[0];
+        const msg = alertStorage.split(":")[1];
+
+        flowAlert(alertType, msg);
+        localStorage.removeItem(alertStorageKey);
+    }
+  });
+
 
   // bookId 최초 세팅
   const url = window.location.href;

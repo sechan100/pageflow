@@ -29,7 +29,7 @@ export default function NewChapterBtn({outline: localOutline} : {outline : Outli
   const { requestCreateChapter } = useCreateChapterStore();
 
   return (
-    <button type="button" onClick={() => requestCreateChapter()} className="absolute z-20 top-5 px-1 md:px-5 left-[7%] py-2 text-xs font-medium text-center ext-gray-900 focus:outline-none bg-gray-200 rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-gray-700">
+    <button type="button" onClick={() => requestCreateChapter()} className="absolute z-20 top-5 px-1 md:px-5 left-[7%] py-2 text-xs font-medium text-center text-gray-900 focus:outline-none bg-gray-200 rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-gray-700">
       새 챕터
     </button>
   );

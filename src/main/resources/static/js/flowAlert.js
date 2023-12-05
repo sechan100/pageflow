@@ -73,11 +73,15 @@ function flowAlert(alertType, msg) {
         dismissAlert(currentAlertId);
     }, 5000);
 
-    setInterval(() => {
+    const countDown = setInterval(() => {
         const countdown = $(`#flow-alert-${currentAlertId}-countdown`);
         const currentCount = parseInt(countdown.text());
         countdown.text(currentCount - 1);
     }, 1000);
+
+    setTimeout(() => {
+        clearInterval(countDown);
+    }, 5000);
 
     alertIdCounter++;
     $('#alert-container').append(alertHtml);

@@ -1,8 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useContext, useEffect, useRef, useState } from "react";
-import flowAlert from "../../etc/flowAlert";
 import { useBookMutation } from "../../api/book-api";
 import { QueryContext } from "../../App";
+import  flowAlert  from "../../etc/flowAlert";
 import { useBookMutationStore } from "../form/pages/book/BookForm";
 import { useOutlineMutationStore } from "../BookEntityDraggableContext";
 import { useOutlineMutation } from "../../api/outline-api";
@@ -160,9 +160,9 @@ export default function MutationSaveBtn(){
 
 
   return (
-  <>
+  <div className="fixed z-50 right-[5vw] top-7 flex">
     {/* eslint-disable-next-line no-restricted-globals */}
-    <div onClick={() => { history.back()}} className="flex justify-start fixed z-50 right-[9vw] top-7">
+    <div onClick={() => { history.back()}} className="flex justify-start mr-3">
       <div className="bg-gray-700 hover:bg-gray-900 w-12 h-12 p-3 mb-3 rounded-full cursor-pointer">
         <svg className="w-6 h-6 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
           <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 5H1m0 0 4 4M1 5l4-4"/>
@@ -170,7 +170,7 @@ export default function MutationSaveBtn(){
       </div>
     </div>
 
-    <div onClick={flushMutationsOnClick} className="flex justify-start fixed z-50 right-[5vw] top-7">
+    <div onClick={flushMutationsOnClick} className="flex justify-start">
       {isAnyMutation && 
       <div className="relative flex items-center mb-2 mr-3 transition-opacity duration-[1500ms] opacity-0" ref={updateAlertTooltip}>
         <div className="tooltip bg-white text-black border border-gray-300 py-1 px-2 rounded shadow-lg">
@@ -178,6 +178,7 @@ export default function MutationSaveBtn(){
           <div className="tooltip-arrow absolute top-[40%] right-1 w-0 h-0 border-transparent border-solid border-l-2 border-t-2 border-b-2 transform -translate-y-1/2 -translate-x-1/2"></div>
         </div>
       </div>}
+
       <div className={ (isAnyMutation ? "bg-gray-700 hover:bg-gray-900" : "bg-gray-500") + " w-12 h-12 p-3 mb-3 rounded-full cursor-pointer"}>
       {isAnyMutation && 
         <span className="absolute top-1 right-[1px] flex h-3 w-3">
@@ -189,7 +190,7 @@ export default function MutationSaveBtn(){
         </svg>
       </div>
     </div>
-  </>
+  </div>
   );
 
 

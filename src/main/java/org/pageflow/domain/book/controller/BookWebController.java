@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.pageflow.base.annotation.SecuredBookId;
 import org.pageflow.base.request.AlertType;
 import org.pageflow.base.request.Rq;
+import org.pageflow.domain.book.constants.BookStatus;
 import org.pageflow.domain.book.entity.Book;
 import org.pageflow.domain.book.model.summary.BookSummary;
 import org.pageflow.domain.book.model.summary.Outline;
@@ -81,6 +82,12 @@ public class BookWebController {
     @GetMapping("/write/{bookId}/**")
     @PreAuthorize("isAuthenticated()")
     public String writeForm(@SecuredBookId @PathVariable Long bookId, Model model) {
+        
+        Book book = bookService.repoFindBookById(bookId);
+        if(book.getStatus().equals(BookStatus.REVIEWING) || book.getStatus().equals(BookStatus.PUBLISHED) || book.getStatus().equals(BookStatus.REVIEW_REQUESTED)){
+            return rq.alert(AlertType.ERROR, String.format("해당 책은 현재 %s 상태입니다. 수정하시려면 상태를 변경해야합니다.", book.getStatus().statusText), "/account/books");
+        }
+        
         return "forward:/react/build/book_write/index.html";
     }
 

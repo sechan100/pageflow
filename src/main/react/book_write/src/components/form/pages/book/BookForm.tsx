@@ -6,6 +6,8 @@ import { useGetOutlineQuery } from "../../../../api/outline-api";
 import { BookMutation, Outline } from "../../../../types/types";
 import ImageCropComponent from "./BookCoverImgCropper";
 import { create } from "zustand";
+import axios from "axios";
+import flowAlert from "../../../../etc/flowAlert";
 
 interface BookMutationStore {
   payload: BookMutation;
@@ -137,7 +139,7 @@ export default function BookForm(){
             <p>미리보기를 모두 확인하셨다면, 아래 버튼을 클릭하여 출판 신청을 해주세요.</p>
             <p>출판 신청이 완료되면, 관리자의 출판검수가 시작됩니다.</p>
             <p>검수가 끝나면 이메일을 보내 알려드리겠습니다.</p>
-            <button className="btn btn" onClick={() => {console.log("출판하기")}}>출판하기</button>
+            <button className="btn btn" onClick={() => {requestBookReview()}}>출판하기</button>
           </div>
         </>
         }
@@ -161,6 +163,23 @@ export default function BookForm(){
       default:
         return state;
     }
+  }
+
+  // 출판 신청
+  function requestBookReview(){
+    axios.post(`/api/books/${bookId}/status?status=REVIEW_REQUESTED`)
+    .then(res => {
+      if(res.data.status === "REVIEW_REQUESTED"){
+        window.location.href = `/account/books`;
+        localStorage.setItem("alertStorageKey", "success:출판 검수 신청이 완료되었습니다! <br> 검수가 완료되면 이메일을 보내드리겠습니다.");
+      } else {
+        throw new Error("출판 신청에 실패했습니다.");
+      }
+    })
+    .catch(err => {
+      flowAlert("출판 신청에 실패했습니다.");
+      console.log(err);
+    })
   }
 
 

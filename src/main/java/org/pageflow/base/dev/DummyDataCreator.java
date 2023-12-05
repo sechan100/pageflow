@@ -3,6 +3,7 @@ package org.pageflow.base.dev;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.pageflow.domain.book.constants.BookStatus;
 import org.pageflow.domain.book.entity.Book;
 import org.pageflow.domain.book.entity.Chapter;
 import org.pageflow.domain.book.entity.Page;
@@ -93,6 +94,7 @@ public class DummyDataCreator {
             Book book = bookWriteService.createBlankBook(profileRepository.findById(randomLDownN(userN)).orElseThrow());
             book.setCoverImgUrl(getRamdomCoverImgUrl());
             book.setTitle("책 제목 " + (i + 1));
+            book.setStatus(BookStatus.PUBLISHED);
             bookService.repoSaveBook(book);
             
             Random random = new Random();

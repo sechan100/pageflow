@@ -29,13 +29,17 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     List<Book> findAllByAuthorId(Long profileId);
 
     @Query("SELECT new org.pageflow.domain.book.dto.BookWithPreferenceCount(b AS book, COUNT(p) AS preferenceCount) " +
-            "FROM Book b LEFT JOIN Preference p ON b.id = p.targetId AND p.targetType = 'Book' AND p.isLiked = true " +
+            "FROM Book b " +
+            "LEFT JOIN Preference p ON b.id = p.targetId AND p.targetType = 'Book' AND p.isLiked = true " +
+            "WHERE b.status = 'PUBLISHED' " +
             "GROUP BY b.id " +
             "ORDER BY COUNT(p) DESC")
     Slice<BookWithPreferenceCount> findAllBooksOrderByPreferenceCount(Specification<Book> spec, Pageable pageable);
 
     @Query("SELECT new org.pageflow.domain.book.dto.BookWithCommentCount(b AS book, COUNT(p) AS commentCount) " +
-            "FROM Book b LEFT JOIN Comment p ON b.id = p.targetId AND p.targetType = 'Book'" +
+            "FROM Book b " +
+            "LEFT JOIN Comment p ON b.id = p.targetId AND p.targetType = 'Book'" +
+            "WHERE b.status = 'PUBLISHED' " +
             "GROUP BY b.id " +
             "ORDER BY COUNT(p) DESC")
     Slice<BookWithCommentCount> findAllBooksOrderByCommentCount(Specification<Book> spec, Pageable pageable);

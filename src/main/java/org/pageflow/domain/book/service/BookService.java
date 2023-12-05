@@ -6,9 +6,12 @@ import lombok.RequiredArgsConstructor;
 import org.pageflow.base.entity.BaseEntity;
 import org.pageflow.base.exception.nosuchentity.NoSuchEntityException;
 import org.pageflow.base.request.Rq;
+import org.pageflow.domain.book.constants.BookStatus;
 import org.pageflow.domain.book.dto.BookWithCommentCount;
 import org.pageflow.domain.book.dto.BookWithPreferenceCount;
-import org.pageflow.domain.book.entity.*;
+import org.pageflow.domain.book.entity.Book;
+import org.pageflow.domain.book.entity.Chapter;
+import org.pageflow.domain.book.entity.Page;
 import org.pageflow.domain.book.model.summary.BookSummary;
 import org.pageflow.domain.book.model.summary.ChapterSummary;
 import org.pageflow.domain.book.model.summary.Outline;
@@ -16,8 +19,8 @@ import org.pageflow.domain.book.model.summary.PageSummary;
 import org.pageflow.domain.book.repository.BookRepository;
 import org.pageflow.domain.book.repository.ChapterRepository;
 import org.pageflow.domain.book.repository.PageRepository;
-import org.pageflow.domain.interaction.service.PreferenceService;
 import org.pageflow.domain.interaction.service.InteractionService;
+import org.pageflow.domain.interaction.service.PreferenceService;
 import org.pageflow.domain.user.entity.Profile;
 import org.pageflow.infra.file.service.FileService;
 import org.springframework.data.domain.PageRequest;
@@ -60,8 +63,14 @@ public class BookService {
                 // u1-Book 엔티티와 Account 엔티티를 아우터 조인하여 만든 Account 앤티티 객체.
                 // Book 앤티티와 Account 앤티티는 author 속성으로 연결되어 있기 때문에
                 // 질문 작성자 검색
-                return cb.or(cb.like(b.get("title"), "%" + kw + "%"),
-                        cb.like(u1.get("nickname"), "%" + kw + "%"));
+                return cb.and(
+                        cb.or(
+                                cb.like(b.get("title"), "%" + kw + "%"),
+                                cb.like(u1.get("nickname"), "%" + kw + "%")
+                        ),
+                        cb.equal(b.get("status"), BookStatus.PUBLISHED)
+                );
+
             }
         };
     }

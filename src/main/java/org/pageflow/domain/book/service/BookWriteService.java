@@ -514,6 +514,12 @@ public class BookWriteService {
                         emailText2
                 );
                 break;
+                
+            case REVIEW_CANCELED:
+                if(staleBook.getStatus() != BookStatus.REVIEW_REQUESTED && staleBook.getStatus() != BookStatus.REVIEWING){
+                    throw new IllegalArgumentException("검수 요청 상태(REVIEW_REQUESTED) 또는 검수중 상태(REVIEWING)인 책만 검수 취소 상태로 변경 가능합니다.");
+                }
+                break;
         }
         staleBook.setStatus(status);
         

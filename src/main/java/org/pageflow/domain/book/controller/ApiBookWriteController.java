@@ -218,7 +218,7 @@ public class ApiBookWriteController {
     ) {
         
         // 작가는 출판 검수 요청을 보내거나, 출판중인 책의 출판을 중단시킬 수 있다.
-        Set<BookStatus> authorUpdateAvailableStatus = Set.of(BookStatus.REVIEW_REQUESTED, BookStatus.SUSPENDED);
+        Set<BookStatus> authorUpdateAvailableStatus = Set.of(BookStatus.REVIEW_REQUESTED, BookStatus.REVIEW_CANCELED, BookStatus.SUSPENDED);
         
         // 만약 허용되는 상태로 변경한게 아니라면 예외
         if(!authorUpdateAvailableStatus.contains(status)){

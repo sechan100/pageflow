@@ -16,6 +16,7 @@ interface BookMutationStore {
     setTitle : (title : string) => void,
     setCoverImg : (coverImg : File) => void
   }
+  resetPayload: () => void;
 }
 
 export const useBookMutationStore = create<BookMutationStore>((set : any) => ({
@@ -52,6 +53,12 @@ export const useBookMutationStore = create<BookMutationStore>((set : any) => ({
     }
 
   },
+  resetPayload: () => set(
+    (state : any) => ({
+      ...state,
+      payload: { title: null, coverImg: null }
+    })
+  )
 }));
 
 
@@ -83,8 +90,10 @@ export default function BookForm(){
     }
     
     // local의 coverImg 데이터가 null이 아니라면 => coverImg 변경사항이 존재
-    if(localBook.coverImg) bookStore.dispatchs.setCoverImg(localBook.coverImg);
-
+    if(localBook.coverImg){
+      bookStore.dispatchs.setCoverImg(localBook.coverImg);
+      localBook.coverImg = null;
+    }
   }, [localBook]);
 
 
@@ -102,7 +111,7 @@ export default function BookForm(){
       </div>
   
         { editMode === "base" && 
-          <div className="mt-16">
+          <div className="my-16">
             <div>
               {/* title */}
               <div className="sm:col-span-2">

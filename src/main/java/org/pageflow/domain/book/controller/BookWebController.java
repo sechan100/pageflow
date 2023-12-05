@@ -81,7 +81,6 @@ public class BookWebController {
     @GetMapping("/write/{bookId}/**")
     @PreAuthorize("isAuthenticated()")
     public String writeForm(@SecuredBookId @PathVariable Long bookId, Model model) {
-        rq.setRequestAttr("bookId", bookId);
         return "forward:/react/build/book_write/index.html";
     }
 

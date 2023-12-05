@@ -6,6 +6,7 @@ interface UseCreateChapterStore {
   isMutated : boolean;
   resetMutation: () => void;
   requestCreateChapter : () => void;
+  resetPayload: () => void;
 }
 
 export const useCreateChapterStore = create<UseCreateChapterStore>((set : any) => ({
@@ -20,7 +21,12 @@ export const useCreateChapterStore = create<UseCreateChapterStore>((set : any) =
     set((state : any) => ({
       isMutated: true
     }));
-  }
+  },
+  resetPayload: () => set(
+    (state : any) => ({
+      ...state,
+    })
+  )
 }));
 
 

@@ -45,7 +45,10 @@ export default function MutationSaveBtn(){
 
   const mutationStores = [bookStore, outlineStore, createChapterStore, chapterStore, createPageStore, pageStore]; // zustand store들을 배열로 저장
   
-  const isMutateds : boolean[] = mutationStores.map((store) => store.isMutated); // store들의 isMutated를 배열로 저장
+  // store들의 isMutated를 배열로 저장한다.
+  // 단, createChapterStore, createPageStore는 변경사항으로 간주하지 않고 바로 요청을 보내기 때문에, 추가하지 않음
+  const isMutateds : boolean[] = [bookStore, outlineStore, chapterStore, pageStore].map((store) => store.isMutated);
+  
   const [isAnyMutation, setIsAnyMutation] = useState(false); // outline, book, chapter중 하나라도 변경사항이 있다면 true.
 
   // outline, book, chapter 중 하나라도 변경 사항이 있다면 hasAnyMutation을 true로 변경한다.

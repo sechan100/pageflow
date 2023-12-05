@@ -21,6 +21,7 @@ interface UseOutlineMutationStore {
   dispatchs: {
     setChapters : (chapters : ChapterSummary[]) => void
   };
+  resetPayload: () => void;
 }
 
 
@@ -49,6 +50,12 @@ export const useOutlineMutationStore = create<UseOutlineMutationStore>((set : an
     }
 
   },
+  resetPayload: () => set(
+    (state : any) => ({
+      ...state,
+      payload: { chapters: null }
+    })
+  )
 }));
 
 

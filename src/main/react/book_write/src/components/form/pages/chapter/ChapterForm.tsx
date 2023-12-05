@@ -15,6 +15,7 @@ interface ChapterMutationStore {
   dispatchs: {
     updateChapter: (update: ChapterMutation) => void;
   }
+  resetPayload: () => void;
 }
 
 export const useChapterMutationStore = create<ChapterMutationStore>((set : any) => ({
@@ -67,6 +68,12 @@ export const useChapterMutationStore = create<ChapterMutationStore>((set : any) 
     },
 
   },
+  resetPayload: () => set(
+    (state : any) => ({
+      ...state,
+      payload: []
+    })
+  )
 }));
 
 

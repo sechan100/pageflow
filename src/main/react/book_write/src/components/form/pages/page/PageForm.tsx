@@ -17,6 +17,7 @@ interface PageMutationStore {
   dispatchs: {
     updatePage: (pageMutation : PageMutation) => void;
   }
+  resetPayload: () => void;
 }
 
 export const usePageMutationStore = create<PageMutationStore>((set : any) => ({
@@ -68,6 +69,12 @@ export const usePageMutationStore = create<PageMutationStore>((set : any) => ({
       });
     },
   },
+  resetPayload: () => set(
+    (state : any) => ({
+      ...state,
+      payload: []
+    })
+  )
 }));
 
 

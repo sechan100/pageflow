@@ -228,4 +228,13 @@ public class ApiBookWriteController {
         return bookWriteService.updateBookStatus(bookId, status);
     }
     
+    /**
+     * 책 삭제
+     */
+    @DeleteMapping("/api/books/{bookId}")
+    public void deleteBook(
+            @SecuredBookId @PathVariable("bookId") Long bookId
+    ) {
+        bookWriteService.deleteBook(bookId);
+    }
 }

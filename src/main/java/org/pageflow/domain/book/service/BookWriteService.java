@@ -533,5 +533,21 @@ public class BookWriteService {
     public Book updateBookStatus(Long bookId, BookStatus status) {
         return updateBookStatus(bookId, status, "");
     }
+    
+    public void deleteBook(Long bookId) {
+        Book bookToDelete = bookService.repoFindBookById(bookId);
+        
+        try {
+            // 영속 전이를 하지 않았으므로, 모든 하위 Page와 Chapter들을 일일히 삭제해준다.
+            bookToDelete.getChapters().forEach(chapter -> {
+                chapter.getPages().forEach(bookService::repoDeletePage);
+                bookService.repoDeleteChapter(chapter);
+            });
+            // 마지막으로 Book까지 삭제
+            bookService.repoDeleteBook(bookToDelete);
+        } catch(Exception e) {
+            log.error("책 삭제 중 오류가 발생했습니다." + e.getMessage());
+        }
+    }
 }
 

@@ -25,6 +25,7 @@ function App() {
       if(response){
         setOutline(response.data);
         console.log("### outline data fetching success! ###", response.data);
+        setIsLoading(false);
         return response.data;
       }
     })

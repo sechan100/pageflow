@@ -103,12 +103,15 @@ export default function BookForm(){
   return (
   <>
       <div>
-        <div className="grid max-w-xs grid-cols-2 gap-1 p-1 mx-auto my-2 bg-gray-200 rounded-lg" role="group">
+        <div className="grid max-w-sm grid-cols-3 gap-1 p-1 mx-auto my-2 bg-gray-200 rounded-lg" role="group">
             <button type="button" onClick={() => setEditMode("base")} className={ (editMode === "base" ? "text-white bg-gray-900" : "text-gray-900 hover:bg-gray-300") + " px-5 py-1.5 text-xs font-medium rounded-lg"}>
               책 정보
             </button>
-            <button type="button" onClick={() => setEditMode("reviewRequest")} className={ (editMode === "base" ? "text-gray-900 hover:bg-gray-300" : "text-white bg-gray-900") + " px-5 py-1.5 text-xs font-medium rounded-lg"}>
+            <button type="button" onClick={() => setEditMode("reviewRequest")} className={ (editMode === "reviewRequest" ? "text-white bg-gray-900" : "text-gray-900 hover:bg-gray-300") + " px-5 py-1.5 text-xs font-medium rounded-lg"}>
               출판검수 신청
+            </button>
+            <button type="button" onClick={() => setEditMode("deleteBook")} className={ (editMode === "deleteBook" ? "text-white bg-gray-900" : "text-gray-900 hover:bg-gray-300") + " px-5 py-1.5 text-xs font-medium rounded-lg"}>
+              삭제
             </button>
         </div>
       </div>
@@ -144,6 +147,17 @@ export default function BookForm(){
           </div>
         </>
         }
+
+        { editMode === "deleteBook" &&
+        <>
+          <div className="mt-16 text-black">
+            <p>정말 삭제하시겠습니까? 책을 삭제하시면 복구할 수 없습니다.</p>
+            <p>삭제하시려면 아래 칸에 <i>삭제</i> 를 입력하고 삭제하기 버튼을 눌러주세요</p>
+            <input className="mt-2 input input-bordered input-error bg-white mr-2" type="text" placeholder="삭제" />
+            <button className="btn btn-error btn-outline" onClick={deleteBook} >삭제하기</button>
+          </div>
+        </>
+        }
       </>
   );
 
@@ -173,6 +187,11 @@ export default function BookForm(){
       requestBookReviewBtnRef.current.classList.add("loading-spinner");
     }
 
+    // eslint-disable-next-line no-restricted-globals
+    if(!confirm("출판 검수를 신청하시겠습니까?")){
+      return 
+    }
+
 
     axios.put(`/api/books/${bookId}/status?status=REVIEW_REQUESTED`)
     .then(res => {
@@ -185,6 +204,29 @@ export default function BookForm(){
     })
     .catch(err => {
       flowAlert("출판 신청에 실패했습니다.");
+      console.log(err);
+    })
+  }
+
+
+  // 책 삭제
+  function deleteBook(){
+    // eslint-disable-next-line no-restricted-globals
+    if(!confirm("정말 삭제하시겠습니까?")){
+      return 
+    }
+
+    axios.delete(`/api/books/${bookId}`)
+    .then(res => {
+      if(res.status === 200){
+        window.location.href = `/account/books`;
+        localStorage.setItem("alertStorageKey", "success:책을 성공적으로 삭제했습니다.");
+      } else {
+        throw new Error("책 삭제에 실패했습니다.");
+      }
+    })
+    .catch(err => {
+      flowAlert("책 삭제에 실패했습니다.");
       console.log(err);
     })
   }

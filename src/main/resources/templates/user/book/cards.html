@@ -48,7 +48,7 @@ select {
             <div class="flex grow ">
                 <!--  정렬순  -->
                     <select id="sortOption" class="select font-semibold text-sm text-gray-700  focus:border-double focus:border-gray-500 focus:ring-0 border-gray-400 sm:text-sm sm:leading-6">
-                        <option disabled selected>정렬순 🍊</option>
+                        <option disabled selected>정렬기준 🍊</option>
                         <option value="createdDate">작성 날짜 </option>
                         <option value="preferenceCount">추천순</option> <!-- JPA에서 지원하는 함수나 필드를 이용 -->
                         <option value="commentCount">댓글순</option>
@@ -57,7 +57,7 @@ select {
             <!--  검색 시작  -->
             <div class="w-full flex justify-between max-w-md">
                     <input id="search_kw" th:value="${kw}" name="search_kw" type="text" autocomplete="search_kw"
-                           placeholder="검색어를 입력해주세요" required
+                           placeholder="책 제목 또는 작가 이름으로 검색" required
                            class="input w-2/3 focus:border-double focus:border-gray-500 focus:ring-0 rounded max-w-xs flex-auto text-black border-gray-400 sm:text-sm sm:leading-6 ">
                     <button id="btn_search" type="button"
                             class="font-semibold rounded border-2 p-3 border-gray-400 text-sm text-gray-700 relative text-center active:top-[3px]   w-1/4 ">
@@ -74,13 +74,13 @@ select {
                             <a th:href="@{|/books/${book.id}/details|}">
                                 <div class="relative w-full h-96">
                                     <img th:src="@{${book.coverImgUrl}}" alt="Book Image" class="contrast-75 object-cover w-full h-full transition-all duration-1000 ease-in-out group-hover:transform group-hover:scale-110 rounded-lg" style="backface-visibility: hidden;">
-                                    <div class="absolute bottom-0 left-0 text-white right-0">
-                                        <div >
-                                            <div >
+                                    <div class="absolute bottom-0 left-0 text-white right-0" style="filter: blur(5px);">
+                                        <div class="bg-gray-200">
+                                            <div>
                                                 <h1 th:text="${book.title}" class="font-extrabold text-3xl text-center overflow-hidden text-white"></h1>
                                             </div>
                                             <div class="p-4 mb-4 text-black font-semibold">
-                                                <h2 th:text="${book.author.nickname}"></h2>
+                                                <h2 class="shadow-2xl" th:text="|${book.author.nickname} 작가|"></h2>
                                             </div>
                                         </div>
                                     </div>

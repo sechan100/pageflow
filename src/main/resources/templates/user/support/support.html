@@ -1,10 +1,7 @@
 <html lang="en" layout:decorate="~{/common/layout.html}">
 
-
 <head>
     <title>고객센터</title>
-    <meta charset="UTF-8">
-    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <style>
 .top {
   background-color: none;
@@ -249,7 +246,6 @@ h5 {
 
 
         </style>
-
     <style>
         /* 간단한 스타일링 */
         body {
@@ -277,11 +273,9 @@ h5 {
           border-radius: 5px;
         }
     </style>
-
 </head>
-    <body>
-    <meta charset="UTF-8">
-    <main layout:fragment="main">
+<body>
+<main layout:fragment="main">
     <div class= "top">
         <h2 class="greeting">고객님 안녕하세요, </br> <b>PageFlow 고객센터</b>입니다!</h2>
        <img class="img1" src="https://kashmirscanmagazine.com/wp-content/uploads/2020/08/Book-Reading.jpg" alt="Background">
@@ -293,7 +287,6 @@ h5 {
         <button class="quickMove2" onclick="goToScroll('accordion')" style="border: 2px solid gray"> 자주 물어보는 질문</button>
         <button class="quickMove3" onclick="goToScroll('chatContainer')" style="border: 2px solid gray"> 건의하기</button>
     </div>
-
 
     <div class="container">
 
@@ -374,33 +367,76 @@ h5 {
             <div class="item-content">eBOOK 상품은 구매 후 바로보기 또는 다운로드를 하지 않은 경우에 한해 구매일로부터 7일 이내 주문 취소가 가능합니다.
             </div>
         </div>
+    </div>
 
-        <div class="chat flex flex-col  ">
+    <div>
+        <div class="chat flex flex-col ">
             <h3 class="normalTitle ">건의하기</h3>
 
             <div class = "chatContainer">
-            <h4>건의할 내용이 있으신가요? 자유롭게 적어주세요! </h4>
-            <title>댓글창</title>
+                <h4>건의할 내용이 있으신가요? 자유롭게 적어주세요! </h4>
 
-            <div class="comment-container">
-                <ul id="comment-list"></ul>
-                <input type="text" id="comment-input" class = "comment-input" placeholder="내용을 입력하세요">
-                <button onclick="addComment()" style="border: 2px solid gray">등록</button>
+                <div class="comment-container">
+                    <ul id="comment-list"></ul>
+                    <form id="question-form" onsubmit="return createQuestion()">
+                        <input name="title" type="text" id="comment-input" class="comment-input" placeholder="제목을 입력하세요">
+                        <textarea name="content" id="question-content" class="comment-input" placeholder="내용을 입력하세요"></textarea>
+                        <button type="submit" style="border: 2px solid gray">등록</button>
+                    </form>
+                </div>
+                <div class="mt-[10vh]" id="question-list"></div>
             </div>
-
-
-
         </div>
     </div>
 
 
+<script>
+    const createQuestion = () => {
+        const questionList = document.getElementById("question-list");
+        const questionForm = document.getElementById("question-form");
 
-    <script >
-        function toggleAccordion(index) {
-  var itemContent = document.querySelectorAll(".item-content");
+        const title = questionForm.title.value;
+        const content = questionForm.content.value;
+
+        const question = {
+            title,
+            content,
+        };
+
+        fetch("/api/question", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(question),
+        })
+        .then((res) => res.json())
+        .then((data) => {
+            const questionData = `제목: ${data.title} \n 내용: ${data.content} \n 작성자: ${data.questioner.nickname}`;
+            questionList.innerHTML = questionData;
+        });
+
+        return false;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function toggleAccordion(index) {
+    let itemContent = document.querySelectorAll(".item-content");
 
   // 모든 아코디언 항목을 닫음
-  for (var i = 0; i < itemContent.length; i++) {
+  for (let i = 0; i < itemContent.length; i++) {
     if (i + 1 !== index) {
       itemContent[i].style.display = "none";
     }
@@ -468,8 +504,7 @@ function goToScroll(name) {
   window.scrollTo({ top: location, behavior: "smooth" });
 }
 
-    </script>
-    </div>
-            </main>
-    </body>
+</script>
+</main>
+</body>
 </html>

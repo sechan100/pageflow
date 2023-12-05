@@ -1,4 +1,4 @@
-package org.pageflow.domain.support;
+package org.pageflow.domain.support.model.dto;
 
 
 import jakarta.validation.constraints.NotEmpty;

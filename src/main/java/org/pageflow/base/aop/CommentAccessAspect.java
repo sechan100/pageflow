@@ -58,7 +58,7 @@ public class CommentAccessAspect {
                     
                     Object arg = joinPoint.getArgs()[i];
                     Long commentId = (Long) arg;
-                    Comment comment = commentService.repoFindCommentById(commentId);
+                    Comment comment = commentService.repoFindCommentWithInteractorById(commentId);
                     Long userId = rq.getUserSession().getId();
                     if (!comment.getInteractor().getId().equals(userId)) {
                         if(isApiClass){

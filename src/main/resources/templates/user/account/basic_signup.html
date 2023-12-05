@@ -60,7 +60,7 @@
                                     <label for="username"
                                            class="block mb-2 text-sm font-medium text-gray-900">아아디</label>
                                     <input type="text" name="username" id="username"
-                                           class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                                           class="focus:ring-0 outline-0 focus:outline-0 disabled:bg-blue-gray-50 disabled:border-0  bg-gray-50 border focus:border-2   border-blue-gray-200 focus:border-gray-900  text-gray-900 sm:text-sm rounded focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
                                            placeholder="username" required="" autofocus>
                                 </div>
 
@@ -68,7 +68,7 @@
                                 <div>
                                     <label for="email" class="block mb-2 text-sm font-medium text-gray-900">이메일</label>
                                     <input type="email" name="email" id="email"
-                                           class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                                           class="focus:ring-0 outline-0 focus:outline-0 disabled:bg-blue-gray-50 disabled:border-0  bg-gray-50 border focus:border-2   border-blue-gray-200 focus:border-gray-900  text-gray-900 sm:text-sm rounded focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
                                            placeholder="name@company.com" required="">
                                 </div>
 
@@ -77,7 +77,7 @@
                                     <label for="password"
                                            class="block mb-2 text-sm font-medium text-gray-900">비밀번호</label>
                                     <input type="password" name="password" id="password" placeholder="••••••••"
-                                           class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 "
+                                           class="focus:ring-0 outline-0 focus:outline-0 disabled:bg-blue-gray-50 disabled:border-0  bg-gray-50 border focus:border-2   border-blue-gray-200 focus:border-gray-900  text-gray-900 sm:text-sm rounded focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 "
                                            required="">
                                 </div>
 
@@ -87,7 +87,7 @@
                                         확인</label>
                                     <input type="password" name="passwordConfirm" id="passwordConfirm"
                                            placeholder="••••••••"
-                                           class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                                           class="focus:ring-0 outline-0 focus:outline-0 disabled:bg-blue-gray-50 disabled:border-0  bg-gray-50 border focus:border-2   border-blue-gray-200 focus:border-gray-900  text-gray-900 sm:text-sm rounded focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
                                            required="">
                                 </div>
 
@@ -151,13 +151,13 @@
             username.val($.trim(username.val()));
 
             if (username.val().length === 0) {
-                alert('아이디를 입력해주세요.');
+                flowAlert("warning",'아이디를 입력해주세요.');
                 username.focus();
                 return;
             }
 
             if (username.val().length < 4) {
-                alert('최소 아이디 길이는 5자리 입니다.');
+                flowAlert("warning",'최소 아이디 길이는 5자리 입니다.');
                 username.focus();
                 return;
             }
@@ -166,14 +166,20 @@
 
             if (password.val().length === 0) {
                 password.focus();
-                alert('비밀번호를 입력해주세요.');
+                flowAlert("warning",'비밀번호를 입력해주세요.');
+                return;
+            }
+
+               if (password.val().length < 5) {
+                password.focus();
+                flowAlert("warning",'비밀번호를 5자 이상 입력해주세요.');
                 return;
             }
 
             passwordConfirm.val($.trim(passwordConfirm.val()));
 
             if (password.val() != passwordConfirm.val()) {
-                alert('비밀번호 확인이 일치하지 않습니다.');
+                flowAlert("warning",'비밀번호 확인이 일치하지 않습니다.');
                 passwordConfirm.focus();
                 return;
             }

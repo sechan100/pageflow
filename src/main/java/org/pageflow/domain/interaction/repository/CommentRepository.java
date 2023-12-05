@@ -13,9 +13,9 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     
     @EntityGraph(attributePaths = {"interactor"}, type = EntityGraph.EntityGraphType.LOAD)
     List<Comment> findAllWithInteractorByTargetTypeAndTargetId(String targetType, Long targetId);
-    
+
     @EntityGraph(attributePaths = {"interactor"}, type = EntityGraph.EntityGraphType.LOAD)
-    Comment findWithInteractorById(long commentId);
+    Comment findWithInteractorById(Long commentId);
     
     void deleteAllByTargetTypeAndTargetId(String targetType, Long targetId);
 }

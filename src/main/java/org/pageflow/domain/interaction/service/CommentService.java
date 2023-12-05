@@ -102,5 +102,9 @@ public class CommentService {
     public Comment repoFindCommentById(Long commentId){
         return commentRepository.findById(commentId).orElseThrow(() -> new WebNoSuchEntityException(Comment.class));
     }
+
+    public Comment repoFindCommentWithInteractorById(Long commentId){
+        return commentRepository.findWithInteractorById(commentId);
+    }
     
 }

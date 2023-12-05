@@ -166,7 +166,7 @@
             var isLiked = $('#heart').data('filled');
             var isLoggedIn = /*[[${user.login}]]*/ false;
 
-            if (!isLoggedIn) {
+            if (isLoggedIn) {
                 flowAlert("warning", '로그인 후 이용해주세요.');
             } else {
                 $.ajax({
@@ -320,11 +320,6 @@
                     form.content.focus();
                     return;
                 }
-                if (form.content.value.length > 30) {
-                    flowAlert("warning", "댓글은 30자를 초과할 수 없습니다");
-                    form.content.focus();
-                    return;
-                }
 
                 $.ajax({
                     type: 'POST',
@@ -455,7 +450,8 @@ function cancelEdit() {
 
         // 댓글 좋아요 초기화
         function initializeCommentLikes() {
-            var commentList = interactions.comments;
+            var bookId = [[${outline.id}]];
+            var commentList = updateCommentList(bookId);
             for (var i = 0; i < commentList.length; i++) {
                 var commentId = commentList[i].id;
                 var isCommentLiked = localStorage.getItem('likedComment_' + commentId);
@@ -465,10 +461,12 @@ function cancelEdit() {
                     $('#likeButton_' + commentId + ' i').removeClass('far').addClass('fas').css('color', 'blue');
                     $('#likeButton_' + commentId).data('filled', true);
                     console.log(isCommentLiked);
+                    console.log('시방');
                 } else {
                     $('#likeButton_' + commentId + ' i').removeClass('fas').addClass('far').css('color', '#000000');
                     $('#likeButton_' + commentId).data('filled', false);
                     console.log(!isCommentLiked);
+                    console.log('시방새ㅐ야');
                 }
 
                 // 댓글 좋아요 버튼 클릭 이벤트 핸들러 추가
@@ -486,7 +484,7 @@ function cancelEdit() {
             var isCommentLiked = $('#likeButton_' + commentId).data('filled');
             var isLoggedIn = /*[[${user.login}]]*/ false;
 
-            if (!isLoggedIn) {
+            if (isLoggedIn) {
                 flowAlert("warning", "로그인 후 이용해주세요.");
             } else {
                 $.ajax({
@@ -523,16 +521,23 @@ function cancelEdit() {
                 type: 'GET',
                 url: '/api/books/' + bookId + '/interactions',
                 success: function (data) {
-                    console.log(data);
-                    var commentLikesCount = data.preferenceStatistics.likes || 0;
-                    $('#likesCount_' + commentId).text(commentLikesCount);
-                },
+
+            // Assuming data.comments is an array
+            for (var i = 0; i < data.comments.length; i++) {
+                var comment = data.comments[i];
+                if(comment.id === commentId) {
+                var commentLikesCount = comment.preferenceStatistics.likes;
+                console.log("새로 바뀌 조아용 개수는...", commentLikesCount);
+                $('#likesCount_' + commentId).text(commentLikesCount);
+                break;
+                }
+            }
+        },
                 error: function (xhr, status, error) {
                     console.error('댓글 좋아요 숫자 가져오기 실패');
                 }
             });
         }
-
     </script>
 
 </main>

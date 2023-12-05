@@ -149,7 +149,6 @@
                 type: 'GET',
                 url: '/api/books/' + bookId + '/preferences',
                 success: function (data) {
-                    console.log(data);
                     var likesCount  = data.likes || 0
                    $('#bookLikesCount').text(likesCount);
                 },
@@ -166,7 +165,7 @@
             var isLiked = $('#heart').data('filled');
             var isLoggedIn = [[${user.login}]];
 
-            if (isLoggedIn) {
+            if (!isLoggedIn) {
                 flowAlert("warning", '로그인 후 이용해주세요.');
             } else {
                 $.ajax({
@@ -230,6 +229,10 @@
                     const commentList = interactions.comments;
 
                     displayCommentList(commentList);
+
+                        if (typeof callback === 'function') {
+                        callback(commentList);
+                    }
                 },
                 error: function (xhr, status, error) {
                     console.error("댓글 목록 업데이트 실패");
@@ -293,11 +296,19 @@
                         output += "</div>";
                         output += "</div>";
 
-                        output += "<div id='editCommentForm_" + comment.id + "' style='display: none;'>"; // 폼 ID를 댓글 ID와 연결
-                        output += "<textarea id='editedCommentContent'></textarea>";
-                        output += "<button onclick='submitEditedComment(" + comment.id + ")'>수정 완료</button>";
-                        output += "<button onclick='cancelEdit()'>취소</button>"
+                        output += "<div id='editCommentForm_" + comment.id + "' style='display: none;' class='p-4'>"; // 폼 ID를 댓글 ID와 연결
+                        output += "<textarea id='editedCommentContent' class='textarea textarea-bordered w-full resize-none	'></textarea>";
+                        output += "<div class='flex justify-end text-center'>";
+                        output += "<div class='mr-2 py-1 px-2 rounded-lg shadow-inner font-bold text-md btn btn-ghos' onclick='submitEditedComment(" + comment.id + ")'>";
+                        output += "<a  href='javascript:void(0);'>수정 완료</a>";
                         output += "</div>";
+                        output += "<div class='mr-2 py-1 px-2 rounded-lg shadow-inner font-bold text-md btn btn-ghos'  onclick='cancelEdit(" + comment.id + ")'>";
+                        output += "<a  href='javascript:void(0);'>취소</a>";
+                        output += "</div>";
+                        output += "</div>";
+                        output += "</div>";
+
+
                     }
                 }
                 $("#comment_list").html(output);
@@ -369,149 +380,151 @@
                 }
             }
 
-// 댓글 수정 폼 보여주기
-function showEditCommentForm(commentId, currentContent) {
-    console.log('보여주고있니?');
-    // 수정 폼 보이기
-    var editForm = $("#editCommentForm_" + commentId);
-    editForm.find("#editedCommentContent").val(currentContent);
-    editForm.show().data('commentId', commentId);
-    console.log('보여주고있니!!!!');
-}
+                // 댓글 수정 폼 보여주기
+                function showEditCommentForm(commentId, currentContent) {
+                    // 수정 폼 보이기
+                    var editForm = $("#editCommentForm_" + commentId);
+                    editForm.find("#editedCommentContent").val(currentContent);
+                    editForm.show().data('commentId', commentId);
+                }
 
 
-// 댓글 수정 제출
-function submitEditedComment(commentId) {
- var bookId = [[${outline.id}]];
-    var editedContent = $("#editCommentForm_" + commentId).find("#editedCommentContent").val();
+                // 댓글 수정 제출
+                function submitEditedComment(commentId) {
+                 var bookId = [[${outline.id}]];
+                    var editedContent = $("#editCommentForm_" + commentId).find("#editedCommentContent").val();
 
 
-    // 수정된 내용이 비어있으면 경고
-    if (editedContent.trim() === "") {
-        flowAlert("warning", "댓글을 입력해주세요");
-        return;
-    }
+                    // 수정된 내용이 비어있으면 경고
+                    if (editedContent.trim() === "") {
+                        flowAlert("warning", "댓글을 입력해주세요");
+                        return;
+                    }
 
-    $.ajax({
-        type: 'PUT',
-        url: '/api/books/' + bookId + '/comments/' + commentId,
-        data: { content: editedContent },
-        success: function (comment) {
-            console.log("댓글 수정 완료:", comment);
-             flowAlert("success", "댓글을 수정했습니다");
-            // 댓글 목록 업데이트
-            updateCommentList(bookId);
+                    $.ajax({
+                        type: 'PUT',
+                        url: '/api/books/' + bookId + '/comments/' + commentId,
+                        data: { content: editedContent },
+                        success: function (comment) {
+                            console.log("댓글 수정 완료:", comment);
+                             flowAlert("success", "댓글을 수정했습니다");
+                            // 댓글 목록 업데이트
+                            updateCommentList(bookId);
 
-            // 댓글 개수 업데이트
-            updateCommentCount();
+                            // 댓글 개수 업데이트
+                            updateCommentCount();
 
-            // 수정 폼 감추기
-            $("#editCommentForm").hide();
-        },
-        error: function (xhr, status, error) {
-            console.error("댓글 수정 실패:", xhr, status, error);
-            flowAlert("error", "댓글 수정 도중 오류가 발생하였습니다.");
-        }
-    });
-}
+                            // 수정 폼 감추기
+                            $("#editCommentForm").hide();
+                        },
+                        error: function (xhr, status, error) {
+                            console.error("댓글 수정 실패:", xhr, status, error);
+                            flowAlert("error", "댓글 수정 도중 오류가 발생하였습니다.");
+                        }
+                    });
+                }
 
-// 취소 시 화면 표시
-function cancelEdit() {
-    // 수정 폼 감추기
-    $("#editCommentForm").hide();
-}
+                    // 취소 시 화면 표시
+                    function cancelEdit(commentId) {
+                    console.log('사라져라잉잉');
+                        // 수정 폼 감추기
+                        $("#editCommentForm_" + commentId).hide();
+                    }
 
-        // 댓글 count 업데이트
-        function updateCommentCount() {
-            var bookId = [[${outline.id}]];
+                        // 댓글 count 업데이트
+                        function updateCommentCount() {
+                            var bookId = [[${outline.id}]];
 
-            $.ajax({
-                type: 'GET',
-                url: '/api/books/' + bookId + '/interactions',
-                success: function (interactions) {
-                    var commentCount = interactions.comments ? interactions.comments.length : 0;
-                    $("#getCommentCount").text(commentCount);
-                },
-                error: function (xhr, status, error) {
-                    console.error("댓글 개수 업데이트 실패");
+                            $.ajax({
+                                type: 'GET',
+                                url: '/api/books/' + bookId + '/interactions',
+                                success: function (interactions) {
+                                    var commentCount = interactions.comments ? interactions.comments.length : 0;
+                                    $("#getCommentCount").text(commentCount);
+                                },
+                                error: function (xhr, status, error) {
+                                    console.error("댓글 개수 업데이트 실패");
+                                }
+                            });
+                        }
+                    </script>
+
+
+                    <!--  댓글 좋아요 싫어요  -->
+                    <script>
+                         // 페이지 로드 시 댓글 좋아요 정보 초기화
+                        $(document).ready(function () {
+                            initializeCommentLikes();
+                        });
+
+                        // 댓글 좋아요 초기화
+                        function initializeCommentLikes() {
+                            var bookId = [[${outline.id}]];
+                            console.log('충청동 히');
+
+                            updateCommentList(bookId, function (commentList) {
+                                for (var i = 0; i < commentList.length; i++) {
+                                    (function () {
+                        let commentId = commentList[i].id;
+
+                        let isCommentLiked = localStorage.getItem('likedComment_' + commentId);
+
+                        // 댓글 좋아요 여부에 따라 아이콘 스타일 변경
+                        if (isCommentLiked) {
+                            $('#likeButton_' + commentId + ' i').removeClass('far').addClass('fas').css('color', 'blue');
+                            $('#likeButton_' + commentId).data('filled', true);
+                        } else {
+                            $('#likeButton_' + commentId + ' i').removeClass('fas').addClass('far').css('color', '#000000');
+                            $('#likeButton_' + commentId).data('filled', false);
+                        }
+
+                        // 댓글 좋아요 버튼 클릭 이벤트 핸들러 추가
+                        $('#likeButton_' + commentId).click(function () {
+                            toggleCommentLike(commentId);
+                        });
+
+                        // 댓글 좋아요 숫자를 서버에서 가져오기
+                        getCommentLikesCountFromServer(commentId);
+                    })();
                 }
             });
         }
-    </script>
 
+             // 댓글 좋아요 클릭 시 호출하는 함수
+            function toggleCommentLike(commentId) {
+                var isCommentLiked = $('#likeButton_' + commentId).data('filled');
+                var isLoggedIn = [[${user.login}]];
 
-    <!--  댓글 좋아요 싫어요  -->
-    <script>
-         // 페이지 로드 시 댓글 좋아요 정보 초기화
-        $(document).ready(function () {
-            initializeCommentLikes();
-        });
-
-        // 댓글 좋아요 초기화
-        function initializeCommentLikes() {
-            var bookId = [[${outline.id}]];
-            var commentList = updateCommentList(bookId);
-            for (var i = 0; i < commentList.length; i++) {
-                var commentId = commentList[i].id;
-                var isCommentLiked = localStorage.getItem('likedComment_' + commentId);
-
-                // 댓글 좋아요 여부에 따라 아이콘 스타일 변경
-                if (isCommentLiked) {
-                    $('#likeButton_' + commentId + ' i').removeClass('far').addClass('fas').css('color', 'blue');
-                    $('#likeButton_' + commentId).data('filled', true);
-                    console.log(isCommentLiked);
-                    console.log('시방');
+                if (!isLoggedIn) {
+                    flowAlert("warning", "로그인 후 이용해주세요.");
                 } else {
-                    $('#likeButton_' + commentId + ' i').removeClass('fas').addClass('far').css('color', '#000000');
-                    $('#likeButton_' + commentId).data('filled', false);
-                    console.log(!isCommentLiked);
-                    console.log('시방새ㅐ야');
-                }
-
-                // 댓글 좋아요 버튼 클릭 이벤트 핸들러 추가
-                $('#likeButton_' + commentId).click(function () {
-                    toggleCommentLike(commentId);
-                });
-
-                // 댓글 좋아요 숫자를 서버에서 가져오기
-                getCommentLikesCountFromServer(commentId);
-            }
-        }
-
-        // 댓글 좋아요 클릭 시 호출하는 함수
-        function toggleCommentLike(commentId) {
-            var isCommentLiked = $('#likeButton_' + commentId).data('filled');
-            var isLoggedIn = [[${user.login}]];
-
-            if (isLoggedIn) {
-                flowAlert("warning", "로그인 후 이용해주세요.");
-            } else {
-                $.ajax({
-                    type: isCommentLiked ? 'DELETE' : 'POST',
-                    url: '/api/comments/' + commentId + '/preferences',
-                    data: { isLiked: !isCommentLiked },
-                    success: function (data) {
-                        if (!isCommentLiked) {
-                            $('#likeButton_' + commentId + ' i').removeClass('far').addClass('fas').css('color', 'blue');
-                            $('#likeButton_' + commentId).data('filled', true);
-                            console.log('댓글에 좋아요를 눌렀습니다.');
-                            console.log(data);
-                            localStorage.setItem('likedComment_' + commentId, true); // 좋아요 상태 로컬 스토리지에 저장
-                        } else {
-                            $('#likeButton_' + commentId + ' i').removeClass('fas').addClass('far').css('color', 'rgb(23 23 23)');
-                            $('#likeButton_' + commentId).data('filled', false);
-                            console.log('댓글에 좋아요를 취소했습니다.');
-                            console.log(data);
-                            localStorage.removeItem('likedComment_' + commentId); // 좋아요 상태 로컬 스토리지에서 제거
+                    $.ajax({
+                        type: isCommentLiked ? 'DELETE' : 'POST',
+                        url: '/api/comments/' + commentId + '/preferences',
+                        data: { isLiked: !isCommentLiked },
+                        success: function (data) {
+                            if (!isCommentLiked) {
+                                $('#likeButton_' + commentId + ' i').removeClass('far').addClass('fas').css('color', 'blue');
+                                $('#likeButton_' + commentId).data('filled', true);
+                                console.log('댓글에 좋아요를 눌렀습니다.');
+                                console.log(data);
+                                localStorage.setItem('likedComment_' + commentId, true); // 좋아요 상태 로컬 스토리지에 저장
+                            } else {
+                                $('#likeButton_' + commentId + ' i').removeClass('fas').addClass('far').css('color', 'rgb(23 23 23)');
+                                $('#likeButton_' + commentId).data('filled', false);
+                                console.log('댓글에 좋아요를 취소했습니다.');
+                                console.log(data);
+                                localStorage.removeItem('likedComment_' + commentId); // 좋아요 상태 로컬 스토리지에서 제거
+                            }
+                            getCommentLikesCountFromServer(commentId);
+                        },
+                        error: function (xhr, status, error) {
+                            console.error('처리 중 에러가 발생');
                         }
-                        getCommentLikesCountFromServer(commentId);
-                    },
-                    error: function (xhr, status, error) {
-                        console.error('처리 중 에러가 발생');
-                    }
-                });
+                    });
+                }
             }
-        }
+
 
         // 댓글 좋아요 숫자를 서버에서 가져오는 함수
         function getCommentLikesCountFromServer(commentId) {
@@ -521,7 +534,6 @@ function cancelEdit() {
                 url: '/api/books/' + bookId + '/interactions',
                 success: function (data) {
 
-            // Assuming data.comments is an array
             for (var i = 0; i < data.comments.length; i++) {
                 var comment = data.comments[i];
                 if(comment.id === commentId) {

@@ -163,16 +163,18 @@ function ImageCropComponent({cropedFilename, defaultSrc, setFileDate} : ImageCro
   // 이미지 크롭 함수
   function getCroppedImg(image: HTMLImageElement, crop: Crop){
     const canvas = document.createElement('canvas');
+    const scaleX = image.naturalWidth / image.width;
+    const scaleY = image.naturalHeight / image.height;
     canvas.width = crop.width;
     canvas.height = crop.height;
     const ctx = canvas.getContext('2d');
 
     ctx?.drawImage(
       image,
-      crop.x,
-      crop.y,
-      crop.width,
-      crop.height,
+      crop.x * scaleX,
+      crop.y * scaleY,
+      crop.width * scaleX,
+      crop.height * scaleY,
       0,
       0,
       crop.width,

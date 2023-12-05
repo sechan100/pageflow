@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import { create } from "zustand";
 import { useNavStore } from "../viewer/ViewerContext";
 import { ChapterSummary } from "../../types/types";
@@ -195,6 +194,7 @@ export default function PageCursor() {
   useEffect(() => {
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location, metaPage, carouselIdx, isLastCarousel]);
 
 

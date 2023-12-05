@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/react/build/book_viewer/static/css/main.b829ba63.css",
+    "main.js": "/react/build/book_viewer/static/js/main.befc82dd.js",
+    "static/js/787.a3d09d52.chunk.js": "/react/build/book_viewer/static/js/787.a3d09d52.chunk.js",
+    "index.html": "/react/build/book_viewer/index.html",
+    "main.b829ba63.css.map": "/react/build/book_viewer/static/css/main.b829ba63.css.map",
+    "main.befc82dd.js.map": "/react/build/book_viewer/static/js/main.befc82dd.js.map",
+    "787.a3d09d52.chunk.js.map": "/react/build/book_viewer/static/js/787.a3d09d52.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.b829ba63.css",
+    "static/js/main.befc82dd.js"
+  ]
+}

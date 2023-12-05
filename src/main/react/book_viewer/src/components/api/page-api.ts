@@ -16,10 +16,6 @@ const fallBackPage : IPage = {
 }
 
 
-type IGetPageAsync = (location: ILocation) => IPage; 
-
-
-
 
 export const useGetPage = (bookId : number, pageMap : Map<string, number>, location: ILocation) : IPage => {
 
@@ -52,7 +48,7 @@ export const useGetPage = (bookId : number, pageMap : Map<string, number>, locat
       return response.data as IPage;
     } else {
       return null;
-    }
+    } 
   }
 
 

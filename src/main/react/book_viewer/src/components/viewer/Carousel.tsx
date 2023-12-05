@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useRef } from 'react';
 import { create } from 'zustand';
 import { useLocationStore } from '../nav/PageCursor';
@@ -147,6 +146,7 @@ const Carousel = ({ children, carouselContentRef, isFallback } : CarouselProps) 
     };
 
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location, metaPage.type, carouselRef.current, isFallback]);
 
 
@@ -181,6 +181,7 @@ const Carousel = ({ children, carouselContentRef, isFallback } : CarouselProps) 
       console.log(logMsg);
     }
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [carouselIdx]);
 
 
@@ -217,6 +218,7 @@ const Carousel = ({ children, carouselContentRef, isFallback } : CarouselProps) 
       debouncedUpdateNewBreakPoints.cancel();
       window.removeEventListener('resize', debouncedUpdateNewBreakPoints);
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [carouselIdx]);
 
 

@@ -57,7 +57,7 @@ public class CommentAccessAspect {
                     
                     Object arg = joinPoint.getArgs()[i];
                     Long commentId = (Long) arg;
-                    Comment comment = commentService.repoFindCommentById(commentId);
+                    Comment comment = commentService.repoFindCommentWithInteractorById(commentId);
                     Long userId = rq.getUserSession().getId();
                     
                     // 작성자도 아니고 관리자도 아니라면 예외

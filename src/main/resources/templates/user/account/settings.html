@@ -1,6 +1,40 @@
 <html lang="en" layout:decorate="~{/common/layout.html}">
 <head>
     <title>회원정보</title>
+
+    <style>
+
+        @media (max-width: 575px) {
+            .file-text{
+               font-size: 0.75rem;
+               line-height: 1.5rem;
+            }
+
+            .ac-div-box{
+               	padding-left: 0.75rem;
+                padding-right: 0.75rem;
+            }
+
+            .read-btn{
+                font-size: 0.75rem;
+                line-height: 1rem;
+            }
+
+            .btn-box{
+                flex-direction: column;
+            }
+
+            #currentPassword,
+            #newPassword,
+            #newPasswordConfirm{
+                font-size: 0.75rem;
+                line-height: 1rem;
+            }
+
+
+        }
+    </style>
+
 </head>
 
 <main layout:fragment="main">
@@ -11,7 +45,7 @@
                 <span class="absolute top-0 left-0 w-full h-full bg-center bg-cover bg-gradient-to-tl from-zinc-800 to-zinc-700 opacity-60"></span>
             </div>
             <div class="relative flex flex-col flex-auto min-w-0 p-4 mx-6 -mt-16 overflow-hidden break-words border-0 shadow-blur rounded-2xl bg-white/50 bg-clip-border backdrop-blur-2xl backdrop-saturate-200">
-                <div class="flex justify-between">
+                <div class="btn-box flex justify-between">
                     <div class="flex w-auto max-w-full px-3">
 
                         <div class="avatar p-2">
@@ -32,7 +66,7 @@
                     </div>
 
                     <div>
-                        <button th:if="${user.provider} == 'pageflow'" class="read-btn flex w-full justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 shadow-sm relative bg-black	text-white p-1 mt-4 w-full border border-red-500" onclick="my_modal_1.showModal()">비밀번호 변경</button>
+                        <button th:if="${user.provider} == 'pageflow'" class="read-btn flex w-full justify-center rounded-md px-3 py-1.5 md:text-sm font-semibold leading-6 shadow-sm relative bg-black text-white p-1 mt-4 w-full  " onclick="my_modal_1.showModal()">비밀번호 변경</button>
                         <dialog id="my_modal_1" class="modal">
                             <div class="modal-box">
                                 <h3 class="font-bold text-lg">비밀번호 변경!</h3>
@@ -45,7 +79,7 @@
                                             <input id="currentPassword" name="currentPassword" type="password"
                                                    autocomplete="password"
                                                    required placeholder="기존 비밀번호를 입력하세요"
-                                                   class="input w-full focus:outline-0 focus:border focus:ring-0 rounded flex-auto text-black border sm:text-sm sm:leading-6">
+                                                   class="focus:ring-0 outline-0 focus:outline-0 disabled:bg-blue-gray-50 disabled:border-0  bg-gray-50 border focus:border-2  relative  border-blue-gray-200 focus:border-gray-900  text-gray-900 sm:text-sm rounded focus:ring-primary-600 focus:border-primary-600 block w-full  p-2.5">
                                         </div>
                                     </div>
                                     <div>
@@ -55,7 +89,7 @@
                                             <input id="newPassword" name="newPassword" type="password"
                                                    autocomplete="password"
                                                    required placeholder="새로운 비밀번호를 입력하세요"
-                                                   class="input w-full focus:outline-0 focus:border focus:ring-0 rounded flex-auto text-black border sm:text-sm sm:leading-6">
+                                                   class="focus:ring-0 outline-0 focus:outline-0 disabled:bg-blue-gray-50 disabled:border-0  bg-gray-50 border focus:border-2  relative  border-blue-gray-200 focus:border-gray-900  text-gray-900 sm:text-sm rounded focus:ring-primary-600 focus:border-primary-600 block w-full  p-2.5">
                                         </div>
                                     </div>
                                     <div>
@@ -64,18 +98,18 @@
                                         <div class="mt-2">
                                             <input id="newPasswordConfirm" name="newPasswordConfirm" type="password"
                                                    required placeholder="새로운 비밀번호를 다시 입력하세요"
-                                                   class="input w-full focus:outline-0 focus:border focus:ring-0 rounded flex-auto text-black border sm:text-sm sm:leading-6">
+                                                   class="focus:ring-0 outline-0 focus:outline-0 disabled:bg-blue-gray-50 disabled:border-0  bg-gray-50 border focus:border-2  relative  border-blue-gray-200 focus:border-gray-900  text-gray-900 sm:text-sm rounded focus:ring-primary-600 focus:border-primary-600 block w-full  p-2.5">
                                         </div>
                                     </div>
                                 </form>
 
                                 <div class="modal-action">
-                                    <button type="submit" form="password-update-form" class="text-gray-900 hover:text-white border border-gray-800 hover:bg-gray-900 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2">
+                                    <button type="submit" form="password-update-form" class="btn btn-outline border-0 text-sm font-semibold text-gray-900">
                                         변경하기
                                     </button>
                                     <form method="dialog">
                                         <!-- if there is a button in form, it will close the modal -->
-                                        <button id="password-modal-close-btn" class="btn">Close</button>
+                                        <button id="password-modal-close-btn" class="btn btn-ghost">Close</button>
                                     </form>
                                 </div>
                             </div>
@@ -97,14 +131,14 @@
                                 <div class=" w-full m-auto max-w-full md:w-6/12 md:flex-none xl:mb-0 xl:w-3/12">
                                     <div class="w-full relative flex flex-col min-w-0">
                                         <div class="w-full min-h-full mx-auto">
-                                            <div class="w-full mt-1 mb-6 sm:mx-auto sm:w-full sm:max-w-sm">
+                                            <div class="ac-div-box w-full mt-1 mb-6 sm:mx-auto sm:w-full sm:max-w-sm">
                                                 <input type="hidden" name="id" th:value="*{profile.id}">
                                                 <div>
                                                     <label class="block text-sm font-medium leading-6 text-gray-900">profile
                                                         Img</label>
                                                     <div class="mt-2 mb-2 flex">
                                                         <p id="originName" class="border p-3 w-9/12 text-black text-xs rounded" >파일명</p>
-                                                        <label class="p-2 text-white bg-gray-300 cursor-pointer ml-2 sm:text-sm sm:leading-6"
+                                                        <label class="file-text p-2 text-white bg-gray-300 cursor-pointer ml-2 md:text-sm md:leading-6"
                                                                for="profileImg">첨부 파일 </label>
                                                         <input onchange="previewImage()" data-ax-path="file"
                                                                autocomplete="profileImg" type="file" id="profileImg"
@@ -119,7 +153,7 @@
                                                         <input id="nickname" name="nickname" type="text"
                                                                autocomplete="nickname"
                                                                required th:value="*{profile.nickname}"
-                                                               class="input w-full focus:outline-0 focus:border focus:ring-0 rounded text-black border sm:text-sm sm:leading-6">
+                                                               class="focus:ring-0 outline-0 focus:outline-0 disabled:bg-blue-gray-50 disabled:border-0  bg-gray-50 border focus:border-2  relative  border-blue-gray-200 focus:border-gray-900  text-gray-900 sm:text-sm rounded focus:ring-primary-600 focus:border-primary-600 block w-full  p-2.5">
                                                     </div>
                                                 </div>
                                                 <div>

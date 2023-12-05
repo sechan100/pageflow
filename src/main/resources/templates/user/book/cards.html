@@ -3,25 +3,25 @@
 <head>
     <title>책 목록</title>
 
-<!--  select 정렬순 스타일  -->
+    <!--  select 정렬순 스타일  -->
     <style>
-select::-ms-expand {
-  display: none;
-}
+        select::-ms-expand {
+          display: none;
+        }
 
-select {
-  -o-appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-}
+        select {
+          -o-appearance: none;
+          -webkit-appearance: none;
+          -moz-appearance: none;
+          appearance: none;
+        }
 
-.select option {
-  margin-top :10px ;
-  color: black;
-  padding: 5px 5px;
-  font : 14px ;
-}
+        .select option {
+          margin-top :10px ;
+          color: black;
+          padding: 5px 5px;
+          font : 14px ;
+        }
 
     </style>
 </head>
@@ -45,38 +45,43 @@ select {
 
         <div class="w-full mx-auto max-w-[75%] sm:px-6 sm:py-24   ">
             <div class="flex justify-between mb-12 w-full  ">
-            <div class="flex grow ">
-                <!--  정렬순  -->
-                    <select id="sortOption" class="select font-semibold text-sm text-gray-700  focus:border-double focus:border-gray-500 focus:ring-0 border-gray-400 sm:text-sm sm:leading-6">
+                <div class="flex grow ">
+                    <!--  정렬순  -->
+                    <select id="sortOption"
+                            class="select font-semibold text-sm text-gray-700  focus:border-double focus:border-gray-500 focus:ring-0 border-gray-400 sm:text-sm sm:leading-6">
                         <option disabled selected>정렬기준 🍊</option>
-                        <option value="createdDate">작성 날짜 </option>
+                        <option value="createdDate">작성 날짜</option>
                         <option value="preferenceCount">추천순</option> <!-- JPA에서 지원하는 함수나 필드를 이용 -->
                         <option value="commentCount">댓글순</option>
                     </select>
-            </div>
-            <!--  검색 시작  -->
-            <div class="w-full flex justify-between max-w-md">
-                    <input id="search_kw" onkeydown="searchInputKeydown()" th:value="${kw}" name="search_kw" type="text" autocomplete="search_kw"
+                </div>
+                <!--  검색 시작  -->
+                <div class="w-full flex justify-between max-w-md">
+                    <input id="search_kw" onkeydown="searchInputKeydown()" th:value="${kw}" name="search_kw" type="text"
+                           autocomplete="search_kw"
                            placeholder="책 제목 또는 작가 이름으로 검색" required
-                           class="input w-2/3 focus:border-double focus:border-gray-500 focus:ring-0 rounded max-w-xs flex-auto text-black border-gray-400 sm:text-sm sm:leading-6 ">
+                           class="mr-3 flex-auto w-2/3 focus:ring-0 outline-0 focus:outline-0 disabled:bg-blue-gray-50 disabled:border-0  bg-gray-50 border focus:border-2   border-blue-gray-200 focus:border-gray-900  text-gray-900 sm:text-sm rounded focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5">
                     <button id="btn_search" type="button"
-                            class="font-semibold rounded border-2 p-3 border-gray-400 text-sm text-gray-700 relative text-center active:top-[3px]   w-1/4 ">
-                    검색
-                </button>
+                            class=" btn btn-outline font-semibold rounded border-2 p-3 border-gray-400 text-sm text-gray-700 relative text-center active:top-[3px]   w-1/4 ">
+                        검색
+                    </button>
+                </div>
+                <!--  검색 끝  -->
             </div>
-            <!--  검색 끝  -->
-        </div>
             <!-- 리스트 J-->
-            <div >
+            <div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-5 gap-x-6 xl:gap-x-8">
                     <div th:each="book : ${paging}" class="w-full">
                         <div class="rounded-md overflow-hidden shadow-lg transition-all duration-150 ease-in-out hover:z-1 hover:transform hover:scale-110 group mb-8">
                             <a th:href="@{|/books/${book.id}/details|}">
                                 <div class="relative w-full h-96">
-                                    <img th:src="@{${book.coverImgUrl}}" alt="Book Image" class="contrast-75 object-cover w-full h-full transition-all duration-1000 ease-in-out group-hover:transform group-hover:scale-110 rounded-lg" style="backface-visibility: hidden;">
+                                    <img th:src="@{${book.coverImgUrl}}" alt="Book Image"
+                                         class="contrast-75 object-cover w-full h-full transition-all duration-1000 ease-in-out group-hover:transform group-hover:scale-110 rounded-lg"
+                                         style="backface-visibility: hidden;">
                                     <div class="absolute bottom-0 left-0 text-white right-0">
                                         <div>
-                                            <h1 th:text="${book.title}" class="font-extrabold text-3xl text-center truncate text-white"></h1>
+                                            <h1 th:text="${book.title}"
+                                                class="font-extrabold text-3xl text-center truncate text-white"></h1>
                                         </div>
                                         <div class="p-4 mb-4 text-black font-semibold">
                                             <h2 class="shadow-2xl truncate" th:text="|${book.author.nickname} 작가|"></h2>
@@ -95,7 +100,7 @@ select {
                 <input type="hidden" id="sort" name="sort" th:value="${sort}">
             </form>
 
-    </div>
+        </div>
 
         <script type='text/javascript'>
             let currentPage = 0;

@@ -60,7 +60,8 @@ public class BookAccessAspect {
                     Long bookId = (Long) arg;
                     Book book = bookService.repoFindBookWithAuthorById(bookId);
                     Long userId = rq.getUserSession().getId();
-                    if (!book.getAuthor().getId().equals(userId)) {
+                    // 작가도 아니고 관리자도 아니라면 예외
+                    if (!book.getAuthor().getId().equals(userId) && !rq.getUserSession().isAdmin()){
                         if(isApiClass){
                             throw new ApiEntityAccessDeniedException();
                         } else {

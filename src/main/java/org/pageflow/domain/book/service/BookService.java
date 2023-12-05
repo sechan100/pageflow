@@ -220,4 +220,11 @@ public class BookService {
     public void repoDeletePage(Page pageToDelete) {
         this.pageRepository.delete(pageToDelete);
     }
+    
+    public List<BookSummary> repoFindBooksByStatuses(Set<BookStatus> reviewRequested) {
+        return bookRepository.findAllByStatusIn(reviewRequested)
+                .stream()
+                .map(BookSummary::new)
+                .toList();
+    }
 }

@@ -55,12 +55,13 @@ public class CommentAccessAspect {
                         }
                     }
                     
-                    
                     Object arg = joinPoint.getArgs()[i];
                     Long commentId = (Long) arg;
                     Comment comment = commentService.repoFindCommentById(commentId);
                     Long userId = rq.getUserSession().getId();
-                    if (!comment.getInteractor().getId().equals(userId)) {
+                    
+                    // 작성자도 아니고 관리자도 아니라면 예외
+                    if (!comment.getInteractor().getId().equals(userId) && !rq.getUserSession().isAdmin()) {
                         if(isApiClass){
                             throw new ApiEntityAccessDeniedException();
                         } else {

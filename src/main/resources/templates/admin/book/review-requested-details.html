@@ -1,0 +1,113 @@
+<html lang="en" layout:decorate="~{/common/layout.html}">
+<head>
+    <title>책 리뷰</title>
+</head>
+
+<body>
+
+<main layout:fragment="main" class="mb-[10vh]">
+
+    <details class="dropdown fixed top-3 left-4">
+        <summary class="m-1 btn btn-neutral">리뷰 옵션</summary>
+        <ul class="p-2 shadow menu dropdown-content z-[1] bg-base-100 rounded-box w-[10vw]">
+            <li>
+                <button class="btn btn-outline btn-accent" onclick="publish_modal.showModal()">출판 수락</button>
+            </li>
+            <li>
+                <button class="btn btn-outline btn-error" onclick="reject_modal.showModal()">출판 거부</button>
+            </li>
+        </ul>
+    </details>
+
+    <dialog id="publish_modal" class="modal">
+        <div class="modal-box">
+            <form method="dialog">
+                <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+            </form>
+            <h3 class="font-bold text-lg">해당 책의 출판요청을 수락합니다.</h3>
+            <div class="bg-gray-200 rounded-lg p-5">
+                <p class="py-4">수락과 동시에 해당 책은 출판되어 모든 사용자에게 공개됩니다.</p>
+                <p>정말로 수락하시겠습니까?</p>
+            </div>
+            <div class="flex justify-end">
+                <button class="btn btn-sm btn-success mt-2" onclick="receiveRequest()">수락</button>
+            </div>
+        </div>
+    </dialog>
+
+    <dialog id="reject_modal" class="modal">
+        <div class="modal-box">
+            <form method="dialog">
+                <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+            </form>
+            <h3 class="font-bold text-lg">해당 책의 출판요청을 기각하고 사유를 전달합니다.</h3>
+            <form onsubmit="return rejectRequest()">
+                <textarea class="textarea textarea-error w-full" rows="5" placeholder="사유를 입력해주세요." style="resize: none;"></textarea>
+                <div class="flex justify-end">
+                    <button type="submit" class="btn btn-sm btn-error mt-2">거부</button>
+                </div>
+            </form>
+        </div>
+    </dialog>
+    <iframe th:src="|/viewer/${book.id}|" class="w-[100vw] h-[100vh]"></iframe>
+
+    <script>
+        const bookId = [[${book.id}]];
+        const currentStatus = "[[${book.status}]]";
+
+        $(() => {
+            // 리뷰 요청중 상태였다면 리뷰중으로 변경
+            if (currentStatus === 'REVIEW_REQUESTED') {
+                changeBookStatus(bookId, 'REVIEWING', '')
+                console.log('리뷰중으로 변경되었습니다.')
+            } else if(currentStatus === 'REVIEW_CANCELED') {
+                flowAlert("error", '작가가 검수요청을 취소하여, 해당 책의 상태를 변경할 수 없습니다.');
+            }
+        });
+
+        const receiveRequest = () => {
+            changeBookStatus(bookId, 'PUBLISHED', '')
+            .then(book => {
+                if (book.status === 'PUBLISHED') {
+                    localStorage.setItem("alertStorageKey", `success:${book.title} 책의 <br> 출판요청을 성공적으로 수락했습니다.`);
+                    window.location.href = '/admin/review-books';
+                } else {
+                    throw new Error('책 출판요청 수락에 실패했습니다.');
+                }
+            })
+            .catch(error => {
+                flowAlert("error", '오류가 발생했습니다.');
+            })
+            return false;
+        }
+
+
+        const rejectRequest = () => {
+            const rejectReason = document.querySelector('textarea').value;
+            changeBookStatus(bookId, 'REJECTED', rejectReason)
+            .then(book => {
+                if (book.status === 'REJECTED') {
+                    localStorage.setItem("alertStorageKey", `success:${book.title} 책의 <br> 출판요청을 거부했습니다.`);
+                    window.location.href = '/admin/review-books';
+                } else {
+                    throw new Error('책 출판요청 거부에 실패했습니다.');
+                }
+            })
+            .catch(error => {
+                flowAlert("error", '오류가 발생했습니다.');
+            })
+            return false;
+        }
+
+
+
+        async function changeBookStatus(bookId, status, rejectReason){
+            const response = await fetch(`/api/admin/books/${bookId}/status?status=${status}&rejectReason=${rejectReason}`, {
+                method: 'PUT',
+            })
+            return response.json();
+        }
+    </script>
+</main>
+</body>
+</html>

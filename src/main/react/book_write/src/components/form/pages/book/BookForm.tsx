@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 
-import { useContext, useEffect, useReducer, useState } from "react";
+import { useContext, useEffect, useReducer, useRef, useState } from "react";
 import { QueryContext } from "../../../../App";
 import { useGetOutlineQuery } from "../../../../api/outline-api";
 import { BookMutation, Outline } from "../../../../types/types";
@@ -72,6 +72,7 @@ export default function BookForm(){
   const bookStore = useBookMutationStore();
   const [localBook, localBookDispatch] : [BookMutation, any] = useReducer(localBookReducer, bookStore.payload); // zustand store에 변경사항을 업데이트하기 전에 임시로 저장하는 로컬 상태
   const [editMode, setEditMode] = useState<string>("base"); // base, content
+  const requestBookReviewBtnRef = useRef<HTMLButtonElement>(null); // 출판 신청 버튼의 ref
 
 
   // outline 데이터의 변경시, 이미 선언된 state인 bookMutation의 상태를 업데이트하기 위함
@@ -139,7 +140,7 @@ export default function BookForm(){
             <p>미리보기를 모두 확인하셨다면, 아래 버튼을 클릭하여 출판 신청을 해주세요.</p>
             <p>출판 신청이 완료되면, 관리자의 출판검수가 시작됩니다.</p>
             <p>검수가 끝나면 이메일을 보내 알려드리겠습니다.</p>
-            <button className="btn btn" onClick={() => {requestBookReview()}}>출판하기</button>
+            <button className="btn btn-neutral" onClick={() => {requestBookReview()}} ref={requestBookReviewBtnRef}>출판하기</button>
           </div>
         </>
         }
@@ -167,7 +168,13 @@ export default function BookForm(){
 
   // 출판 신청
   function requestBookReview(){
-    axios.post(`/api/books/${bookId}/status?status=REVIEW_REQUESTED`)
+    if(requestBookReviewBtnRef.current){
+      requestBookReviewBtnRef.current.classList.add("loading");
+      requestBookReviewBtnRef.current.classList.add("loading-spinner");
+    }
+
+
+    axios.put(`/api/books/${bookId}/status?status=REVIEW_REQUESTED`)
     .then(res => {
       if(res.data.status === "REVIEW_REQUESTED"){
         window.location.href = `/account/books`;

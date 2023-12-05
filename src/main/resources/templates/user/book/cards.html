@@ -76,7 +76,7 @@ select {
                                     <img th:src="@{${book.coverImgUrl}}" alt="Book Image" class="contrast-75 object-cover w-full h-full transition-all duration-1000 ease-in-out group-hover:transform group-hover:scale-110 rounded-lg" style="backface-visibility: hidden;">
                                     <div class="absolute bottom-0 left-0 text-white right-0">
                                         <div>
-                                            <h1 th:text="${book.title}" class="font-extrabold text-3xl text-center truncate text-white"></h1>
+                                            <h1 th:text="${book.title}" class="font-extrabold text-xl text-center truncate text-white"></h1>
                                         </div>
                                         <div class="p-4 mb-4 text-black font-semibold">
                                             <h2 class="shadow-2xl truncate" th:text="|${book.author.nickname} 작가|"></h2>
@@ -177,7 +177,7 @@ select {
                  titleDiv.classList.add('mb-4');
 
                  const titleH1 = document.createElement('h1');
-                 titleH1.classList.add('font-extrabold', 'text-3xl', 'text-center', 'truncate');
+                 titleH1.classList.add('font-extrabold', 'text-xl', 'text-center', 'truncate');
                  titleH1.textContent = book.title;
                  const authorDiv = document.createElement('div');
                  authorDiv.classList.add('text-black', 'font-semibold', 'p-4', 'mb-4', 'truncate');

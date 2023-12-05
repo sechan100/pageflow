@@ -1,8 +1,9 @@
 package org.pageflow.domain.book.repository;
 
-import org.pageflow.domain.book.entity.Book;
+import org.pageflow.domain.book.constants.BookStatus;
 import org.pageflow.domain.book.dto.BookWithCommentCount;
 import org.pageflow.domain.book.dto.BookWithPreferenceCount;
+import org.pageflow.domain.book.entity.Book;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.domain.Specification;
@@ -12,6 +13,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 
 public interface BookRepository extends JpaRepository<Book, Long> {
@@ -43,4 +45,6 @@ public interface BookRepository extends JpaRepository<Book, Long> {
             "GROUP BY b.id " +
             "ORDER BY COUNT(p) DESC")
     Slice<BookWithCommentCount> findAllBooksOrderByCommentCount(Specification<Book> spec, Pageable pageable);
+    
+    List<Book> findAllByStatusIn(Set<BookStatus> reviewRequested);
 }

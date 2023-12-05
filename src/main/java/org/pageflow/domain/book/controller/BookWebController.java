@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
+import java.util.Set;
 
 @Controller
 @RequiredArgsConstructor
@@ -89,6 +90,36 @@ public class BookWebController {
         }
         
         return "forward:/react/build/book_write/index.html";
+    }
+    
+    
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // ADMIN METHODS
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
+    
+    /**
+     * 검수 요청된 책 리스트 페이지
+     */
+    @GetMapping("/admin/review-books")
+    public String reviewList(Model model) {
+        List<BookSummary> books = bookService.repoFindBooksByStatuses(Set.of(BookStatus.REVIEW_REQUESTED, BookStatus.REVIEWING));
+        model.addAttribute("books", books);
+        return "/admin/book/review-requested-list";
+    }
+    
+    
+    /**
+     * 검수 요청된 책 상세 리뷰 페이지
+     */
+    @GetMapping("/admin/review-books/{bookId}")
+    public String reviewDetails(
+            @SecuredBookId(adminOnly = true) @PathVariable Long bookId,
+            Model model
+    ) {
+        Book book = bookService.repoFindBookById(bookId);
+        model.addAttribute("book", book);
+        return "/admin/book/review-requested-details";
     }
 
 }

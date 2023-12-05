@@ -190,7 +190,7 @@ public class ApiBookWriteController {
      * @param bookId 책 아이디
      * @param status 변경할 상태
      */
-    @PostMapping("/api/admin/books/{bookId}/status")
+    @PutMapping("/api/admin/books/{bookId}/status")
     public Book updateBookStatusByAdmin(
             @SecuredBookId(adminOnly = true) @PathVariable("bookId") Long bookId,
             @RequestParam("status") BookStatus status,
@@ -211,7 +211,7 @@ public class ApiBookWriteController {
      * @param bookId 책 아이디
      * @param status 변경할 상태
      */
-    @PostMapping("/api/books/{bookId}/status")
+    @PutMapping("/api/books/{bookId}/status")
     public Book updateBookStatusByAuthor(
             @SecuredBookId @PathVariable("bookId") Long bookId,
             @RequestParam("status") BookStatus status

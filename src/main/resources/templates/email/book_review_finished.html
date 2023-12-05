@@ -24,7 +24,7 @@
 
     <div th:case="'PUBLISHED'" style="font-size: large;">
       지금부터 바로 작가님의 책을 모든 사용자가 볼 수 있습니다. <br>
-        <a th:href="${baseUrl}" style="color: #00E0D8; font-size: large;">책 보러가기</a>
+        <a th:href="|${baseUrl}/books/${book.id}/details|" style="color: #00E0D8; font-size: large;">책 보러가기</a>
       <p>감사합니다.</p>
     </div>
 

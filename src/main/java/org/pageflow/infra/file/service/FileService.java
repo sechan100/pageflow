@@ -86,7 +86,7 @@ public class FileService {
         
         // if filePath doesn't have /{y}/{m}/{d}/{UUID}.{ext} format, return throw Exception
         if (!filePath.matches("^/\\d{4}/\\d{1,2}/\\d{1,2}/[\\w\\-]+\\.\\w+$")) {
-            throw new IllegalArgumentException("올바르지 않은 파일 경로입니다." + filePath);
+            return false;
         }
         
         

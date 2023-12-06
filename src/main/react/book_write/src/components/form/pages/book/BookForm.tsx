@@ -80,6 +80,10 @@ export default function BookForm(){
     if(outline){
       localBookDispatch({type: 'TITLE', payload: outline.title});
     }
+    
+    if(outline.coverImgUrl){
+      localBookDispatch({type: 'COVER_IMG', payload: null});
+    }
   }, [outline]);
 
   
@@ -95,7 +99,6 @@ export default function BookForm(){
     // local의 coverImg 데이터가 null이 아니라면 => coverImg 변경사항이 존재
     if(localBook.coverImg){
       bookStore.dispatchs.setCoverImg(localBook.coverImg);
-      localBook.coverImg = null;
     }
   }, [localBook]);
 

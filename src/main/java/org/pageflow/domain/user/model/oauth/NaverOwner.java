@@ -1,5 +1,6 @@
 package org.pageflow.domain.user.model.oauth;
 
+import org.pageflow.domain.user.constants.ProviderType;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
@@ -24,5 +25,10 @@ public class NaverOwner extends DefaultResourceOwner {
     @Override
     public String getNickname() {
         return (String) getAttributes().get("nickname");
+    }
+    
+    @Override
+    public ProviderType getProviderType() {
+        return ProviderType.NAVER;
     }
 }

@@ -8,15 +8,11 @@ import jakarta.servlet.http.HttpSession;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.pageflow.base.exception.nosuchentity.NoSuchEntityException;
-import org.pageflow.domain.user.entity.Account;
-import org.pageflow.domain.user.entity.Profile;
 import org.pageflow.domain.user.model.dto.PrincipalContext;
-import org.pageflow.domain.user.model.dto.UserSession;
+import org.pageflow.domain.user.model.dto.UserDto;
 import org.pageflow.domain.user.repository.ProfileRepository;
-import org.pageflow.domain.user.service.AccountService;
+import org.pageflow.domain.user.service.UserService;
 import org.springframework.context.ApplicationContext;
-import org.springframework.lang.Nullable;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -28,8 +24,6 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.io.IOException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
 
@@ -39,64 +33,61 @@ import java.util.Objects;
 @Slf4j
 public class Rq {
 
+    // 현재 request에 대한 세션 사용자
+    @Setter
+    private UserDto userDto;
+    
     private final HttpServletRequest request;
     private final HttpServletResponse response;
     private final HttpSession session;
-    @Setter
-    private UserSession userSession;
     private final ApplicationContext context;
-    private final AccountService accountService;
+    private final UserService userService;
     private final ProfileRepository profileRepository;
 
 
-    public Rq(ApplicationContext context, AccountService accountService, ProfileRepository profileRepository) {
+    public Rq(ApplicationContext context, UserService userService, ProfileRepository profileRepository) {
 
+        // [[빈 주입
         ServletRequestAttributes sessionAttributes = ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes()));
         this.request = sessionAttributes.getRequest();
         this.response = sessionAttributes.getResponse();
         this.session = request.getSession();
         this.context = context;
-        this.accountService = accountService;
+        this.userService = userService;
         this.profileRepository = profileRepository;
-
+        // 빈 주입]]
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication instanceof UsernamePasswordAuthenticationToken) {
-
-            UserSession userSession = ((PrincipalContext) authentication.getPrincipal()).getUserSession();
-            userSession.setLogin(true);
-            this.userSession = userSession;
+            
+            this.userDto = ((PrincipalContext) authentication.getPrincipal()).getUserDto();
 
         } else if (authentication instanceof OAuth2AuthenticationToken) {
 
-            UserSession userSession = ((PrincipalContext) authentication.getPrincipal()).getUserSession();
-            String nickname = userSession.getNickname();
+            UserDto userDto = ((PrincipalContext) authentication.getPrincipal()).getUserDto();
+            String nickname = userDto.getPenname();
 
             // OAuth를 이용해서 신규로 가입하는 사용자인 경우
             if (nickname == null) {
-                this.userSession = UserSession.anonymousUserSession();
+                this.userDto = UserDto.anonymous();
 
                 // OAuth를 통한 로그인인 경우
             } else {
-                userSession.setLogin(true);
-                this.userSession = userSession;
+                this.userDto = userDto;
             }
 
         } else if (authentication instanceof AnonymousAuthenticationToken) {
 
-            this.userSession = UserSession.anonymousUserSession();
+            this.userDto = UserDto.anonymous();
 
         } else {
 
-            this.userSession = null;
+            this.userDto = null;
 
         }
     }
     
-    public void setRequestAttr(String attrName, Object attrValue) {
-        request.setAttribute(attrName, attrValue);
-    }
 
     public <R> R getRequestAttr(String attrName) {
         return (R) request.getAttribute(attrName);
@@ -114,63 +105,7 @@ public class Rq {
         }
         return null;
     }
-
-    /**
-     * alert 메시지를 띄우고 redirectUri로 이동
-     *
-     * @param msg : alert에 띄울 메시지
-     * @return alertStorage.js로 이동
-     */
-    public String alert(AlertType alertType, String msg, String redirectUri) {
-        request.setAttribute("msg", msg);
-        request.setAttribute("alertType", alertType.toString().toLowerCase());
-        if (redirectUri != null) {
-            request.setAttribute("redirectUri", redirectUri);
-        }
-        if (alertType == AlertType.ERROR || alertType == AlertType.WARNING) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-        }
-
-        return "/common/alertStorage";
-    }
-
-    /**
-     * alert 메시지를 띄우고 history.back()
-     *
-     * @param msg : alert에 띄울 메시지
-     * @return alertStorage.js로 이동
-     */
-    public String alert(AlertType alertType, String msg) {
-        return alert(alertType, msg, null);
-    }
-
-    /**
-     * @param alertType   : alertType
-     * @param msg         : alert에 띄울 메시지
-     * @param redirectUri nullable: redirectUri가 null이면 history.back()
-     */
-    public String getAlertStorageRedirectUri(AlertType alertType, String msg, @Nullable String redirectUri) {
-        msg = URLEncoder.encode(msg, StandardCharsets.UTF_8);
-        if (redirectUri != null) {
-            return "/common/alertStorage?msg=" + msg + "&alertType=" + alertType.toString().toLowerCase() + "&redirectUri=" + redirectUri;
-        } else {
-            return "/common/alertStorage?msg=" + msg + "&alertType=" + alertType.toString().toLowerCase();
-        }
-    }
-
-    /**
-     * 일반적인 페이지 렌더링 후 응답하는 컨트롤러에서, alert 메세지를 띄울 수 있음.
-     *
-     * @param alertType : alertType
-     * @param msg       : alert에 띄울 메시지
-     */
-    public void setAlert(AlertType alertType, String msg) {
-        request.setAttribute("oncePerRequestAlert", alertType + ":" + msg);
-        if (alertType == AlertType.ERROR || alertType == AlertType.WARNING) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-        }
-    }
-
+    
     public void redirect(String redirectUrl) {
         try {
             response.sendRedirect(redirectUrl);
@@ -179,14 +114,5 @@ public class Rq {
         }
     }
 
-    public Account getAccount() {
-        return accountService.repoFindFetchJoinProfileByUsername(userSession.getUsername());
-    }
-    
-    public Profile getProfile() {
-        return profileRepository.findById(userSession.getId()).orElseThrow(
-                () -> new NoSuchEntityException(Profile.class)
-        );
-    }
     
 }

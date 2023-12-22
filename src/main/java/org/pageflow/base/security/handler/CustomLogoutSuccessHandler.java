@@ -4,7 +4,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.pageflow.base.request.AlertType;
 import org.pageflow.base.request.Rq;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.DefaultRedirectStrategy;
@@ -18,7 +17,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class CustomLogoutSuccessHandler implements LogoutSuccessHandler {
 
-    private RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
+    private final RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
     private final Rq rq;
 
     @Override
@@ -26,7 +25,7 @@ public class CustomLogoutSuccessHandler implements LogoutSuccessHandler {
         redirectStrategy.sendRedirect(
                 request,
                 response,
-                rq.getAlertStorageRedirectUri(AlertType.NEUTRAL, "로그아웃 되었습니다.", "/login")
+                "/"
         );
     }
 }

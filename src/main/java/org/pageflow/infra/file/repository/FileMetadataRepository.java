@@ -5,7 +5,6 @@ import org.pageflow.infra.file.entity.FileMetadata;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface FileMetadataRepository extends JpaRepository<FileMetadata, Long> {
 
@@ -16,5 +15,5 @@ public interface FileMetadataRepository extends JpaRepository<FileMetadata, Long
      * @param managedFilename {UUID}.{확장자}
      * @return Optional<FileMetadata>
      */
-    Optional<FileMetadata> findByPathPrefixAndManagedFilename(String pathPrefix, String managedFilename);
+    FileMetadata findByPathPrefixAndManagedFilename(String pathPrefix, String managedFilename);
 }

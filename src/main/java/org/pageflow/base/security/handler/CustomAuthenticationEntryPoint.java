@@ -4,7 +4,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.pageflow.base.constants.CustomProperties;
-import org.pageflow.base.request.AlertType;
 import org.pageflow.base.request.Rq;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.core.AuthenticationException;
@@ -26,7 +25,11 @@ public class CustomAuthenticationEntryPoint extends LoginUrlAuthenticationEntryP
     private final Rq rq;
 
     @Override
-    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
+    public void commence(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            AuthenticationException authException
+    ) throws IOException, ServletException {
         String redirectUri = request.getRequestURI();
         String queryString;
 
@@ -34,7 +37,7 @@ public class CustomAuthenticationEntryPoint extends LoginUrlAuthenticationEntryP
         if (authException instanceof InsufficientAuthenticationException insufficientAuthenticationException) {
 
             new LoginUrlAuthenticationEntryPoint(
-                    rq.getAlertStorageRedirectUri(AlertType.WARNING, "로그인 후 이용해주세요.", customProperties.getSite().getLoginFormUri())
+                    customProperties.getSite().getLoginFormUri()
             ).commence(request, response, insufficientAuthenticationException);
 
         }

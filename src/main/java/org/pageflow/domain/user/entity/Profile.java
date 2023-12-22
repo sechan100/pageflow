@@ -1,33 +1,56 @@
 package org.pageflow.domain.user.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
 import lombok.*;
-import org.pageflow.base.entity.BaseEntity;
+import org.hibernate.annotations.DynamicUpdate;
+import org.pageflow.base.entity.NoIdBaseEntity;
 
 
 @Entity
 @Getter
-@Setter
+@Setter(AccessLevel.NONE)
 @Builder
+@EqualsAndHashCode(of = "id", callSuper = false)
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Profile extends BaseEntity {
-
-    private String nickname;
-
-    @Column(columnDefinition = "TEXT")
+@DynamicUpdate
+public class Profile extends NoIdBaseEntity {
+    
+    // @MapsId: Profile의 PK를 Account의 PK와 매핑한다.
+    @Id
+    private Long id;
+    
+    // 필명
+    @Column(unique = true, nullable = false)
+    private String penname;
+    
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String profileImgUrl;
-
-    @OneToOne(
-            optional = false,
-            fetch = FetchType.LAZY,
-            mappedBy = "profile"
-    )
+    
     @JsonIgnore
+    @MapsId
+    @JoinColumn(name = "id")
+    @OneToOne(optional = false, fetch = FetchType.LAZY)
     private Account account;
-
+    
+    
+    
+    
+    public void changePenname(String penname) {
+        this.penname = penname;
+    }
+    
+    public void changeProfileImgUrl(String profileImgUrl) {
+        this.profileImgUrl = profileImgUrl;
+    }
+    
+    public void associateAccount(Account account) {
+        this.account = account;
+        // Account가 참조하는 profile이 null이거나, 자기 자신이 아니라면 참조를 갱신
+        if(account.getProfile() == null || !account.getProfile().equals(this)) {
+            account.associateProfile(this);
+        }
+    }
+    
 }

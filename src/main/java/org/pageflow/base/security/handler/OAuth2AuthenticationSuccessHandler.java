@@ -4,6 +4,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.pageflow.base.request.Rq;
+import org.pageflow.domain.user.constants.RoleType;
 import org.pageflow.domain.user.model.dto.PrincipalContext;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -21,8 +22,8 @@ public class OAuth2AuthenticationSuccessHandler extends FormLoginAuthenticationS
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
 
         if (authentication != null) {
-            String userRole = ((PrincipalContext) authentication.getPrincipal()).getUserSession().getRole();
-            if (!userRole.equals("ROLE_ANONYMOUS")) {
+            RoleType userRole = ((PrincipalContext) authentication.getPrincipal()).getUserDto().getRole();
+            if (!userRole.equals(RoleType.ROLE_ANONYMOUS)) {
                 super.onAuthenticationSuccess(request, response, authentication);
             }
         }

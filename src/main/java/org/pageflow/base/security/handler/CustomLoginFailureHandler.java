@@ -5,7 +5,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.pageflow.base.constants.CustomProperties;
-import org.pageflow.base.request.AlertType;
 import org.pageflow.base.request.Rq;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
@@ -24,20 +23,23 @@ public class CustomLoginFailureHandler implements AuthenticationFailureHandler {
 
 
     @Override
-    public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
+    public void onAuthenticationFailure(HttpServletRequest request,
+                                        HttpServletResponse response,
+                                        AuthenticationException exception
+    ) throws IOException, ServletException {
 
         // UsernameNotFoundException
         if (exception instanceof UsernameNotFoundException) {
 
             response.sendRedirect(
-                    rq.getAlertStorageRedirectUri(AlertType.ERROR, "존재하지 않는 아이디입니다.", null)
+                    customProperties.getSite().getLoginFormUri()
             );
 
             // BadCredentialsException
         } else if (exception instanceof BadCredentialsException) {
 
             response.sendRedirect(
-                    rq.getAlertStorageRedirectUri(AlertType.ERROR, "비밀번호가 일치하지 않습니다.", null)
+                    customProperties.getSite().getLoginFormUri()
             );
 
         }

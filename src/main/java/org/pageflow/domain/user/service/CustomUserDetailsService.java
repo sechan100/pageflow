@@ -4,9 +4,9 @@ package org.pageflow.domain.user.service;
 import lombok.RequiredArgsConstructor;
 import org.pageflow.domain.user.entity.Account;
 import org.pageflow.domain.user.model.dto.PrincipalContext;
+import org.pageflow.domain.user.model.dto.UserDto;
 import org.pageflow.domain.user.repository.AccountRepository;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 /**
@@ -20,14 +20,9 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public PrincipalContext loadUserByUsername(String username) {
-
+        
         Account account = accountRepository.findFetchJoinProfileByUsername(username);
 
-        // username not found check
-        if (account == null) {
-            throw new UsernameNotFoundException("Account Entity found by username '" + username + "' does not exist.");
-        }
-
-        return new PrincipalContext(account);
+        return new PrincipalContext(UserDto.from(account));
     }
 }

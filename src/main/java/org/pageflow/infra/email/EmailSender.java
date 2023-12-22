@@ -15,8 +15,7 @@ import org.springframework.stereotype.Service;
 public class EmailSender {
 
     private final JavaMailSender javaMailSender;
-
-
+    
     public void sendMail(EmailRequest request, String content) {
 
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();

@@ -3,17 +3,15 @@ package org.pageflow.domain.user.service;
 
 import lombok.RequiredArgsConstructor;
 import org.pageflow.base.request.Rq;
-import org.pageflow.domain.user.constants.Role;
-import org.pageflow.domain.user.entity.Account;
-import org.pageflow.domain.user.entity.AwaitingEmailVerificationRequest;
-import org.pageflow.domain.user.model.dto.BasicSignupAccountDto;
-import org.pageflow.domain.user.model.dto.OAuth2AdditionalProfileData;
+import org.pageflow.domain.user.entity.SignupCache;
 import org.pageflow.domain.user.model.dto.PrincipalContext;
+import org.pageflow.domain.user.model.dto.UserDto;
 import org.pageflow.domain.user.model.oauth.GithubOwner;
 import org.pageflow.domain.user.model.oauth.GoogleOwner;
 import org.pageflow.domain.user.model.oauth.NaverOwner;
 import org.pageflow.domain.user.model.oauth.ResourceOwner;
-import org.pageflow.infra.util.Ut;
+import org.pageflow.domain.user.repository.AccountRepository;
+import org.pageflow.domain.user.repository.SignupCacheRepository;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -29,8 +27,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 
-    private final AccountService accountService;
-    private final AwaitingVerificationEmailService emailCacheService;
+    private final UserService userService;
+    private final AccountRepository accountRepository;
+    private final SignupCacheRepository signupCacheRepository;
     private final Rq rq;
 
     @Override
@@ -44,31 +43,29 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         // social login provider 별로 인증객체를 분리하여 처리
         ResourceOwner resourceOwner = convertToResourceOwnerImpl(oAuth2User, clientRegistration);
 
-        // 기존 회원정보 존재 -> 회원정보를 업데이트 후, 로그인 진행
-        if (accountService.repoExistsByUsername(resourceOwner.getUsername())) {
-            accountService.updateAccount(resourceOwner);
-            Account refrashedAccount = accountService.repoFindFetchJoinProfileByUsername(resourceOwner.getUsername());
-            return new PrincipalContext(refrashedAccount);
+        // 기존 회원정보 존재 -> 기존 정보로 로그인
+        if (accountRepository.existsByUsername(resourceOwner.getUsername())) {
+            return new PrincipalContext(accountRepository.findFetchJoinProfileByUsername(resourceOwner.getUsername()));
 
-            // 회원정보 없음(신규) -> 기본 Account 정보가 포함된 AccountDetilasRegisterForm을 redis에 저장하고 리다이렉트
+        // 회원정보 없음(신규) -> OAuth2 데이터를 username으로 캐싱하고, signup 페이지로 리디렉션
         } else {
-            String authenticationCode = Ut.generator.generateRandomString();
-            emailCacheService.save(
-                    AwaitingEmailVerificationRequest.builder()
+            
+            // username으로 회원가입 임시 데이터를 캐싱
+            signupCacheRepository.save(
+                    SignupCache.builder()
+                            .username(resourceOwner.getUsername())
+                            .provider(resourceOwner.getProviderType())
+                            .penname(resourceOwner.getNickname())
                             .email(resourceOwner.getEmail())
-                            .accountDto(new BasicSignupAccountDto(resourceOwner))
-                            .oAuth2AdditionalProfileData(
-                                    OAuth2AdditionalProfileData.builder()
-                                            .profileImgUrl(resourceOwner.getProfileImgUrl())
-                                            .nickname(resourceOwner.getNickname())
-                                            .build()
-                            )
-                            .authenticationCode(authenticationCode)
-                            .isVerified(true)
+                            .profileImgUrl(resourceOwner.getProfileImgUrl())
                             .build()
             );
-            rq.redirect("/signup?code=" + authenticationCode + "&email=" + resourceOwner.getEmail());
-            return new PrincipalContext(Account.builder().username("anonymous").password("anonymous").role(Role.ANONYMOUS).build());
+            
+            // OAuth2 전용 회원가입 페이지로 리디렉션
+            rq.redirect("signup?username=" + resourceOwner.getUsername());
+            
+            // security 스펙상, 제대로 반환을 안하면 AuthenticationException이 발생하므로, 빈 객체를 반환
+            return new PrincipalContext(UserDto.anonymous());
         }
     }
 

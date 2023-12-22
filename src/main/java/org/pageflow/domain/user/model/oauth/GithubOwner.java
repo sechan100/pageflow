@@ -1,5 +1,6 @@
 package org.pageflow.domain.user.model.oauth;
 
+import org.pageflow.domain.user.constants.ProviderType;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
@@ -25,4 +26,8 @@ public class GithubOwner extends DefaultResourceOwner {
         return (String) getAttributes().get("login");
     }
 
+    @Override
+    public ProviderType getProviderType() {
+        return ProviderType.GITHUB;
+    }
 }

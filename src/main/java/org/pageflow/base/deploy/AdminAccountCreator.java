@@ -4,9 +4,10 @@ package org.pageflow.base.deploy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pageflow.base.constants.CustomProperties;
-import org.pageflow.domain.user.constants.ProviderType;
-import org.pageflow.domain.user.model.dto.AdditionalSignupAccountDto;
-import org.pageflow.domain.user.service.AccountService;
+import org.pageflow.domain.user.constants.RoleType;
+import org.pageflow.domain.user.model.dto.SignupForm;
+import org.pageflow.domain.user.repository.AccountRepository;
+import org.pageflow.domain.user.service.AdminUserService;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,7 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class AdminAccountCreator {
     
-    private final AccountService accountService;
+    private final AdminUserService adminUserService;
+    private final AccountRepository accountRepository;
     private final CustomProperties customProperties;
 
     
@@ -26,33 +28,29 @@ public class AdminAccountCreator {
         return args -> {
             createAdminAccount();
         };
-    };
+    }
     
     @Transactional
     private void createAdminAccount() {
-        boolean isAdminAccountExist = accountService.repoExistsByUsername("admin");
         // 이미 관리자 계정이 존재하면 생성하지 않음
-        if(isAdminAccountExist) {
-            log.info("====== 관리자 계정이 이미 존재해서 생성하지 않았습니다. ======");
+        if(accountRepository.existsByRole(RoleType.ROLE_ADMIN)) {
             return;
         }
         
         log.info("====== 관리자 계정을 생성합니다. ======");
         
-        CustomProperties.Admin adminProperties = customProperties.getAdmin();
+        CustomProperties.Admin adminProps = customProperties.getAdmin();
         
-        //관리자 계정 생성
-        AdditionalSignupAccountDto adminAccountDto = AdditionalSignupAccountDto.builder()
-                .username("admin")
-                .password(adminProperties.getPassword())
-                .email(adminProperties.getEmail())
-                .nickname(adminProperties.getNickname())
-                .provider(ProviderType.NATIVE)
-                .profileImgUrl("/img/pageflow-banner2.PNG")
+        SignupForm adminForm = SignupForm.builder()
+                .username(adminProps.getUsername())
+                .password(adminProps.getPassword())
+                .passwordConfirm(adminProps.getPassword())
+                .email(adminProps.getEmail())
+                .penname("관리자")
                 .build();
+        adminUserService.adminSignup(adminForm);
         
-        accountService.register(adminAccountDto);
-        log.info("====== 관리자 계정 생성완료! ======");
+        log.info("====== 관리자 계정을 생성했습니다. ======");
     }
     
     

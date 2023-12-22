@@ -1,14 +1,10 @@
 package org.pageflow.domain.user.model.oauth;
 
 
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
-import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 public abstract class DefaultResourceOwner implements ResourceOwner {
 
@@ -23,11 +19,6 @@ public abstract class DefaultResourceOwner implements ResourceOwner {
     }
 
     @Override
-    public String getPassword() {
-        return UUID.randomUUID().toString();
-    }
-
-    @Override
     public String getEmail() {
         return (String) getAttributes().get("email");
     }
@@ -37,18 +28,12 @@ public abstract class DefaultResourceOwner implements ResourceOwner {
         return clientRegistration.getRegistrationId();
     }
 
+    // GOOGLE-14223456829527890 형식
     @Override
     public String getUsername() {
-        return getId();
+        return getProviderType() + "-" + getId();
     }
-
-    @Override
-    public List<? extends GrantedAuthority> getAuthorities() {
-        return oAuth2User.getAuthorities().stream()
-                .map(authority -> new SimpleGrantedAuthority(authority.getAuthority()))
-                .toList();
-    }
-
+    
     @Override
     public Map<String, Object> getAttributes() {
         return attributes;

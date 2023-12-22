@@ -70,7 +70,6 @@ public class BookService {
                         ),
                         cb.equal(b.get("status"), BookStatus.PUBLISHED)
                 );
-
             }
         };
     }

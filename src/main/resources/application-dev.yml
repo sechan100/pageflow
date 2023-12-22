@@ -70,6 +70,12 @@ custom:
     username: admin
     password: admin
     email: pagefloworg@gmail.com
+  jwt:
+    secret: SeEgdfkIJN13nKJDbbai1399dnbfgjdkja
+    access:
+      expirationPeriodMinutes: 30
+    refresh:
+      expirationPeriodDay: 14
   files:
     img:
       base-url: /files/img

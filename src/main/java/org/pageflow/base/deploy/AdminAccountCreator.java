@@ -3,7 +3,7 @@ package org.pageflow.base.deploy;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.pageflow.base.constants.CustomProperties;
+import org.pageflow.base.constants.CustomProps;
 import org.pageflow.domain.user.constants.RoleType;
 import org.pageflow.domain.user.model.dto.SignupForm;
 import org.pageflow.domain.user.repository.AccountRepository;
@@ -20,7 +20,7 @@ public class AdminAccountCreator {
     
     private final AdminUserService adminUserService;
     private final AccountRepository accountRepository;
-    private final CustomProperties customProperties;
+    private final CustomProps customProps;
 
     
     @Bean
@@ -39,7 +39,7 @@ public class AdminAccountCreator {
         
         log.info("====== 관리자 계정을 생성합니다. ======");
         
-        CustomProperties.Admin adminProps = customProperties.getAdmin();
+        CustomProps.Admin adminProps = customProps.getAdmin();
         
         SignupForm adminForm = SignupForm.builder()
                 .username(adminProps.getUsername())

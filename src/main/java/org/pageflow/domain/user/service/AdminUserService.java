@@ -1,7 +1,7 @@
 package org.pageflow.domain.user.service;
 
 import lombok.RequiredArgsConstructor;
-import org.pageflow.base.constants.CustomProperties;
+import org.pageflow.base.constants.CustomProps;
 import org.pageflow.domain.user.constants.ProviderType;
 import org.pageflow.domain.user.constants.RoleType;
 import org.pageflow.domain.user.entity.Account;
@@ -24,7 +24,7 @@ import java.util.Objects;
 public class AdminUserService {
     
     private final AccountRepository accountRepository;
-    private final CustomProperties customProperties;
+    private final CustomProps customProps;
     private final PasswordEncoder passwordEncoder;
     private final DefaultUserService defaultUserService;
     private final ProfileRepository profileRepository;
@@ -35,7 +35,7 @@ public class AdminUserService {
         Profile profile = Profile.builder()
                 .penname(form.getPenname())
                 // 프로필 사진을 등록하지 않은 경우, 기본 이미지로 설정한다.
-                .profileImgUrl(Objects.requireNonNullElse(form.getProfileImgUrl(), customProperties.getDefaults().getDefaultUserProfileImg()))
+                .profileImgUrl(Objects.requireNonNullElse(form.getProfileImgUrl(), customProps.getDefaults().getDefaultUserProfileImg()))
                 .build();
         
         // 계정 생성

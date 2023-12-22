@@ -2,7 +2,7 @@ package org.pageflow.domain.user.service;
 
 
 import lombok.RequiredArgsConstructor;
-import org.pageflow.base.constants.CustomProperties;
+import org.pageflow.base.constants.CustomProps;
 import org.pageflow.base.exception.DomainError;
 import org.pageflow.base.exception.DomainException;
 import org.pageflow.domain.user.constants.ProviderType;
@@ -42,7 +42,7 @@ public class DefaultUserService implements UserService {
     private final TemplateEngine templateEngine;
     private final EmailSender emailSender;
     private final FileService fileService;
-    private final CustomProperties customProperties;
+    private final CustomProps customProps;
     
     
     /**
@@ -66,7 +66,7 @@ public class DefaultUserService implements UserService {
         Profile profile = Profile.builder()
                 .penname(form.getPenname())
                 // 프로필 사진을 등록하지 않은 경우, 기본 이미지로 설정한다.
-                .profileImgUrl(Objects.requireNonNullElse(form.getProfileImgUrl(), customProperties.getDefaults().getDefaultUserProfileImg()))
+                .profileImgUrl(Objects.requireNonNullElse(form.getProfileImgUrl(), customProps.getDefaults().getDefaultUserProfileImg()))
                 .build();
         
         // 계정 생성
@@ -193,7 +193,7 @@ public class DefaultUserService implements UserService {
      */
     public void sendEmailVerifyingEmail(String toEmail, String authCode) {
 
-        String authenticationUrl = customProperties.getSite().getBaseUrl() + "/signup?code=" + authCode + "&email=" + toEmail;
+        String authenticationUrl = customProps.getSite().getBaseUrl() + "/signup?code=" + authCode + "&email=" + toEmail;
 
         // 인증 코드를 템플릿에 담아서 이메일 내용 생성
         Context context = new Context();
@@ -202,7 +202,7 @@ public class DefaultUserService implements UserService {
 
         // 이메일 발송
         emailSender.sendMail(
-                new EmailRequest(customProperties.getEmail().getEmailVerifySender(), toEmail, "Pageflow 회원가입 이메일 인증"),
+                new EmailRequest(customProps.getEmail().getEmailVerifySender(), toEmail, "Pageflow 회원가입 이메일 인증"),
                 emailText
         );
     }

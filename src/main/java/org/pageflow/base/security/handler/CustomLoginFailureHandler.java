@@ -4,7 +4,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.pageflow.base.constants.CustomProperties;
+import org.pageflow.base.constants.CustomProps;
 import org.pageflow.base.request.Rq;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
@@ -18,7 +18,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class CustomLoginFailureHandler implements AuthenticationFailureHandler {
 
-    private final CustomProperties customProperties;
+    private final CustomProps customProps;
     private final Rq rq;
 
 
@@ -32,14 +32,14 @@ public class CustomLoginFailureHandler implements AuthenticationFailureHandler {
         if (exception instanceof UsernameNotFoundException) {
 
             response.sendRedirect(
-                    customProperties.getSite().getLoginFormUri()
+                    customProps.getSite().getLoginFormUri()
             );
 
             // BadCredentialsException
         } else if (exception instanceof BadCredentialsException) {
 
             response.sendRedirect(
-                    customProperties.getSite().getLoginFormUri()
+                    customProps.getSite().getLoginFormUri()
             );
 
         }

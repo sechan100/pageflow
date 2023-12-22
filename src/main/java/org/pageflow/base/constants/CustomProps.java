@@ -8,13 +8,14 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 @Data
 @ConfigurationProperties(prefix = "custom")
-public class CustomProperties {
+public class CustomProps {
 
     private final Site site = new Site();
     private final Email email = new Email();
     private final Files files = new Files();
     private final Defaults defaults = new Defaults();
     private final Admin admin = new Admin();
+    private final Jwt jwt = new Jwt();
 
 
     @Data
@@ -68,5 +69,24 @@ public class CustomProperties {
         private String username;
         private String password;
         private String email;
+    }
+    
+    @Data
+    public static class Jwt{
+        
+        private String secret;
+        private final Access access = new Access();
+        private final Refresh refresh = new Refresh();
+        
+
+        @Data
+        public static class Access{
+            private int expirationPeriodMinutes;
+        }
+        
+        @Data
+        public static class Refresh{
+            private int expirationPeriodDay;
+        }
     }
 }

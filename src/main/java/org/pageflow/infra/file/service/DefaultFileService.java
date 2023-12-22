@@ -1,7 +1,7 @@
 package org.pageflow.infra.file.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.pageflow.base.constants.CustomProperties;
+import org.pageflow.base.constants.CustomProps;
 import org.pageflow.base.entity.DefaultBaseEntity;
 import org.pageflow.base.exception.DomainError;
 import org.pageflow.base.exception.DomainException;
@@ -25,15 +25,15 @@ import static org.pageflow.base.exception.DomainError.File.*;
 @Slf4j
 public class DefaultFileService implements FileService {
 
-    private final CustomProperties customProperties;
+    private final CustomProps customProps;
     private final FileMetadataRepository fileRepository;
     private final String uploadDirectoryPath;
 
     // AllArgsConstructor
-    public DefaultFileService(CustomProperties customProperties, FileMetadataRepository fileRepository) {
-        this.customProperties = customProperties;
+    public DefaultFileService(CustomProps customProps, FileMetadataRepository fileRepository) {
+        this.customProps = customProps;
         this.fileRepository = fileRepository;
-        this.uploadDirectoryPath = customProperties.getFiles().getImg().getDirectory();
+        this.uploadDirectoryPath = customProps.getFiles().getImg().getDirectory();
     }
     
     
@@ -100,7 +100,7 @@ public class DefaultFileService implements FileService {
             throw new DomainException(FAIL_TO_DELETE_FILE, INVALID_FILE_PATH, filePath);
         }
         
-        File file = new File(customProperties.getFiles().getImg().getDirectory() + filePath);
+        File file = new File(customProps.getFiles().getImg().getDirectory() + filePath);
         boolean deleteSuccess = file.delete();
         if(!deleteSuccess) {
             throw new DomainException(FAIL_TO_DELETE_FILE);
@@ -149,7 +149,7 @@ public class DefaultFileService implements FileService {
      */
     @Override
     public String getUrl(FileMetadata fileMetadata) {
-        String imgResourcePathPrefix = customProperties.getFiles().getImg().getBaseUrl();
+        String imgResourcePathPrefix = customProps.getFiles().getImg().getBaseUrl();
         
         return imgResourcePathPrefix +
                 fileMetadata.getPathPrefix() + "/" + fileMetadata.getManagedFilename();
@@ -160,7 +160,7 @@ public class DefaultFileService implements FileService {
      * @return  url상에서 접근 가능한 baseUrl prefix를 제거한 디렉토리상의 위치와 일치하는 파일 경로 /{y}/{m}/{d}/{UUID}.{ext}
      */
     public String getPureFilePath(String filePath) {
-        String imgResourcePathPrefix = customProperties.getFiles().getImg().getBaseUrl();
+        String imgResourcePathPrefix = customProps.getFiles().getImg().getBaseUrl();
         return filePath.substring(imgResourcePathPrefix.length());
     }
 }

@@ -1,7 +1,7 @@
 package org.pageflow.base.security.config;
 
 import lombok.RequiredArgsConstructor;
-import org.pageflow.base.constants.CustomProperties;
+import org.pageflow.base.constants.CustomProps;
 import org.pageflow.base.security.handler.*;
 import org.pageflow.domain.user.service.CustomOAuth2UserService;
 import org.springframework.context.annotation.Bean;
@@ -24,7 +24,7 @@ public class SecurityConfig {
     
     private final AuthenticationProvider daoAuthenticationProvider;
     private final CustomOAuth2UserService customOAuth2UserService;
-    private final CustomProperties customProperties;
+    private final CustomProps customProps;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
     private final CustomLoginFailureHandler customLoginFailureHandler;
     private final FormLoginAuthenticationSuccessHandler formLoginAuthenticationSuccessHandler;

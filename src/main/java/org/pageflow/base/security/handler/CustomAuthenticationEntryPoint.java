@@ -3,7 +3,7 @@ package org.pageflow.base.security.handler;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.pageflow.base.constants.CustomProperties;
+import org.pageflow.base.constants.CustomProps;
 import org.pageflow.base.request.Rq;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.core.AuthenticationException;
@@ -15,13 +15,13 @@ import java.io.IOException;
 @Component
 public class CustomAuthenticationEntryPoint extends LoginUrlAuthenticationEntryPoint {
 
-    public CustomAuthenticationEntryPoint(CustomProperties customProperties, Rq rq) {
-        super(customProperties.getSite().getLoginFormUri());
-        this.customProperties = customProperties;
+    public CustomAuthenticationEntryPoint(CustomProps customProps, Rq rq) {
+        super(customProps.getSite().getLoginFormUri());
+        this.customProps = customProps;
         this.rq = rq;
     }
 
-    private final CustomProperties customProperties;
+    private final CustomProps customProps;
     private final Rq rq;
 
     @Override
@@ -37,7 +37,7 @@ public class CustomAuthenticationEntryPoint extends LoginUrlAuthenticationEntryP
         if (authException instanceof InsufficientAuthenticationException insufficientAuthenticationException) {
 
             new LoginUrlAuthenticationEntryPoint(
-                    customProperties.getSite().getLoginFormUri()
+                    customProps.getSite().getLoginFormUri()
             ).commence(request, response, insufficientAuthenticationException);
 
         }

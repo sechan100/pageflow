@@ -22,4 +22,22 @@ public enum RoleType {
                 role -> new SimpleGrantedAuthority(role.name())
         ).toList();
     }
+    
+    public static Collection<? extends GrantedAuthority> getAuthorities(String... roles) {
+        Assert.notNull(roles, "권한 수준 문자열 배열 roles는 null일 수 없습니다.");
+        
+        return Arrays.stream(roles)
+                .map(SimpleGrantedAuthority::new)
+                .toList();
+    }
+    
+    public static RoleType getRoleType(Collection<? extends GrantedAuthority> authorities) {
+        Assert.notNull(authorities, "권한 수준 문자열 배열 authorities는 null일 수 없습니다.");
+        
+        return authorities.stream()
+                .map(GrantedAuthority::getAuthority)
+                .map(RoleType::valueOf)
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("해당하는 권한 수준이 없습니다."));
+    }
 }

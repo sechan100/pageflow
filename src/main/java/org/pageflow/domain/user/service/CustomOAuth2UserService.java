@@ -3,9 +3,9 @@ package org.pageflow.domain.user.service;
 
 import lombok.RequiredArgsConstructor;
 import org.pageflow.base.request.Rq;
+import org.pageflow.domain.user.entity.Account;
 import org.pageflow.domain.user.entity.SignupCache;
 import org.pageflow.domain.user.model.dto.PrincipalContext;
-import org.pageflow.domain.user.model.dto.UserDto;
 import org.pageflow.domain.user.model.oauth.GithubOwner;
 import org.pageflow.domain.user.model.oauth.GoogleOwner;
 import org.pageflow.domain.user.model.oauth.NaverOwner;
@@ -27,7 +27,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 
-    private final UserService userService;
+    private final DefaultUserService defaultUserService;
     private final AccountRepository accountRepository;
     private final SignupCacheRepository signupCacheRepository;
     private final Rq rq;
@@ -45,28 +45,34 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
         // 기존 회원정보 존재 -> 기존 정보로 로그인
         if (accountRepository.existsByUsername(resourceOwner.getUsername())) {
-            return new PrincipalContext(accountRepository.findFetchJoinProfileByUsername(resourceOwner.getUsername()));
-
+            
+            Account account = accountRepository.findFetchJoinProfileByUsername(resourceOwner.getUsername());
+            rq.redirect("/internal/login?username=" + resourceOwner.getUsername() + "&password=" + account.getPassword());
+            
         // 회원정보 없음(신규) -> OAuth2 데이터를 username으로 캐싱하고, signup 페이지로 리디렉션
         } else {
             
-            // username으로 회원가입 임시 데이터를 캐싱
-            signupCacheRepository.save(
-                    SignupCache.builder()
-                            .username(resourceOwner.getUsername())
-                            .provider(resourceOwner.getProviderType())
-                            .penname(resourceOwner.getNickname())
-                            .email(resourceOwner.getEmail())
-                            .profileImgUrl(resourceOwner.getProfileImgUrl())
-                            .build()
-            );
+            // 캐시 존재 여부
+            boolean isAlreadyCached = signupCacheRepository.existsByUsername(resourceOwner.getUsername());
+            if(isAlreadyCached){
+                // 캐시가 없다면, username으로 회원가입 임시 데이터를 캐싱
+                signupCacheRepository.save(
+                        SignupCache.builder()
+                                .username(resourceOwner.getUsername())
+                                .provider(resourceOwner.getProviderType())
+                                .penname(resourceOwner.getNickname())
+                                .email(resourceOwner.getEmail())
+                                .profileImgUrl(resourceOwner.getProfileImgUrl())
+                                .build()
+                );
+            }
             
             // OAuth2 전용 회원가입 페이지로 리디렉션
-            rq.redirect("signup?username=" + resourceOwner.getUsername());
-            
-            // security 스펙상, 제대로 반환을 안하면 AuthenticationException이 발생하므로, 빈 객체를 반환
-            return new PrincipalContext(UserDto.anonymous());
+            rq.redirect("/internal/signup/cache?username=" + resourceOwner.getUsername());
         }
+        
+        // security 스펙상, 제대로 반환을 안하면 AuthenticationException이 발생하므로, 빈 객체를 반환
+        return PrincipalContext.anonymous();
     }
 
 

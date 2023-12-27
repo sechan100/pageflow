@@ -43,7 +43,7 @@ public class DefaultFileService implements FileService {
         String pathPrefix = getDailyPathPrefix();
         String originalFilename = file.getOriginalFilename();
         if (originalFilename == null) {
-            throw new DomainException(FAIL_TO_UPLOAD_FILE, INVALID_FILE_NAME);
+            throw new DomainException(INVALID_FILE_NAME, "파일 이름이 없습니다.(null)");
         }
         String extension = extractExtension(originalFilename);
         String UUIDfilename = UUID.randomUUID() + "." + extension;
@@ -97,7 +97,7 @@ public class DefaultFileService implements FileService {
     public void delete(String filePath) {
         // filePath가 '/{y}/{m}/{d}/{UUID}.{ext}'의 형식이 아니라면 예외
         if(!filePath.matches("^/\\d{4}/\\d{1,2}/\\d{1,2}/[\\w\\-]+\\.\\w+$")) {
-            throw new DomainException(FAIL_TO_DELETE_FILE, INVALID_FILE_PATH, filePath);
+            throw new DomainException(INVALID_FILE_PATH, String.format("'%s'는 올바른 파일 경로가 아닙니다. (정규식 불일치)", filePath));
         }
         
         File file = new File(customProps.getFiles().getImg().getDirectory() + filePath);

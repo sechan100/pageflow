@@ -20,25 +20,33 @@ import java.util.Map;
 @Setter
 public class PrincipalContext extends User implements OAuth2User {
 
-    protected UserDto userDto;
+    protected Long id;
+    protected String username;
     
-    public PrincipalContext(Account user) {
-        super(user.getUsername(), null, RoleType.getAuthorities(user.getRole()));
-        this.userDto = UserDto.from(user);
+    public PrincipalContext(Long id, String username, String password, RoleType roleType) {
+        super(username, password, RoleType.getAuthorities(roleType));
+        this.id = id;
+        this.username = username;
     }
     
-    // Role을 강제로 변경하여 저장
-    public PrincipalContext(Account user, RoleType roleType) {
-        super(user.getUsername(), "", RoleType.getAuthorities(roleType));
-        this.userDto = UserDto.from(user);
-        this.userDto.setRole(roleType);
+    public static PrincipalContext from(Account user) {
+        return new PrincipalContext(user.getId(), user.getUsername(), user.getPassword(), user.getRole());
     }
     
-    public PrincipalContext(UserDto userDto) {
-        super(userDto.getUsername(), "", RoleType.getAuthorities(userDto.getRole()));
-        this.userDto = userDto;
+    // Role 임의 지정
+    public static PrincipalContext from(Account user, RoleType roleType) {
+        return new PrincipalContext(user.getId(), user.getUsername(), user.getPassword(), roleType);
     }
-
+    
+    public static PrincipalContext anonymous() {
+        return new PrincipalContext(
+                0L,
+                "anonymous",
+                "",
+                RoleType.ROLE_ANONYMOUS);
+    }
+    
+    
     @Override
     public Map<String, Object> getAttributes() {
         return null;
@@ -46,7 +54,7 @@ public class PrincipalContext extends User implements OAuth2User {
 
     @Override
     public String getName() {
-        return userDto.getUsername();
+        return getUsername();
     }
 
 }

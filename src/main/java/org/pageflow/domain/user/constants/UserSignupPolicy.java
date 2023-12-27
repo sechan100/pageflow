@@ -39,7 +39,7 @@ public class UserSignupPolicy {
     public static final int PASSWORD_MAX_LENGTH = 36;
     public static final String PASSWORD_REGEX_DISCRIPTION = "비밀번호는 영문, 숫자를 포함한 "+PASSWORD_MIN_LENGTH+"~"+PASSWORD_MAX_LENGTH+"자여야 합니다";
     // 대소문자, 숫자, 일부 특수문자만 허용
-    public static final String PASSWORD_REGEX = "^(?=.*[A-Za-z])(?=.*[0-9])[A-Za-z0-9~!@#$%^&*()+_-|=]{"+PASSWORD_MIN_LENGTH+","+PASSWORD_MAX_LENGTH+"}$";
+    public static final String PASSWORD_REGEX = "^(?=.*[A-Za-z])(?=.*[0-9])([A-Za-z0-9~!@#$%^&*()+_|=]|[-]){"+PASSWORD_MIN_LENGTH+","+PASSWORD_MAX_LENGTH+"}$";
     
     public static final int PENNAME_MIN_LENGTH = 1;
     public static final int PENNAME_MAX_LENGTH = 12;

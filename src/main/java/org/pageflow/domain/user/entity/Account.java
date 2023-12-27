@@ -27,7 +27,6 @@ public class Account extends DefaultBaseEntity {
     @Column(unique = true, nullable = false, updatable = false)
     private String username;
     
-    @Getter(AccessLevel.NONE)
     private String password;
     
     /**

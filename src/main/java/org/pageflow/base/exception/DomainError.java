@@ -76,7 +76,6 @@ public class DomainError {
         
         // 찾지 못함
         USER_NOT_FOUND(HttpStatus.BAD_REQUEST, "사용자를 찾을 수 없습니다."),
-        USERNAME_NOT_FOUND(HttpStatus.BAD_REQUEST, "존재하지 않는 아이디입니다."),
         
         ;private final HttpStatus httpStatus;
         private final String message;

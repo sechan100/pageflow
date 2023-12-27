@@ -10,6 +10,9 @@ import org.pageflow.domain.user.constants.RoleType;
 import org.pageflow.domain.user.constants.UserSignupPolicy;
 import org.pageflow.domain.user.entity.Account;
 import org.pageflow.domain.user.entity.Profile;
+import org.pageflow.domain.user.jwt.JwtProvider;
+import org.pageflow.domain.user.jwt.TokenDto;
+import org.pageflow.domain.user.model.dto.PrincipalContext;
 import org.pageflow.domain.user.model.dto.SignupForm;
 import org.pageflow.domain.user.repository.AccountRepository;
 import org.pageflow.domain.user.repository.ProfileRepository;
@@ -18,6 +21,14 @@ import org.pageflow.infra.email.EmailSender;
 import org.pageflow.infra.file.repository.FileMetadataRepository;
 import org.pageflow.infra.file.service.FileService;
 import org.springframework.lang.Nullable;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,16 +44,18 @@ import java.util.Objects;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class DefaultUserService implements UserService {
+public class DefaultUserService {
     
     private final AccountRepository accountRepository;
     private final ProfileRepository profileRepository;
     private final FileMetadataRepository fileMetadataRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AuthenticationProvider authenticationProvider;
     private final TemplateEngine templateEngine;
     private final EmailSender emailSender;
     private final FileService fileService;
     private final CustomProps customProps;
+    private final JwtProvider jwtProvider;
     
     
     /**
@@ -50,7 +63,6 @@ public class DefaultUserService implements UserService {
      * @param userRole 사용자에게 부여할 권한
      * @return 영속화된 계정
      */
-    @Override
     public Account signup(SignupForm form, ProviderType provider, RoleType userRole) {
         
         // username 검사
@@ -183,8 +195,6 @@ public class DefaultUserService implements UserService {
         }
     }
     
-    
-    
     /**
      * send email for verifying email
      *
@@ -206,8 +216,47 @@ public class DefaultUserService implements UserService {
                 emailText
         );
     }
-
-//    public String changeProfileImg(MultipartFile profileImg, Profile profile) {
+    
+    public TokenDto login(String username, String password) {
+        Authentication authentication = delegateAuthenticate(username, password);
+        
+        if(authentication.getPrincipal() instanceof PrincipalContext principal) {
+            return jwtProvider.generateTokenDto(principal.getId(), authentication);
+        } else {
+            throw new IllegalArgumentException("authentication.getPrincipal() 객체가 PrincipalContext의 인스턴스가 아닙니다. \n UserDetailsService의 구현이 올바른지 확인해주세요.");
+        }
+        
+    }
+    
+    private Authentication delegateAuthenticate(String username, String password) {
+        
+        UserDetails principal = User.builder()
+                .username(username)
+                .password(password)
+                .build();
+        
+        try {
+            return authenticationProvider.authenticate(
+                    new UsernamePasswordAuthenticationToken(principal, password)
+            );
+        } catch (AuthenticationException authException) {
+            
+            // UsernameNotFoundException
+            if (authException instanceof UsernameNotFoundException) {
+                throw new DomainException(DomainError.User.USER_NOT_FOUND);
+                
+            // BadCredentialsException
+            } else if (authException instanceof BadCredentialsException) {
+                throw new DomainException(DomainError.User.PASSWORD_NOT_MATCH);
+                
+            } else {
+                throw authException;
+            }
+        }
+    }
+    
+    
+    //    public String changeProfileImg(MultipartFile profileImg, Profile profile) {
 //        String staleProfileImgUrl = profile.getProfileImgUrl();
 //
 //        // 프로필 이미지가 없거나 기본 이미지가 아닌 경우, 기존에 있던 프로필 사진은 삭제한다.

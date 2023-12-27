@@ -6,13 +6,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.pageflow.domain.user.model.dto.PrincipalContext;
-import org.pageflow.domain.user.model.dto.UserDto;
 import org.pageflow.domain.user.repository.ProfileRepository;
-import org.pageflow.domain.user.service.UserService;
-import org.springframework.context.ApplicationContext;
+import org.pageflow.domain.user.service.DefaultUserService;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -32,28 +29,22 @@ import java.util.Objects;
 @Getter
 @Slf4j
 public class Rq {
-
-    // 현재 request에 대한 세션 사용자
-    @Setter
-    private UserDto userDto;
     
+    private PrincipalContext principal;
     private final HttpServletRequest request;
     private final HttpServletResponse response;
     private final HttpSession session;
-    private final ApplicationContext context;
-    private final UserService userService;
+    private final DefaultUserService defaultUserService;
     private final ProfileRepository profileRepository;
-
-
-    public Rq(ApplicationContext context, UserService userService, ProfileRepository profileRepository) {
+    
+    public Rq(DefaultUserService userService, ProfileRepository profileRepository) {
 
         // [[빈 주입
         ServletRequestAttributes sessionAttributes = ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes()));
         this.request = sessionAttributes.getRequest();
         this.response = sessionAttributes.getResponse();
         this.session = request.getSession();
-        this.context = context;
-        this.userService = userService;
+        this.defaultUserService = userService;
         this.profileRepository = profileRepository;
         // 빈 주입]]
 
@@ -61,34 +52,25 @@ public class Rq {
 
         if (authentication instanceof UsernamePasswordAuthenticationToken) {
             
-            this.userDto = ((PrincipalContext) authentication.getPrincipal()).getUserDto();
+            this.principal = (PrincipalContext) authentication.getPrincipal();
 
         } else if (authentication instanceof OAuth2AuthenticationToken) {
 
-            UserDto userDto = ((PrincipalContext) authentication.getPrincipal()).getUserDto();
-            String nickname = userDto.getPenname();
-
-            // OAuth를 이용해서 신규로 가입하는 사용자인 경우
-            if (nickname == null) {
-                this.userDto = UserDto.anonymous();
-
-                // OAuth를 통한 로그인인 경우
-            } else {
-                this.userDto = userDto;
-            }
+            this.principal = (PrincipalContext) authentication.getPrincipal();
 
         } else if (authentication instanceof AnonymousAuthenticationToken) {
 
-            this.userDto = UserDto.anonymous();
+            this.principal = PrincipalContext.anonymous();
 
         } else {
 
-            this.userDto = null;
+            this.principal = null;
 
         }
     }
-    
 
+    
+    
     public <R> R getRequestAttr(String attrName) {
         return (R) request.getAttribute(attrName);
     }
@@ -110,9 +92,17 @@ public class Rq {
         try {
             response.sendRedirect(redirectUrl);
         } catch (IOException e) {
-            log.info("fail to redirect: bean of Rq.java redirect() method");
+            log.info("Redirect 실패: {}", e.getMessage());
         }
     }
-
+    
+    public Long getId() {
+        return principal.getId();
+    }
+    
+    public String getUsername() {
+        return principal.getUsername();
+    }
+    
     
 }

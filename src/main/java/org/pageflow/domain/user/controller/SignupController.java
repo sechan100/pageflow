@@ -36,7 +36,7 @@ public class SignupController {
     public UserDto signup(@Valid @RequestBody SignupForm form) {
         
         // 캐싱된 회원가입 데이터가 존재하는지 확인 -> 존재하면 OAuth2로 가입한 사용자
-        boolean isOAuth = signupCacheRepository.existsByUsername(form.getUsername());
+        boolean isOAuth = signupCacheRepository.existsById(form.getUsername());
         Account savedAccount;
         
         // OAuth2 회원가입
@@ -59,7 +59,6 @@ public class SignupController {
         // 사용자 데이터 반환
         return UserDto.from(savedAccount);
     }
-    
     
     @Hidden
     @GetMapping("/internal/signup/cache")

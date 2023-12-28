@@ -60,8 +60,8 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         } else {
             
             // 캐시 존재 여부
-            boolean isAlreadyCached = signupCacheRepository.existsByUsername(resourceOwner.getUsername());
-            if(isAlreadyCached){
+            boolean isAlreadyCached = signupCacheRepository.existsById(resourceOwner.getUsername());
+            if(!isAlreadyCached){
                 // 캐시가 없다면, username으로 회원가입 임시 데이터를 캐싱
                 signupCacheRepository.save(
                         SignupCache.builder()

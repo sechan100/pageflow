@@ -1,11 +1,8 @@
 package org.pageflow.domain.user.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.*;
-import org.pageflow.base.entity.DefaultBaseEntity;
+import org.pageflow.base.entity.BaseEntity;
 
 /**
  * @author : sechan
@@ -14,16 +11,18 @@ import org.pageflow.base.entity.DefaultBaseEntity;
 @Getter
 @Setter(AccessLevel.NONE)
 @Builder
-@EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class TokenSession extends DefaultBaseEntity {
+public class TokenSession implements BaseEntity {
+    
+    /**
+     * UUID
+     */
+    @Id
+    private String id;
     
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Account account;
-    
-    @Column(nullable = false, updatable = false, unique = true)
-    private String sessionKey;
     
     private String refreshToken;
     

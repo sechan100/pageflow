@@ -25,6 +25,7 @@ import java.security.Key;
 import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 
 @Service
@@ -37,6 +38,7 @@ public class JwtProvider {
     private final TokenSessionRepository tokenSessionRepository;
     private final AccountRepository accountRepository;
     private Key signKey;
+    private static final String USER_ID_KEY = "UID";
     private static final String AUTHORITY_KEY = "auth";
     private static final long ACCESS_TOKEN_EXPIRED_IN = (1000 * 60) * 30; // 30분
     private static final long REFRESH_TOKEN_EXPIRED_IN = (1000 * 60) * 60 * 24 * 14; // 14일
@@ -89,7 +91,7 @@ public class JwtProvider {
         
         String token = Jwts.builder()
                 .setSubject(username) // "sub": "username"
-                .addClaims(Map.of("id", userId)) // "id": 34
+                .addClaims(Map.of(USER_ID_KEY, userId)) // "UID": 34
                 .addClaims(Map.of(AUTHORITY_KEY, roleType)) // "auth": "ROLE_USER"
                 .setIssuedAt(new Date()) // "iat": 1516239022
                 .setExpiration(expiredIn) // "exp": 1516239022
@@ -109,25 +111,34 @@ public class JwtProvider {
         
         Date expiredIn = new Date(System.currentTimeMillis() + REFRESH_TOKEN_EXPIRED_IN);
         
+        // Token Session에 사용할 Id 값인 UUID를 생성
+        String sessionId = UUID.randomUUID().toString();
+        
         // refresh token 생성
         String token = Jwts.builder()
-                .setSubject(username)
-                .setIssuedAt(new Date())
-                .setExpiration(expiredIn)
+                .setSubject(sessionId) // "subject": "8a5ff68f-e9f8-49da-899a-8222aedc69b8"
+                .addClaims(Map.of(USER_ID_KEY, userId)) // "UID": 34
+                .setIssuedAt(new Date()) // "iat": 1516239022
+                .setExpiration(expiredIn) // "exp": 1516239022
                 .signWith(getSignKey())
                 .compact();
         
         // TokenSession에 refreshToken을 저장(유니크 키: username_expiredIn(UTC))
         String sessionKey = username + "_" +  expiredIn.getTime();
         
-        // 저장
-        tokenSessionRepository.save(
-                TokenSession.builder()
-                        .sessionKey(sessionKey)
-                        .refreshToken(token)
-                        .account(accountRepository.getReferenceById(userId))
-                        .build()
-        );
+        
+        try {
+            // 저장
+            tokenSessionRepository.save(
+                    TokenSession.builder()
+                            .id(sessionId) // UUID
+                            .refreshToken(token) // refresh token
+                            .account(accountRepository.getReferenceById(userId)) // account
+                            .build()
+            );
+        } catch(Exception e) {
+            log.error("refresh token 영속화 실패: {}", e.getMessage());
+        }
         
         
         return TokenResult.builder()
@@ -156,7 +167,7 @@ public class JwtProvider {
         
         // principal 작성
         UserDetails principal = new PrincipalContext(
-                claims.get("id", Long.class),
+                claims.get(USER_ID_KEY, Long.class),
                 claims.getSubject(),
                 "",
                 RoleType.valueOf(authorityOrNull.get())

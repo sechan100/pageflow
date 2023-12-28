@@ -26,7 +26,8 @@ public class UserSignupPolicy {
                     "씨방","씨방새","씨버럴","씨벌","씨보랄","씨보럴","씨부랄","씨부럴","씨부리","씨불","씨브랄","씨파","씨팍","씨팔",
                     "씹","야동","야사","야설","야캠","야한","에로","오랄","와레즈","원조교재","원조교제","음란","자위","자지","젖꼭지",
                     "젖탱이","젼나","조까","졸라","좃","좆","지랄","지미랄","창녀","창년","창놈","창뇬","캠색","캠섹","페니스","페티쉬",
-                    "폰색","폰쌕","헨타이","호로새끼","호빠","호스테스바","호스트바","화상색","화상섹","자살","음독","청산가리","청산가루"
+                    "폰색","폰쌕","헨타이","호로새끼","호빠","호스테스바","호스트바","화상색","화상섹","자살","음독","청산가리","청산가루",
+                    "븅신", "븅딱"
             );
     
     public static final int USERNAME_MIN_LENGTH = 4;
@@ -39,7 +40,7 @@ public class UserSignupPolicy {
     public static final int PASSWORD_MAX_LENGTH = 36;
     public static final String PASSWORD_REGEX_DISCRIPTION = "비밀번호는 영문, 숫자를 포함한 "+PASSWORD_MIN_LENGTH+"~"+PASSWORD_MAX_LENGTH+"자여야 합니다";
     // 대소문자, 숫자, 일부 특수문자만 허용
-    public static final String PASSWORD_REGEX = "^(?=.*[A-Za-z])(?=.*[0-9])[A-Za-z0-9~!@#$%^&*()+_-|=]{"+PASSWORD_MIN_LENGTH+","+PASSWORD_MAX_LENGTH+"}$";
+    public static final String PASSWORD_REGEX = "^(?=.*[A-Za-z])(?=.*[0-9])([A-Za-z0-9~!@#$%^&*()+_|=]|[-]){"+PASSWORD_MIN_LENGTH+","+PASSWORD_MAX_LENGTH+"}$";
     
     public static final int PENNAME_MIN_LENGTH = 1;
     public static final int PENNAME_MAX_LENGTH = 12;

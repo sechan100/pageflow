@@ -53,13 +53,4 @@ public class UserDto {
     public static UserDto from(Profile profile){
         return UserDto.from(profile.getAccount());
     }
-
-    public static UserDto anonymous() {
-        UserDto anonymousUserDto = new UserDto();
-
-        anonymousUserDto.username ="anonymous";
-        anonymousUserDto.penname = "anonymous";
-        anonymousUserDto.role = RoleType.ROLE_ANONYMOUS;
-        return anonymousUserDto;
-    }
 }

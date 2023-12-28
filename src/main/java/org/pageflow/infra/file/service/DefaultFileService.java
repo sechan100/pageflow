@@ -3,10 +3,12 @@ package org.pageflow.infra.file.service;
 import lombok.extern.slf4j.Slf4j;
 import org.pageflow.base.constants.CustomProps;
 import org.pageflow.base.entity.DefaultBaseEntity;
-import org.pageflow.base.exception.DomainError;
-import org.pageflow.base.exception.DomainException;
+import org.pageflow.base.exception.BadRequestException;
+import org.pageflow.base.exception.code.CommonErrorCode;
+import org.pageflow.base.exception.code.FileErrorCode;
 import org.pageflow.infra.file.constants.FileMetadataType;
 import org.pageflow.infra.file.entity.FileMetadata;
+import org.pageflow.infra.file.exception.FileProcessingException;
 import org.pageflow.infra.file.repository.FileMetadataRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,8 +18,6 @@ import java.io.File;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
-
-import static org.pageflow.base.exception.DomainError.File.*;
 
 
 @Service
@@ -43,7 +43,7 @@ public class DefaultFileService implements FileService {
         String pathPrefix = getDailyPathPrefix();
         String originalFilename = file.getOriginalFilename();
         if (originalFilename == null) {
-            throw new DomainException(FAIL_TO_UPLOAD_FILE, INVALID_FILE_NAME);
+            throw new BadRequestException(FileErrorCode.BLANK_FILE_NAME);
         }
         String extension = extractExtension(originalFilename);
         String UUIDfilename = UUID.randomUUID() + "." + extension;
@@ -76,9 +76,9 @@ public class DefaultFileService implements FileService {
             // 파일 저장
             File fileToStore = new File(uploadDirectoryFullPath);
             file.transferTo(fileToStore);
-        } catch (Exception e) {
-            log.info("'{}' 파일 저장 중 오류가 발생했습니다.", fileMetadata.getUploadDirectory());
-            throw new DomainException(DomainError.File.FAIL_TO_UPLOAD_FILE);
+        } catch(Exception e) {
+            log.error("'{}' 파일 저장 중 오류가 발생했습니다: {}", fileMetadata.getUploadDirectory(), e.getMessage());
+            throw new BadRequestException(CommonErrorCode.INTERNAL_SERVER_ERROR);
         }
 
         return fileMetadata;
@@ -97,13 +97,14 @@ public class DefaultFileService implements FileService {
     public void delete(String filePath) {
         // filePath가 '/{y}/{m}/{d}/{UUID}.{ext}'의 형식이 아니라면 예외
         if(!filePath.matches("^/\\d{4}/\\d{1,2}/\\d{1,2}/[\\w\\-]+\\.\\w+$")) {
-            throw new DomainException(FAIL_TO_DELETE_FILE, INVALID_FILE_PATH, filePath);
+            throw new BadRequestException(FileErrorCode.INVALID_FILE_PATH, filePath);
         }
         
         File file = new File(customProps.getFiles().getImg().getDirectory() + filePath);
         boolean deleteSuccess = file.delete();
         if(!deleteSuccess) {
-            throw new DomainException(FAIL_TO_DELETE_FILE);
+            log.error("파일 삭제에 실패: {}", file);
+            throw new FileProcessingException("파일 삭제에 실패했습니다.");
         }
         
         String pathPrefix = filePath.substring(0, filePath.lastIndexOf("/"));
@@ -113,7 +114,7 @@ public class DefaultFileService implements FileService {
             FileMetadata fileMetadataToDelete = fileRepository.findByPathPrefixAndManagedFilename(pathPrefix, managedFilename);
             fileRepository.delete(fileMetadataToDelete);
         } catch(Exception e){
-            throw new DomainException(FAIL_TO_DELETE_FILE);
+            throw new FileProcessingException("파일 메타데이터 삭제에 실패했습니다.");
         }
     }
 
@@ -126,12 +127,16 @@ public class DefaultFileService implements FileService {
         );
     }
 
-    public String extractExtension(String filename) throws DomainException {
-        String extension = filename.substring(filename.lastIndexOf(".") + 1);
-        if (extension.isEmpty()) {
-            throw new DomainException(DomainError.File.INVALID_FILE_NAME);
-        } else {
-            return extension;
+    public String extractExtension(String filename) throws BadRequestException {
+        try {
+            String extension = filename.substring(filename.lastIndexOf(".") + 1);
+            if (extension.isEmpty()) {
+                throw new BadRequestException(FileErrorCode.INVALID_FILE_EXTENSION, filename);
+            } else {
+                return extension;
+            }
+        } catch (Exception e) {
+            throw new BadRequestException(FileErrorCode.INVALID_FILE_NAME, filename);
         }
     }
 

@@ -5,15 +5,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.pageflow.base.request.Rq;
-import org.pageflow.domain.user.model.dto.PrincipalContext;
-import org.pageflow.domain.user.model.dto.UserDto;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.DefaultRedirectStrategy;
 import org.springframework.security.web.RedirectStrategy;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 import org.springframework.security.web.savedrequest.RequestCache;
-import org.springframework.security.web.savedrequest.SavedRequest;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -28,25 +25,25 @@ public class FormLoginAuthenticationSuccessHandler implements AuthenticationSucc
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-        UserDto userDto = ((PrincipalContext) authentication.getPrincipal()).getUserDto();
-        String nickname = userDto.getPenname();
-
-        SavedRequest savedRequest = requestCache.getRequest(request, response);
-
-        if (savedRequest != null) {
-            String cachedRedirectUrl = savedRequest.getRedirectUrl();
-            redirectStrategy.sendRedirect(
-                    request,
-                    response,
-                    cachedRedirectUrl
-            );
-
-        } else {
-            redirectStrategy.sendRedirect(
-                    request,
-                    response,
-                    "/"
-            );
-        }
+//        UserDto userDto = ((PrincipalContext) authentication.getPrincipal()).getUserDto();
+//        String nickname = userDto.getPenname();
+//
+//        SavedRequest savedRequest = requestCache.getRequest(request, response);
+//
+//        if (savedRequest != null) {
+//            String cachedRedirectUrl = savedRequest.getRedirectUrl();
+//            redirectStrategy.sendRedirect(
+//                    request,
+//                    response,
+//                    cachedRedirectUrl
+//            );
+//
+//        } else {
+//            redirectStrategy.sendRedirect(
+//                    request,
+//                    response,
+//                    "/"
+//            );
+//        }
     }
 }

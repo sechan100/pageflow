@@ -15,7 +15,6 @@ public class CustomProps {
     private final Files files = new Files();
     private final Defaults defaults = new Defaults();
     private final Admin admin = new Admin();
-    private final Jwt jwt = new Jwt();
 
 
     @Data
@@ -70,23 +69,5 @@ public class CustomProps {
         private String password;
         private String email;
     }
-    
-    @Data
-    public static class Jwt{
-        
-        private String secret;
-        private final Access access = new Access();
-        private final Refresh refresh = new Refresh();
-        
-
-        @Data
-        public static class Access{
-            private int expirationPeriodMinutes;
-        }
-        
-        @Data
-        public static class Refresh{
-            private int expirationPeriodDay;
-        }
-    }
+ 
 }

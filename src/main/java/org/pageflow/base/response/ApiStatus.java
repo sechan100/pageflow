@@ -1,11 +1,13 @@
 package org.pageflow.base.response;
 
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 /**
  * @author : sechan
  */
 @AllArgsConstructor
+@Getter
 public enum ApiStatus {
     
       SUCCESS("성공")
@@ -14,5 +16,5 @@ public enum ApiStatus {
     
     
     public static final String ATTRIBUTE_KEY = "apiStatus";
-    public final String message;
+    private final String message;
 }

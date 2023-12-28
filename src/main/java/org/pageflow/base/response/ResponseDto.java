@@ -19,7 +19,7 @@ public class ResponseDto {
     
     
     public static ResponseDto success(Object data){
-        return new ResponseDto(ApiStatus.SUCCESS, null, ApiStatus.SUCCESS.message, data);
+        return new ResponseDto(ApiStatus.SUCCESS, null, ApiStatus.SUCCESS.getMessage(), data);
     }
     
     public static ResponseDto error(BadRequestException e){

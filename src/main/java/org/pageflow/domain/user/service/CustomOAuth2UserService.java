@@ -3,6 +3,7 @@ package org.pageflow.domain.user.service;
 
 import lombok.RequiredArgsConstructor;
 import org.pageflow.base.request.Rq;
+import org.pageflow.base.response.ApiStatus;
 import org.pageflow.domain.user.entity.Account;
 import org.pageflow.domain.user.entity.SignupCache;
 import org.pageflow.domain.user.model.dto.PrincipalContext;
@@ -47,7 +48,13 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         if (accountRepository.existsByUsername(resourceOwner.getUsername())) {
             
             Account account = accountRepository.findFetchJoinProfileByUsername(resourceOwner.getUsername());
-            rq.redirect("/internal/login?username=" + resourceOwner.getUsername() + "&password=" + account.getPassword());
+            
+            // 포워딩으로 위임
+            rq.forwardBuilder("/internal/login")
+                    .status(ApiStatus.SUCCESS)
+                    .param("username", resourceOwner.getUsername())
+                    .param("password", account.getPassword())
+                    .send();
             
         // 회원정보 없음(신규) -> OAuth2 데이터를 username으로 캐싱하고, signup 페이지로 리디렉션
         } else {
@@ -67,8 +74,11 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
                 );
             }
             
-            // OAuth2 전용 회원가입 페이지로 리디렉션
-            rq.redirect("/internal/signup/cache?username=" + resourceOwner.getUsername());
+            // OAuth2 캐시 데이터를 반환
+            rq.forwardBuilder("/internal/signup/cache")
+                    .param("username", resourceOwner.getUsername())
+                    .status(ApiStatus.OAUTH2_SIGNUP_REQUIRED)
+                    .send();
         }
         
         // security 스펙상, 제대로 반환을 안하면 AuthenticationException이 발생하므로, 빈 객체를 반환

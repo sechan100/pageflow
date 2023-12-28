@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.pageflow.domain.user.model.dto.PrincipalContext;
 import org.pageflow.domain.user.repository.ProfileRepository;
 import org.pageflow.domain.user.service.DefaultUserService;
+import org.pageflow.infra.util.ForwordBuilder;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -92,11 +93,20 @@ public class Rq {
         try {
             response.sendRedirect(redirectUrl);
         } catch (IOException e) {
-            log.info("Redirect 실패: {}", e.getMessage());
+            log.error("{}로 redirect에 실패했습니다: {}", redirectUrl, e.getMessage());
         }
     }
     
-    public Long getId() {
+    public ForwordBuilder forwardBuilder(String forwardUrl) {
+        try {
+            return new ForwordBuilder(request, response, forwardUrl);
+        } catch (Exception e) {
+            log.error("{}로 forward하지 못했습니다: {}", forwardUrl, e.getMessage());
+            throw e;
+        }
+    }
+    
+    public Long getUID() {
         return principal.getId();
     }
     

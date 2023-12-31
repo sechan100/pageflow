@@ -2,9 +2,8 @@ package org.pageflow.domain.user.jwt;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.UnsupportedJwtException;
-import io.jsonwebtoken.security.SignatureException;
 import lombok.Builder;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -22,9 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
-import java.util.Date;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 
 @Service
@@ -37,6 +34,7 @@ public class JwtProvider {
     private final TokenSessionRepository tokenSessionRepository;
     private final AccountRepository accountRepository;
     private Key signKey;
+    private static final String USER_ID_KEY = "UID";
     private static final String AUTHORITY_KEY = "auth";
     private static final long ACCESS_TOKEN_EXPIRED_IN = (1000 * 60) * 30; // 30분
     private static final long REFRESH_TOKEN_EXPIRED_IN = (1000 * 60) * 60 * 24 * 14; // 14일
@@ -89,7 +87,7 @@ public class JwtProvider {
         
         String token = Jwts.builder()
                 .setSubject(username) // "sub": "username"
-                .addClaims(Map.of("id", userId)) // "id": 34
+                .addClaims(Map.of(USER_ID_KEY, userId)) // "UID": 34
                 .addClaims(Map.of(AUTHORITY_KEY, roleType)) // "auth": "ROLE_USER"
                 .setIssuedAt(new Date()) // "iat": 1516239022
                 .setExpiration(expiredIn) // "exp": 1516239022
@@ -109,25 +107,34 @@ public class JwtProvider {
         
         Date expiredIn = new Date(System.currentTimeMillis() + REFRESH_TOKEN_EXPIRED_IN);
         
+        // Token Session에 사용할 Id 값인 UUID를 생성
+        String sessionId = UUID.randomUUID().toString();
+        
         // refresh token 생성
         String token = Jwts.builder()
-                .setSubject(username)
-                .setIssuedAt(new Date())
-                .setExpiration(expiredIn)
+                .setSubject(sessionId) // "subject": "8a5ff68f-e9f8-49da-899a-8222aedc69b8"
+                .addClaims(Map.of(USER_ID_KEY, userId)) // "UID": 34
+                .setIssuedAt(new Date()) // "iat": 1516239022
+                .setExpiration(expiredIn) // "exp": 1516239022
                 .signWith(getSignKey())
                 .compact();
         
         // TokenSession에 refreshToken을 저장(유니크 키: username_expiredIn(UTC))
         String sessionKey = username + "_" +  expiredIn.getTime();
         
-        // 저장
-        tokenSessionRepository.save(
-                TokenSession.builder()
-                        .sessionKey(sessionKey)
-                        .refreshToken(token)
-                        .account(accountRepository.getReferenceById(userId))
-                        .build()
-        );
+        
+        try {
+            // 저장
+            tokenSessionRepository.save(
+                    TokenSession.builder()
+                            .id(sessionId) // UUID
+                            .refreshToken(token) // refresh token
+                            .account(accountRepository.getReferenceById(userId)) // account
+                            .build()
+            );
+        } catch(Exception e) {
+            log.error("refresh token 영속화 실패: {}", e.getMessage());
+        }
         
         
         return TokenResult.builder()
@@ -140,10 +147,10 @@ public class JwtProvider {
      * access token을 통해 인증객체를 추출
      * @throws IllegalArgumentException 토큰에 권한 정보가 없는 경우.(refresh token인 경우)
      */
-    public Authentication parseAuthentication(String accessToken) {
+    public Authentication parseAccessToken(String accessToken) {
         
         // 토큰 복호화
-        Claims claims = parseClaims(accessToken);
+        Claims claims = parseToken(accessToken);
         
         // 권한 추출
         Optional<String> authorityOrNull = Optional.ofNullable(claims.get(AUTHORITY_KEY).toString());
@@ -156,7 +163,7 @@ public class JwtProvider {
         
         // principal 작성
         UserDetails principal = new PrincipalContext(
-                claims.get("id", Long.class),
+                claims.get(USER_ID_KEY, Long.class),
                 claims.getSubject(),
                 "",
                 RoleType.valueOf(authorityOrNull.get())
@@ -170,33 +177,23 @@ public class JwtProvider {
         );
     }
     
-
-    /**
-     * 토큰의 유효성을 검사
-     * @throws ExpiredJwtException 토큰이 만료된 경우
-     * @return 유효한 토큰인 경우 true, 그 외의 경우 false
-     * */
-    public boolean validateToken(String token) {
+    public void removeRefreshToken(String refreshToken) {
+        
+        Claims claims;
         try {
-            Jwts.parserBuilder().setSigningKey(getSignKey()).build().parseClaimsJws(token);
-            return true;
-
-        // 토큰 만료시 예외를 받아서 다시 던짐 -> ExpiredJwtException만 따로 처리
-        } catch (ExpiredJwtException e) {
-            throw e;
-        } catch(UnsupportedJwtException unsupportedJwtException){
-            log.error("지원되지 않는 토큰입니다. 예외: {} ", unsupportedJwtException.getMessage());
-        } catch(SignatureException signatureException){
-            log.error("잘못된 토큰 서명입니다. 예외: {} ", signatureException.getMessage());
-        } catch(IllegalArgumentException illegalArgumentException){
-            log.error("토큰이 null이거나 빈문자열, 또는 공백문자로만 이루어져 있습니다. 예외: {} ", illegalArgumentException.getMessage());
-        } catch(Exception exception){
-            log.error("알 수 없는 토큰 예외. 예외: {} ", exception.getMessage());
+            // 토큰 복호화
+            claims = parseToken(refreshToken);
+        } catch(ExpiredJwtException e) {
+            // 만료된 토큰이라도, 어차피 토큰을 삭제하기 위함이므로, 그냥 해석해서 삭제한다.
+            claims = decodeExpiredJwtToken(refreshToken);
         }
         
-        // 예외 상황은 모두 false 반환
-        return false;
+        // 토큰 세션을 삭제
+        String sessionId = claims.getSubject(); // UUID
+        tokenSessionRepository.deleteById(sessionId);
     }
+    
+    
     
     
     public Key getSignKey() {
@@ -206,9 +203,36 @@ public class JwtProvider {
         }
         return signKey;
     }
-
-
-    public Claims parseClaims(String token) {
-        return Jwts.parserBuilder().setSigningKey(getSignKey()).build().parseClaimsJws(token).getBody();
+    
+    /**
+     * @param token 토큰
+     * @return 클레임
+     * @throws ExpiredJwtException 토큰이 만료된 경우
+     * @throws JwtException 그 외의 파싱 예외
+     */
+    public Claims parseToken(String token) {
+        try {
+            return Jwts.parserBuilder().setSigningKey(getSignKey()).build().parseClaimsJws(token).getBody();
+            
+        // 만료예외는 호출한 곳에서 처리
+        } catch(ExpiredJwtException e) {
+            throw e;
+        // 그 외의 예외는 JwtException으로 던짐
+        } catch(Exception exception) {
+            log.error("토큰 해석 실패: {} ", exception.getMessage());
+            throw new JwtException(exception.getMessage(), exception);
+        }
+    }
+    
+    /**
+     * 일반적인 파싱으로는 ExpiredJwtException이 발생하는 만료된 토큰을 억지로 디코딩
+     * @param jwtToken jwt 토큰
+     * @return 만료된 토큰의 클레임
+     */
+    private Claims decodeExpiredJwtToken(String jwtToken) {
+        String payload = jwtToken.split("\\.")[1]; // header.payload.signature 구조를 스플릿
+        String decodedJson = new String(Base64.getDecoder().decode(payload));
+        // JSON을 Claims 객체로 변환
+        return Jwts.parserBuilder().build().parseClaimsJws(decodedJson).getBody();
     }
 }

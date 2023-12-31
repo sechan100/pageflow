@@ -31,6 +31,7 @@ public class SignupController {
     private final DefaultUserService defaultUserService;
     
     
+    
     @Operation(summary = "회원가입", description = "새로운 사용자의 회원가입을 요청")
     @PostMapping("/signup")
     public UserDto signup(@Valid @RequestBody SignupForm form) {
@@ -59,6 +60,7 @@ public class SignupController {
         // 사용자 데이터 반환
         return UserDto.from(savedAccount);
     }
+    
     
     @Hidden
     @GetMapping("/internal/signup/cache")

@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.pageflow.domain.user.jwt.JwtProvider;
 import org.pageflow.domain.user.jwt.TokenDto;
 import org.pageflow.domain.user.model.dto.WebLoginRequest;
+import org.pageflow.domain.user.model.dto.WebLogoutRequest;
 import org.pageflow.domain.user.service.DefaultUserService;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,4 +41,10 @@ public class LoginLogoutController {
         return defaultUserService.login(username, password);
     }
 
+    
+    @Operation(summary = "로그아웃", description = "refreshToken을 받아서, 해당 세션을 무효화")
+    @PostMapping("/logout")
+    public void logout(@RequestBody WebLogoutRequest logout) {
+        defaultUserService.logout(logout.getRefreshToken());
+    }
 }

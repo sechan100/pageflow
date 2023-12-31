@@ -35,14 +35,11 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
-        
-        // 유효성 검증
-        if(jwtProvider.validateToken(accessTokenOptional.get())){
-            // 유효한 경우 토큰으로 인증 객체를 생성
-            Authentication authentication = jwtProvider.parseAuthentication(accessTokenOptional.get());
-            // 인증 객체를 세팅
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-        }
+    
+        // 유효한 경우 토큰으로 인증 객체를 생성
+        Authentication authentication = jwtProvider.parseAccessToken(accessTokenOptional.get());
+        // 인증 객체를 세팅
+        SecurityContextHolder.getContext().setAuthentication(authentication);
     
         filterChain.doFilter(request, response);
     }

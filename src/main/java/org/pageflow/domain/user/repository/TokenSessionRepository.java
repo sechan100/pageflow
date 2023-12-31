@@ -6,6 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 /**
  * @author : sechan
  */
-public interface TokenSessionRepository extends JpaRepository<TokenSession, Long> {
+public interface TokenSessionRepository extends JpaRepository<TokenSession, String> {
 
 }

@@ -232,5 +232,7 @@ public class DefaultUserService {
     }
     
     
-    
+    public void logout(String refreshToken) {
+        jwtProvider.removeRefreshToken(refreshToken);
+    }
 }

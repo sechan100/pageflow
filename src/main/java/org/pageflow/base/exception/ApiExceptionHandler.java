@@ -38,8 +38,8 @@ public class ApiExceptionHandler {
     
     
     // BadRequestException 발생시 -> 바로 사용자에게 피드백을 줘야하는 예외
-    @ExceptionHandler(BadRequestException.class)
-    public ResponseDto handleBadRequestException(BadRequestException e) {
+    @ExceptionHandler(UserFeedbackException.class)
+    public ResponseDto handleBadRequestException(UserFeedbackException e) {
         return ResponseDto.error(e);
     }
     

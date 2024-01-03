@@ -24,6 +24,17 @@ public class TokenSession implements BaseEntity {
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Account account;
     
+    /**
+     * 만료시간(UTC)
+     */
+    @Column(nullable = false)
+    private Long expiredIn;
+    
     private String refreshToken;
+    
+    
+    public boolean isExpired() {
+        return System.currentTimeMillis() > expiredIn;
+    }
     
 }

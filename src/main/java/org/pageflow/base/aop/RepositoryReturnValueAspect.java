@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.pageflow.base.exception.BadRequestException;
+import org.pageflow.base.exception.UserFeedbackException;
 import org.pageflow.base.exception.code.CommonErrorCode;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,16 +35,16 @@ public class RepositoryReturnValueAspect {
         String entityName = joinPoint.getSignature().getDeclaringType().getSimpleName().replace("Repository", "");
         // 단일 엔티티 객체일 경우의 처리
         if(result == null){
-            throw new BadRequestException(CommonErrorCode.DATA_NOT_FOUND, entityName + "를 다음으로 조회: " + arsString);
+            throw new UserFeedbackException(CommonErrorCode.DATA_NOT_FOUND, entityName + "를 다음으로 조회: " + arsString);
             
         // 컬렉션 객체일 경우의 처리
         } else if(result instanceof Collection<?> results){
             if(results.isEmpty()){
-                throw new BadRequestException(CommonErrorCode.DATA_NOT_FOUND, entityName + "컬렉션을 다음으로 조회: " + arsString);
+                throw new UserFeedbackException(CommonErrorCode.DATA_NOT_FOUND, entityName + "컬렉션을 다음으로 조회: " + arsString);
             }
         } else if(result instanceof Optional<?> optional){
             if(optional.isEmpty()){
-                throw new BadRequestException(CommonErrorCode.DATA_NOT_FOUND, entityName + "를 다음으로 조회: " + arsString);
+                throw new UserFeedbackException(CommonErrorCode.DATA_NOT_FOUND, entityName + "를 다음으로 조회: " + arsString);
             }
         }
         

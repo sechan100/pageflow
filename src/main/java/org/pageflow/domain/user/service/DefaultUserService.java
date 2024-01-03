@@ -1,9 +1,10 @@
 package org.pageflow.domain.user.service;
 
 
+import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 import org.pageflow.base.constants.CustomProps;
-import org.pageflow.base.exception.BadRequestException;
+import org.pageflow.base.exception.UserFeedbackException;
 import org.pageflow.base.exception.code.UserErrorCode;
 import org.pageflow.domain.user.constants.ProviderType;
 import org.pageflow.domain.user.constants.RoleType;
@@ -11,13 +12,15 @@ import org.pageflow.domain.user.constants.UserSignupPolicy;
 import org.pageflow.domain.user.entity.Account;
 import org.pageflow.domain.user.entity.Profile;
 import org.pageflow.domain.user.jwt.JwtProvider;
-import org.pageflow.domain.user.jwt.TokenDto;
 import org.pageflow.domain.user.model.dto.PrincipalContext;
 import org.pageflow.domain.user.model.dto.SignupForm;
+import org.pageflow.domain.user.model.token.AccessToken;
+import org.pageflow.domain.user.model.token.RefreshToken;
+import org.pageflow.domain.user.model.token.SessionToken;
 import org.pageflow.domain.user.repository.AccountRepository;
 import org.pageflow.domain.user.repository.ProfileRepository;
+import org.pageflow.domain.user.repository.TokenSessionRepository;
 import org.pageflow.infra.email.EmailSender;
-import org.pageflow.infra.file.repository.FileMetadataRepository;
 import org.pageflow.infra.file.service.FileService;
 import org.springframework.lang.Nullable;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -34,6 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.thymeleaf.TemplateEngine;
 
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -46,9 +50,9 @@ public class DefaultUserService {
     
     private final AccountRepository accountRepository;
     private final ProfileRepository profileRepository;
-    private final FileMetadataRepository fileMetadataRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationProvider authenticationProvider;
+    private final TokenSessionRepository tokenSessionRepository;
     private final TemplateEngine templateEngine;
     private final EmailSender emailSender;
     private final FileService fileService;
@@ -108,24 +112,24 @@ public class DefaultUserService {
         
         // 1. null, 공백문자 검사
         if(!StringUtils.hasText(username)){
-            throw new BadRequestException(UserErrorCode.BLANK_USERNAME);
+            throw new UserFeedbackException(UserErrorCode.BLANK_USERNAME);
         }
         
         // 2. username 정규식 검사
         if(!username.matches(UserSignupPolicy.USERNAME_REGEX)) {
-            throw new BadRequestException(UserErrorCode.USERNAME_REGEX_NOT_MATCH);
+            throw new UserFeedbackException(UserErrorCode.USERNAME_REGEX_NOT_MATCH);
         }
         
         // 3. 사용할 수 없는 username 검사
         for(String invalidUsername : UserSignupPolicy.INVALID_USERNAME) {
             if(username.contains(invalidUsername)) {
-                throw new BadRequestException(UserErrorCode.UNUSEABLE_USERNAME, username);
+                throw new UserFeedbackException(UserErrorCode.UNUSEABLE_USERNAME, username);
             }
         }
         
         // 4. username 중복 검사
         if(accountRepository.existsByUsername(username)){
-            throw new BadRequestException(UserErrorCode.DUPLICATE_USERNAME, username);
+            throw new UserFeedbackException(UserErrorCode.DUPLICATE_USERNAME, username);
         }
     }
     
@@ -134,17 +138,17 @@ public class DefaultUserService {
         
         // 1. null, 빈 문자열 검사
         if(!StringUtils.hasText(email)){
-            throw new BadRequestException(UserErrorCode.BLANK_EMAIL);
+            throw new UserFeedbackException(UserErrorCode.BLANK_EMAIL);
         }
         
         // 2. email 형식 검사
         if(!email.matches("^[_a-z0-9-]+(.[_a-z0-9-]+)*@(?:\\w+\\.)+\\w+$")){
-            throw new BadRequestException(UserErrorCode.EMAIL_REGEX_NOT_MATCH);
+            throw new UserFeedbackException(UserErrorCode.EMAIL_REGEX_NOT_MATCH);
         }
         
         // 3. email 중복 검사
         if(accountRepository.existsByEmailAndEmailVerified(email, true)){
-            throw new BadRequestException(UserErrorCode.DUPLICATE_EMAIL, email);
+            throw new UserFeedbackException(UserErrorCode.DUPLICATE_EMAIL, email);
         }
     }
     
@@ -153,17 +157,17 @@ public class DefaultUserService {
         
         // 1. null, 빈 문자열 검사
         if(!StringUtils.hasText(password)){
-            throw new BadRequestException(UserErrorCode.BLANK_PASSWORD);
+            throw new UserFeedbackException(UserErrorCode.BLANK_PASSWORD);
         }
         
         // 2. password 정규식 검사
         if(!password.matches(UserSignupPolicy.PASSWORD_REGEX)) {
-            throw new BadRequestException(UserErrorCode.PASSWORD_REGEX_NOT_MATCH);
+            throw new UserFeedbackException(UserErrorCode.PASSWORD_REGEX_NOT_MATCH);
         }
         
         // 3. password와 passwordConfirm이 일치 검사
         if(passwordConfirm != null && !password.equals(passwordConfirm)){
-            throw new BadRequestException(UserErrorCode.PASSWORD_CONFIRM_NOT_MATCH);
+            throw new UserFeedbackException(UserErrorCode.PASSWORD_CONFIRM_NOT_MATCH);
         }
     }
     
@@ -172,32 +176,52 @@ public class DefaultUserService {
         
         // 1. null, 빈 문자열 검사
         if(!StringUtils.hasText(penname)){
-            throw new BadRequestException(UserErrorCode.BLANK_PENNAME);
+            throw new UserFeedbackException(UserErrorCode.BLANK_PENNAME);
         }
         
         // 2. penname 정규식 검사
         if(!penname.matches(UserSignupPolicy.PENNAME_REGEX)) {
-            throw new BadRequestException(UserErrorCode.PENNAME_REGEX_NOT_MATCH);
+            throw new UserFeedbackException(UserErrorCode.PENNAME_REGEX_NOT_MATCH);
         }
         
         // 3. 사용할 수 없는 필명
         for(String invalidPenname : UserSignupPolicy.INVALID_PENNAME) {
             if(penname.contains(invalidPenname)) {
-                throw new BadRequestException(UserErrorCode.UNUSEABLE_PENNAME, penname);
+                throw new UserFeedbackException(UserErrorCode.UNUSEABLE_PENNAME, penname);
             }
         }
         
         // 4. penname 중복 검사
         if(profileRepository.existsByPenname(penname)){
-            throw new BadRequestException(UserErrorCode.DUPLICATE_PENNAME, penname);
+            throw new UserFeedbackException(UserErrorCode.DUPLICATE_PENNAME, penname);
         }
     }
     
-    public TokenDto login(String username, String password) {
+    /**
+     * @param username 아이디
+     * @param password 비밀번호
+     * @return accessToken, refreshToken
+     */
+    public Map<String, SessionToken> login(String username, String password) {
         Authentication authentication = delegateAuthenticate(username, password);
         
         if(authentication.getPrincipal() instanceof PrincipalContext principal) {
-            return jwtProvider.generateTokenDto(principal.getId(), authentication);
+            // accessToken 발급
+            AccessToken accessToken = jwtProvider.generateAccessToken(
+                    principal.getId(),
+                    principal.getUsername(),
+                    principal.getRole()
+            );
+            
+            // refreshToken 발급
+            RefreshToken refreshToken = jwtProvider.generateRefreshToken(principal.getId());
+            
+            // 응답 객체 반환
+            return Map.of(
+                    "accessToken", accessToken,
+                    "refreshToken", refreshToken
+            );
+            
         } else {
             throw new IllegalArgumentException("authentication.getPrincipal() 객체가 PrincipalContext의 인스턴스가 아닙니다. \n UserDetailsService의 구현이 올바른지 확인해주세요.");
         }
@@ -219,11 +243,11 @@ public class DefaultUserService {
             
             // UsernameNotFoundException
             if (authException instanceof UsernameNotFoundException) {
-                throw new BadRequestException(UserErrorCode.USERNAME_NOT_EXIST, username);
+                throw new UserFeedbackException(UserErrorCode.USERNAME_NOT_EXIST, username);
                 
             // BadCredentialsException
             } else if (authException instanceof BadCredentialsException) {
-                throw new BadRequestException(UserErrorCode.PASSWORD_NOT_MATCH);
+                throw new UserFeedbackException(UserErrorCode.PASSWORD_NOT_MATCH);
                 
             } else {
                 throw authException;
@@ -231,8 +255,33 @@ public class DefaultUserService {
         }
     }
     
-    
     public void logout(String refreshToken) {
-        jwtProvider.removeRefreshToken(refreshToken);
+        try {
+            RefreshToken token = jwtProvider.parseRefreshToken(refreshToken);
+            tokenSessionRepository.deleteById(token.getSessionId());
+        } catch(ExpiredJwtException ignored) {
+            // 어차피 만료된 토큰이면 로그아웃된거나 마찬가지.. -> 무시
+        }
+    }
+    
+    public AccessToken refresh(String refreshToken){
+        
+        try {
+            // 파싱된 토큰에서 해당 세션에 해당하는 UUID 형태의 PK를 추출
+            String sessionId = jwtProvider.parseRefreshToken(refreshToken).getSessionId();
+            
+            // 세션의 소유자를 조회
+            Account user = tokenSessionRepository.findWithAccountById(sessionId).getAccount();
+            
+            // 새 토큰을 발급
+            return jwtProvider.generateAccessToken(
+                    user.getId(),
+                    user.getUsername(),
+                    user.getRole()
+            );
+        } catch(ExpiredJwtException e) {
+            // 만료된 세션인 경우 피드백
+            throw new UserFeedbackException(UserErrorCode.SESSION_EXPIRED);
+        }
     }
 }

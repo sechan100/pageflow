@@ -2,7 +2,7 @@ package org.pageflow.base.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.pageflow.base.exception.BadRequestException;
+import org.pageflow.base.exception.UserFeedbackException;
 import org.pageflow.base.exception.code.ErrorCode;
 
 /**
@@ -22,7 +22,7 @@ public class ResponseDto {
         return new ResponseDto(ApiStatus.SUCCESS, null, ApiStatus.SUCCESS.getMessage(), data);
     }
     
-    public static ResponseDto error(BadRequestException e){
+    public static ResponseDto error(UserFeedbackException e){
         return new ResponseDto(ApiStatus.ERROR, e.getErrorCode(), e.getMessage(), null);
     }
     

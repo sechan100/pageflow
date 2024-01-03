@@ -3,7 +3,7 @@ package org.pageflow.infra.file.service;
 import lombok.extern.slf4j.Slf4j;
 import org.pageflow.base.constants.CustomProps;
 import org.pageflow.base.entity.DefaultBaseEntity;
-import org.pageflow.base.exception.BadRequestException;
+import org.pageflow.base.exception.UserFeedbackException;
 import org.pageflow.base.exception.code.CommonErrorCode;
 import org.pageflow.base.exception.code.FileErrorCode;
 import org.pageflow.infra.file.constants.FileMetadataType;
@@ -43,7 +43,7 @@ public class DefaultFileService implements FileService {
         String pathPrefix = getDailyPathPrefix();
         String originalFilename = file.getOriginalFilename();
         if (originalFilename == null) {
-            throw new BadRequestException(FileErrorCode.BLANK_FILE_NAME);
+            throw new UserFeedbackException(FileErrorCode.BLANK_FILE_NAME);
         }
         String extension = extractExtension(originalFilename);
         String UUIDfilename = UUID.randomUUID() + "." + extension;
@@ -78,7 +78,7 @@ public class DefaultFileService implements FileService {
             file.transferTo(fileToStore);
         } catch(Exception e) {
             log.error("'{}' 파일 저장 중 오류가 발생했습니다: {}", fileMetadata.getUploadDirectory(), e.getMessage());
-            throw new BadRequestException(CommonErrorCode.INTERNAL_SERVER_ERROR);
+            throw new UserFeedbackException(CommonErrorCode.INTERNAL_SERVER_ERROR);
         }
 
         return fileMetadata;
@@ -97,7 +97,7 @@ public class DefaultFileService implements FileService {
     public void delete(String filePath) {
         // filePath가 '/{y}/{m}/{d}/{UUID}.{ext}'의 형식이 아니라면 예외
         if(!filePath.matches("^/\\d{4}/\\d{1,2}/\\d{1,2}/[\\w\\-]+\\.\\w+$")) {
-            throw new BadRequestException(FileErrorCode.INVALID_FILE_PATH, filePath);
+            throw new UserFeedbackException(FileErrorCode.INVALID_FILE_PATH, filePath);
         }
         
         File file = new File(customProps.getFiles().getImg().getDirectory() + filePath);
@@ -127,16 +127,16 @@ public class DefaultFileService implements FileService {
         );
     }
 
-    public String extractExtension(String filename) throws BadRequestException {
+    public String extractExtension(String filename) throws UserFeedbackException {
         try {
             String extension = filename.substring(filename.lastIndexOf(".") + 1);
             if (extension.isEmpty()) {
-                throw new BadRequestException(FileErrorCode.INVALID_FILE_EXTENSION, filename);
+                throw new UserFeedbackException(FileErrorCode.INVALID_FILE_EXTENSION, filename);
             } else {
                 return extension;
             }
         } catch (Exception e) {
-            throw new BadRequestException(FileErrorCode.INVALID_FILE_NAME, filename);
+            throw new UserFeedbackException(FileErrorCode.INVALID_FILE_NAME, filename);
         }
     }
 

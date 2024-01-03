@@ -1,23 +1,19 @@
 package org.pageflow.base.exception;
 
-import lombok.AccessLevel;
 import lombok.Getter;
 import org.pageflow.base.exception.code.ErrorCode;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * @author : sechan
- */
-@Getter
-public class BadRequestException extends RuntimeException {
 
-    private final ErrorCode errorCode;
-    @Getter(AccessLevel.NONE)
-    private String messageWithArgs;
+public class UserFeedbackException extends RuntimeException {
     
-    public BadRequestException(ErrorCode domainError, String... args) {
+    @Getter
+    private final ErrorCode errorCode;
+    private final String messageWithArgs;
+    
+    public UserFeedbackException(ErrorCode domainError, String... args) {
         super();
         this.errorCode = domainError;
         Pattern pattern = Pattern.compile("\\{\\d}");
@@ -30,7 +26,7 @@ public class BadRequestException extends RuntimeException {
         }
         // 파라미터 갯수 불일치
         if(argCount != args.length){
-            throw new ErrorCodeParseException(errorCode.toString() + "에러 코드를 담은 exception을 생성할 수 없습니다: 파라미터 개수" + argCount + "개 중 " + args.length + "개가 입력되었습니다.");
+            throw new ErrorCodeParseException(errorCode + "에러 코드를 담은 exception을 생성할 수 없습니다: 파라미터 개수" + argCount + "개 중 " + args.length + "개가 입력되었습니다.");
         }
         
         // 파라미터 치환

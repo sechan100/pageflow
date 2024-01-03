@@ -1,14 +1,13 @@
 package org.pageflow.base.exception.code;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.pageflow.domain.user.constants.UserSignupPolicy;
+import org.springframework.http.HttpStatus;
 
 /**
  * @author : sechan
  */
 @Getter
-@AllArgsConstructor
 public enum UserErrorCode implements ErrorCode {
     // 빈 문자열
       BLANK_USERNAME("아이디를 입력해주세요.")
@@ -40,6 +39,23 @@ public enum UserErrorCode implements ErrorCode {
     
     // 존재하지 않음
     , USERNAME_NOT_EXIST("'{0}'은(는) 존재하지 않는 아이디입니다.")
+    
+    // 만료됨
+    , SESSION_EXPIRED("로그인 시간이 만료되었습니다. 다시 로그인해주세요.")
     ;
     private final String messageTemplate;
+    private final HttpStatus httpStatus;
+    
+    
+    // HttpStatus 400
+    UserErrorCode(String messageTemplate) {
+        this.messageTemplate = messageTemplate;
+        this.httpStatus = HttpStatus.BAD_REQUEST;
+    }
+    
+    // HttpStatus가 400가 아닌 경우
+    UserErrorCode(String messageTemplate, HttpStatus httpStatus) {
+        this.messageTemplate = messageTemplate;
+        this.httpStatus = httpStatus;
+    }
 }

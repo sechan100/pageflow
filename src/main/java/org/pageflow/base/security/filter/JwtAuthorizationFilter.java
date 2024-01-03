@@ -6,9 +6,14 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.pageflow.domain.user.constants.RoleType;
 import org.pageflow.domain.user.jwt.JwtProvider;
+import org.pageflow.domain.user.model.dto.PrincipalContext;
+import org.pageflow.domain.user.model.token.AccessToken;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -35,10 +40,26 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
-    
-        // 유효한 경우 토큰으로 인증 객체를 생성
-        Authentication authentication = jwtProvider.parseAccessToken(accessTokenOptional.get());
-        // 인증 객체를 세팅
+        
+        // 토큰 파싱
+        AccessToken accessToken = jwtProvider.parseAccessToken(accessTokenOptional.get());
+        
+        // principal 작성
+        UserDetails principal = new PrincipalContext(
+                accessToken.getUID(),
+                accessToken.getUsername(),
+                "",
+                accessToken.getRole()
+        );
+        
+        // authentication 작성
+        Authentication authentication = new UsernamePasswordAuthenticationToken(
+                principal,
+                "",
+                RoleType.getAuthorities(accessToken.getRole())
+        );
+
+        // authentication 할당
         SecurityContextHolder.getContext().setAuthentication(authentication);
     
         filterChain.doFilter(request, response);

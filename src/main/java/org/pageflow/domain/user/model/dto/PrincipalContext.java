@@ -22,11 +22,13 @@ public class PrincipalContext extends User implements OAuth2User {
 
     protected Long id;
     protected String username;
+    protected RoleType role;
     
-    public PrincipalContext(Long id, String username, String password, RoleType roleType) {
+    public PrincipalContext(Long UID, String username, String password, RoleType roleType) {
         super(username, password, RoleType.getAuthorities(roleType));
-        this.id = id;
+        this.id = UID;
         this.username = username;
+        this.role = roleType;
     }
     
     public static PrincipalContext from(Account user) {
@@ -45,7 +47,6 @@ public class PrincipalContext extends User implements OAuth2User {
                 "",
                 RoleType.ROLE_ANONYMOUS);
     }
-    
     
     @Override
     public Map<String, Object> getAttributes() {

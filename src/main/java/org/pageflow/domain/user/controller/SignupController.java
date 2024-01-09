@@ -14,7 +14,7 @@ import org.pageflow.domain.user.entity.SignupCache;
 import org.pageflow.domain.user.model.dto.SignupForm;
 import org.pageflow.domain.user.model.dto.UserDto;
 import org.pageflow.domain.user.repository.SignupCacheRepository;
-import org.pageflow.domain.user.service.DefaultUserService;
+import org.pageflow.domain.user.service.UserApplication;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,7 +28,7 @@ public class SignupController {
 
     private final Rq rq;
     private final SignupCacheRepository signupCacheRepository;
-    private final DefaultUserService defaultUserService;
+    private final UserApplication userApplication;
     
     
     
@@ -40,21 +40,21 @@ public class SignupController {
         boolean isOAuth = signupCacheRepository.existsById(form.getUsername());
         Account savedAccount;
         
-        // OAuth2 회원가입
+        // 1. OAuth2 회원가입
         if(isOAuth){
             // 캐시 가져옴
             SignupCache cache = signupCacheRepository.findById(form.getUsername()).orElseThrow();
             
-            // 사용자 등록(사용자가 임의로 변경해선 안되는 데이터는 캐시에서 지정)
-            savedAccount = defaultUserService.signup(form, cache.getProvider(), RoleType.ROLE_USER);
+            // 사용자 등록(사용자가 임의로 변경해선 안되는 데이터는 캐시에 있던 값으로 지정: Provider)
+            savedAccount = userApplication.signup(form, cache.getProvider(), RoleType.ROLE_USER);
             
             // 캐싱된 회원가입 데이터를 삭제
             signupCacheRepository.deleteById(form.getUsername());
         }
-        // 일반 회원가입
+        // 2. 일반 회원가입
         else {
             // 사용자 등록
-            savedAccount = defaultUserService.signup(form, ProviderType.NATIVE, RoleType.ROLE_USER);
+            savedAccount = userApplication.signup(form, ProviderType.NATIVE, RoleType.ROLE_USER);
         }
         
         // 사용자 데이터 반환

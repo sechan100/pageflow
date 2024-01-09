@@ -1,4 +1,4 @@
-package org.pageflow.base.constants.deploy;
+package org.pageflow.base.deploy;
 
 
 import lombok.RequiredArgsConstructor;

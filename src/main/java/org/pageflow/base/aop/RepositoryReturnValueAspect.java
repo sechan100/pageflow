@@ -6,8 +6,8 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.pageflow.base.exception.UserFeedbackException;
 import org.pageflow.base.exception.code.CommonErrorCode;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -20,7 +20,6 @@ import java.util.stream.Collectors;
 @Aspect
 @Component
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class RepositoryReturnValueAspect {
     
     
@@ -31,20 +30,25 @@ public class RepositoryReturnValueAspect {
         // 메소드 실행
         Object result = joinPoint.proceed();
         Object[] args = joinPoint.getArgs();
-        String arsString = "(" + Arrays.stream(args).map(Object::toString).collect(Collectors.joining(", ")) + ")";
+        String argString = "(" + Arrays.stream(args).map(Object::toString).collect(Collectors.joining(", ")) + ")";
         String entityName = joinPoint.getSignature().getDeclaringType().getSimpleName().replace("Repository", "");
-        // 단일 엔티티 객체일 경우의 처리
+        // 1. 단일 엔티티 객체일 경우의 처리
         if(result == null){
-            throw new UserFeedbackException(CommonErrorCode.DATA_NOT_FOUND, entityName + "를 다음으로 조회: " + arsString);
+            throw new UserFeedbackException(CommonErrorCode.DATA_NOT_FOUND, entityName + "를 다음으로 조회: " + argString);
             
-        // 컬렉션 객체일 경우의 처리
+        // 2. 컬렉션 객체일 경우의 처리
         } else if(result instanceof Collection<?> results){
             if(results.isEmpty()){
-                throw new UserFeedbackException(CommonErrorCode.DATA_NOT_FOUND, entityName + "컬렉션을 다음으로 조회: " + arsString);
+                throw new UserFeedbackException(CommonErrorCode.DATA_NOT_FOUND, entityName + "컬렉션을 다음으로 조회: " + argString);
             }
+        // 3. Optional 객체일 경우의 처리
         } else if(result instanceof Optional<?> optional){
             if(optional.isEmpty()){
-                throw new UserFeedbackException(CommonErrorCode.DATA_NOT_FOUND, entityName + "를 다음으로 조회: " + arsString);
+                throw new UserFeedbackException(CommonErrorCode.DATA_NOT_FOUND, entityName + "를 다음으로 조회: " + argString);
+            }
+        } else if(result instanceof Slice<?> sliceOrPage){
+            if(sliceOrPage.isEmpty()){
+                throw new UserFeedbackException(CommonErrorCode.DATA_NOT_FOUND, entityName + "페이지(slice를) 다음으로 조회: " + argString);
             }
         }
         

@@ -1,22 +1,14 @@
 package org.pageflow.domain.user.service;
 
 
-import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 import org.pageflow.base.constants.CustomProps;
 import org.pageflow.base.exception.UserFeedbackException;
 import org.pageflow.base.exception.code.UserErrorCode;
-import org.pageflow.domain.user.constants.ProviderType;
-import org.pageflow.domain.user.constants.RoleType;
 import org.pageflow.domain.user.constants.UserSignupPolicy;
 import org.pageflow.domain.user.entity.Account;
 import org.pageflow.domain.user.entity.Profile;
-import org.pageflow.domain.user.jwt.JwtProvider;
-import org.pageflow.domain.user.model.dto.PrincipalContext;
-import org.pageflow.domain.user.model.dto.SignupForm;
-import org.pageflow.domain.user.model.token.AccessToken;
-import org.pageflow.domain.user.model.token.RefreshToken;
-import org.pageflow.domain.user.model.token.SessionToken;
+import org.pageflow.infra.jwt.provider.JwtProvider;
 import org.pageflow.domain.user.repository.AccountRepository;
 import org.pageflow.domain.user.repository.ProfileRepository;
 import org.pageflow.domain.user.repository.TokenSessionRepository;
@@ -34,18 +26,15 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.thymeleaf.TemplateEngine;
-
-import java.util.Map;
-import java.util.Objects;
 
 /**
  *
  */
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class DefaultUserService {
     
     private final AccountRepository accountRepository;
@@ -59,46 +48,17 @@ public class DefaultUserService {
     private final CustomProps customProps;
     private final JwtProvider jwtProvider;
     
-    
     /**
-     * @param form 회원가입 폼
-     * @param userRole 사용자에게 부여할 권한
-     * @return 영속화된 계정
+     * 서로 연관이 없는 새로운 Account와 Profile의 인스턴스를 적절한 순서로 연관관계를 지은 후 저장한다. <br>
+     * 누가 먼저 영속화되냐, account에 profile이 있냐 profile에 account가 있냐에 따라서 에러가 발생할 수 있기 때문
      */
-    public Account signup(SignupForm form, ProviderType provider, RoleType userRole) {
-        
-        // username 검사
-        validateUsername(form.getUsername());
-        // email 검사
-        validateEmail(form.getEmail());
-        // password 검사
-        validatePassword(form.getPassword(), form.getPasswordConfirm());
-        // penname 검사
-        validatePenname(form.getPenname());
-        
-        // 프로필 생성
-        Profile profile = Profile.builder()
-                .penname(form.getPenname())
-                // 프로필 사진을 등록하지 않은 경우, 기본 이미지로 설정한다.
-                .profileImgUrl(Objects.requireNonNullElse(form.getProfileImgUrl(), customProps.getDefaults().getDefaultUserProfileImg()))
-                .build();
-        
-        // 계정 생성
-        Account account = Account.builder()
-                .provider(provider)
-                .email(form.getEmail())
-                .username(form.getUsername())
-                .password(passwordEncoder.encode(form.getPassword()))
-                .role(userRole)
-                .build();
-        
-        return saveUser(account, profile);
-    }
-    
+    @Transactional
     public Account saveUser(Account account, Profile profile) {
         
         // Account 먼저 영속
         Account savedAccount = accountRepository.save(account);
+        
+        // 영속된 account를 영속되지 않은 profile과 연관지음
         profile.associateAccount(savedAccount);
         
         // Profile 영속
@@ -107,7 +67,6 @@ public class DefaultUserService {
         return savedProfile.getAccount();
     }
     
-    // username 검사
     public void validateUsername(String username) {
         
         // 1. null, 공백문자 검사
@@ -133,7 +92,6 @@ public class DefaultUserService {
         }
     }
     
-    // email 검사
     public void validateEmail(String email){
         
         // 1. null, 빈 문자열 검사
@@ -152,7 +110,6 @@ public class DefaultUserService {
         }
     }
     
-    // password 검사
     public void validatePassword(String password, @Nullable String passwordConfirm) {
         
         // 1. null, 빈 문자열 검사
@@ -171,7 +128,6 @@ public class DefaultUserService {
         }
     }
     
-    // penname 검사
     public void validatePenname(String penname) {
         
         // 1. null, 빈 문자열 검사
@@ -197,38 +153,10 @@ public class DefaultUserService {
         }
     }
     
-    /**
-     * @param username 아이디
-     * @param password 비밀번호
-     * @return accessToken, refreshToken
-     */
-    public Map<String, SessionToken> login(String username, String password) {
-        Authentication authentication = delegateAuthenticate(username, password);
+    public Authentication authenticate(String username, String password) {
         
-        if(authentication.getPrincipal() instanceof PrincipalContext principal) {
-            // accessToken 발급
-            AccessToken accessToken = jwtProvider.generateAccessToken(
-                    principal.getId(),
-                    principal.getUsername(),
-                    principal.getRole()
-            );
-            
-            // refreshToken 발급
-            RefreshToken refreshToken = jwtProvider.generateRefreshToken(principal.getId());
-            
-            // 응답 객체 반환
-            return Map.of(
-                    "accessToken", accessToken,
-                    "refreshToken", refreshToken
-            );
-            
-        } else {
-            throw new IllegalArgumentException("authentication.getPrincipal() 객체가 PrincipalContext의 인스턴스가 아닙니다. \n UserDetailsService의 구현이 올바른지 확인해주세요.");
-        }
-        
-    }
-    
-    private Authentication delegateAuthenticate(String username, String password) {
+        Assert.hasText(username, "username이 비어있습니다.");
+        Assert.hasText(password, "password가 비어있습니다.");
         
         UserDetails principal = User.builder()
                 .username(username)
@@ -255,33 +183,5 @@ public class DefaultUserService {
         }
     }
     
-    public void logout(String refreshToken) {
-        try {
-            RefreshToken token = jwtProvider.parseRefreshToken(refreshToken);
-            tokenSessionRepository.deleteById(token.getSessionId());
-        } catch(ExpiredJwtException ignored) {
-            // 어차피 만료된 토큰이면 로그아웃된거나 마찬가지.. -> 무시
-        }
-    }
     
-    public AccessToken refresh(String refreshToken){
-        
-        try {
-            // 파싱된 토큰에서 해당 세션에 해당하는 UUID 형태의 PK를 추출
-            String sessionId = jwtProvider.parseRefreshToken(refreshToken).getSessionId();
-            
-            // 세션의 소유자를 조회
-            Account user = tokenSessionRepository.findWithAccountById(sessionId).getAccount();
-            
-            // 새 토큰을 발급
-            return jwtProvider.generateAccessToken(
-                    user.getId(),
-                    user.getUsername(),
-                    user.getRole()
-            );
-        } catch(ExpiredJwtException e) {
-            // 만료된 세션인 경우 피드백
-            throw new UserFeedbackException(UserErrorCode.SESSION_EXPIRED);
-        }
-    }
 }

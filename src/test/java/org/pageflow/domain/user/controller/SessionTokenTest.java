@@ -26,7 +26,7 @@ public class SessionTokenTest {
         this.mockMvc.perform(
                 get("/anyRequest")
                         .header("Authorization", "Bearer " + accessToken)
-        )
+                ).andReturn().getResponse()
                 .andExpect(status().isOk());
     }
 }

@@ -11,7 +11,6 @@ import org.pageflow.domain.user.repository.AccountRepository;
 import org.pageflow.domain.user.repository.ProfileRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
 
@@ -19,7 +18,6 @@ import java.util.Objects;
  * @author : sechan
  */
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class AdminUserService {
     

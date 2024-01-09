@@ -1,4 +1,4 @@
-package org.pageflow.domain.user.jwt;
+package org.pageflow.infra.jwt.provider;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -6,14 +6,11 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import lombok.extern.slf4j.Slf4j;
 import org.pageflow.domain.user.constants.RoleType;
-import org.pageflow.domain.user.entity.TokenSession;
-import org.pageflow.domain.user.model.token.AccessToken;
-import org.pageflow.domain.user.model.token.RefreshToken;
-import org.pageflow.domain.user.repository.AccountRepository;
-import org.pageflow.domain.user.repository.TokenSessionRepository;
+import org.pageflow.infra.jwt.token.AccessToken;
+import org.pageflow.infra.jwt.token.RefreshToken;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
@@ -22,33 +19,22 @@ import java.util.UUID;
 
 
 @Service
-@Transactional
 @Slf4j
 public class JwtProvider {
     
     @Value("${jwt.secret}")
     private String secretKey;
-    private final TokenSessionRepository tokenSessionRepository;
-    private final AccountRepository accountRepository;
     private Key signKey;
     public static final String ROLE_CLAIM_KEY = "rol";
     public static final String UID_CLAIM_KEY = "uid";
     public static final long ACCESS_TOKEN_EXPIRED_IN = (1000 * 60) * 30; // 30분
     public static final long REFRESH_TOKEN_EXPIRED_IN = (1000 * 60) * 60 * 24 * 14; // 14일
     
-    public JwtProvider(
-            TokenSessionRepository tokenSessionRepository,
-            AccountRepository accountRepository
-    ) {
-        this.tokenSessionRepository = tokenSessionRepository;
-        this.accountRepository = accountRepository;
-    }
     
-
-    /**
-     * access token 발급
-     */
     public AccessToken generateAccessToken(Long userId, String username, RoleType roleType) {
+        Assert.notNull(userId, "userId must not be null");
+        Assert.hasText(username, "username must not be null or empty");
+        Assert.notNull(roleType, "roleType must not be null");
         
         Date issuedAt = new Date();
         Date expiredIn = new Date(System.currentTimeMillis() + ACCESS_TOKEN_EXPIRED_IN);
@@ -71,11 +57,9 @@ public class JwtProvider {
                 .username(username)
                 .build();
     }
-
-    /**
-     *  refresh token 발급 및 저장
-     */
+    
     public RefreshToken generateRefreshToken(Long userId) {
+        Assert.notNull(userId, "userId must not be null");
         
         Date issuedAt = new Date();
         Date expiredIn = new Date(System.currentTimeMillis() + REFRESH_TOKEN_EXPIRED_IN);
@@ -90,26 +74,9 @@ public class JwtProvider {
         claims.setIssuedAt(issuedAt); // "iat": 1516239022
         claims.setExpiration(expiredIn); // "exp": 1516239022
         
-        // refresh token 생성
-        String token = compact(claims);
-        
-        try {
-            // 새로운 세션을 저장
-            tokenSessionRepository.save(
-                    TokenSession.builder()
-                            .id(sessionId) // UUID
-                            .refreshToken(token) // refreshToken
-                            .expiredIn(expiredIn.getTime()) // 만료시간
-                            .account(accountRepository.getReferenceById(userId)) // account
-                            .build()
-            );
-        } catch(Exception e) {
-            log.error("refresh token 영속화 실패: {}", e.getMessage());
-        }
-        
-        
+        // refresh token dto 생성
         return RefreshToken.builder()
-                .token(token)
+                .token(compact(claims))
                 .iat(issuedAt)
                 .exp(expiredIn)
                 .UID(userId)
@@ -118,6 +85,8 @@ public class JwtProvider {
     }
     
     public AccessToken parseAccessToken(String accessToken) {
+        Assert.hasText(accessToken, "accessToken must not be null or empty");
+        
         Claims claims = parseToken(accessToken);
         return AccessToken.builder()
                 .token(accessToken)
@@ -130,6 +99,8 @@ public class JwtProvider {
     }
 
     public RefreshToken parseRefreshToken(String refreshToken) {
+        Assert.hasText(refreshToken, "refreshToken must not be null or empty");
+        
         Claims claims = parseToken(refreshToken);
         return RefreshToken.builder()
                 .token(refreshToken)
@@ -140,7 +111,6 @@ public class JwtProvider {
                 .build();
     }
     
-    
     public Key getSignKey() {
         if(signKey == null){
             byte[] decodedKey = secretKey.getBytes();
@@ -148,6 +118,7 @@ public class JwtProvider {
         }
         return signKey;
     }
+    
     
     /**
      * @param token 토큰
@@ -165,7 +136,7 @@ public class JwtProvider {
             
         // 그 외의 예외는 JwtException으로 던짐
         } catch(Exception exception) {
-            log.error("토큰 해석 실패: {} ", exception.getMessage());
+            log.error("토큰 파싱 실패: {} ", exception.getMessage());
             throw new JwtException(exception.getMessage(), exception);
         }
     }

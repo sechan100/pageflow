@@ -50,8 +50,6 @@ public class ForwordBuilder {
         return this;
     }
     
-    
-    
     public void send(){
         StringBuilder sb = new StringBuilder();
         sb.append(forwordUrl);

@@ -1,4 +1,4 @@
-package org.pageflow.domain.user.model.token;
+package org.pageflow.infra.jwt.token;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

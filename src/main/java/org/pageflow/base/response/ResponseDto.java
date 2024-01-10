@@ -3,7 +3,7 @@ package org.pageflow.base.response;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.pageflow.base.exception.UserFeedbackException;
-import org.pageflow.base.exception.code.ErrorCode;
+import org.pageflow.base.exception.code.ApiStatusCode;
 
 /**
  * @author : sechan
@@ -13,7 +13,7 @@ import org.pageflow.base.exception.code.ErrorCode;
 public class ResponseDto {
     
     private ApiStatus status;
-    private ErrorCode errorCode;
+    private ApiStatusCode apiStatusCode;
     private String message;
     private Object data;
     
@@ -22,8 +22,8 @@ public class ResponseDto {
         return new ResponseDto(ApiStatus.SUCCESS, null, ApiStatus.SUCCESS.getMessage(), data);
     }
     
-    public static ResponseDto error(UserFeedbackException e){
-        return new ResponseDto(ApiStatus.ERROR, e.getErrorCode(), e.getMessage(), null);
+    public static ResponseDto feedback(UserFeedbackException e){
+        return new ResponseDto(ApiStatus.FEEDBACK, (ApiStatusCode) e.getFeedbackCode(), e.getMessage(), null);
     }
     
 }

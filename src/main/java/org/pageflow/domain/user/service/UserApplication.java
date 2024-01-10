@@ -15,7 +15,6 @@ import java.util.Map;
 public interface UserApplication {
     
     Account signup(SignupForm form, ProviderType provider, RoleType userRole);
-    
     /**
      * @return accessToken, refreshToken
      */

@@ -38,21 +38,27 @@ public class CustomProps {
         @Setter
         @NoArgsConstructor
         public static class Img {
-            private String baseUrl;
+            private String webUrlPrefix;
             private String directory;
             
             
-            public Img(String baseUrl, String directory) {
-                if(baseUrl.endsWith("/")) {
-                    baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
-                }
-                if(directory.endsWith("/")) {
-                    directory = directory.substring(0, directory.length() - 1);
-                }
+            public Img(String webUrlPrefix, String directory) {
+                this.webUrlPrefix = addPrefixSlashAndRemoveSuffixSlash(webUrlPrefix);
+                this.directory = addPrefixSlashAndRemoveSuffixSlash(directory);
                 
-                this.baseUrl = baseUrl;
-                this.directory = directory;
-                
+            }
+            
+            /**
+             * path를 받아서 맨 앞에 /가 없다면 붙이고, 맨 뒤에 /가 있다면 지운다.
+             */
+            private String addPrefixSlashAndRemoveSuffixSlash(String path) {
+                if(path.endsWith("/")) {
+                    path = path.substring(0, path.length() - 1);
+                }
+                if(!path.startsWith("/")) {
+                    path = "/" + path;
+                }
+                return path;
             }
         }
     }

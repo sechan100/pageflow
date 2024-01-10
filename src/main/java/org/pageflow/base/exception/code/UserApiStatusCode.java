@@ -8,7 +8,7 @@ import org.springframework.http.HttpStatus;
  * @author : sechan
  */
 @Getter
-public enum UserErrorCode implements ErrorCode {
+public enum UserApiStatusCode implements FeedbackCode {
     // 빈 문자열
       BLANK_USERNAME("아이디를 입력해주세요.")
     , BLANK_PASSWORD("비밀번호를 입력해주세요.")
@@ -48,13 +48,13 @@ public enum UserErrorCode implements ErrorCode {
     
     
     // HttpStatus 400
-    UserErrorCode(String messageTemplate) {
+    UserApiStatusCode(String messageTemplate) {
         this.messageTemplate = messageTemplate;
         this.httpStatus = HttpStatus.BAD_REQUEST;
     }
     
     // HttpStatus가 400가 아닌 경우
-    UserErrorCode(String messageTemplate, HttpStatus httpStatus) {
+    UserApiStatusCode(String messageTemplate, HttpStatus httpStatus) {
         this.messageTemplate = messageTemplate;
         this.httpStatus = httpStatus;
     }

@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pageflow.base.constants.CustomProps;
 import org.pageflow.base.exception.UserFeedbackException;
-import org.pageflow.base.exception.code.UserErrorCode;
+import org.pageflow.base.exception.code.UserApiStatusCode;
 import org.pageflow.domain.user.constants.ProviderType;
 import org.pageflow.domain.user.constants.RoleType;
 import org.pageflow.domain.user.entity.Account;
@@ -142,7 +142,7 @@ public class UserApplicationImpl implements UserApplication {
             );
         } catch(ExpiredJwtException e) {
             // 만료된 세션인 경우 피드백
-            throw new UserFeedbackException(UserErrorCode.SESSION_EXPIRED);
+            throw new UserFeedbackException(UserApiStatusCode.SESSION_EXPIRED);
         }
     }
 }

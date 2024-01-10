@@ -8,12 +8,7 @@ import java.util.List;
 
 public interface FileMetadataRepository extends JpaRepository<FileMetadata, Long> {
 
-    List<FileMetadata> findAllByOwnerIdAndOwnerEntityTypeAndFileMetadataType(Long id, String simpleName, FileMetadataType fileMetadataType);
-
-    /**
-     * @param pathPrefix      {y}/{m}/{d}/
-     * @param managedFilename {UUID}.{확장자}
-     * @return Optional<FileMetadata>
-     */
-    FileMetadata findByPathPrefixAndManagedFilename(String pathPrefix, String managedFilename);
+    List<FileMetadata> findAllByOwnerIdAndOwnerEntityTypeAndFileMetadataType(String id, String simpleName, FileMetadataType fileMetadataType);
+    
+    void deleteByManagedFilename(String managedFilename);
 }

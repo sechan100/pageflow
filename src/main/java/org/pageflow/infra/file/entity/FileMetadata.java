@@ -17,7 +17,7 @@ import org.pageflow.infra.file.constants.FileMetadataType;
 public class FileMetadata extends DefaultBaseEntity {
 
     @Column(name = "owner_id")
-    private Long ownerId;
+    private String ownerId;
 
     @Column(name = "owner_entity_type")
     private String ownerEntityType;
@@ -33,7 +33,7 @@ public class FileMetadata extends DefaultBaseEntity {
 
     /**
      * 서버 업로드 디렉토리 경로
-     * {uploadDirectory}/
+     * /{uploadDirectory}
      */
     @Column
     private String uploadDirectory;
@@ -46,6 +46,7 @@ public class FileMetadata extends DefaultBaseEntity {
     /**
      * {UUID}.{확장자}
      */
+    @Column(unique = true)
     private String managedFilename;
 
     /**
@@ -54,7 +55,7 @@ public class FileMetadata extends DefaultBaseEntity {
     private String originalExtension;
 
     /**
-     * {y}/{m}/{d}/
+     * /{y}/{m}/{d}
      */
     private String pathPrefix;
 

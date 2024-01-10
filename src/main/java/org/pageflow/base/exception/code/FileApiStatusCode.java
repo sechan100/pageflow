@@ -8,7 +8,7 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-public enum FileErrorCode implements ErrorCode {
+public enum FileApiStatusCode implements FeedbackCode {
     
     // 비어있음
       BLANK_FILE("파일이 비어있습니다.")

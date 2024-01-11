@@ -2,7 +2,7 @@ package org.pageflow.infra.file.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.pageflow.base.entity.DefaultBaseEntity;
+import org.pageflow.global.entity.DefaultBaseEntity;
 import org.pageflow.infra.file.constants.FileMetadataType;
 
 @Entity

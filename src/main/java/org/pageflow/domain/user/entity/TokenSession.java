@@ -2,7 +2,7 @@ package org.pageflow.domain.user.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.pageflow.base.entity.BaseEntity;
+import org.pageflow.global.entity.BaseEntity;
 
 /**
  * @author : sechan

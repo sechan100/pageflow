@@ -1,7 +1,7 @@
 package org.pageflow.domain.user.service;
 
 import lombok.RequiredArgsConstructor;
-import org.pageflow.base.constants.CustomProps;
+import org.pageflow.global.constants.CustomProps;
 import org.pageflow.domain.user.constants.ProviderType;
 import org.pageflow.domain.user.constants.RoleType;
 import org.pageflow.domain.user.entity.Account;

@@ -1,9 +1,9 @@
 package org.pageflow.infra.file.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.pageflow.base.constants.CustomProps;
-import org.pageflow.base.entity.BaseEntity;
-import org.pageflow.base.entity.DefaultBaseEntity;
+import org.pageflow.global.constants.CustomProps;
+import org.pageflow.global.entity.BaseEntity;
+import org.pageflow.global.entity.DefaultBaseEntity;
 import org.pageflow.infra.file.constants.FileMetadataType;
 import org.pageflow.infra.file.entity.FileMetadata;
 import org.pageflow.infra.file.exception.FileProcessingException;

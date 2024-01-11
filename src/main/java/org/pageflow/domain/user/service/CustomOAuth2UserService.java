@@ -2,8 +2,8 @@ package org.pageflow.domain.user.service;
 
 
 import lombok.RequiredArgsConstructor;
-import org.pageflow.base.request.Rq;
-import org.pageflow.base.response.ApiStatus;
+import org.pageflow.global.request.RequestContext;
+import org.pageflow.global.response.ApiStatus;
 import org.pageflow.domain.user.entity.Account;
 import org.pageflow.domain.user.entity.SignupCache;
 import org.pageflow.domain.user.model.dto.PrincipalContext;
@@ -31,7 +31,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
     private final DefaultUserService defaultUserService;
     private final AccountRepository accountRepository;
     private final SignupCacheRepository signupCacheRepository;
-    private final Rq rq;
+    private final RequestContext requestContext;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -50,7 +50,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
             Account account = accountRepository.findFetchJoinProfileByUsername(resourceOwner.getUsername());
             
             // 포워딩으로 위임
-            rq.forwardBuilder("/internal/login")
+            requestContext.forwardBuilder("/internal/login")
                     .status(ApiStatus.SUCCESS)
                     .param("username", resourceOwner.getUsername())
                     .param("password", account.getPassword())
@@ -75,9 +75,9 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
             }
             
             // OAuth2 캐시 데이터를 반환
-            rq.forwardBuilder("/internal/signup/cache")
+            requestContext.forwardBuilder("/internal/signup/cache")
                     .param("username", resourceOwner.getUsername())
-                    .status(ApiStatus.OAUTH2_SIGNUP_REQUIRED)
+                    .status(ApiStatus.CONDITIONAL_SUCCESS)
                     .send();
         }
         

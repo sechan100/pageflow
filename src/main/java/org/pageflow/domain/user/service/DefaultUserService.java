@@ -2,9 +2,9 @@ package org.pageflow.domain.user.service;
 
 
 import lombok.RequiredArgsConstructor;
-import org.pageflow.base.constants.CustomProps;
-import org.pageflow.base.exception.UserFeedbackException;
-import org.pageflow.base.exception.code.UserApiStatusCode;
+import org.pageflow.global.constants.CustomProps;
+import org.pageflow.global.business.BizException;
+import org.pageflow.global.business.UserApiStatusCode;
 import org.pageflow.domain.user.constants.UserSignupPolicy;
 import org.pageflow.domain.user.entity.Account;
 import org.pageflow.domain.user.entity.Profile;
@@ -71,24 +71,24 @@ public class DefaultUserService {
         
         // 1. null, 공백문자 검사
         if(!StringUtils.hasText(username)){
-            throw new UserFeedbackException(UserApiStatusCode.BLANK_USERNAME);
+            throw new BizException(UserApiStatusCode.BLANK_USERNAME);
         }
         
         // 2. username 정규식 검사
         if(!username.matches(UserSignupPolicy.USERNAME_REGEX)) {
-            throw new UserFeedbackException(UserApiStatusCode.USERNAME_REGEX_NOT_MATCH);
+            throw new BizException(UserApiStatusCode.USERNAME_REGEX_NOT_MATCH);
         }
         
         // 3. 사용할 수 없는 username 검사
         for(String invalidUsername : UserSignupPolicy.INVALID_USERNAME) {
             if(username.contains(invalidUsername)) {
-                throw new UserFeedbackException(UserApiStatusCode.UNUSEABLE_USERNAME, username);
+                throw new BizException(UserApiStatusCode.UNUSEABLE_USERNAME, username);
             }
         }
         
         // 4. username 중복 검사
         if(accountRepository.existsByUsername(username)){
-            throw new UserFeedbackException(UserApiStatusCode.DUPLICATE_USERNAME, username);
+            throw new BizException(UserApiStatusCode.DUPLICATE_USERNAME, username);
         }
     }
     
@@ -96,17 +96,17 @@ public class DefaultUserService {
         
         // 1. null, 빈 문자열 검사
         if(!StringUtils.hasText(email)){
-            throw new UserFeedbackException(UserApiStatusCode.BLANK_EMAIL);
+            throw new BizException(UserApiStatusCode.BLANK_EMAIL);
         }
         
         // 2. email 형식 검사
         if(!email.matches("^[_a-z0-9-]+(.[_a-z0-9-]+)*@(?:\\w+\\.)+\\w+$")){
-            throw new UserFeedbackException(UserApiStatusCode.EMAIL_REGEX_NOT_MATCH);
+            throw new BizException(UserApiStatusCode.EMAIL_REGEX_NOT_MATCH);
         }
         
         // 3. email 중복 검사
         if(accountRepository.existsByEmailAndEmailVerified(email, true)){
-            throw new UserFeedbackException(UserApiStatusCode.DUPLICATE_EMAIL, email);
+            throw new BizException(UserApiStatusCode.DUPLICATE_EMAIL, email);
         }
     }
     
@@ -114,17 +114,17 @@ public class DefaultUserService {
         
         // 1. null, 빈 문자열 검사
         if(!StringUtils.hasText(password)){
-            throw new UserFeedbackException(UserApiStatusCode.BLANK_PASSWORD);
+            throw new BizException(UserApiStatusCode.BLANK_PASSWORD);
         }
         
         // 2. password 정규식 검사
         if(!password.matches(UserSignupPolicy.PASSWORD_REGEX)) {
-            throw new UserFeedbackException(UserApiStatusCode.PASSWORD_REGEX_NOT_MATCH);
+            throw new BizException(UserApiStatusCode.PASSWORD_REGEX_NOT_MATCH);
         }
         
         // 3. password와 passwordConfirm이 일치 검사
         if(passwordConfirm != null && !password.equals(passwordConfirm)){
-            throw new UserFeedbackException(UserApiStatusCode.PASSWORD_CONFIRM_NOT_MATCH);
+            throw new BizException(UserApiStatusCode.PASSWORD_CONFIRM_NOT_MATCH);
         }
     }
     
@@ -132,24 +132,24 @@ public class DefaultUserService {
         
         // 1. null, 빈 문자열 검사
         if(!StringUtils.hasText(penname)){
-            throw new UserFeedbackException(UserApiStatusCode.BLANK_PENNAME);
+            throw new BizException(UserApiStatusCode.BLANK_PENNAME);
         }
         
         // 2. penname 정규식 검사
         if(!penname.matches(UserSignupPolicy.PENNAME_REGEX)) {
-            throw new UserFeedbackException(UserApiStatusCode.PENNAME_REGEX_NOT_MATCH);
+            throw new BizException(UserApiStatusCode.PENNAME_REGEX_NOT_MATCH);
         }
         
         // 3. 사용할 수 없는 필명
         for(String invalidPenname : UserSignupPolicy.INVALID_PENNAME) {
             if(penname.contains(invalidPenname)) {
-                throw new UserFeedbackException(UserApiStatusCode.UNUSEABLE_PENNAME, penname);
+                throw new BizException(UserApiStatusCode.UNUSEABLE_PENNAME, penname);
             }
         }
         
         // 4. penname 중복 검사
         if(profileRepository.existsByPenname(penname)){
-            throw new UserFeedbackException(UserApiStatusCode.DUPLICATE_PENNAME, penname);
+            throw new BizException(UserApiStatusCode.DUPLICATE_PENNAME, penname);
         }
     }
     
@@ -171,11 +171,11 @@ public class DefaultUserService {
             
             // UsernameNotFoundException
             if (authException instanceof UsernameNotFoundException) {
-                throw new UserFeedbackException(UserApiStatusCode.USERNAME_NOT_EXIST, username);
+                throw new BizException(UserApiStatusCode.USERNAME_NOT_EXIST, username);
                 
             // BadCredentialsException
             } else if (authException instanceof BadCredentialsException) {
-                throw new UserFeedbackException(UserApiStatusCode.PASSWORD_NOT_MATCH);
+                throw new BizException(UserApiStatusCode.PASSWORD_NOT_MATCH);
                 
             } else {
                 throw authException;

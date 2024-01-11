@@ -2,7 +2,7 @@ package org.pageflow.infra.util;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.pageflow.base.response.ApiStatus;
+import org.pageflow.global.response.ApiStatus;
 
 import java.util.HashMap;
 import java.util.Map;

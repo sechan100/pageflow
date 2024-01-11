@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
-import org.pageflow.base.entity.DefaultBaseEntity;
+import org.pageflow.global.entity.DefaultBaseEntity;
 import org.pageflow.domain.user.constants.ProviderType;
 import org.pageflow.domain.user.constants.RoleType;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;

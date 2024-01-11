@@ -6,7 +6,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.pageflow.base.request.Rq;
+import org.pageflow.global.request.RequestContext;
 import org.pageflow.domain.user.constants.ProviderType;
 import org.pageflow.domain.user.constants.RoleType;
 import org.pageflow.domain.user.entity.Account;
@@ -26,7 +26,7 @@ import java.util.UUID;
 @Tag(name = "User", description = "사용자 API")
 public class SignupController {
 
-    private final Rq rq;
+    private final RequestContext requestContext;
     private final SignupCacheRepository signupCacheRepository;
     private final UserApplication userApplication;
     

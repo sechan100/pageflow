@@ -119,7 +119,6 @@ public class JwtProvider {
         return signKey;
     }
     
-    
     /**
      * @param token 토큰
      * @return 클레임

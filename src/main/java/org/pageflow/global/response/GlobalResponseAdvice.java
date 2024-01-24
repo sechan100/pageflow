@@ -18,7 +18,7 @@ public class GlobalResponseAdvice implements ResponseBodyAdvice {
     
     @Override
     public boolean supports(@NonNull MethodParameter returnType, @NonNull Class converterType) {
-        // ResponseDto를 반환하지 않는 메소드에 적용
+        // 공통응답 객체를 반환하지 않는 메소드에 적용
         return !returnType.getParameterType().equals(GeneralResponse.class);
     }
     
@@ -31,7 +31,7 @@ public class GlobalResponseAdvice implements ResponseBodyAdvice {
             @NonNull ServerHttpRequest request,
             @NonNull ServerHttpResponse response
     ) {
-        return GeneralResponse.response(ApiStatus.SUCCESS, body);
+        return GeneralResponse.success(body);
     }
     
 }

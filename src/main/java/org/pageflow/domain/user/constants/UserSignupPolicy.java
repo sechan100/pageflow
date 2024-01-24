@@ -7,12 +7,12 @@ import java.util.Set;
  */
 public class UserSignupPolicy {
     
-    public static final Set<String> INVALID_USERNAME =
+    public static final Set<String> FORBIDDEN_USERNAME_WORDS =
             Set.of(
                     "admin","administrator","anonymous","pageflow"
             );
     
-    public static final Set<String> INVALID_PENNAME =
+    public static final Set<String> FORBIDDEN_PENNAME_WORDS =
             Set.of(
                     "admin","administrator","anonymous","pageflow","관리자","어드민","페이지플로우","패이지플로우","매니저",
                     "패플","도우미","고객센터","고객센타","고객샌터","고객샌타","한게임","한개임","운영자","엔토이","앤토이","씨펄",

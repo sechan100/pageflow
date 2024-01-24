@@ -2,18 +2,18 @@ package org.pageflow.domain.user.service;
 
 
 import lombok.RequiredArgsConstructor;
-import org.pageflow.global.constants.CustomProps;
-import org.pageflow.global.business.BizException;
-import org.pageflow.global.business.UserApiStatusCode;
 import org.pageflow.domain.user.constants.UserSignupPolicy;
 import org.pageflow.domain.user.entity.Account;
 import org.pageflow.domain.user.entity.Profile;
-import org.pageflow.infra.jwt.provider.JwtProvider;
 import org.pageflow.domain.user.repository.AccountRepository;
 import org.pageflow.domain.user.repository.ProfileRepository;
 import org.pageflow.domain.user.repository.TokenSessionRepository;
+import org.pageflow.global.constants.CustomProps;
+import org.pageflow.global.response.BizException;
+import org.pageflow.global.response.UserCode;
 import org.pageflow.infra.email.EmailSender;
 import org.pageflow.infra.file.service.FileService;
+import org.pageflow.infra.jwt.provider.JwtProvider;
 import org.springframework.lang.Nullable;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -67,96 +67,142 @@ public class DefaultUserService {
         return savedProfile.getAccount();
     }
     
+    /**
+     * @throws BizException INVALID_USERNAME, DUPLICATED_USERNAME, USERNAME_CONTAINS_FORBIDDEN_WORD
+     */
     public void validateUsername(String username) {
         
         // 1. null, 공백문자 검사
         if(!StringUtils.hasText(username)){
-            throw new BizException(UserApiStatusCode.BLANK_USERNAME);
+            throw BizException.builder()
+                    .code(UserCode.INVALID_USERNAME)
+                    .message("비어있는 username; null/빈 문자열/공백 문자열")
+                    .build();
         }
         
         // 2. username 정규식 검사
         if(!username.matches(UserSignupPolicy.USERNAME_REGEX)) {
-            throw new BizException(UserApiStatusCode.USERNAME_REGEX_NOT_MATCH);
+            throw BizException.builder()
+                    .code(UserCode.INVALID_USERNAME)
+                    .message(UserSignupPolicy.USERNAME_REGEX_DISCRIPTION)
+                    .build();
         }
         
         // 3. 사용할 수 없는 username 검사
-        for(String invalidUsername : UserSignupPolicy.INVALID_USERNAME) {
-            if(username.contains(invalidUsername)) {
-                throw new BizException(UserApiStatusCode.UNUSEABLE_USERNAME, username);
+        for(String forbiddenWord : UserSignupPolicy.FORBIDDEN_USERNAME_WORDS) {
+            if(username.contains(forbiddenWord)) {
+                throw BizException.builder()
+                        .code(UserCode.USERNAME_CONTAINS_FORBIDDEN_WORD)
+                        .data(forbiddenWord)
+                        .build();
             }
         }
         
         // 4. username 중복 검사
         if(accountRepository.existsByUsername(username)){
-            throw new BizException(UserApiStatusCode.DUPLICATE_USERNAME, username);
+            throw new BizException(UserCode.DUPLICATED_USERNAME);
         }
     }
     
-    public void validateEmail(String email){
+    /**
+     * @throws BizException INVALID_EMAIL, DUPLICATED_EMAIL
+     */
+    public void validateEmail(String email) {
         
         // 1. null, 빈 문자열 검사
         if(!StringUtils.hasText(email)){
-            throw new BizException(UserApiStatusCode.BLANK_EMAIL);
+            throw BizException.builder()
+                    .code(UserCode.INVALID_EMAIL)
+                    .message("비어있는 email; null/빈 문자열/공백 문자열")
+                    .build();
         }
         
         // 2. email 형식 검사
         if(!email.matches("^[_a-z0-9-]+(.[_a-z0-9-]+)*@(?:\\w+\\.)+\\w+$")){
-            throw new BizException(UserApiStatusCode.EMAIL_REGEX_NOT_MATCH);
+            throw BizException.builder()
+                    .code(UserCode.INVALID_EMAIL)
+                    .message("email 형식 오류; 정규식 불일치")
+                    .build();
         }
         
         // 3. email 중복 검사
         if(accountRepository.existsByEmailAndEmailVerified(email, true)){
-            throw new BizException(UserApiStatusCode.DUPLICATE_EMAIL, email);
+            throw new BizException(UserCode.DUPLICATED_EMAIL);
         }
     }
     
+    /**
+     * @throws BizException INVALID_PASSWORD, PASSWORD_CONFIRM_NOT_MATCH
+     */
     public void validatePassword(String password, @Nullable String passwordConfirm) {
         
         // 1. null, 빈 문자열 검사
         if(!StringUtils.hasText(password)){
-            throw new BizException(UserApiStatusCode.BLANK_PASSWORD);
+            throw BizException.builder()
+                    .code(UserCode.INVALID_PASSWORD)
+                    .message("비어있는 password; null/빈 문자열/공백 문자열")
+                    .build();
         }
         
         // 2. password 정규식 검사
         if(!password.matches(UserSignupPolicy.PASSWORD_REGEX)) {
-            throw new BizException(UserApiStatusCode.PASSWORD_REGEX_NOT_MATCH);
+            throw BizException.builder()
+                    .code(UserCode.INVALID_PASSWORD)
+                    .message(UserSignupPolicy.PASSWORD_REGEX_DISCRIPTION)
+                    .build();
         }
         
         // 3. password와 passwordConfirm이 일치 검사
         if(passwordConfirm != null && !password.equals(passwordConfirm)){
-            throw new BizException(UserApiStatusCode.PASSWORD_CONFIRM_NOT_MATCH);
+            throw new BizException(UserCode.PASSWORD_CONFIRM_NOT_MATCH);
         }
     }
     
+    /**
+     * @throws BizException INVALID_PENNAME, DUPLICATED_PENNAME, PENNAME_CONTAINS_FORBIDDEN_WORD
+     */
     public void validatePenname(String penname) {
         
         // 1. null, 빈 문자열 검사
         if(!StringUtils.hasText(penname)){
-            throw new BizException(UserApiStatusCode.BLANK_PENNAME);
+            throw BizException.builder()
+                    .code(UserCode.INVALID_PENNAME)
+                    .message("비어있는 penname; null/빈 문자열/공백 문자열")
+                    .build();
         }
         
         // 2. penname 정규식 검사
         if(!penname.matches(UserSignupPolicy.PENNAME_REGEX)) {
-            throw new BizException(UserApiStatusCode.PENNAME_REGEX_NOT_MATCH);
+            throw BizException.builder()
+                    .code(UserCode.INVALID_PENNAME)
+                    .message(UserSignupPolicy.PENNAME_REGEX_DISCRIPTION)
+                    .build();
         }
         
         // 3. 사용할 수 없는 필명
-        for(String invalidPenname : UserSignupPolicy.INVALID_PENNAME) {
-            if(penname.contains(invalidPenname)) {
-                throw new BizException(UserApiStatusCode.UNUSEABLE_PENNAME, penname);
+        for(String forbiddenWord : UserSignupPolicy.FORBIDDEN_PENNAME_WORDS) {
+            if(penname.contains(forbiddenWord)) {
+                throw BizException.builder()
+                        .code(UserCode.PENNAME_CONTAINS_FORBIDDEN_WORD)
+                        .data(forbiddenWord)
+                        .build();
             }
         }
         
         // 4. penname 중복 검사
         if(profileRepository.existsByPenname(penname)){
-            throw new BizException(UserApiStatusCode.DUPLICATE_PENNAME, penname);
+            throw new BizException(UserCode.DUPLICATED_PENNAME);
         }
     }
     
+    /**
+     * @throws BizException USER_NOT_FOUND, PASSWORD_NOT_MATCH
+     * @throws AuthenticationException UsernameNotFoundException, BadCredentialsException이 아닌 인증 예외
+     */
     public Authentication authenticate(String username, String password) {
         
-        Assert.hasText(username, "username이 비어있습니다.");
-        Assert.hasText(password, "password가 비어있습니다.");
+        Assert.hasText(username, "username must not be empty");
+        Assert.hasText(password, "password must not be empty");
         
         UserDetails principal = User.builder()
                 .username(username)
@@ -169,13 +215,16 @@ public class DefaultUserService {
             );
         } catch (AuthenticationException authException) {
             
-            // UsernameNotFoundException
+            // username을 찾지 못함
             if (authException instanceof UsernameNotFoundException) {
-                throw new BizException(UserApiStatusCode.USERNAME_NOT_EXIST, username);
+                throw BizException.builder()
+                        .code(UserCode.USER_NOT_FOUND)
+                        .data(username)
+                        .build();
                 
-            // BadCredentialsException
+            // credentials 불일치
             } else if (authException instanceof BadCredentialsException) {
-                throw new BizException(UserApiStatusCode.PASSWORD_NOT_MATCH);
+                throw new BizException(UserCode.PASSWORD_NOT_MATCH);
                 
             } else {
                 throw authException;

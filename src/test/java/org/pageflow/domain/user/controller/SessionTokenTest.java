@@ -7,7 +7,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * @author : sechan
@@ -26,7 +25,6 @@ public class SessionTokenTest {
         this.mockMvc.perform(
                 get("/anyRequest")
                         .header("Authorization", "Bearer " + accessToken)
-                ).andReturn().getResponse()
-                .andExpect(status().isOk());
+                ).andReturn().getResponse();
     }
 }

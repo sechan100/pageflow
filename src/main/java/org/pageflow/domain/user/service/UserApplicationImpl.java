@@ -3,9 +3,6 @@ package org.pageflow.domain.user.service;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.pageflow.global.constants.CustomProps;
-import org.pageflow.global.business.BizException;
-import org.pageflow.global.business.UserApiStatusCode;
 import org.pageflow.domain.user.constants.ProviderType;
 import org.pageflow.domain.user.constants.RoleType;
 import org.pageflow.domain.user.entity.Account;
@@ -15,6 +12,9 @@ import org.pageflow.domain.user.model.dto.PrincipalContext;
 import org.pageflow.domain.user.model.dto.SignupForm;
 import org.pageflow.domain.user.repository.AccountRepository;
 import org.pageflow.domain.user.repository.TokenSessionRepository;
+import org.pageflow.global.constants.CustomProps;
+import org.pageflow.global.response.BizException;
+import org.pageflow.global.response.SessionCode;
 import org.pageflow.infra.jwt.provider.JwtProvider;
 import org.pageflow.infra.jwt.token.AccessToken;
 import org.pageflow.infra.jwt.token.RefreshToken;
@@ -124,6 +124,9 @@ public class UserApplicationImpl implements UserApplication {
         }
     }
     
+    /**
+     * @throws BizException SESSION_EXPIRED
+     */
     @Override
     public AccessToken refresh(String refreshToken){
         
@@ -141,8 +144,8 @@ public class UserApplicationImpl implements UserApplication {
                     user.getRole()
             );
         } catch(ExpiredJwtException e) {
-            // 만료된 세션인 경우 피드백
-            throw new BizException(UserApiStatusCode.SESSION_EXPIRED);
+            // 만료된 세션인 경우
+            throw new BizException(SessionCode.SESSION_EXPIRED);
         }
     }
 }

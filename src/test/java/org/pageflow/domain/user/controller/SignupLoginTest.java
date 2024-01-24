@@ -119,7 +119,7 @@ class SignupLoginTest {
                                 .build()
                 )
         );
-        Mockito.when(signupCacheRepository.existsByUsername(username))
+        Mockito.when(signupCacheRepository.existsById(username))
                 .thenReturn(true);
         
         

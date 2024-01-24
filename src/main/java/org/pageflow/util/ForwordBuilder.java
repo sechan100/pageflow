@@ -1,8 +1,7 @@
-package org.pageflow.infra.util;
+package org.pageflow.util;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.pageflow.global.response.ApiStatus;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,7 +13,6 @@ public class ForwordBuilder {
     
     private final HttpServletRequest request;
     private final HttpServletResponse response;
-    private ApiStatus status;
     private final String forwordUrl;
     private final Map<String, String> params;
     
@@ -45,12 +43,7 @@ public class ForwordBuilder {
         return this;
     }
     
-    public ForwordBuilder status(ApiStatus status){
-        this.status = status;
-        return this;
-    }
-    
-    public void send(){
+    public void forward(){
         StringBuilder sb = new StringBuilder();
         sb.append(forwordUrl);
         sb.append("?");
@@ -64,11 +57,6 @@ public class ForwordBuilder {
         
         // url 완성
         String url = sb.toString();
-        
-        // status가 존재한다면, 값 세팅
-        if(status != null){
-            request.setAttribute(ApiStatus.ATTRIBUTE_KEY, status);
-        }
         
         // forward
         try {

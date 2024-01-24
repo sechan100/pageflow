@@ -2,8 +2,6 @@ package org.pageflow.domain.user.service;
 
 
 import lombok.RequiredArgsConstructor;
-import org.pageflow.global.request.RequestContext;
-import org.pageflow.global.response.ApiStatus;
 import org.pageflow.domain.user.entity.Account;
 import org.pageflow.domain.user.entity.SignupCache;
 import org.pageflow.domain.user.model.dto.PrincipalContext;
@@ -13,6 +11,7 @@ import org.pageflow.domain.user.model.oauth.NaverOwner;
 import org.pageflow.domain.user.model.oauth.ResourceOwner;
 import org.pageflow.domain.user.repository.AccountRepository;
 import org.pageflow.domain.user.repository.SignupCacheRepository;
+import org.pageflow.global.request.RequestContext;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -51,10 +50,9 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
             
             // 포워딩으로 위임
             requestContext.forwardBuilder("/internal/login")
-                    .status(ApiStatus.SUCCESS)
                     .param("username", resourceOwner.getUsername())
                     .param("password", account.getPassword())
-                    .send();
+                    .forward();
             
         // 회원정보 없음(신규) -> OAuth2 데이터를 username으로 캐싱하고, signup 페이지로 리디렉션
         } else {
@@ -77,8 +75,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
             // OAuth2 캐시 데이터를 반환
             requestContext.forwardBuilder("/internal/signup/cache")
                     .param("username", resourceOwner.getUsername())
-                    .status(ApiStatus.CONDITIONAL_SUCCESS)
-                    .send();
+                    .forward();
         }
         
         // security 스펙상, 제대로 반환을 안하면 AuthenticationException이 발생하므로, 빈 객체를 반환

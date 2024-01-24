@@ -1,27 +1,20 @@
 package org.pageflow.global.security.handler;
 
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.pageflow.global.constants.CustomProps;
+import lombok.AllArgsConstructor;
 import org.pageflow.global.request.RequestContext;
+import org.pageflow.global.response.BizException;
+import org.pageflow.global.response.SessionCode;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-
+@AllArgsConstructor
 @Component
-public class CustomAuthenticationEntryPoint extends LoginUrlAuthenticationEntryPoint {
-
-    public CustomAuthenticationEntryPoint(CustomProps customProps, RequestContext requestContext) {
-        super(customProps.getSite().getLoginFormUri());
-        this.customProps = customProps;
-        this.requestContext = requestContext;
-    }
-
-    private final CustomProps customProps;
+public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
+    
     private final RequestContext requestContext;
 
     @Override
@@ -29,17 +22,14 @@ public class CustomAuthenticationEntryPoint extends LoginUrlAuthenticationEntryP
             HttpServletRequest request,
             HttpServletResponse response,
             AuthenticationException authException
-    ) throws IOException, ServletException {
-        String redirectUri = request.getRequestURI();
-        String queryString;
-
-        // anonymous가 authenticated에 접근
+    ) {
+        
         if (authException instanceof InsufficientAuthenticationException insufficientAuthenticationException) {
-
-            new LoginUrlAuthenticationEntryPoint(
-                    customProps.getSite().getLoginFormUri()
-            ).commence(request, response, insufficientAuthenticationException);
-
+            /* SecurityFilterChain은, MVC 디스패처보다 먼저 실행되기 때문에 @RestControllerAdvice로 위임되지 않는다.
+             * 때문에 이의 처리를 위해 Exception을 처리하여 공통응답을 반환하는 Controller로 직접 forward하는 것.
+             * */
+            requestContext.delegateBizExceptionHandling(new BizException(SessionCode.LOGIN_REQUIRED));
         }
+        
     }
 }

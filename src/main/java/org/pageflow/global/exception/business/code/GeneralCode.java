@@ -1,4 +1,4 @@
-package org.pageflow.global.response;
+package org.pageflow.global.exception.business.code;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

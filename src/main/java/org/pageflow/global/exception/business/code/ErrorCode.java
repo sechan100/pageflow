@@ -1,4 +1,4 @@
-package org.pageflow.global.response;
+package org.pageflow.global.exception.business.code;
 
 /**
  * @author : sechan

@@ -13,8 +13,8 @@ import org.pageflow.domain.user.model.dto.SignupForm;
 import org.pageflow.domain.user.repository.AccountRepository;
 import org.pageflow.domain.user.repository.TokenSessionRepository;
 import org.pageflow.global.constants.CustomProps;
-import org.pageflow.global.response.BizException;
-import org.pageflow.global.response.SessionCode;
+import org.pageflow.global.exception.business.exception.BizException;
+import org.pageflow.global.exception.business.code.SessionCode;
 import org.pageflow.infra.jwt.provider.JwtProvider;
 import org.pageflow.infra.jwt.token.AccessToken;
 import org.pageflow.infra.jwt.token.RefreshToken;
@@ -119,8 +119,10 @@ public class UserApplicationImpl implements UserApplication {
         try {
             RefreshToken token = jwtProvider.parseRefreshToken(refreshToken);
             tokenSessionRepository.deleteById(token.getSessionId());
-        } catch(ExpiredJwtException ignored) {
-            // 어차피 만료된 토큰이면 로그아웃된거나 마찬가지이므로, 해당 예외는 무시한다.
+        } catch(BizException biz) {
+            biz.handle()
+                    .filter(SessionCode.SESSION_EXPIRED)
+                    .process(code -> log.warn("SESSION_EXPIRED -> 만료된 세션이므로, 이미 로그아웃된 것으로 간주합니다."));
         }
     }
     

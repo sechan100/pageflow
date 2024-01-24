@@ -1,8 +1,8 @@
-package org.pageflow.global.exception.handler;
+package org.pageflow.global.response.advice;
 
-import org.pageflow.global.response.BizException;
 import org.pageflow.global.response.GeneralResponse;
-import org.pageflow.global.response.InputCode;
+import org.pageflow.global.exception.business.code.InputCode;
+import org.pageflow.global.exception.business.exception.BizException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;

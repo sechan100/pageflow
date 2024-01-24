@@ -10,7 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.pageflow.domain.user.model.dto.PrincipalContext;
 import org.pageflow.domain.user.repository.ProfileRepository;
 import org.pageflow.domain.user.service.DefaultUserService;
-import org.pageflow.global.response.BizException;
+import org.pageflow.global.exception.business.exception.BizException;
 import org.pageflow.util.ForwordBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;

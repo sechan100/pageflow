@@ -2,10 +2,11 @@ package org.pageflow.infra.jwt.provider;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import lombok.extern.slf4j.Slf4j;
 import org.pageflow.domain.user.constants.RoleType;
+import org.pageflow.global.exception.business.code.SessionCode;
+import org.pageflow.global.exception.business.exception.BizException;
 import org.pageflow.infra.jwt.token.AccessToken;
 import org.pageflow.infra.jwt.token.RefreshToken;
 import org.springframework.beans.factory.annotation.Value;
@@ -122,21 +123,20 @@ public class JwtProvider {
     /**
      * @param token 토큰
      * @return 클레임
-     * @throws ExpiredJwtException 토큰이 만료된 경우
-     * @throws JwtException 그 외의 파싱 예외
+     * @throws BizException SESSION_EXPIRED, INVALID_TOKEN
      */
-    private Claims parseToken(String token) throws ExpiredJwtException, JwtException {
+    private Claims parseToken(String token){
         try {
             return Jwts.parserBuilder().setSigningKey(getSignKey()).build().parseClaimsJws(token).getBody();
             
-        // ExpiredJwtException은 그대로 던짐
+        // ExpiredJwtException -> 세션 만료
         } catch(ExpiredJwtException e) {
-            throw e;
+            throw new BizException(SessionCode.SESSION_EXPIRED);
             
-        // 그 외의 예외는 JwtException으로 던짐
+        // 그 외에는 토큰 파싱 실패로 간주
         } catch(Exception exception) {
             log.error("토큰 파싱 실패: {} ", exception.getMessage());
-            throw new JwtException(exception.getMessage(), exception);
+            throw new BizException(SessionCode.INVALID_TOKEN);
         }
     }
     

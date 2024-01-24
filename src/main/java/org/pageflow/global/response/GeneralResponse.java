@@ -1,6 +1,8 @@
 package org.pageflow.global.response;
 
 import lombok.Getter;
+import org.pageflow.global.exception.business.code.ErrorCode;
+import org.pageflow.global.exception.business.code.GeneralCode;
 import org.springframework.util.Assert;
 
 import java.util.Objects;

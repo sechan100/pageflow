@@ -1,7 +1,8 @@
-package org.pageflow.global.response;
+package org.pageflow.global.response.advice;
 
 import lombok.RequiredArgsConstructor;
 import org.pageflow.global.request.RequestContext;
+import org.pageflow.global.response.GeneralResponse;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;
 import org.springframework.http.server.ServerHttpRequest;

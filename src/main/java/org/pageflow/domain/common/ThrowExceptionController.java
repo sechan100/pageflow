@@ -2,7 +2,7 @@ package org.pageflow.domain.common;
 
 import lombok.AllArgsConstructor;
 import org.pageflow.global.request.RequestContext;
-import org.pageflow.global.response.BizException;
+import org.pageflow.global.exception.business.exception.BizException;
 import org.pageflow.global.response.GeneralResponse;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

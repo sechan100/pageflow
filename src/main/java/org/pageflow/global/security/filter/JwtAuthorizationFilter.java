@@ -6,10 +6,12 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.pageflow.domain.user.constants.RoleType;
-import org.pageflow.infra.jwt.provider.JwtProvider;
 import org.pageflow.domain.user.model.dto.PrincipalContext;
+import org.pageflow.infra.jwt.provider.JwtProvider;
 import org.pageflow.infra.jwt.token.AccessToken;
+import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -30,8 +32,12 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     private final JwtProvider jwtProvider;
     
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        
+    @SneakyThrows({ServletException.class, IOException.class})
+    protected void doFilterInternal(
+            @NonNull HttpServletRequest request,
+            @NonNull HttpServletResponse response,
+            @NonNull FilterChain filterChain
+    ){
         // 토큰 추출
         Optional<String> accessTokenOptional = resolveToken(request);
         

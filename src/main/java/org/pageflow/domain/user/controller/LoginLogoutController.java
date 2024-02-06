@@ -65,7 +65,7 @@ public class LoginLogoutController {
         
         return new AccessTokenRes(
                 newAccessToken.getToken(), // accessToken
-                newAccessToken.getExp().getTime() // accessTokenExpiresIn
+                newAccessToken.getExp().getTime() // accessTokenExpiresAt
         );
     }
     
@@ -80,7 +80,7 @@ public class LoginLogoutController {
     }
     
     
-    public record TokenRes(String accessToken, long accessTokenExpiresIn, String refreshToken, long refreshTokenExpiresIn) {
+    public record TokenRes(String accessToken, long accessTokenExpiresAt, String refreshToken, long refreshTokenExpiresAt) {
         public static TokenRes loginRes(Map<String, SessionToken> tokens) {
             AccessToken accessToken = (AccessToken) tokens.get("accessToken");
             RefreshToken refreshToken = (RefreshToken) tokens.get("refreshToken");

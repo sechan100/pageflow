@@ -18,6 +18,7 @@ import java.util.Map;
  */
 @Getter
 @Setter
+// TODO: 이름 바꾸기 -> ComplextPrincipal
 public class PrincipalContext extends User implements OAuth2User {
 
     protected Long id;

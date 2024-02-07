@@ -7,7 +7,7 @@ import org.pageflow.domain.user.entity.Account;
 import org.pageflow.domain.user.entity.Profile;
 import org.pageflow.domain.user.repository.AccountRepository;
 import org.pageflow.domain.user.repository.ProfileRepository;
-import org.pageflow.domain.user.repository.TokenSessionRepository;
+import org.pageflow.domain.user.repository.RefreshTokenRepository;
 import org.pageflow.global.constants.CustomProps;
 import org.pageflow.global.exception.business.exception.BizException;
 import org.pageflow.global.exception.business.code.UserCode;
@@ -41,7 +41,7 @@ public class DefaultUserService {
     private final ProfileRepository profileRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationProvider authenticationProvider;
-    private final TokenSessionRepository tokenSessionRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
     private final TemplateEngine templateEngine;
     private final EmailSender emailSender;
     private final FileService fileService;

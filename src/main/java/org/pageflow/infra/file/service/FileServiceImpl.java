@@ -28,10 +28,10 @@ public class FileServiceImpl implements FileService {
     private final String webUrlPrefix;
 
     // AllArgsConstructor
-    public FileServiceImpl(CustomProps customProps, FileMetadataRepository fileRepository) {
+    public FileServiceImpl(CustomProps props, FileMetadataRepository fileRepository) {
         this.fileRepository = fileRepository;
-        this.uploadDirectoryPrefix = customProps.getFiles().getImg().getDirectory();
-        this.webUrlPrefix = customProps.getFiles().getImg().getWebUrlPrefix();
+        this.uploadDirectoryPrefix = props.files().img().directory();
+        this.webUrlPrefix = props.files().img().webUrlPrefix();
     }
     
     

@@ -59,20 +59,21 @@ spring:
 custom:
   site:
     base-url: 'http://localhost:${server.port}'
-    login-form-uri: '/login'
+    access-token-expire-minutes: 30
+    refresh-token-expire-days: 30
   email:
     email-verify-sender: verify@pageflow.org
     no-reply-sender: no-reply@pageflow.org
   defaults:
-    default-user-profile-img: /img/default_profile_img.png
-    default-book-cover-img: /img/default-book-cover-img.png
+    user-profile-img: /img/default_profile_img.png
+    book-cover-img: /img/default-book-cover-img.png
   admin:
     username: admin
     password: admin
     email: pagefloworg@gmail.com
   files:
     img:
-      base-url: /files/img
+      web-url-prefix: /files/img
 #      directory: C:/Users/SBS/local/uploads/img
 #      directory: C:/Users/gsw05/local/uploads/img
       directory: /Users/sechan/local/uploads/img

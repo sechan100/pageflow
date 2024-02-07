@@ -1,18 +1,22 @@
 package org.pageflow.infra.jwt.token;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.experimental.SuperBuilder;
 import org.pageflow.domain.user.constants.RoleType;
+
+import java.util.Date;
 
 
 @Getter
 @Setter
-@SuperBuilder
-public class AccessToken extends AbstractSessionToken {
+@Builder
+public class AccessToken {
     
     private Long UID;
-    private String username;
     private RoleType role;
+    private String token;
+    private Date exp;
+    private Date iat;
     
 }

@@ -1,53 +1,22 @@
 package org.pageflow.global.constants;
 
-import lombok.*;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
 
-@Component
-@RequiredArgsConstructor
-@Data
+
 @ConfigurationProperties(prefix = "custom")
-public class CustomProps {
-
-    private final Site site = new Site();
-    private final Email email = new Email();
-    private final Files files = new Files();
-    private final Defaults defaults = new Defaults();
-    private final Admin admin = new Admin();
-
-
-    @Data
-    public static class Site {
-        private String baseUrl;
-        private String loginFormUri;
-    }
-
-    @Data
-    public static class Email {
-        private String emailVerifySender;
-        private String noReplySender;
-    }
-
-    @Data
-    public static class Files {
-
-        private final Img img = new Img();
-
-        @Getter
-        @Setter
-        @NoArgsConstructor
-        public static class Img {
-            private String webUrlPrefix;
-            private String directory;
-            
-            
+public record CustomProps(Site site, Email email, Files files, Defaults defaults, Admin admin) {
+    
+    public record Site(String baseUrl, Integer accessTokenExpireMinutes, Integer refreshTokenExpireDays) {}
+    
+    public record Email(String emailVerifySender, String noReplySender) {}
+    
+    public record Files(Img img) {
+        public record Img(String webUrlPrefix, String directory) {
             public Img(String webUrlPrefix, String directory) {
                 this.webUrlPrefix = addPrefixSlashAndRemoveSuffixSlash(webUrlPrefix);
                 this.directory = addPrefixSlashAndRemoveSuffixSlash(directory);
-                
             }
-            
+
             /**
              * path를 받아서 맨 앞에 /가 없다면 붙이고, 맨 뒤에 /가 있다면 지운다.
              */
@@ -63,17 +32,8 @@ public class CustomProps {
         }
     }
     
-    @Data
-    public static class Defaults {
-        private String defaultUserProfileImg;
-        private String defaultBookCoverImg;
-    }
+    public record Defaults(String userProfileImg, String bookCoverImg) {}
     
-    @Data
-    public static class Admin{
-        private String username;
-        private String password;
-        private String email;
-    }
- 
+    public record Admin(String username, String password, String email) {}
+    
 }

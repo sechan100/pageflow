@@ -1,24 +1,20 @@
 package org.pageflow.global.config;
 
-import org.springframework.beans.factory.annotation.Value;
+import lombok.RequiredArgsConstructor;
+import org.pageflow.global.constants.CustomProps;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
+@RequiredArgsConstructor
 public class StaticResourceHandlersConfig implements WebMvcConfigurer {
-
-
-    @Value("${custom.files.img.directory}")
-    private String uploadDirectory;
-
-    @Value("${custom.files.img.base-url}")
-    private String baseUrl;
-
+    
+    private final CustomProps props;
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler(baseUrl + "/**")
-                .addResourceLocations("file:" + uploadDirectory + "/");
+        registry.addResourceHandler(props.files().img().webUrlPrefix() + "/**")
+                .addResourceLocations("file:" + props.files().img().directory() + "/");
     }
 }

@@ -21,6 +21,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.io.IOException;
 import java.util.Objects;
+import java.util.Optional;
 
 
 @Component
@@ -80,17 +81,17 @@ public class RequestContext {
     /**
      * @param name 쿠키 이름
      */
-    public Cookie getCookie(String name) {
+    public Optional<Cookie> getCookie(String name) {
 
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {
                 if (cookie.getName().equals(name)) {
-                    return cookie;
+                    return Optional.of(cookie);
                 }
             }
         }
-        return null;
+        return Optional.empty();
     }
     
     /**

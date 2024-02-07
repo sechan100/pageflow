@@ -13,14 +13,16 @@ import org.pageflow.global.entity.BaseEntity;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class TokenSession implements BaseEntity {
+public class RefreshToken implements BaseEntity {
+    
+    public static final String COOKIE_NAME = "pageflowRefreshTokenUUID";
     
     /**
      * UUID
      */
     @Id
     private String id;
-    
+
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Account account;
     
@@ -28,13 +30,11 @@ public class TokenSession implements BaseEntity {
      * 만료시간(UTC)
      */
     @Column(nullable = false)
-    private Long expiredIn;
-    
-    private String refreshToken;
+    private Long expiredAt;
     
     
     public boolean isExpired() {
-        return System.currentTimeMillis() > expiredIn;
+        return System.currentTimeMillis() > expiredAt;
     }
     
 }

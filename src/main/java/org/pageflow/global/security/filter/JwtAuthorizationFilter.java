@@ -8,14 +8,13 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.pageflow.domain.user.constants.RoleType;
-import org.pageflow.domain.user.model.dto.PrincipalContext;
+import org.pageflow.domain.user.model.dto.SessionPrincipal;
 import org.pageflow.infra.jwt.provider.JwtProvider;
 import org.pageflow.infra.jwt.token.AccessToken;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -51,17 +50,14 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         AccessToken accessToken = jwtProvider.parseAccessToken(accessTokenOptional.get());
         
         // principal 작성
-        UserDetails principal = new PrincipalContext(
-                accessToken.getUID(),
-                accessToken.getUsername(),
-                "",
-                accessToken.getRole()
-        );
+        SessionPrincipal principal = SessionPrincipal.builder()
+                .UID(accessToken.getUID())
+                .build();
         
         // authentication 작성
         Authentication authentication = new UsernamePasswordAuthenticationToken(
                 principal,
-                "",
+                null,
                 RoleType.getAuthorities(accessToken.getRole())
         );
 

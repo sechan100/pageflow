@@ -22,7 +22,10 @@ import java.util.stream.Collectors;
 public class RepositoryReturnValueAspect {
     
     
-    // 모든 find로 시작하는 메소드에 대한 Aspect를 실행하여, 반환이 null이거나 비어있는 컬렉션일 경우 예외를 발생시킨다.
+    /**
+     * 모든 repository의 'find'로 시작하는 메소드에 대한 Aspect를 실행.
+     * 반환이 'null'이거나 '비어있는 컬렉션', 또는 빈 'Optional'인 경우 {@link DataNotFoundException}을 발생시킨다.
+     */
     @Around("execution(* org.pageflow.domain.*.repository.*.find*(..))")
     public Object handleRepositoryReturnValue(ProceedingJoinPoint joinPoint) throws Throwable {
         

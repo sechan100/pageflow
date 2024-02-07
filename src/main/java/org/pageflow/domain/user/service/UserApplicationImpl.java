@@ -7,7 +7,7 @@ import org.pageflow.domain.user.constants.RoleType;
 import org.pageflow.domain.user.entity.Account;
 import org.pageflow.domain.user.entity.Profile;
 import org.pageflow.domain.user.entity.RefreshToken;
-import org.pageflow.domain.user.model.dto.PrincipalContext;
+import org.pageflow.domain.user.model.principal.InitialAuthenticationPrincipal;
 import org.pageflow.domain.user.model.dto.SignupForm;
 import org.pageflow.domain.user.repository.AccountRepository;
 import org.pageflow.domain.user.repository.RefreshTokenRepository;
@@ -74,10 +74,10 @@ public class UserApplicationImpl implements UserApplication {
     public ClientAspectAuthResults login(String username, String password) {
         Authentication authentication = defaultUserService.authenticate(username, password);
         
-        if(authentication.getPrincipal() instanceof PrincipalContext principal) {
+        if(authentication.getPrincipal() instanceof InitialAuthenticationPrincipal principal) {
             // accessToken 발급
             JwtProvider.AccessTokenReturn accessToken = jwtProvider.generateAccessToken(
-                    principal.getId(),
+                    principal.getUID(),
                     principal.getRole()
             );
             
@@ -89,7 +89,7 @@ public class UserApplicationImpl implements UserApplication {
                                 .id(refreshTokenId) // UUID
                                 .expiredAt(System.currentTimeMillis() + (props.site().refreshTokenExpireDays() * MilliSeconds.DAY)) // 만료시간
                                 // UID와 연관관계 매핑(프록시로만 조회하여 굳이 사용하지 않을 Account를 쿼리하지 않고 id로만 매핑)
-                                .account(accountRepository.getReferenceById(principal.getId()))
+                                .account(accountRepository.getReferenceById(principal.getUID()))
                                 .build()
                 );
             } catch(Exception e) {

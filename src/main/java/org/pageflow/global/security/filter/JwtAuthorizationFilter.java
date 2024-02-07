@@ -8,9 +8,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.pageflow.domain.user.constants.RoleType;
-import org.pageflow.domain.user.model.dto.SessionPrincipal;
+import org.pageflow.domain.user.model.principal.SessionPrincipal;
 import org.pageflow.infra.jwt.provider.JwtProvider;
 import org.pageflow.infra.jwt.token.AccessToken;
+import org.springframework.http.HttpHeaders;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -26,7 +27,6 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
     
-    public static final String AUTHORIZATION_HEADER = "Authorization";
     public static final String BEARER = "Bearer ";
     private final JwtProvider jwtProvider;
     
@@ -72,7 +72,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         
         String token = null;
         
-        String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
+        String bearerToken = request.getHeader(HttpHeaders.AUTHORIZATION);
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER)) {
             token = bearerToken.split(" ")[1].trim();
         }

@@ -62,7 +62,7 @@ public class JwtProvider {
                 .UID(Long.valueOf(claims.getSubject()))
                 .iat(claims.getIssuedAt())
                 .exp(claims.getExpiration())
-                .role(claims.get(ROLE_CLAIM_KEY, RoleType.class))
+                .role(RoleType.valueOf(claims.get(ROLE_CLAIM_KEY).toString()))
                 .build();
     }
     

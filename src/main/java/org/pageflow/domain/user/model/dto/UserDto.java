@@ -6,12 +6,13 @@ import org.pageflow.domain.user.constants.ProviderType;
 import org.pageflow.domain.user.constants.RoleType;
 import org.pageflow.domain.user.entity.Account;
 import org.pageflow.domain.user.entity.Profile;
+import org.pageflow.domain.user.model.principal.InitialAuthenticationPrincipal;
 
 
 /**
  * Account 엔티티와 Profile 엔티티의 정보를 종합하고, 민감한 정보는 제외한 사용자 dto 클래스
  * PrincipalContext에서 현재 로그인중인 사용자의 세션데이터를 저장하는데에 사용
- * @see PrincipalContext
+ * @see InitialAuthenticationPrincipal
  */
 @Data
 public class UserDto {

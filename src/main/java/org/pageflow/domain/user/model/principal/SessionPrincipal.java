@@ -13,4 +13,11 @@ import lombok.Getter;
 @AllArgsConstructor
 public class SessionPrincipal implements PageflowPrincipal {
     private Long UID;
+    
+    
+    public static SessionPrincipal anonymous() {
+        return SessionPrincipal.builder()
+                .UID(0L)
+                .build();
+    }
 }

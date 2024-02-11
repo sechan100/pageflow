@@ -9,6 +9,7 @@ import org.pageflow.domain.user.model.oauth.GithubOwner;
 import org.pageflow.domain.user.model.oauth.GoogleOwner;
 import org.pageflow.domain.user.model.oauth.NaverOwner;
 import org.pageflow.domain.user.model.oauth.ResourceOwner;
+import org.pageflow.domain.user.model.principal.SessionPrincipal;
 import org.pageflow.domain.user.repository.AccountRepository;
 import org.pageflow.domain.user.repository.SignupCacheRepository;
 import org.pageflow.global.request.RequestContext;

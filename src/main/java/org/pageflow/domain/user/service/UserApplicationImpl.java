@@ -121,9 +121,14 @@ public class UserApplicationImpl implements UserApplication {
     @Override
     public JwtProvider.AccessTokenReturn refresh(String refreshTokenId){
         try {
-            // 세션의 소유자를 조회
-            Account user = refreshTokenRepository.findWithAccountById(refreshTokenId).getAccount();
+            // 세션을 조회하고, refreshToken의 만료여부를 확인
+            RefreshToken refreshToken = refreshTokenRepository.findWithAccountById(refreshTokenId);
+            if(refreshToken.isExpired()) {
+                throw new BizException(SessionCode.SESSION_EXPIRED);
+            }
+            
             // 새 토큰을 발급
+            Account user = refreshToken.getAccount();
             return jwtProvider.generateAccessToken(user.getId(), user.getRole());
             
         // 세션을 찾지 못함

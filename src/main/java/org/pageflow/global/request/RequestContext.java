@@ -1,16 +1,17 @@
 package org.pageflow.global.request;
 
 
+import com.google.common.base.Preconditions;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.pageflow.domain.user.model.principal.InitialAuthenticationPrincipal;
 import org.pageflow.domain.user.model.principal.PageflowPrincipal;
 import org.pageflow.domain.user.model.principal.SessionPrincipal;
 import org.pageflow.domain.user.repository.ProfileRepository;
 import org.pageflow.global.exception.business.exception.BizException;
 import org.pageflow.util.ForwordBuilder;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -19,7 +20,6 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.io.IOException;
-import java.lang.instrument.IllegalClassFormatException;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -37,7 +37,7 @@ public class RequestContext {
     private final HttpServletResponse response;
     private final ProfileRepository profileRepository;
     
-    public RequestContext(ProfileRepository profileRepository) throws IllegalClassFormatException {
+    public RequestContext(ProfileRepository profileRepository) {
         
         ServletRequestAttributes sessionAttributes = ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes()));
         this.request = sessionAttributes.getRequest();
@@ -46,38 +46,38 @@ public class RequestContext {
         // DI
         this.profileRepository = profileRepository;
         
-        /*
-        * 로그인 실패, 로그인 안한 상태로 authenticated에 접근 -> authentication == null
-        * 필터를 모두 거친 상태에서... UsernamePasswordAuthenticationToken, OAuth2AuthenticationToken, AnonymousAuthenticationToken 중 하나
-        * */
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean isAnonymous = true;
+        // 인증객체 참조
+        Authentication authentication = Preconditions.checkNotNull(
+                SecurityContextHolder.getContext().getAuthentication(),
+                "인증객체가 존재하지 않습니다. 'SecurityContextHolder.getContext().getAuthentication()'"
+        );
         
-        if(authentication != null) {
-            // UsernamePasswordAuthenticationToken, OAuth2AuthenticationToken인 경우
-            if(authentication.isAuthenticated()) { // AnonymousAuthenticationToken이어도 이건 true임
-                isAnonymous = false;
-            }
-        }
+        // 인증상태 점검
+        Preconditions.checkState(
+                /*
+                 * AnonymousAuthenticationToken이어도 authenticated 필드는 true임
+                 * 쉽게 생각해서,
+                 * Token 내부의 authenticated 필드 -> Provider에 의해서 검증되었냐 안되었냐 여부
+                 * Token 타입 -> 인증 타입(form, OAuth2, 익명)
+                 * */
+                authentication.isAuthenticated(),
+                "Authentication(인증객체)의 authenticated 필드가 false입니다. " +
+                        "AuthenticationProvider가 정상적으로 작동하지 않았거나, 임의로 필드가 변경되었을 수 있습니다."
+        );
         
+        
+        // 사용자 타입 분류
         // 익명 사용자
-        if(isAnonymous) {
-            this.principal = InitialAuthenticationPrincipal.anonymous();
+        if(authentication instanceof AnonymousAuthenticationToken) {
+            this.principal = SessionPrincipal.anonymous();
             
-        // 로그인한 사용자
+        // 인증된 사용자
         } else {
-            // 최초 로그인을 하여 세션을 생성중인 경우
-            if(authentication.getPrincipal() instanceof InitialAuthenticationPrincipal){
-                this.principal = (PageflowPrincipal) authentication.getPrincipal();
-                
-            // 이미 로그인한 세션에 AccessToken으로 인증하는 경우
-            } else if(authentication.getPrincipal() instanceof SessionPrincipal){
-                this.principal = (PageflowPrincipal) authentication.getPrincipal();
-            } else {
-                throw new IllegalArgumentException("처리할 수 없는 Principal 객체타입: " + authentication.getPrincipal().getClass().getName());
+            Object principal = authentication.getPrincipal();
+            Preconditions.checkArgument(PageflowPrincipal.class.isAssignableFrom(principal.getClass()));
+                throw new IllegalArgumentException("처리할 수 없는 Principal 객체타입: " + principal.getClass().getName());
             }
         }
-    }
     
     
     /**

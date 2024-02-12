@@ -8,6 +8,12 @@ spring:
     ansi:
       enabled: always
 
+#server:
+#  servlet:
+#    session:
+#      persistent: false
+
+
 logging:
   level:
     org:

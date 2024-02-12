@@ -1,17 +1,17 @@
 package org.pageflow.global.request;
 
 
+import com.google.common.base.Preconditions;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.pageflow.domain.user.model.dto.PrincipalContext;
+import org.pageflow.domain.user.model.principal.PageflowPrincipal;
+import org.pageflow.domain.user.model.principal.SessionPrincipal;
 import org.pageflow.domain.user.repository.ProfileRepository;
-import org.pageflow.domain.user.service.DefaultUserService;
 import org.pageflow.global.exception.business.exception.BizException;
 import org.pageflow.util.ForwordBuilder;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -21,52 +21,63 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.io.IOException;
 import java.util.Objects;
+import java.util.Optional;
 
 
+/**
+ *
+ */
 @Component
 @RequestScope
-@Getter
 @Slf4j
 public class RequestContext {
     
-    private final PrincipalContext principal;
+    private final PageflowPrincipal principal;
     private final HttpServletRequest request;
     private final HttpServletResponse response;
-    private final HttpSession session;
-    private final DefaultUserService defaultUserService;
     private final ProfileRepository profileRepository;
     
-    public RequestContext(DefaultUserService userService, ProfileRepository profileRepository) {
-
-        // [[빈 주입
+    public RequestContext(ProfileRepository profileRepository) {
+        
         ServletRequestAttributes sessionAttributes = ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes()));
         this.request = sessionAttributes.getRequest();
         this.response = sessionAttributes.getResponse();
-        this.session = request.getSession();
-        this.defaultUserService = userService;
+        
+        // DI
         this.profileRepository = profileRepository;
-        // 빈 주입]]
         
-        /*
-        * 로그인 실패, 로그인 안한 상태로 authenticated에 접근 -> authentication == null
-        * 필터를 모두 거친 상태에서... UsernamePasswordAuthenticationToken, OAuth2AuthenticationToken, AnonymousAuthenticationToken 중 하나
-        * */
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean isAnonymous = true;
+        // 인증객체 참조
+        Authentication authentication = Preconditions.checkNotNull(
+                SecurityContextHolder.getContext().getAuthentication(),
+                "인증객체가 존재하지 않습니다. 'SecurityContextHolder.getContext().getAuthentication()'"
+        );
         
-        if(authentication != null) {
-            // UsernamePasswordAuthenticationToken, OAuth2AuthenticationToken인 경우
-            if(authentication.isAuthenticated()) {
-                isAnonymous = false;
+        // 인증상태 점검
+        Preconditions.checkState(
+                /*
+                 * AnonymousAuthenticationToken이어도 authenticated 필드는 true임
+                 * 쉽게 생각해서,
+                 * Token 내부의 authenticated 필드 -> Provider에 의해서 검증되었냐 안되었냐 여부
+                 * Token 타입 -> 인증 타입(form, OAuth2, 익명)
+                 * */
+                authentication.isAuthenticated(),
+                "Authentication(인증객체)의 authenticated 필드가 false입니다. " +
+                        "AuthenticationProvider가 정상적으로 작동하지 않았거나, 임의로 필드가 변경되었을 수 있습니다."
+        );
+        
+        
+        // 사용자 타입 분류
+        // 익명 사용자
+        if(authentication instanceof AnonymousAuthenticationToken) {
+            this.principal = SessionPrincipal.anonymous();
+            
+        // 인증된 사용자
+        } else {
+            Object principal = authentication.getPrincipal();
+            Preconditions.checkArgument(PageflowPrincipal.class.isAssignableFrom(principal.getClass()));
+                throw new IllegalArgumentException("처리할 수 없는 Principal 객체타입: " + principal.getClass().getName());
             }
         }
-        
-        if(isAnonymous) {
-            this.principal = PrincipalContext.anonymous();
-        } else {
-            this.principal = (PrincipalContext) authentication.getPrincipal();
-        }
-    }
     
     
     /**
@@ -80,17 +91,21 @@ public class RequestContext {
     /**
      * @param name 쿠키 이름
      */
-    public Cookie getCookie(String name) {
+    public Optional<Cookie> getCookie(String name) {
 
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {
                 if (cookie.getName().equals(name)) {
-                    return cookie;
+                    return Optional.of(cookie);
                 }
             }
         }
-        return null;
+        return Optional.empty();
+    }
+    
+    public void setCookie(Cookie cookie) {
+        response.addCookie(cookie);
     }
     
     /**
@@ -121,23 +136,14 @@ public class RequestContext {
      * @return 현재 로그인한 사용자의 UID
      */
     public Long getUID() {
-        return principal.getId();
+        return principal.getUID();
     }
     
     /**
-     * @return 현재 로그인한 사용자의 username
-     */
-    public String getUsername() {
-        return principal.getUsername();
-    }
-    
-    /**
-     * BizException을 올바르게 처리하여 반환해주는 컨트롤러로 매핑함
+     * BizException을 처리하여 반환해주는 컨트롤러로 매핑함
      */
     public void delegateBizExceptionHandling(BizException e){
         request.setAttribute(BizException.class.getSimpleName(), e);
         forwardBuilder("/internal/throw/biz").forward();
     }
-    
-    
 }

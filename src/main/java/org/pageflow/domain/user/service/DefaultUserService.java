@@ -1,16 +1,18 @@
 package org.pageflow.domain.user.service;
 
 
+import com.google.common.base.Preconditions;
 import lombok.RequiredArgsConstructor;
+import org.pageflow.domain.user.constants.ProfileFetchDepth;
 import org.pageflow.domain.user.constants.UserSignupPolicy;
 import org.pageflow.domain.user.entity.Account;
 import org.pageflow.domain.user.entity.Profile;
 import org.pageflow.domain.user.repository.AccountRepository;
 import org.pageflow.domain.user.repository.ProfileRepository;
-import org.pageflow.domain.user.repository.TokenSessionRepository;
+import org.pageflow.domain.user.repository.RefreshTokenRepository;
 import org.pageflow.global.constants.CustomProps;
-import org.pageflow.global.exception.business.exception.BizException;
 import org.pageflow.global.exception.business.code.UserCode;
+import org.pageflow.global.exception.business.exception.BizException;
 import org.pageflow.infra.email.EmailSender;
 import org.pageflow.infra.file.service.FileService;
 import org.pageflow.infra.jwt.provider.JwtProvider;
@@ -41,7 +43,7 @@ public class DefaultUserService {
     private final ProfileRepository profileRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationProvider authenticationProvider;
-    private final TokenSessionRepository tokenSessionRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
     private final TemplateEngine templateEngine;
     private final EmailSender emailSender;
     private final FileService fileService;
@@ -232,5 +234,20 @@ public class DefaultUserService {
         }
     }
     
+    /**
+     * @param UID UID
+     * @param fetchDepth 프로필 조회 깊이 {@link ProfileFetchDepth}
+     * @return 지정한 수준까지 초기화된 후, JPA 세션이 닫힌 상태의 Profile 인스턴스
+     */
+    public Profile fetchProfile(Long UID, ProfileFetchDepth fetchDepth){
+        Preconditions.checkNotNull(UID, "UID must not be null");
+        Preconditions.checkNotNull(fetchDepth, "fetchDepth must not be null");
+        
+        return switch (fetchDepth) {
+            case PROXY -> profileRepository.getReferenceById(UID);
+            case BASIC -> profileRepository.findById(UID).orElseThrow();
+            case WITH_ACCOUNT -> profileRepository.findWithAccountById(UID);
+        };
+    }
     
 }

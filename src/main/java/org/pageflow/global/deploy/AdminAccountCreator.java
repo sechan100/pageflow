@@ -20,7 +20,7 @@ public class AdminAccountCreator {
     
     private final AdminUserService adminUserService;
     private final AccountRepository accountRepository;
-    private final CustomProps customProps;
+    private final CustomProps props;
 
     
     @Bean
@@ -39,13 +39,13 @@ public class AdminAccountCreator {
         
         log.info("====== 관리자 계정을 생성합니다. ======");
         
-        CustomProps.Admin adminProps = customProps.getAdmin();
+        CustomProps.Admin adminProps = props.admin();
         
         SignupForm adminForm = SignupForm.builder()
-                .username(adminProps.getUsername())
-                .password(adminProps.getPassword())
-                .passwordConfirm(adminProps.getPassword())
-                .email(adminProps.getEmail())
+                .username(adminProps.username())
+                .password(adminProps.password())
+                .passwordConfirm(adminProps.password())
+                .email(adminProps.email())
                 .penname("관리자")
                 .build();
         adminUserService.adminSignup(adminForm);

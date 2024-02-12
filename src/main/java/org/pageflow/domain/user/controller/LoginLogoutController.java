@@ -2,19 +2,21 @@ package org.pageflow.domain.user.controller;
 
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.servlet.http.Cookie;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.pageflow.infra.jwt.provider.JwtProvider;
+import org.pageflow.domain.user.entity.RefreshToken;
 import org.pageflow.domain.user.model.dto.WebLoginRequest;
-import org.pageflow.domain.user.model.dto.WebLogoutRequest;
-import org.pageflow.domain.user.model.dto.WebRefreshRequest;
-import org.pageflow.infra.jwt.token.AccessToken;
-import org.pageflow.infra.jwt.token.RefreshToken;
-import org.pageflow.infra.jwt.token.SessionToken;
 import org.pageflow.domain.user.service.UserApplication;
+import org.pageflow.domain.user.service.UserApplication.*;
+import org.pageflow.global.constants.CustomProps;
+import org.pageflow.global.exception.business.code.SessionCode;
+import org.pageflow.global.exception.business.exception.BizException;
+import org.pageflow.global.request.RequestContext;
+import org.pageflow.infra.jwt.dto.AccessTokenDto;
+import org.pageflow.infra.jwt.provider.JwtProvider;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
 
 /**
  * @author : sechan
@@ -24,6 +26,8 @@ import java.util.Map;
 public class LoginLogoutController {
     
     private final UserApplication userApp;
+    private final RequestContext requestContext;
+    private final CustomProps customProps;
     private final JwtProvider jwtProvider;
     
     
@@ -33,10 +37,27 @@ public class LoginLogoutController {
      */
     @Operation(summary = "로그인", description = "아이디와 비밀번호를 받고, access 토큰과 refresh 토큰을 반환")
     @PostMapping("/login")
-    public TokenRes webLogin(@Valid @RequestBody WebLoginRequest loginReq) {
-        Map result = userApp.login(loginReq.getUsername(), loginReq.getPassword());
-        return TokenRes.loginRes(result);
+    public AccessTokenDto webLogin(@Valid @RequestBody WebLoginRequest loginReq) {
+        LoginTokens result = userApp.login(loginReq.getUsername(), loginReq.getPassword());
+        
+        Cookie refreshTokenUUID = new Cookie(
+                RefreshToken.COOKIE_NAME, result.refreshTokenUUID()
+        );
+        refreshTokenUUID.setPath("/refresh");
+        refreshTokenUUID.setHttpOnly(true); // JS에서 접근 불가
+        refreshTokenUUID.setSecure(true); // HTTPS에서만 전송
+        refreshTokenUUID.setMaxAge(60 * 60 * 24 * customProps.site().refreshTokenExpireDays()); // 30일
+        
+        // 쿠키 할당
+        requestContext.setCookie(refreshTokenUUID);
+        
+        // RETURN
+        return AccessTokenDto.builder()
+                .accessToken(result.accessToken())
+                .expiredAt(result.accessTokenExpiredAt())
+                .build();
     }
+    
     
     /**
      * OAuth2로 접근하는 요청을 포워딩하여 로그인처리. <br>
@@ -46,51 +67,42 @@ public class LoginLogoutController {
      */
     @Hidden
     @GetMapping("/internal/login")
-    public TokenRes oauth2Login(
+    public UserApplication.LoginTokens oauth2Login(
             @RequestParam("username") String username,
             @RequestParam("password") String password
     ) {
-        Map result = userApp.login(username, password);
-        return TokenRes.loginRes(result);
+        return userApp.login(username, password);
     }
     
     /**
      * refreshToken으로 새로운 accessToken을 발급한다.
      */
     @Operation(summary = "accessToken 재발급", description = "refreshToken을 받아서, accessToken을 재발급")
-    @PostMapping("/refresh")
-    public AccessTokenRes refresh(@RequestBody WebRefreshRequest refresh) {
+    @PostMapping("/refresh") // 멱등성을 성립하지 않는 요청이라 Post임
+    public AccessTokenDto refresh() {
+        return requestContext.getCookie(RefreshToken.COOKIE_NAME)
+                // 쿠키 존재
+                .map(refreshTokenId -> userApp.refresh(refreshTokenId.getValue()))
+                
+                // 쿠키 존재하지 않음
+                .orElseThrow(()-> BizException.builder()
+                        .code(SessionCode.TOKEN_NOT_FOUND)
+                        .message("'" + RefreshToken.COOKIE_NAME + "' 이름을 가진 쿠키가 존재하지 않습니다.")
+                        .build()
+                );
         
-        AccessToken newAccessToken = userApp.refresh(refresh.getRefreshToken());
-        
-        return new AccessTokenRes(
-                newAccessToken.getToken(), // accessToken
-                newAccessToken.getExp().getTime() // accessTokenExpiresAt
-        );
     }
     
     /**
-     * refreshToken을 받아서 세션을 지운다. 이미 만료된 세션이라면 아무런 행동도 하지 않는다.
-     * @param logout refreshToken
+     * 리프레시 토큰을 제거
      */
-    @Operation(summary = "로그아웃", description = "refreshToken을 받아서, 해당 세션을 무효화")
+    @Operation(summary = "로그아웃", description = "쿠키로 전달된 refreshTokenId를 받아서, 해당 세션을 무효화")
     @PostMapping("/logout")
-    public void logout(@RequestBody WebLogoutRequest logout) {
-        userApp.logout(logout.getRefreshToken());
+    public void logout() {
+        //TODO: refreshToken을 정상적으로 삭제하지 못한 경우의 동작
+        requestContext.getCookie(RefreshToken.COOKIE_NAME)
+                .ifPresent(refreshTokenId -> userApp.logout((refreshTokenId.getValue())));
+        //TODO: 쿠키가 존재하지 않는 경우의 동작...
     }
     
-    
-    public record TokenRes(String accessToken, long accessTokenExpiresAt, String refreshToken, long refreshTokenExpiresAt) {
-        public static TokenRes loginRes(Map<String, SessionToken> tokens) {
-            AccessToken accessToken = (AccessToken) tokens.get("accessToken");
-            RefreshToken refreshToken = (RefreshToken) tokens.get("refreshToken");
-            return new TokenRes(
-                    accessToken.getToken(),
-                    accessToken.getExp().getTime(),
-                    refreshToken.getToken(),
-                    refreshToken.getExp().getTime()
-            );
-        }
-    }
-    public record AccessTokenRes(String accessToken, long accessTokenExpiresIn){}
 }

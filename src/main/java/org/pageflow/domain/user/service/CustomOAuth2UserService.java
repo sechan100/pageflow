@@ -4,11 +4,12 @@ package org.pageflow.domain.user.service;
 import lombok.RequiredArgsConstructor;
 import org.pageflow.domain.user.entity.Account;
 import org.pageflow.domain.user.entity.SignupCache;
-import org.pageflow.domain.user.model.dto.PrincipalContext;
+import org.pageflow.domain.user.model.principal.InitialAuthenticationPrincipal;
 import org.pageflow.domain.user.model.oauth.GithubOwner;
 import org.pageflow.domain.user.model.oauth.GoogleOwner;
 import org.pageflow.domain.user.model.oauth.NaverOwner;
 import org.pageflow.domain.user.model.oauth.ResourceOwner;
+import org.pageflow.domain.user.model.principal.SessionPrincipal;
 import org.pageflow.domain.user.repository.AccountRepository;
 import org.pageflow.domain.user.repository.SignupCacheRepository;
 import org.pageflow.global.request.RequestContext;
@@ -46,7 +47,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         // 기존 회원정보 존재 -> 기존 정보로 로그인
         if (accountRepository.existsByUsername(resourceOwner.getUsername())) {
             
-            Account account = accountRepository.findFetchJoinProfileByUsername(resourceOwner.getUsername());
+            Account account = accountRepository.findWithProfileByUsername(resourceOwner.getUsername());
             
             // 포워딩으로 위임
             requestContext.forwardBuilder("/internal/login")
@@ -79,7 +80,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         }
         
         // security 스펙상, 제대로 반환을 안하면 AuthenticationException이 발생하므로, 빈 객체를 반환
-        return PrincipalContext.anonymous();
+        return InitialAuthenticationPrincipal.anonymous();
     }
 
 

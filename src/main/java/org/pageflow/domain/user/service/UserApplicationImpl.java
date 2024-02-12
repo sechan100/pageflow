@@ -15,6 +15,7 @@ import org.pageflow.global.constants.CustomProps;
 import org.pageflow.global.entity.DataNotFoundException;
 import org.pageflow.global.exception.business.code.SessionCode;
 import org.pageflow.global.exception.business.exception.BizException;
+import org.pageflow.infra.jwt.dto.AccessTokenDto;
 import org.pageflow.infra.jwt.provider.JwtProvider;
 import org.pageflow.util.MilliSeconds;
 import org.springframework.security.core.Authentication;
@@ -71,12 +72,12 @@ public class UserApplicationImpl implements UserApplication {
     }
     
     @Override
-    public ClientAspectAuthResults login(String username, String password) {
+    public LoginTokens login(String username, String password) {
         Authentication authentication = defaultUserService.authenticate(username, password);
         
         if(authentication.getPrincipal() instanceof InitialAuthenticationPrincipal principal) {
             // accessToken 발급
-            JwtProvider.AccessTokenReturn accessToken = jwtProvider.generateAccessToken(
+            AccessTokenDto accessToken = jwtProvider.generateAccessToken(
                     principal.getUID(),
                     principal.getRole()
             );
@@ -98,7 +99,7 @@ public class UserApplicationImpl implements UserApplication {
             }
             
             // RETURN
-            return new ClientAspectAuthResults(
+            return new LoginTokens(
                     accessToken.accessToken(),
                     accessToken.expiredAt(),
                     refreshTokenId
@@ -119,7 +120,7 @@ public class UserApplicationImpl implements UserApplication {
      * @throws BizException SESSION_EXPIRED
      */
     @Override
-    public JwtProvider.AccessTokenReturn refresh(String refreshTokenId){
+    public AccessTokenDto refresh(String refreshTokenId){
         try {
             // 세션을 조회하고, refreshToken의 만료여부를 확인
             RefreshToken refreshToken = refreshTokenRepository.findWithAccountById(refreshTokenId);

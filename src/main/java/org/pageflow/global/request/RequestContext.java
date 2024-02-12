@@ -104,6 +104,10 @@ public class RequestContext {
         return Optional.empty();
     }
     
+    public void setCookie(Cookie cookie) {
+        response.addCookie(cookie);
+    }
+    
     /**
      * @param redirectUrl redirect할 url
      */

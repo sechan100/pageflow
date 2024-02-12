@@ -9,6 +9,7 @@ import org.pageflow.domain.user.constants.RoleType;
 import org.pageflow.global.constants.CustomProps;
 import org.pageflow.global.exception.business.code.SessionCode;
 import org.pageflow.global.exception.business.exception.BizException;
+import org.pageflow.infra.jwt.dto.AccessTokenDto;
 import org.pageflow.infra.jwt.token.AccessToken;
 import org.pageflow.util.MilliSeconds;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,7 +32,7 @@ public class JwtProvider {
     private final CustomProps props;
     public static final String ROLE_CLAIM_KEY = "rol";
     
-    public AccessTokenReturn generateAccessToken(Long UID, RoleType role) {
+    public AccessTokenDto generateAccessToken(Long UID, RoleType role) {
         Assert.notNull(UID, "UID must not be null");
         Assert.notNull(role, "role must not be null");
         
@@ -46,12 +47,11 @@ public class JwtProvider {
         claims.setExpiration(expiredAt); // "exp": 1516239022
         
         // return
-        return new AccessTokenReturn(
-                compact(claims),
-                expiredAt.getTime()
-        );
+        return AccessTokenDto.builder()
+                .accessToken(compact(claims))
+                .expiredAt(expiredAt.getTime())
+                .build();
     }
-    public record AccessTokenReturn(String accessToken, Long expiredAt) {}
     
     public AccessToken parseAccessToken(String accessToken) {
         Assert.hasText(accessToken, "accessToken must not be null or empty");

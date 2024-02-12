@@ -2,16 +2,21 @@ package org.pageflow.domain.user.controller;
 
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.servlet.http.Cookie;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.pageflow.domain.user.entity.RefreshToken;
 import org.pageflow.domain.user.model.dto.WebLoginRequest;
 import org.pageflow.domain.user.service.UserApplication;
+import org.pageflow.domain.user.service.UserApplication.*;
+import org.pageflow.global.constants.CustomProps;
 import org.pageflow.global.exception.business.code.SessionCode;
 import org.pageflow.global.exception.business.exception.BizException;
 import org.pageflow.global.request.RequestContext;
+import org.pageflow.infra.jwt.dto.AccessTokenDto;
 import org.pageflow.infra.jwt.provider.JwtProvider;
 import org.springframework.web.bind.annotation.*;
+
 
 /**
  * @author : sechan
@@ -22,6 +27,7 @@ public class LoginLogoutController {
     
     private final UserApplication userApp;
     private final RequestContext requestContext;
+    private final CustomProps customProps;
     private final JwtProvider jwtProvider;
     
     
@@ -31,9 +37,27 @@ public class LoginLogoutController {
      */
     @Operation(summary = "로그인", description = "아이디와 비밀번호를 받고, access 토큰과 refresh 토큰을 반환")
     @PostMapping("/login")
-    public UserApplication.ClientAspectAuthResults webLogin(@Valid @RequestBody WebLoginRequest loginReq) {
-        return userApp.login(loginReq.getUsername(), loginReq.getPassword());
+    public AccessTokenDto webLogin(@Valid @RequestBody WebLoginRequest loginReq) {
+        LoginTokens result = userApp.login(loginReq.getUsername(), loginReq.getPassword());
+        
+        Cookie refreshTokenUUID = new Cookie(
+                RefreshToken.COOKIE_NAME, result.refreshTokenUUID()
+        );
+        refreshTokenUUID.setPath("/refresh");
+        refreshTokenUUID.setHttpOnly(true); // JS에서 접근 불가
+        refreshTokenUUID.setSecure(true); // HTTPS에서만 전송
+        refreshTokenUUID.setMaxAge(60 * 60 * 24 * customProps.site().refreshTokenExpireDays()); // 30일
+        
+        // 쿠키 할당
+        requestContext.setCookie(refreshTokenUUID);
+        
+        // RETURN
+        return AccessTokenDto.builder()
+                .accessToken(result.accessToken())
+                .expiredAt(result.accessTokenExpiredAt())
+                .build();
     }
+    
     
     /**
      * OAuth2로 접근하는 요청을 포워딩하여 로그인처리. <br>
@@ -43,7 +67,7 @@ public class LoginLogoutController {
      */
     @Hidden
     @GetMapping("/internal/login")
-    public UserApplication.ClientAspectAuthResults oauth2Login(
+    public UserApplication.LoginTokens oauth2Login(
             @RequestParam("username") String username,
             @RequestParam("password") String password
     ) {
@@ -55,7 +79,7 @@ public class LoginLogoutController {
      */
     @Operation(summary = "accessToken 재발급", description = "refreshToken을 받아서, accessToken을 재발급")
     @PostMapping("/refresh") // 멱등성을 성립하지 않는 요청이라 Post임
-    public JwtProvider.AccessTokenReturn refresh() {
+    public AccessTokenDto refresh() {
         return requestContext.getCookie(RefreshToken.COOKIE_NAME)
                 // 쿠키 존재
                 .map(refreshTokenId -> userApp.refresh(refreshTokenId.getValue()))

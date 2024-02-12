@@ -4,7 +4,7 @@ import org.pageflow.domain.user.constants.ProviderType;
 import org.pageflow.domain.user.constants.RoleType;
 import org.pageflow.domain.user.entity.Account;
 import org.pageflow.domain.user.model.dto.SignupForm;
-import org.pageflow.infra.jwt.provider.JwtProvider;
+import org.pageflow.infra.jwt.dto.AccessTokenDto;
 
 /**
  * @author : sechan
@@ -13,11 +13,11 @@ public interface UserApplication {
     
     Account signup(SignupForm form, ProviderType provider, RoleType userRole);
     
-    ClientAspectAuthResults login(String username, String password);
-    record ClientAspectAuthResults(String accessToken, long accessTokenExpiredAt, String refreshTokenUUID){}
+    LoginTokens login(String username, String password);
+    record LoginTokens(String accessToken, long accessTokenExpiredAt, String refreshTokenUUID){}
     
     void logout(String refreshToken);
     
-    JwtProvider.AccessTokenReturn refresh(String refreshTokesnId);
+    AccessTokenDto refresh(String refreshTokesnId);
 
 }

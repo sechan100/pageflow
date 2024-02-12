@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.pageflow.domain.user.entity.RefreshToken;
 import org.pageflow.domain.user.model.dto.WebLoginRequest;
 import org.pageflow.domain.user.service.UserApplication;
+import org.pageflow.global.exception.business.code.SessionCode;
+import org.pageflow.global.exception.business.exception.BizException;
 import org.pageflow.global.request.RequestContext;
 import org.pageflow.infra.jwt.provider.JwtProvider;
 import org.springframework.web.bind.annotation.*;
@@ -55,8 +57,15 @@ public class LoginLogoutController {
     @PostMapping("/refresh") // 멱등성을 성립하지 않는 요청이라 Post임
     public JwtProvider.AccessTokenReturn refresh() {
         return requestContext.getCookie(RefreshToken.COOKIE_NAME)
+                // 쿠키 존재
                 .map(refreshTokenId -> userApp.refresh(refreshTokenId.getValue()))
-                .orElseThrow();
+                
+                // 쿠키 존재하지 않음
+                .orElseThrow(()-> BizException.builder()
+                        .code(SessionCode.TOKEN_NOT_FOUND)
+                        .message("'" + RefreshToken.COOKIE_NAME + "' 이름을 가진 쿠키가 존재하지 않습니다.")
+                        .build()
+                );
         
     }
     

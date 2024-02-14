@@ -16,7 +16,6 @@ import org.pageflow.global.exception.business.exception.BizException;
 import org.pageflow.infra.email.EmailSender;
 import org.pageflow.infra.file.service.FileService;
 import org.pageflow.infra.jwt.provider.JwtProvider;
-import org.springframework.lang.Nullable;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -134,9 +133,9 @@ public class DefaultUserService {
     }
     
     /**
-     * @throws BizException INVALID_PASSWORD, PASSWORD_CONFIRM_NOT_MATCH
+     * @throws BizException INVALID_PASSWORD
      */
-    public void validatePassword(String password, @Nullable String passwordConfirm) {
+    public void validatePassword(String password) {
         
         // 1. null, 빈 문자열 검사
         if(!StringUtils.hasText(password)){
@@ -152,11 +151,6 @@ public class DefaultUserService {
                     .code(UserCode.INVALID_PASSWORD)
                     .message(UserSignupPolicy.PASSWORD_REGEX_DISCRIPTION)
                     .build();
-        }
-        
-        // 3. password와 passwordConfirm이 일치 검사
-        if(passwordConfirm != null && !password.equals(passwordConfirm)){
-            throw new BizException(UserCode.PASSWORD_CONFIRM_NOT_MATCH);
         }
     }
     

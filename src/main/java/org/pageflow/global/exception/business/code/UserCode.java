@@ -19,7 +19,6 @@ public enum UserCode implements ErrorCode {
     
     // 비밀번호
     , PASSWORD_NOT_MATCH("비밀번호 불일치")
-    , PASSWORD_CONFIRM_NOT_MATCH("비밀번호 확인 불일치")
     
     // 중복
     , DUPLICATED_USERNAME("아이디 중복")

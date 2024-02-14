@@ -48,7 +48,7 @@ public class UserApplicationImpl implements UserApplication {
         // email 검사
         defaultUserService.validateEmail(form.getEmail());
         // password 검사
-        defaultUserService.validatePassword(form.getPassword(), form.getPasswordConfirm());
+        defaultUserService.validatePassword(form.getPassword());
         // penname 검사
         defaultUserService.validatePenname(form.getPenname());
         

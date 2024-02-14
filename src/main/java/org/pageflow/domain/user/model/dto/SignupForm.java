@@ -27,9 +27,6 @@ public class SignupForm {
     @Pattern(regexp = UserSignupPolicy.PASSWORD_REGEX, message = UserSignupPolicy.PASSWORD_REGEX_DISCRIPTION)
     private String password;
     
-    @NotBlank
-    private String passwordConfirm;
-    
     @Email
     private String email;
     

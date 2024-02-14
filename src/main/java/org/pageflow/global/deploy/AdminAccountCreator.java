@@ -44,7 +44,6 @@ public class AdminAccountCreator {
         SignupForm adminForm = SignupForm.builder()
                 .username(adminProps.username())
                 .password(adminProps.password())
-                .passwordConfirm(adminProps.password())
                 .email(adminProps.email())
                 .penname("관리자")
                 .build();

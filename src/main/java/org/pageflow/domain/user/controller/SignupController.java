@@ -71,7 +71,6 @@ public class SignupController {
         return SignupForm.builder()
                 .username(cache.getUsername())
                 .password(radomPassword)
-                .passwordConfirm(radomPassword)
                 .email(cache.getEmail())
                 .penname(cache.getPenname())
                 .profileImgUrl(cache.getProfileImgUrl())

@@ -4,18 +4,20 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pageflow.domain.user.constants.ProviderType;
 import org.pageflow.domain.user.constants.RoleType;
+import org.pageflow.domain.user.dto.SignupForm;
 import org.pageflow.domain.user.entity.Account;
 import org.pageflow.domain.user.entity.Profile;
 import org.pageflow.domain.user.entity.RefreshToken;
 import org.pageflow.domain.user.model.principal.InitialAuthenticationPrincipal;
-import org.pageflow.domain.user.model.dto.SignupForm;
+import org.pageflow.domain.user.model.token.AccessToken;
+import org.pageflow.domain.user.model.token.AuthTokens;
+import org.pageflow.domain.user.model.user.AggregateUser;
 import org.pageflow.domain.user.repository.AccountRepository;
 import org.pageflow.domain.user.repository.RefreshTokenRepository;
 import org.pageflow.global.constants.CustomProps;
 import org.pageflow.global.entity.DataNotFoundException;
 import org.pageflow.global.exception.business.code.SessionCode;
 import org.pageflow.global.exception.business.exception.BizException;
-import org.pageflow.infra.jwt.dto.AccessTokenDto;
 import org.pageflow.infra.jwt.provider.JwtProvider;
 import org.pageflow.util.MilliSeconds;
 import org.springframework.security.core.Authentication;
@@ -41,7 +43,7 @@ public class UserApplicationImpl implements UserApplication {
     private final JwtProvider jwtProvider;
     
     @Override
-    public Account signup(SignupForm form, ProviderType provider, RoleType userRole) {
+    public AggregateUser signup(SignupForm form, ProviderType provider, RoleType userRole) {
         
         // username 검사
         defaultUserService.validateUsername(form.getUsername());
@@ -72,39 +74,32 @@ public class UserApplicationImpl implements UserApplication {
     }
     
     @Override
-    public LoginTokens login(String username, String password) {
+    public AuthTokens login(String username, String password) {
         Authentication authentication = defaultUserService.authenticate(username, password);
         
         if(authentication.getPrincipal() instanceof InitialAuthenticationPrincipal principal) {
-            // accessToken 발급
-            AccessTokenDto accessToken = jwtProvider.generateAccessToken(
+            // AccessToken 발급
+            AccessToken accessToken = jwtProvider.generateAccessToken(
                     principal.getUID(),
                     principal.getRole()
             );
             
             // refreshToken을 생성(새로 생성된 세션 정보를 기록)
-            String refreshTokenId = UUID.randomUUID().toString();
+            String refreshTokenUUID = UUID.randomUUID().toString();
             try {
-                refreshTokenRepository.save(
-                        RefreshToken.builder()
-                                .id(refreshTokenId) // UUID
-                                .expiredAt(System.currentTimeMillis() + (props.site().refreshTokenExpireDays() * MilliSeconds.DAY)) // 만료시간
-                                // UID와 연관관계 매핑(프록시로만 조회하여 굳이 사용하지 않을 Account를 쿼리하지 않고 id로만 매핑)
-                                .account(accountRepository.getReferenceById(principal.getUID()))
-                                .build()
+                RefreshToken refreshToken = refreshTokenRepository.save(
+                    RefreshToken.builder()
+                        .id(refreshTokenUUID) // UUID
+                        .expiredAt(System.currentTimeMillis() + (props.site().refreshTokenExpireDays() * MilliSeconds.DAY)) // 만료시간
+                        // UID와 연관관계 매핑(프록시로만 조회하여 굳이 사용하지 않을 Account를 쿼리하지 않고 id로만 매핑)
+                        .account(accountRepository.getReferenceById(principal.getUID()))
+                        .build()
                 );
+                return new AuthTokens(accessToken, refreshToken); // RETURN
             } catch(Exception e) {
-                // 혹여나 Session UUID가 중복된 경우...
-                log.error("refresh token 영속화 실패: {}", e.getMessage());
+                log.error("refresh accessToken 영속화 실패: {}", e.getMessage());
+                throw e;
             }
-            
-            // RETURN
-            return new LoginTokens(
-                    accessToken.accessToken(),
-                    accessToken.expiredAt(),
-                    refreshTokenId
-            );
-            
         } else {
             throw new IllegalArgumentException("authentication.getPrincipal() 객체가 PrincipalContext의 인스턴스가 아닙니다. \n " +
                     "UserDetailsService의 구현이 올바르지 않을 수 있습니다.");
@@ -120,7 +115,7 @@ public class UserApplicationImpl implements UserApplication {
      * @throws BizException SESSION_EXPIRED
      */
     @Override
-    public AccessTokenDto refresh(String refreshTokenId){
+    public AccessToken refresh(String refreshTokenId){
         try {
             // 세션을 조회하고, refreshToken의 만료여부를 확인
             RefreshToken refreshToken = refreshTokenRepository.findWithAccountById(refreshTokenId);
@@ -130,7 +125,7 @@ public class UserApplicationImpl implements UserApplication {
             
             // 새 토큰을 발급
             Account user = refreshToken.getAccount();
-            return jwtProvider.generateAccessToken(user.getId(), user.getRole());
+            return jwtProvider.generateAccessToken(user.getUID(), user.getRole());
             
         // 세션을 찾지 못함
         } catch(DataNotFoundException sessionNotExist) {

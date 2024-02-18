@@ -6,8 +6,8 @@ import org.mockito.Mockito;
 import org.pageflow.domain.user.constants.ProviderType;
 import org.pageflow.domain.user.constants.RoleType;
 import org.pageflow.domain.user.entity.SignupCache;
-import org.pageflow.domain.user.model.dto.SignupForm;
-import org.pageflow.domain.user.model.dto.WebLoginRequest;
+import org.pageflow.domain.user.dto.SignupForm;
+import org.pageflow.domain.user.dto.WebLoginRequest;
 import org.pageflow.domain.user.repository.SignupCacheRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -96,7 +96,7 @@ class SignupLoginTest {
                         ))
                 )
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.accessToken").exists())
+                .andExpect(jsonPath("$.compact").exists())
                 .andExpect(jsonPath("$.refreshToken").exists());
     }
     

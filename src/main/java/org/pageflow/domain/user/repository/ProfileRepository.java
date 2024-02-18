@@ -13,6 +13,6 @@ public interface ProfileRepository extends JpaRepository<Profile, Long> {
     boolean existsByPenname(String penname);
     
     @EntityGraph(attributePaths = {"account"})
-    Profile findWithAccountById(Long UID);
+    Profile findWithAccountByUID(Long UID);
     
 }

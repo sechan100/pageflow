@@ -9,8 +9,7 @@ import org.pageflow.domain.user.constants.RoleType;
 import org.pageflow.global.constants.CustomProps;
 import org.pageflow.global.exception.business.code.SessionCode;
 import org.pageflow.global.exception.business.exception.BizException;
-import org.pageflow.infra.jwt.dto.AccessTokenDto;
-import org.pageflow.infra.jwt.token.AccessToken;
+import org.pageflow.domain.user.model.token.AccessToken;
 import org.pageflow.util.MilliSeconds;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -32,7 +31,7 @@ public class JwtProvider {
     private final CustomProps props;
     public static final String ROLE_CLAIM_KEY = "rol";
     
-    public AccessTokenDto generateAccessToken(Long UID, RoleType role) {
+    public AccessToken generateAccessToken(Long UID, RoleType role) {
         Assert.notNull(UID, "UID must not be null");
         Assert.notNull(role, "role must not be null");
         
@@ -47,18 +46,21 @@ public class JwtProvider {
         claims.setExpiration(expiredAt); // "exp": 1516239022
         
         // return
-        return AccessTokenDto.builder()
-                .accessToken(compact(claims))
-                .expiredAt(expiredAt.getTime())
+        return AccessToken.builder()
+                .UID(UID)
+                .compact(compact(claims))
+                .iat(claims.getIssuedAt())
+                .exp(claims.getExpiration())
+                .role(role)
                 .build();
     }
     
     public AccessToken parseAccessToken(String accessToken) {
-        Assert.hasText(accessToken, "accessToken must not be null or empty");
+        Assert.hasText(accessToken, "compact must not be null or empty");
         
         Claims claims = parseToken(accessToken);
         return AccessToken.builder()
-                .token(accessToken)
+                .compact(accessToken)
                 .UID(Long.valueOf(claims.getSubject()))
                 .iat(claims.getIssuedAt())
                 .exp(claims.getExpiration())

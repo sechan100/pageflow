@@ -1,4 +1,4 @@
-package org.pageflow.domain.user.model.dto;
+package org.pageflow.domain.user.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;

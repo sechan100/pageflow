@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pageflow.global.constants.CustomProps;
 import org.pageflow.domain.user.constants.RoleType;
-import org.pageflow.domain.user.model.dto.SignupForm;
+import org.pageflow.domain.user.dto.SignupForm;
 import org.pageflow.domain.user.repository.AccountRepository;
 import org.pageflow.domain.user.service.AdminUserService;
 import org.springframework.boot.ApplicationRunner;

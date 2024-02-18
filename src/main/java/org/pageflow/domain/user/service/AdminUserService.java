@@ -1,12 +1,13 @@
 package org.pageflow.domain.user.service;
 
 import lombok.RequiredArgsConstructor;
+import org.pageflow.domain.user.model.user.AggregateUser;
 import org.pageflow.global.constants.CustomProps;
 import org.pageflow.domain.user.constants.ProviderType;
 import org.pageflow.domain.user.constants.RoleType;
 import org.pageflow.domain.user.entity.Account;
 import org.pageflow.domain.user.entity.Profile;
-import org.pageflow.domain.user.model.dto.SignupForm;
+import org.pageflow.domain.user.dto.SignupForm;
 import org.pageflow.domain.user.repository.AccountRepository;
 import org.pageflow.domain.user.repository.ProfileRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,7 +28,7 @@ public class AdminUserService {
     private final DefaultUserService defaultUserService;
     private final ProfileRepository profileRepository;
     
-    public Account adminSignup(SignupForm form) {
+    public AggregateUser adminSignup(SignupForm form) {
         
         // 프로필 생성
         Profile profile = Profile.builder()

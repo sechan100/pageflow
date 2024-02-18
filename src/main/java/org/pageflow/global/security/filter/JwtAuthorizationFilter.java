@@ -10,7 +10,7 @@ import lombok.SneakyThrows;
 import org.pageflow.domain.user.constants.RoleType;
 import org.pageflow.domain.user.model.principal.SessionPrincipal;
 import org.pageflow.infra.jwt.provider.JwtProvider;
-import org.pageflow.infra.jwt.token.AccessToken;
+import org.pageflow.domain.user.model.token.AccessToken;
 import org.springframework.http.HttpHeaders;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

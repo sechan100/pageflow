@@ -21,7 +21,7 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
     Account findWithProfileByUsername(String username);
     
     @EntityGraph(attributePaths = {"profile"})
-    Account findWithProfileById(Long UID);
+    Account findWithProfileByUID(Long UID);
     
     
 }

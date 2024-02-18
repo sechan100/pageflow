@@ -2,22 +2,24 @@ package org.pageflow.domain.user.service;
 
 import org.pageflow.domain.user.constants.ProviderType;
 import org.pageflow.domain.user.constants.RoleType;
-import org.pageflow.domain.user.entity.Account;
-import org.pageflow.domain.user.model.dto.SignupForm;
-import org.pageflow.infra.jwt.dto.AccessTokenDto;
+import org.pageflow.domain.user.dto.SignupForm;
+import org.pageflow.domain.user.model.token.AccessToken;
+import org.pageflow.domain.user.model.token.AuthTokens;
+import org.pageflow.domain.user.model.user.AggregateUser;
 
 /**
  * @author : sechan
  */
 public interface UserApplication {
     
-    Account signup(SignupForm form, ProviderType provider, RoleType userRole);
+    AggregateUser signup(SignupForm form, ProviderType provider, RoleType userRole);
     
-    LoginTokens login(String username, String password);
-    record LoginTokens(String accessToken, long accessTokenExpiredAt, String refreshTokenUUID){}
+    AuthTokens login(String username, String password);
     
     void logout(String refreshToken);
     
-    AccessTokenDto refresh(String refreshTokesnId);
+    AccessToken refresh(String refreshTokesnId);
+    
+    
 
 }

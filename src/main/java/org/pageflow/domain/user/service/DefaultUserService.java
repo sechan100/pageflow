@@ -3,10 +3,11 @@ package org.pageflow.domain.user.service;
 
 import com.google.common.base.Preconditions;
 import lombok.RequiredArgsConstructor;
-import org.pageflow.domain.user.constants.ProfileFetchDepth;
+import org.pageflow.domain.user.constants.UserFetchDepth;
 import org.pageflow.domain.user.constants.UserSignupPolicy;
 import org.pageflow.domain.user.entity.Account;
 import org.pageflow.domain.user.entity.Profile;
+import org.pageflow.domain.user.model.user.AggregateUser;
 import org.pageflow.domain.user.repository.AccountRepository;
 import org.pageflow.domain.user.repository.ProfileRepository;
 import org.pageflow.domain.user.repository.RefreshTokenRepository;
@@ -54,7 +55,7 @@ public class DefaultUserService {
      * 누가 먼저 영속화되냐, account에 profile이 있냐 profile에 account가 있냐에 따라서 에러가 발생할 수 있기 때문
      */
     @Transactional
-    public Account saveUser(Account account, Profile profile) {
+    public AggregateUser saveUser(Account account, Profile profile) {
         
         // Account 먼저 영속
         Account savedAccount = accountRepository.save(account);
@@ -65,7 +66,11 @@ public class DefaultUserService {
         // Profile 영속
         Profile savedProfile = profileRepository.save(profile);
         
-        return savedProfile.getAccount();
+        return AggregateUser.builder()
+                .fetchDepth(UserFetchDepth.FULL)
+                .account(savedAccount)
+                .profile(savedProfile)
+                .build();
     }
     
     /**
@@ -230,17 +235,21 @@ public class DefaultUserService {
     
     /**
      * @param UID UID
-     * @param fetchDepth 프로필 조회 깊이 {@link ProfileFetchDepth}
+     * @param fetchDepth 프로필 조회 깊이 {@link UserFetchDepth}
      * @return 지정한 수준까지 초기화된 후, JPA 세션이 닫힌 상태의 Profile 인스턴스
      */
-    public Profile fetchProfile(Long UID, ProfileFetchDepth fetchDepth){
+    public AggregateUser fetchUser(Long UID, UserFetchDepth fetchDepth){
         Preconditions.checkNotNull(UID, "UID must not be null");
         Preconditions.checkNotNull(fetchDepth, "fetchDepth must not be null");
         
-        return switch (fetchDepth) {
-            case PROXY -> profileRepository.getReferenceById(UID);
-            case BASIC -> profileRepository.findById(UID).orElseThrow();
-            case WITH_ACCOUNT -> profileRepository.findWithAccountById(UID);
+         return switch(fetchDepth) {
+             case PROXY -> new AggregateUser(UserFetchDepth.PROXY, accountRepository.getReferenceById(UID), profileRepository.getReferenceById(UID));
+             case PROFILE -> new AggregateUser(UserFetchDepth.PROFILE, accountRepository.getReferenceById(UID), profileRepository.findById(UID).orElseThrow());
+             case ACCOUNT -> new AggregateUser(UserFetchDepth.ACCOUNT, accountRepository.findById(UID).orElseThrow(), profileRepository.getReferenceById(UID));
+             case FULL -> {
+                 Profile profile = profileRepository.findWithAccountByUID(UID);
+                 yield new AggregateUser(UserFetchDepth.FULL, profile.getAccount(), profile);
+             }
         };
     }
     

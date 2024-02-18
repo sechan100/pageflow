@@ -30,7 +30,7 @@ public class InitialAuthenticationPrincipal extends User implements OAuth2User, 
     }
     
     public static InitialAuthenticationPrincipal from(Account user) {
-        return new InitialAuthenticationPrincipal(user.getId(), user.getUsername(), user.getPassword(), user.getRole());
+        return new InitialAuthenticationPrincipal(user.getUID(), user.getUsername(), user.getPassword(), user.getRole());
     }
     
     public static InitialAuthenticationPrincipal anonymous() {

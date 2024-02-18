@@ -11,15 +11,15 @@ import org.pageflow.global.entity.NoIdBaseEntity;
 @Getter
 @Setter(AccessLevel.NONE)
 @Builder
-@EqualsAndHashCode(of = "id", callSuper = false)
+@EqualsAndHashCode(of = "UID", callSuper = false)
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @DynamicUpdate
 public class Profile extends NoIdBaseEntity {
     
-    // @MapsId: Profile의 PK를 Account의 PK와 매핑한다.
+    // @MapsId: Account의 PK를 Profile의 PK로 사용
     @Id
-    private Long id;
+    private Long UID;
     
     // 필명
     @Column(unique = true, nullable = false)
@@ -30,7 +30,7 @@ public class Profile extends NoIdBaseEntity {
     
     @JsonIgnore
     @MapsId
-    @JoinColumn(name = "id")
+    @JoinColumn(name = "UID")
     @OneToOne(optional = false, fetch = FetchType.LAZY)
     private Account account;
     

@@ -1,23 +1,20 @@
-package org.pageflow.domain.user.model.dto;
+package org.pageflow.domain.user.dto;
 
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 import org.pageflow.domain.user.constants.UserSignupPolicy;
 import org.springframework.lang.Nullable;
 
 
-/**
- * username, password, passwordConfirm, email, penname, profileImgUrl
- */
 @Getter
 @Setter
 @Builder
-@AllArgsConstructor
-@NoArgsConstructor
-public class SignupForm {
+public class UpdateForm {
     
     @NotBlank
     @Pattern(regexp = UserSignupPolicy.USERNAME_REGEX, message = UserSignupPolicy.USERNAME_REGEX_DISCRIPTION)
@@ -26,6 +23,9 @@ public class SignupForm {
     @NotBlank
     @Pattern(regexp = UserSignupPolicy.PASSWORD_REGEX, message = UserSignupPolicy.PASSWORD_REGEX_DISCRIPTION)
     private String password;
+    
+    @NotBlank
+    private String passwordConfirm;
     
     @Email
     private String email;

@@ -1,4 +1,4 @@
-package org.pageflow.infra.jwt.token;
+package org.pageflow.domain.user.model.token;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -15,7 +15,7 @@ public class AccessToken {
     
     private Long UID;
     private RoleType role;
-    private String token;
+    private String compact;
     private Date exp;
     private Date iat;
     

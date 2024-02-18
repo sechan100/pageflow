@@ -43,9 +43,9 @@ public class LoginLogoutController {
         Cookie refreshTokenUUID = new Cookie(
                 RefreshToken.COOKIE_NAME, result.refreshTokenUUID()
         );
-        refreshTokenUUID.setPath("/refresh");
+        refreshTokenUUID.setPath("/_pageflow/api/refresh");
         refreshTokenUUID.setHttpOnly(true); // JS에서 접근 불가
-        refreshTokenUUID.setSecure(true); // HTTPS에서만 전송
+        refreshTokenUUID.setSecure(false); // HTTPS에서만 전송
         refreshTokenUUID.setMaxAge(60 * 60 * 24 * customProps.site().refreshTokenExpireDays()); // 30일
         
         // 쿠키 할당

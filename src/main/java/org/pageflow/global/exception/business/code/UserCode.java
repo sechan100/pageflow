@@ -8,7 +8,7 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-public enum UserCode implements ErrorCode {
+public enum UserCode implements ApiCode {
       USER_NOT_FOUND("사용자를 찾을 수 없음")
     
     // 유효하지 않음

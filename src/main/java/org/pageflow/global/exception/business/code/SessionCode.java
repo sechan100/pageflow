@@ -8,7 +8,7 @@ import lombok.Getter;
  */
 @AllArgsConstructor
 @Getter
-public enum SessionCode implements ErrorCode {
+public enum SessionCode implements ApiCode {
       SESSION_EXPIRED("세션이 만료됨; refreshToken 만료")
     , LOGIN_REQUIRED("로그인 필요")
     , INVALID_TOKEN("올바르지 않은 토큰")

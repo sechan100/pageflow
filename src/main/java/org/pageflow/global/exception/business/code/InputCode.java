@@ -8,7 +8,7 @@ import lombok.Getter;
  */
 @AllArgsConstructor
 @Getter
-public enum InputCode implements ErrorCode {
+public enum InputCode implements ApiCode {
     FIELD_VALIDATION("사용자 입력 필드 검증 오류"),
     
     ;

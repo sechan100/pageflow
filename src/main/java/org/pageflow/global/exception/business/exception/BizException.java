@@ -1,7 +1,7 @@
 package org.pageflow.global.exception.business.exception;
 
 import lombok.Getter;
-import org.pageflow.global.exception.business.code.ErrorCode;
+import org.pageflow.global.exception.business.code.ApiCode;
 import org.springframework.util.Assert;
 
 import java.util.Objects;
@@ -10,15 +10,15 @@ import java.util.Set;
 @Getter
 public class BizException extends RuntimeException {
     
-    private final ErrorCode code;
+    private final ApiCode code;
     private final String message;
     private final Object data;
     
-    public BizException(ErrorCode code) {
+    public BizException(ApiCode code) {
         this(code, code.getMessage(), null);
     }
     
-    private BizException(ErrorCode code, String message, Object data) {
+    private BizException(ApiCode code, String message, Object data) {
         super(message);
         this.code = code;
         this.message = message;
@@ -31,11 +31,11 @@ public class BizException extends RuntimeException {
     }
     
     public static class Builder {
-        private ErrorCode code;
+        private ApiCode code;
         private String message;
         private Object data;
         
-        public BizException.Builder code(ErrorCode code){
+        public BizException.Builder code(ApiCode code){
             this.code = code;
             return this;
         }
@@ -63,7 +63,7 @@ public class BizException extends RuntimeException {
     public static class Handler {
         
         private final BizException bizException;
-        private Set<ErrorCode> selectedFilterCodes;
+        private Set<ApiCode> selectedFilterCodes;
         
         public Handler(BizException bizException) {
             this.bizException = bizException;
@@ -72,7 +72,7 @@ public class BizException extends RuntimeException {
         /**
          * @param code 원하는 에러코드에 해당하는 BizException만을 지정함. 나머지는 그대로 던짐
          */
-        public Handler filter(ErrorCode... code) {
+        public Handler filter(ApiCode... code) {
             Assert.notEmpty(code, "code must not be empty");
             this.selectedFilterCodes = Set.of(code);
             return this;
@@ -81,7 +81,7 @@ public class BizException extends RuntimeException {
         /**
          * @param code 새로운 에러코드를 지정하여 해당 코드로 다시 던짐
          */
-        public void throwNewCode(ErrorCode code) {
+        public void throwNewCode(ApiCode code) {
             if(isTarget()) {
                 throw new BizException(code);
             }
@@ -98,7 +98,7 @@ public class BizException extends RuntimeException {
         
         @FunctionalInterface
         public interface ErrorCodeProcessor {
-            void process(ErrorCode code);
+            void process(ApiCode code);
         }
         
         /**

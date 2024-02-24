@@ -3,6 +3,6 @@ package org.pageflow.global.exception.business.code;
 /**
  * @author : sechan
  */
-public interface ErrorCode {
+public interface ApiCode {
     String getMessage();
 }

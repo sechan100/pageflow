@@ -8,8 +8,6 @@ import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.pageflow.domain.user.constants.UserFetchDepth;
 import org.pageflow.domain.user.dto.WebLoginRequest;
-import org.pageflow.domain.user.entity.Account;
-import org.pageflow.domain.user.entity.Profile;
 import org.pageflow.domain.user.entity.RefreshToken;
 import org.pageflow.domain.user.model.token.AccessToken;
 import org.pageflow.domain.user.model.token.AuthTokens;
@@ -29,7 +27,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @RestController
 @RequiredArgsConstructor
-public class LoginLogoutController {
+public class SessionController {
     
     private final UserApplication userApp;
     private final DefaultUserService defaultUserService;
@@ -44,7 +42,7 @@ public class LoginLogoutController {
      */
     @Operation(summary = "로그인", description = "아이디와 비밀번호를 받고, access 토큰과 refresh 토큰을 반환")
     @PostMapping("/login")
-    public WebLoginResp webLogin(@Valid @RequestBody WebLoginRequest loginReq) {
+    public AccessTokenResp webLogin(@Valid @RequestBody WebLoginRequest loginReq) {
         
         // 로그인 -> Access, Refresh 토큰 발급
         AuthTokens authTokens = userApp.login(loginReq.getUsername(), loginReq.getPassword());
@@ -61,27 +59,21 @@ public class LoginLogoutController {
         AggregateUser user = defaultUserService.fetchUser(
                 authTokens.getAccessToken().getUID(), UserFetchDepth.FULL
         );
-        Profile profile = user.getProfile();
-        Account account = user.getAccount();
         
         // RETURN
-        return WebLoginResp.builder()
-                .accessToken(AccessTokenResp.builder()
-                        .compact(authTokens.getAccessToken().getCompact())
-                        .expiredAt(authTokens.getAccessToken().getExp().getTime())
-                        .build()
-                )
-                .user(User.builder()
-                        .UID(profile.getUID())
-                        .username(account.getUsername())
-                        .email(account.getEmail())
-                        .penname(profile.getPenname())
-                        .build()
-                )
+        return AccessTokenResp.builder()
+                .compact(authTokens.getAccessToken().getCompact())
+                .expiredAt(authTokens.getAccessToken().getExp().getTime())
                 .build();
-    }
-    
-    /**
+//              .User.builder()
+//                        .UID(user.getProfile().getUID())
+//                        .username(user.getAccount().getUsername())
+//                        .email(user.getAccount().getEmail())
+//                        .penname(user.getProfile().getPenname())
+//                        .build()
+}
+
+/**
      * OAuth2로 접근하는 요청을 포워딩하여 로그인처리. <br>
      * authorization_code를 포함한 인가요청을 해당 매핑으로 포워딩하여 로그인을 처리한다.
      * @param username
@@ -130,8 +122,25 @@ public class LoginLogoutController {
         //TODO: 쿠키가 존재하지 않는 경우의 동작...
     }
     
+    @Operation(summary = "세션 정보", description = "현재 세션의 정보를 반환")
+    @GetMapping("/user/session")
+    public Session getSession() {
+        AggregateUser user = defaultUserService.fetchUser(requestContext.getUID(), UserFetchDepth.FULL);
+        return Session.builder()
+                .user(User.builder()
+                        .email(user.getAccount().getEmail())
+                        .penname(user.getProfile().getPenname())
+                        .UID(user.getProfile().getUID())
+                        .username(user.getAccount().getUsername())
+                        .build()
+                )
+                .build();
+    }
     
-    @Builder public record WebLoginResp(AccessTokenResp accessToken, User user){}
+    
+    
+    
     @Builder record AccessTokenResp(String compact, long expiredAt){}
     @Builder record User(Long UID, String username, String email, String penname){}
+    @Builder record Session(User user){}
 }

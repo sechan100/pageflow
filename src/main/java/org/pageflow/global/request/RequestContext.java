@@ -74,8 +74,11 @@ public class RequestContext {
         // 인증된 사용자
         } else {
             Object principal = authentication.getPrincipal();
-            Preconditions.checkArgument(PageflowPrincipal.class.isAssignableFrom(principal.getClass()));
-                throw new IllegalArgumentException("처리할 수 없는 Principal 객체타입: " + principal.getClass().getName());
+            Preconditions.checkArgument(
+                    PageflowPrincipal.class.isAssignableFrom(principal.getClass()),
+                    "처리할 수 없는 Principal 객체타입: " + principal.getClass().getName()
+            );
+            this.principal = (PageflowPrincipal) principal;
             }
         }
     

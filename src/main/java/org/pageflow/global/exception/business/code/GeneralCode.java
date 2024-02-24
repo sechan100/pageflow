@@ -8,7 +8,7 @@ import lombok.Getter;
  */
 @AllArgsConstructor
 @Getter
-public enum GeneralCode implements ErrorCode {
+public enum GeneralCode implements ApiCode {
       SUCCESS("성공")
     
     ;

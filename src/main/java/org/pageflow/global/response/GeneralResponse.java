@@ -1,7 +1,7 @@
 package org.pageflow.global.response;
 
 import lombok.Getter;
-import org.pageflow.global.exception.business.code.ErrorCode;
+import org.pageflow.global.exception.business.code.ApiCode;
 import org.pageflow.global.exception.business.code.GeneralCode;
 import org.springframework.util.Assert;
 
@@ -14,7 +14,7 @@ import java.util.Objects;
 @Getter
 public class GeneralResponse<T> {
     
-    private final ErrorCode code;
+    private final ApiCode apiCode;
     private final String message;
     private final T data;
     
@@ -28,14 +28,14 @@ public class GeneralResponse<T> {
                 .build();
     }
     
-    public GeneralResponse(ErrorCode code){
-        this.code = code;
-        this.message = code.getMessage();
+    public GeneralResponse(ApiCode apiCode){
+        this.apiCode = apiCode;
+        this.message = apiCode.getMessage();
         this.data = null;
     }
     
-    private GeneralResponse(ErrorCode code, String message, T data){
-        this.code = code;
+    private GeneralResponse(ApiCode apiCode, String message, T data){
+        this.apiCode = apiCode;
         this.message = message;
         this.data = data;
     }
@@ -46,11 +46,11 @@ public class GeneralResponse<T> {
     
     
     public static class Builder<T> {
-        private ErrorCode code;
+        private ApiCode code;
         private String message;
         private T data;
         
-        public Builder code(ErrorCode code){
+        public Builder code(ApiCode code){
             this.code = code;
             return this;
         }

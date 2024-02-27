@@ -34,19 +34,19 @@ spring:
             scope: profile,email
             client-name: naver
             authorization-grant-type: authorization_code
-            redirect-uri: '${custom.site.base-url}/login/oauth2/code/naver'
+            redirect-uri: '${custom.site.client-url}/login/oauth2/code/naver'
 
           google:
             scope: profile, email
             client-name: google
             authorization-grant-type: authorization_code
-            redirect-uri: '${custom.site.base-url}/login/oauth2/code/google'
+            redirect-uri: '${custom.site.client-url}/login/oauth2/code/google'
 
           github:
             scope: user:email, read:user
             client-name: github
             authorization-grant-type: authorization_code
-            redirect-uri: '${custom.site.base-url}/login/oauth2/code/github'
+            redirect-uri: '${custom.site.client-url}/login/oauth2/code/github'
 
 
         provider:
@@ -59,6 +59,7 @@ spring:
 custom:
   site:
     base-url: 'http://localhost:${server.port}'
+    client-url: 'http://localhost:3000'
     access-token-expire-minutes: 30
     refresh-token-expire-days: 30
   email:

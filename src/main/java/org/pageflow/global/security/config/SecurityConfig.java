@@ -31,19 +31,20 @@ public class SecurityConfig {
     private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
     private final CustomLogoutSuccessHandler customLogoutSuccessHandler;
     private final JwtAuthorizationFilter jwtAuthorizationFilter;
+    private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
     
     
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/signup/**", "/login", "/internal/**", "/refresh").permitAll()
+                        .requestMatchers("/signup/**", "/user/login", "/internal/**", "/user/refresh").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll()
                 )
                 
                 .oauth2Login(oauth2 -> oauth2
-                        .loginPage("/login")
+                        .failureHandler(oAuth2AuthenticationFailureHandler)
                         .userInfoEndpoint(userInfo -> userInfo
                                 .userService(customOAuth2UserService)
                         )
@@ -70,6 +71,8 @@ public class SecurityConfig {
                 .addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class)
                 
                 .csrf(AbstractHttpConfigurer::disable)
+                
+                .cors(AbstractHttpConfigurer::disable)
                 
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint(customAuthenticationEntryPoint)

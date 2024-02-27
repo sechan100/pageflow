@@ -3,7 +3,6 @@ package org.pageflow.global.response;
 import lombok.Getter;
 import org.pageflow.global.exception.business.code.ApiCode;
 import org.pageflow.global.exception.business.code.GeneralCode;
-import org.springframework.util.Assert;
 
 import java.util.Objects;
 
@@ -19,8 +18,6 @@ public class GeneralResponse<T> {
     private final T data;
     
     public static <T> GeneralResponse success(T data){
-        Assert.notNull(data, "data must not be null");
-        
         return GeneralResponse.builder()
                 .code(GeneralCode.SUCCESS)
                 .message(GeneralCode.SUCCESS.getMessage())

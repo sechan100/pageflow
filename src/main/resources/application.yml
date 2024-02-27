@@ -8,21 +8,15 @@ spring:
     ansi:
       enabled: always
 
-#server:
-#  servlet:
-#    session:
-#      persistent: false
-
-
 logging:
   level:
     org:
-#    root: DEBUG
+      root: DEBUG
 #      pageflow:
 #        domain:
 #          book:
 #            service: DEBUG
-#      springframework:
-#        security: DEBUG
+      springframework:
+        security: TRACE
 #        jdbc:
 #          core: DEBUG

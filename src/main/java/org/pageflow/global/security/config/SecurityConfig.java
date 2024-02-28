@@ -1,12 +1,13 @@
 package org.pageflow.global.security.config;
 
 import lombok.RequiredArgsConstructor;
+import org.pageflow.domain.user.service.CustomOAuth2UserService;
 import org.pageflow.global.constants.CustomProps;
 import org.pageflow.global.security.filter.JwtAuthorizationFilter;
 import org.pageflow.global.security.handler.*;
-import org.pageflow.domain.user.service.CustomOAuth2UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -35,6 +36,7 @@ public class SecurityConfig {
     
     
     @Bean
+    @Order(1)
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
@@ -43,6 +45,28 @@ public class SecurityConfig {
                         .anyRequest().permitAll()
                 )
                 
+                .headers(headers -> headers
+                        .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
+                )
+                
+                .csrf(AbstractHttpConfigurer::disable)
+                
+                .cors(AbstractHttpConfigurer::disable)
+                
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(customAuthenticationEntryPoint)
+//                        .accessDeniedHandler()
+                )
+        ;
+        
+        
+        return http.build();
+    }
+    
+    @Bean
+    @Order(2)
+    SecurityFilterChain oAuth2Config(HttpSecurity http) throws Exception {
+        http
                 .oauth2Login(oauth2 -> oauth2
                         .failureHandler(oAuth2AuthenticationFailureHandler)
                         .userInfoEndpoint(userInfo -> userInfo
@@ -50,13 +74,18 @@ public class SecurityConfig {
                         )
                         .successHandler(oAuth2AuthenticationSuccessHandler)
                 )
+        ;
+        
+        return http.build();
+    }
+    
+    @Bean
+    @Order(3)
+    SecurityFilterChain jwtAuthenticationConfig(HttpSecurity http) throws Exception {
+        http
+                .formLogin(AbstractHttpConfigurer::disable)
                 
-                .headers(headers -> headers
-                        .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
-                )
-                
-                // formLogin을 사용하지 않기 때문에 authenticationProvider를 등록할 필요가 없음
-//                .authenticationProvider(daoAuthenticationProvider)
+                .logout(AbstractHttpConfigurer::disable)
                 
                 .sessionManagement(session -> session
                         /* [세션 생성 정책]
@@ -69,19 +98,12 @@ public class SecurityConfig {
                 )
                 
                 .addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class)
-                
-                .csrf(AbstractHttpConfigurer::disable)
-                
-                .cors(AbstractHttpConfigurer::disable)
-                
-                .exceptionHandling(exception -> exception
-                        .authenticationEntryPoint(customAuthenticationEntryPoint)
-//                        .accessDeniedHandler()
-                );
-        
+        ;
         
         return http.build();
     }
+    
+    
     
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {

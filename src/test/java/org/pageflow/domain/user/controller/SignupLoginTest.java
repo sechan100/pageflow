@@ -3,12 +3,12 @@ package org.pageflow.domain.user.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.pageflow.domain.user.constants.ProviderType;
-import org.pageflow.domain.user.constants.RoleType;
-import org.pageflow.domain.user.entity.SignupCache;
-import org.pageflow.domain.user.dto.SignupForm;
-import org.pageflow.domain.user.dto.WebLoginRequest;
-import org.pageflow.domain.user.repository.SignupCacheRepository;
+import org.pageflow.boundedcontext.user.constants.ProviderType;
+import org.pageflow.boundedcontext.user.constants.RoleType;
+import org.pageflow.boundedcontext.user.entity.SignupCache;
+import org.pageflow.boundedcontext.user.dto.SignupForm;
+import org.pageflow.boundedcontext.user.dto.WebLoginRequest;
+import org.pageflow.boundedcontext.user.repository.SignupCacheRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -36,7 +36,7 @@ class SignupLoginTest {
     private MockMvc mockMvc;
     
     @MockBean
-    private SignupCacheRepository signupCacheRepository;
+    private SignupCacheRepo signupCacheRepo;
     
     // NATIVE로 회원가입
     @Test
@@ -108,7 +108,7 @@ class SignupLoginTest {
         String profileImgUrl = "https://pageflow.org/profileImgUrl";
         
         // OAuth2 요청 했다고치고, 캐싱된 데이터가 존재하는 것처럼 Mocking
-        Mockito.when(signupCacheRepository.findById(username))
+        Mockito.when(signupCacheRepo.findById(username))
                 .thenReturn(Optional.of(
                         SignupCache.builder()
                                 .username(username)
@@ -119,7 +119,7 @@ class SignupLoginTest {
                                 .build()
                 )
         );
-        Mockito.when(signupCacheRepository.existsById(username))
+        Mockito.when(signupCacheRepo.existsById(username))
                 .thenReturn(true);
         
         
@@ -128,7 +128,6 @@ class SignupLoginTest {
                 SignupForm.builder()
                         .username(username)
                         .password(radomPassword)
-                        .passwordConfirm(radomPassword)
                         .email("pagefloworg@gmail.com")
                         .penname("펜네임이랑께")
                         .profileImgUrl(profileImgUrl)

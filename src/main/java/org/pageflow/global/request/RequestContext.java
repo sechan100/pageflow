@@ -6,10 +6,10 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.pageflow.domain.user.model.principal.PageflowPrincipal;
-import org.pageflow.domain.user.model.principal.SessionPrincipal;
-import org.pageflow.domain.user.repository.ProfileRepository;
-import org.pageflow.global.exception.business.exception.BizException;
+import org.pageflow.boundedcontext.user.model.principal.PageflowPrincipal;
+import org.pageflow.boundedcontext.user.model.principal.SessionPrincipal;
+import org.pageflow.boundedcontext.user.repository.ProfileRepo;
+import org.pageflow.global.api.code.exception.BizException;
 import org.pageflow.util.ForwordBuilder;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -35,16 +35,16 @@ public class RequestContext {
     private final PageflowPrincipal principal;
     private final HttpServletRequest request;
     private final HttpServletResponse response;
-    private final ProfileRepository profileRepository;
+    private final ProfileRepo profileRepo;
     
-    public RequestContext(ProfileRepository profileRepository) {
+    public RequestContext(ProfileRepo profileRepo) {
         
         ServletRequestAttributes servletRequest = ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes()));
         this.request = servletRequest.getRequest();
         this.response = servletRequest.getResponse();
         
         // DI
-        this.profileRepository = profileRepository;
+        this.profileRepo = profileRepo;
         
         // 인증객체 참조
         Authentication authentication = Preconditions.checkNotNull(

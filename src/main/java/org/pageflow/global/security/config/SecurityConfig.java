@@ -1,7 +1,7 @@
 package org.pageflow.global.security.config;
 
 import lombok.RequiredArgsConstructor;
-import org.pageflow.domain.user.service.CustomOAuth2UserService;
+import org.pageflow.boundedcontext.user.service.CustomOAuth2UserService;
 import org.pageflow.global.constants.CustomProps;
 import org.pageflow.global.security.filter.JwtAuthorizationFilter;
 import org.springframework.context.annotation.Bean;

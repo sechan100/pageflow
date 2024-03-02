@@ -39,9 +39,9 @@ public class RequestContext {
     
     public RequestContext(ProfileRepository profileRepository) {
         
-        ServletRequestAttributes sessionAttributes = ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes()));
-        this.request = sessionAttributes.getRequest();
-        this.response = sessionAttributes.getResponse();
+        ServletRequestAttributes servletRequest = ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes()));
+        this.request = servletRequest.getRequest();
+        this.response = servletRequest.getResponse();
         
         // DI
         this.profileRepository = profileRepository;

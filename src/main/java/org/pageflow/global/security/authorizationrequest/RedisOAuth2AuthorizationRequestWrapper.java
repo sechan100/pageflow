@@ -1,8 +1,9 @@
 package org.pageflow.global.security.authorizationrequest;
 
-import jakarta.persistence.Id;
+
+import lombok.Builder;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 
@@ -10,15 +11,15 @@ import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequ
  * {@link OAuth2AuthorizationRequest}가 상속이 안되서 wrapper로 만듦
  * @author : sechan
  */
-@RequiredArgsConstructor
+@Builder
 @RedisHash("oauth2_authorization_request")
 public class RedisOAuth2AuthorizationRequestWrapper {
     
     @Id
-    private final String state;
+    private String state;
     
     @Getter
-    private final OAuth2AuthorizationRequest request;
+    private OAuth2AuthorizationRequest request;
     
     
 }

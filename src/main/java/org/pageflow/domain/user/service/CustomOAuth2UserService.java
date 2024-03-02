@@ -4,15 +4,14 @@ package org.pageflow.domain.user.service;
 import lombok.RequiredArgsConstructor;
 import org.pageflow.domain.user.entity.Account;
 import org.pageflow.domain.user.entity.SignupCache;
-import org.pageflow.domain.user.model.principal.InitialAuthenticationPrincipal;
 import org.pageflow.domain.user.model.oauth.GithubOwner;
 import org.pageflow.domain.user.model.oauth.GoogleOwner;
 import org.pageflow.domain.user.model.oauth.NaverOwner;
 import org.pageflow.domain.user.model.oauth.ResourceOwner;
-import org.pageflow.domain.user.model.principal.SessionPrincipal;
+import org.pageflow.domain.user.model.principal.InitialAuthenticationPrincipal;
 import org.pageflow.domain.user.repository.AccountRepository;
 import org.pageflow.domain.user.repository.SignupCacheRepository;
-import org.pageflow.global.request.RequestContext;
+import org.pageflow.global.request.Forwarder;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -31,7 +30,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
     private final DefaultUserService defaultUserService;
     private final AccountRepository accountRepository;
     private final SignupCacheRepository signupCacheRepository;
-    private final RequestContext requestContext;
+    private final Forwarder forwarder;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -50,7 +49,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
             Account account = accountRepository.findWithProfileByUsername(resourceOwner.getUsername());
             
             // 포워딩으로 위임
-            requestContext.forwardBuilder("/internal/login")
+            forwarder.forwardBuilder("/internal/login")
                     .param("username", resourceOwner.getUsername())
                     .param("password", account.getPassword())
                     .forward();
@@ -74,7 +73,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
             }
             
             // OAuth2 캐시 데이터를 반환
-            requestContext.forwardBuilder("/internal/signup/cache")
+            forwarder.forwardBuilder("/internal/signup/cache")
                     .param("username", resourceOwner.getUsername())
                     .forward();
         }

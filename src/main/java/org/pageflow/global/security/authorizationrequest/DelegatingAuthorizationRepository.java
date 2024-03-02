@@ -16,19 +16,25 @@ import org.springframework.util.Assert;
  */
 @Service
 @RequiredArgsConstructor
-public class RedisAuthorizationRequestService implements AuthorizationRequestRepository<OAuth2AuthorizationRequest> {
+public class DelegatingAuthorizationRepository implements AuthorizationRequestRepository<OAuth2AuthorizationRequest> {
     
     private final RedisAuthorizationRequestRepository repository;
     
     
     @Override
     public OAuth2AuthorizationRequest loadAuthorizationRequest(HttpServletRequest request) {
-        return repository.findById(getStateParameter(request)).orElseThrow().getRequest();
+        return repository.findById(getStateParameter(request))
+                .orElseThrow().getRequest();
     }
     
     @Override
     public void saveAuthorizationRequest(OAuth2AuthorizationRequest authorizationRequest, HttpServletRequest request, HttpServletResponse response) {
-        repository.save(new RedisOAuth2AuthorizationRequestWrapper(getStateParameter(request), authorizationRequest));
+        repository.save(
+                RedisOAuth2AuthorizationRequestWrapper.builder()
+                        .state(authorizationRequest.getState())
+                        .request(authorizationRequest)
+                        .build()
+        );
     }
     
     @Override

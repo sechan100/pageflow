@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 
 @AllArgsConstructor
 @Component
-public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
+public class PageflowAuthenticationEntryPoint implements AuthenticationEntryPoint {
     
     private final RequestContext requestContext;
 

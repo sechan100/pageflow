@@ -5,7 +5,7 @@ import org.pageflow.boundedcontext.user.constants.UserFetchDepth;
 import org.pageflow.boundedcontext.user.entity.Account;
 import org.pageflow.boundedcontext.user.entity.Profile;
 import org.pageflow.boundedcontext.user.model.user.AggregateUser;
-import org.pageflow.boundedcontext.user.repository.AccountRepo;
+import org.pageflow.boundedcontext.user.repository.AccountRepository;
 import org.pageflow.boundedcontext.user.repository.ProfileRepo;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class UserCommander {
     
-    private final AccountRepo accountRepo;
+    private final AccountRepository accountRepository;
     private final ProfileRepo profileRepo;
     
     /**
@@ -28,7 +28,7 @@ public class UserCommander {
     public AggregateUser saveUser(Account account, Profile profile) {
         
         // Account 먼저 영속
-        Account savedAccount = accountRepo.save(account);
+        Account savedAccount = accountRepository.save(account);
         
         // 영속된 account를 영속되지 않은 profile과 연관지음
         profile.associateAccount(savedAccount);

@@ -9,9 +9,6 @@ import org.pageflow.boundedcontext.user.constants.UserSignupPolicy;
 import org.springframework.lang.Nullable;
 
 
-/**
- * username, password, passwordConfirm, email, penname, profileImgUrl
- */
 @Getter
 @Setter
 @Builder

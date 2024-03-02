@@ -11,12 +11,12 @@ spring:
 logging:
   level:
     org:
-      root: DEBUG
+#      root: DEBUG
 #      pageflow:
 #        domain:
 #          book:
 #            service: DEBUG
-      springframework:
-        security: TRACE
+#      springframework:
+#        security: TRACE
 #        jdbc:
 #          core: DEBUG

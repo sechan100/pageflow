@@ -4,11 +4,10 @@ import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.Cookie;
 import jakarta.validation.Valid;
-import lombok.Builder;
-import lombok.RequiredArgsConstructor;
+import jakarta.validation.constraints.NotBlank;
+import lombok.*;
 import org.pageflow.boundedcontext.user.constants.UserFetchDepth;
 import org.pageflow.boundedcontext.user.domain.UserDomain;
-import org.pageflow.boundedcontext.user.dto.WebLoginRequest;
 import org.pageflow.boundedcontext.user.entity.RefreshToken;
 import org.pageflow.boundedcontext.user.model.token.AccessToken;
 import org.pageflow.boundedcontext.user.model.token.AuthTokens;
@@ -44,10 +43,33 @@ public class SessionController {
     @Operation(summary = "로그인", description = "아이디와 비밀번호를 받고, access 토큰과 refresh 토큰을 반환")
     @PostMapping("/user/login")
     public AccessTokenResp webLogin(@Valid @RequestBody WebLoginRequest loginReq) {
-        
         // 로그인 -> Access, Refresh 토큰 발급
-        AuthTokens authTokens = userDomain.login(loginReq.getUsername(), loginReq.getPassword());
-        
+        AuthTokens authTokens = userDomain.formLogin(loginReq.username, loginReq.password);
+        // 세션을 할당
+        return allocateSession(authTokens);
+    }
+    
+    
+    /**
+     * OAuth2로 접근하는 요청을 포워딩하여 로그인처리. <br>
+     * authorization_code를 포함한 인가요청을 해당 매핑으로 포워딩하여 로그인을 처리한다.
+     */
+    @Hidden
+    @GetMapping("/internal/user/oauth2/login")
+    public AccessTokenResp oauth2Login(String username) {
+        // 로그인 -> Access, Refresh 토큰 발급
+        AuthTokens authTokens = userDomain.oauth2Login(username);
+        // 세션을 할당
+        return allocateSession(authTokens);
+    }
+    
+    
+    /**
+     * 인증 토큰을 받아서, 쿠키에 세션을 할당하고, accessToken은 반환한다.
+     * @param authTokens accessToken과 refreshToken
+     * @return accessToken
+     */
+    private AccessTokenResp allocateSession(AuthTokens authTokens) {
         // 쿠키 설정 및 할당
         Cookie rfTknUUID = new Cookie(RefreshToken.COOKIE_NAME, authTokens.getRefreshToken().getId());
         rfTknUUID.setPath("/_pageflow/api/user/refresh");
@@ -56,38 +78,13 @@ public class SessionController {
         rfTknUUID.setMaxAge(60 * 60 * 24 * customProps.site().refreshTokenExpireDays()); // 30일
         requestContext.setCookie(rfTknUUID);
         
-        // 사용자 정보 불러옴
-//        AggregateUser user = userService.fetchUser(
-//                authTokens.getAccessToken().getUID(), UserFetchDepth.FULL
-//        );
-        
         // RETURN
         return AccessTokenResp.builder()
                 .compact(authTokens.getAccessToken().getCompact())
                 .expiredAt(authTokens.getAccessToken().getExp().getTime())
                 .build();
-//              .User.builder()
-//                        .UID(user.getProfile().getUID())
-//                        .username(user.getAccount().getUsername())
-//                        .email(user.getAccount().getEmail())
-//                        .penname(user.getProfile().getPenname())
-//                        .build()
-}
-
-/**
-     * OAuth2로 접근하는 요청을 포워딩하여 로그인처리. <br>
-     * authorization_code를 포함한 인가요청을 해당 매핑으로 포워딩하여 로그인을 처리한다.
-     * @param username
-     * @param password
-     */
-    @Hidden
-    @GetMapping("/internal/user/login")
-    public AuthTokens oauth2Login(
-            @RequestParam("username") String username,
-            @RequestParam("password") String password
-    ) {
-        return userDomain.login(username, password);
     }
+    
     
     /**
      * refreshToken으로 새로운 accessToken을 발급한다.
@@ -111,6 +108,7 @@ public class SessionController {
             );
     }
     
+    
     /**
      * 리프레시 토큰을 제거
      */
@@ -122,6 +120,7 @@ public class SessionController {
                 .ifPresent(refreshTokenId -> userDomain.logout((refreshTokenId.getValue())));
         //TODO: 쿠키가 존재하지 않는 경우의 동작...
     }
+    
     
     @Operation(summary = "세션 정보", description = "현재 세션의 정보를 반환")
     @GetMapping("/user/session")
@@ -143,8 +142,7 @@ public class SessionController {
     }
     
     
-    
-    
+    @Builder record WebLoginRequest(@NotBlank String username, @NotBlank String password){}
     @Builder record AccessTokenResp(String compact, long expiredAt){}
     @Builder record Session(PublicUserInfo user){}
 }

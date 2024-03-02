@@ -7,7 +7,7 @@ import org.pageflow.boundedcontext.user.constants.UserFetchDepth;
 import org.pageflow.boundedcontext.user.constants.UserSignupPolicy;
 import org.pageflow.boundedcontext.user.entity.Profile;
 import org.pageflow.boundedcontext.user.model.user.AggregateUser;
-import org.pageflow.boundedcontext.user.repository.AccountRepo;
+import org.pageflow.boundedcontext.user.repository.AccountRepository;
 import org.pageflow.boundedcontext.user.repository.ProfileRepo;
 import org.pageflow.global.api.code.UserCode;
 import org.pageflow.global.api.code.exception.BizException;
@@ -21,7 +21,7 @@ import org.springframework.util.StringUtils;
 @RequiredArgsConstructor
 public class $UserServiceUtil {
     
-    private final AccountRepo accountRepo;
+    private final AccountRepository accountRepository;
     private final ProfileRepo profileRepo;
     
     
@@ -57,7 +57,7 @@ public class $UserServiceUtil {
         }
         
         // 4. username 중복 검사
-        if(accountRepo.existsByUsername(username)){
+        if(accountRepository.existsByUsername(username)){
             throw new BizException(UserCode.DUPLICATED_USERNAME);
         }
     }
@@ -84,7 +84,7 @@ public class $UserServiceUtil {
         }
         
         // 3. email 중복 검사
-        if(accountRepo.existsByEmailAndEmailVerified(email, true)){
+        if(accountRepository.existsByEmailAndEmailVerified(email, true)){
             throw new BizException(UserCode.DUPLICATED_EMAIL);
         }
     }
@@ -158,9 +158,9 @@ public class $UserServiceUtil {
         Preconditions.checkNotNull(fetchDepth, "fetchDepth must not be null");
         
          return switch(fetchDepth) {
-             case PROXY -> new AggregateUser(UserFetchDepth.PROXY, accountRepo.getReferenceById(UID), profileRepo.getReferenceById(UID));
-             case PROFILE -> new AggregateUser(UserFetchDepth.PROFILE, accountRepo.getReferenceById(UID), profileRepo.findById(UID).orElseThrow());
-             case ACCOUNT -> new AggregateUser(UserFetchDepth.ACCOUNT, accountRepo.findById(UID).orElseThrow(), profileRepo.getReferenceById(UID));
+             case PROXY -> new AggregateUser(UserFetchDepth.PROXY, accountRepository.getReferenceById(UID), profileRepo.getReferenceById(UID));
+             case PROFILE -> new AggregateUser(UserFetchDepth.PROFILE, accountRepository.getReferenceById(UID), profileRepo.findById(UID).orElseThrow());
+             case ACCOUNT -> new AggregateUser(UserFetchDepth.ACCOUNT, accountRepository.findById(UID).orElseThrow(), profileRepo.getReferenceById(UID));
              case FULL -> {
                  Profile profile = profileRepo.findWithAccountByUID(UID);
                  yield new AggregateUser(UserFetchDepth.FULL, profile.getAccount(), profile);

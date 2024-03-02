@@ -6,5 +6,5 @@ import org.springframework.data.repository.CrudRepository;
 /**
  * @author : sechan
  */
-public interface SignupCacheRepo extends CrudRepository<SignupCache, String> {
+public interface SignupCacheRepository extends CrudRepository<SignupCache, String> {
 }

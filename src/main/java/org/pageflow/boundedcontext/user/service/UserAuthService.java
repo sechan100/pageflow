@@ -5,7 +5,7 @@ import org.pageflow.boundedcontext.user.constants.RoleType;
 import org.pageflow.boundedcontext.user.entity.RefreshToken;
 import org.pageflow.boundedcontext.user.model.token.AccessToken;
 import org.pageflow.boundedcontext.user.model.token.AuthTokens;
-import org.pageflow.boundedcontext.user.repository.AccountRepo;
+import org.pageflow.boundedcontext.user.repository.AccountRepository;
 import org.pageflow.boundedcontext.user.repository.RefreshTokenRepo;
 import org.pageflow.global.api.code.UserCode;
 import org.pageflow.global.api.code.exception.BizException;
@@ -35,7 +35,7 @@ import java.util.UUID;
 public class UserAuthService {
     
     private final CustomProps props;
-    private final AccountRepo accountRepo;
+    private final AccountRepository accountRepository;
     private final RefreshTokenRepo refreshTokenRepo;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationProvider authenticationProvider;
@@ -91,7 +91,7 @@ public class UserAuthService {
                             .id(refreshTokenUUID) // UUID
                             .expiredAt(System.currentTimeMillis() + (props.site().refreshTokenExpireDays() * MilliSeconds.DAY)) // 만료시간
                             // UID와 연관관계 매핑(프록시로만 조회하여 굳이 사용하지 않을 Account를 쿼리하지 않고 id로만 매핑)
-                            .account(accountRepo.getReferenceById(UID))
+                            .account(accountRepository.getReferenceById(UID))
                             .build()
             );
             return new AuthTokens(accessToken, refreshToken); // RETURN

@@ -5,7 +5,7 @@ import org.pageflow.boundedcontext.user.constants.RoleType;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface AccountRepo extends JpaRepository<Account, Long> {
+public interface AccountRepository extends JpaRepository<Account, Long> {
 
     boolean existsByUsername(String username);
     
@@ -22,6 +22,5 @@ public interface AccountRepo extends JpaRepository<Account, Long> {
     
     @EntityGraph(attributePaths = {"profile"})
     Account findWithProfileByUID(Long UID);
-    
     
 }

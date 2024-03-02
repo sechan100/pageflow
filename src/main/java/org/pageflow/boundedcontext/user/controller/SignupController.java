@@ -13,7 +13,7 @@ import org.pageflow.boundedcontext.user.domain.UserDomain;
 import org.pageflow.boundedcontext.user.dto.SignupForm;
 import org.pageflow.boundedcontext.user.entity.SignupCache;
 import org.pageflow.boundedcontext.user.model.user.AggregateUser;
-import org.pageflow.boundedcontext.user.repository.SignupCacheRepo;
+import org.pageflow.boundedcontext.user.repository.SignupCacheRepository;
 import org.pageflow.global.api.code.UserCode;
 import org.pageflow.global.api.response.GeneralResponse;
 import org.pageflow.global.request.RequestContext;
@@ -29,7 +29,7 @@ import java.util.UUID;
 public class SignupController {
 
     private final RequestContext requestContext;
-    private final SignupCacheRepo signupCacheRepo;
+    private final SignupCacheRepository signupCacheRepository;
     private final UserDomain userDomain;
     
     
@@ -39,19 +39,19 @@ public class SignupController {
     public SignupedUser signup(@Valid @RequestBody SignupForm form) {
         
         // 캐싱된 회원가입 데이터가 존재하는지 확인 -> 존재하면 OAuth2로 가입한 사용자
-        boolean isOAuth = signupCacheRepo.existsById(form.getUsername());
+        boolean isOAuth = signupCacheRepository.existsById(form.getUsername());
         AggregateUser persistedUser;
         
         // 1. OAuth2 회원가입
         if(isOAuth){
             // 캐시 가져옴
-            SignupCache cache = signupCacheRepo.findById(form.getUsername()).orElseThrow();
+            SignupCache cache = signupCacheRepository.findById(form.getUsername()).orElseThrow();
             
             // 사용자 등록(사용자가 임의로 변경해선 안되는 데이터는 캐시에 있던 값으로 지정: Provider)
             persistedUser = userDomain.signup(form, cache.getProvider(), RoleType.ROLE_USER);
             
             // 캐싱된 회원가입 데이터를 삭제
-            signupCacheRepo.deleteById(form.getUsername());
+            signupCacheRepository.deleteById(form.getUsername());
         }
         // 2. 일반 회원가입
         else {
@@ -75,7 +75,7 @@ public class SignupController {
     @Hidden
     @GetMapping("/internal/signup/cache")
     public GeneralResponse<SignupForm> signupCache(@RequestParam("username") String username) {
-        SignupCache cache = signupCacheRepo.findById(username).orElseThrow();
+        SignupCache cache = signupCacheRepository.findById(username).orElseThrow();
         
         String radomPassword = UUID.randomUUID().toString();
         SignupForm form = SignupForm.builder()

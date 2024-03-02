@@ -2,15 +2,14 @@ package org.pageflow.boundedcontext.user.service;
 
 
 import lombok.RequiredArgsConstructor;
-import org.pageflow.boundedcontext.user.entity.Account;
 import org.pageflow.boundedcontext.user.entity.SignupCache;
 import org.pageflow.boundedcontext.user.model.oauth.GithubOwner;
 import org.pageflow.boundedcontext.user.model.oauth.GoogleOwner;
 import org.pageflow.boundedcontext.user.model.oauth.NaverOwner;
 import org.pageflow.boundedcontext.user.model.oauth.ResourceOwner;
 import org.pageflow.boundedcontext.user.model.principal.InitialAuthenticationPrincipal;
-import org.pageflow.boundedcontext.user.repository.AccountRepo;
-import org.pageflow.boundedcontext.user.repository.SignupCacheRepo;
+import org.pageflow.boundedcontext.user.repository.AccountRepository;
+import org.pageflow.boundedcontext.user.repository.SignupCacheRepository;
 import org.pageflow.global.request.Forwarder;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -27,8 +26,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
     
-    private final AccountRepo accountRepo;
-    private final SignupCacheRepo signupCacheRepo;
+    private final AccountRepository accountRepository;
+    private final SignupCacheRepository signupCacheRepository;
     private final Forwarder forwarder;
     
     @Override
@@ -43,24 +42,21 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         ResourceOwner resourceOwner = convertToResourceOwnerImpl(oAuth2User, clientRegistration);
         
         // 기존 회원정보 존재 -> 기존 정보로 로그인
-        if (accountRepo.existsByUsername(resourceOwner.getUsername())) {
-            
-            Account account = accountRepo.findWithProfileByUsername(resourceOwner.getUsername());
+        if (accountRepository.existsByUsername(resourceOwner.getUsername())) {
             
             // 포워딩으로 위임
-            forwarder.forwardBuilder("/internal/user/login")
+            forwarder.forwardBuilder("/internal/user/oauth2/login")
                     .param("username", resourceOwner.getUsername())
-                    .param("password", account.getPassword())
                     .forward();
             
             // 회원정보 없음(신규) -> OAuth2 데이터를 username으로 캐싱하고, signup 페이지로 리디렉션
         } else {
             
             // 캐시 존재 여부
-            boolean isAlreadyCached = signupCacheRepo.existsById(resourceOwner.getUsername());
+            boolean isAlreadyCached = signupCacheRepository.existsById(resourceOwner.getUsername());
             if(!isAlreadyCached){
                 // 캐시가 없다면, username으로 회원가입 임시 데이터를 캐싱
-                signupCacheRepo.save(
+                signupCacheRepository.save(
                         SignupCache.builder()
                                 .username(resourceOwner.getUsername())
                                 .provider(resourceOwner.getProviderType())

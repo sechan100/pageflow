@@ -45,7 +45,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         if (accountRepository.existsByUsername(resourceOwner.getUsername())) {
             
             // 포워딩으로 위임
-            forwarder.forwardBuilder("/internal/user/oauth2/login")
+            forwarder.forwardBuilder("/internal/oauth2/login")
                     .param("username", resourceOwner.getUsername())
                     .forward();
             

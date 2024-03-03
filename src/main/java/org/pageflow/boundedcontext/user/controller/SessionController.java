@@ -41,7 +41,7 @@ public class SessionController {
      * @param loginReq username, password
      */
     @Operation(summary = "로그인", description = "아이디와 비밀번호를 받고, access 토큰과 refresh 토큰을 반환")
-    @PostMapping("/user/login")
+    @PostMapping("/login")
     public AccessTokenResp webLogin(@Valid @RequestBody WebLoginRequest loginReq) {
         // 로그인 -> Access, Refresh 토큰 발급
         AuthTokens authTokens = userDomain.formLogin(loginReq.username, loginReq.password);
@@ -55,7 +55,7 @@ public class SessionController {
      * authorization_code를 포함한 인가요청을 해당 매핑으로 포워딩하여 로그인을 처리한다.
      */
     @Hidden
-    @GetMapping("/internal/user/oauth2/login")
+    @GetMapping("/internal/oauth2/login")
     public AccessTokenResp oauth2Login(String username) {
         // 로그인 -> Access, Refresh 토큰 발급
         AuthTokens authTokens = userDomain.oauth2Login(username);
@@ -72,7 +72,7 @@ public class SessionController {
     private AccessTokenResp allocateSession(AuthTokens authTokens) {
         // 쿠키 설정 및 할당
         Cookie rfTknUUID = new Cookie(RefreshToken.COOKIE_NAME, authTokens.getRefreshToken().getId());
-        rfTknUUID.setPath("/_pageflow/api/user/refresh");
+        rfTknUUID.setPath("/_pageflow/api/refresh");
         rfTknUUID.setHttpOnly(true); // JS에서 접근 불가
         rfTknUUID.setSecure(false); // HTTPS에서만 전송
         rfTknUUID.setMaxAge(60 * 60 * 24 * customProps.site().refreshTokenExpireDays()); // 30일
@@ -85,12 +85,11 @@ public class SessionController {
                 .build();
     }
     
-    
     /**
      * refreshToken으로 새로운 accessToken을 발급한다.
      */
     @Operation(summary = "compact 재발급", description = "refreshToken을 받아서, accessToken을 재발급")
-    @PostMapping("/user/refresh") // 멱등성을 성립하지 않는 요청이라 Post임
+    @PostMapping("/refresh") // 멱등성을 성립하지 않는 요청이라 Post임
     public AccessTokenResp refresh() {
         return requestContext.getCookie(RefreshToken.COOKIE_NAME)
             // 쿠키 존재
@@ -113,7 +112,7 @@ public class SessionController {
      * 리프레시 토큰을 제거
      */
     @Operation(summary = "로그아웃", description = "쿠키로 전달된 refreshTokenId를 받아서, 해당 세션을 무효화")
-    @PostMapping("/user/logout")
+    @PostMapping("/logout")
     public void logout() {
         //TODO: refreshToken을 정상적으로 삭제하지 못한 경우의 동작
         requestContext.getCookie(RefreshToken.COOKIE_NAME)

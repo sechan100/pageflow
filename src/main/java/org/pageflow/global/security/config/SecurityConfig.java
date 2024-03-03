@@ -40,9 +40,10 @@ public class SecurityConfig {
     SecurityFilterChain pageflowApiChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/signup/**", "/user/login", "/internal/**", "/user/refresh").permitAll()
+                        .requestMatchers("/user/**").hasRole("USER")
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .anyRequest().permitAll()
+                        .requestMatchers("/signup/**", "/login/**", "/logout/**", "/internal/**", "/refresh/**").permitAll()
+                        .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2 -> oauth2
                         .failureHandler(oAuth2AuthenticationFailureHandler)

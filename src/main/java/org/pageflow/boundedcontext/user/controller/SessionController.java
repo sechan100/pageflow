@@ -32,7 +32,7 @@ public class SessionController {
     private final UserDomain userDomain;
     private final $UserServiceUtil userServiceUtil;
     private final RequestContext requestContext;
-    private final CustomProps customProps;
+    private final CustomProps props;
     private final JwtProvider jwtProvider;
     
     
@@ -72,10 +72,10 @@ public class SessionController {
     private AccessTokenResp allocateSession(AuthTokens authTokens) {
         // 쿠키 설정 및 할당
         Cookie rfTknUUID = new Cookie(RefreshToken.COOKIE_NAME, authTokens.getRefreshToken().getId());
-        rfTknUUID.setPath("/_pageflow/api/refresh");
+        rfTknUUID.setPath(props.site().clientProxyPrefix() +"/session");
         rfTknUUID.setHttpOnly(true); // JS에서 접근 불가
         rfTknUUID.setSecure(false); // HTTPS에서만 전송
-        rfTknUUID.setMaxAge(60 * 60 * 24 * customProps.site().refreshTokenExpireDays()); // 30일
+        rfTknUUID.setMaxAge(60 * 60 * 24 * props.site().refreshTokenExpireDays()); // 30일
         requestContext.setCookie(rfTknUUID);
         
         // RETURN
@@ -89,7 +89,7 @@ public class SessionController {
      * refreshToken으로 새로운 accessToken을 발급한다.
      */
     @Operation(summary = "compact 재발급", description = "refreshToken을 받아서, accessToken을 재발급")
-    @PostMapping("/refresh") // 멱등성을 성립하지 않는 요청이라 Post임
+    @PostMapping("/session/refresh") // 멱등성을 성립하지 않는 요청이라 Post임
     public AccessTokenResp refresh() {
         return requestContext.getCookie(RefreshToken.COOKIE_NAME)
             // 쿠키 존재
@@ -112,11 +112,11 @@ public class SessionController {
      * 리프레시 토큰을 제거
      */
     @Operation(summary = "로그아웃", description = "쿠키로 전달된 refreshTokenId를 받아서, 해당 세션을 무효화")
-    @PostMapping("/logout")
+    @PostMapping("/session/logout")
     public void logout() {
         //TODO: refreshToken을 정상적으로 삭제하지 못한 경우의 동작
         requestContext.getCookie(RefreshToken.COOKIE_NAME)
-                .ifPresent(refreshTokenId -> userDomain.logout((refreshTokenId.getValue())));
+                .ifPresent(refreshTokenId -> userDomain.logout(refreshTokenId.getValue()));
         //TODO: 쿠키가 존재하지 않는 경우의 동작...
     }
     
@@ -133,6 +133,9 @@ public class SessionController {
                 .penname(userAggregate.getProfile().getPenname())
                 .UID(userAggregate.getProfile().getUID())
                 .username(userAggregate.getAccount().getUsername())
+                .profileImgUrl(userAggregate.getProfile().getProfileImgUrl())
+                .role(userAggregate.getAccount().getRole())
+                .isEmailVerified(userAggregate.getAccount().isEmailVerified())
                 .build();
         
         return Session.builder()

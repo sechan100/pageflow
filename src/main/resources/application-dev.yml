@@ -60,6 +60,7 @@ custom:
   site:
     base-url: 'http://localhost:${server.port}'
     client-url: 'http://localhost:3000'
+    client-proxy-prefix: '/_pageflow/api'
     access-token-expire-minutes: 30
     refresh-token-expire-days: 30
   email:

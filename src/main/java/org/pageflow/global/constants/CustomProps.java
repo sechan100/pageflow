@@ -6,7 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "custom")
 public record CustomProps(Site site, Email email, Files files, Defaults defaults, Admin admin) {
     
-    public record Site(String baseUrl, Integer accessTokenExpireMinutes, Integer refreshTokenExpireDays) {}
+    public record Site(String baseUrl, String clientProxyPrefix, Integer accessTokenExpireMinutes, Integer refreshTokenExpireDays) {}
     
     public record Email(String emailVerifySender, String noReplySender) {}
     

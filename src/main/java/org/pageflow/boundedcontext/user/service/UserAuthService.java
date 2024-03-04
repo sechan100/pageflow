@@ -6,7 +6,7 @@ import org.pageflow.boundedcontext.user.entity.RefreshToken;
 import org.pageflow.boundedcontext.user.model.token.AccessToken;
 import org.pageflow.boundedcontext.user.model.token.AuthTokens;
 import org.pageflow.boundedcontext.user.repository.AccountRepository;
-import org.pageflow.boundedcontext.user.repository.RefreshTokenRepo;
+import org.pageflow.boundedcontext.user.repository.RefreshTokenRepository;
 import org.pageflow.global.api.code.UserCode;
 import org.pageflow.global.api.code.exception.BizException;
 import org.pageflow.global.constants.CustomProps;
@@ -36,7 +36,7 @@ public class UserAuthService {
     
     private final CustomProps props;
     private final AccountRepository accountRepository;
-    private final RefreshTokenRepo refreshTokenRepo;
+    private final RefreshTokenRepository refreshTokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationProvider authenticationProvider;
     private final $UserServiceUtil userUtil;
@@ -86,7 +86,7 @@ public class UserAuthService {
         // refreshToken을 생성(새로 생성된 세션 정보를 기록)
         String refreshTokenUUID = UUID.randomUUID().toString();
         try {
-            RefreshToken refreshToken = refreshTokenRepo.save(
+            RefreshToken refreshToken = refreshTokenRepository.save(
                     RefreshToken.builder()
                             .id(refreshTokenUUID) // UUID
                             .expiredAt(System.currentTimeMillis() + (props.site().refreshTokenExpireDays() * MilliSeconds.DAY)) // 만료시간

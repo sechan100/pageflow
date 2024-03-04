@@ -2,6 +2,7 @@ package org.pageflow.boundedcontext.user.model.user;
 
 import lombok.Builder;
 import lombok.Data;
+import org.pageflow.boundedcontext.user.constants.RoleType;
 
 /**
  * @author : sechan
@@ -13,4 +14,7 @@ public class PublicUserInfo {
     private String username;
     private String email;
     private String penname;
+    private String profileImgUrl;
+    private RoleType role;
+    private boolean isEmailVerified;
 }

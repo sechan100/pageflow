@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 /**
  * @author : sechan
  */
-public interface RefreshTokenRepo extends JpaRepository<RefreshToken, String> {
+public interface RefreshTokenRepository extends JpaRepository<RefreshToken, String> {
     @EntityGraph(attributePaths = {"account"})
     RefreshToken findWithAccountById(String id);
 }

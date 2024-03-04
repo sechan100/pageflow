@@ -14,7 +14,7 @@ import org.pageflow.boundedcontext.user.model.token.AuthTokens;
 import org.pageflow.boundedcontext.user.model.user.AggregateUser;
 import org.pageflow.boundedcontext.user.repository.AccountRepository;
 import org.pageflow.boundedcontext.user.repository.ProfileRepo;
-import org.pageflow.boundedcontext.user.repository.RefreshTokenRepo;
+import org.pageflow.boundedcontext.user.repository.RefreshTokenRepository;
 import org.pageflow.boundedcontext.user.service.$UserServiceUtil;
 import org.pageflow.boundedcontext.user.service.UserAuthService;
 import org.pageflow.boundedcontext.user.service.UserCommander;
@@ -41,7 +41,7 @@ public class UserDomain {
     private final AccountRepository accountRepository;
     private final ProfileRepo profileRepo;
     private final PasswordEncoder passwordEncoder;
-    private final RefreshTokenRepo refreshTokenRepo;
+    private final RefreshTokenRepository refreshTokenRepository;
     private final JwtProvider jwtProvider;
     private final $UserServiceUtil userUtil;
     private final UserAuthService userAuthService;
@@ -107,7 +107,7 @@ public class UserDomain {
     
     
     public void logout(String refreshTokenId) {
-        refreshTokenRepo.deleteById(refreshTokenId);
+        refreshTokenRepository.deleteById(refreshTokenId);
     }
     
     
@@ -117,7 +117,7 @@ public class UserDomain {
     public AccessToken refresh(String refreshTokenId){
         try {
             // 세션을 조회하고, refreshToken의 만료여부를 확인
-            RefreshToken refreshToken = refreshTokenRepo.findWithAccountById(refreshTokenId);
+            RefreshToken refreshToken = refreshTokenRepository.findWithAccountById(refreshTokenId);
             if(refreshToken.isExpired()) {
                 throw new BizException(SessionCode.SESSION_EXPIRED);
             }

@@ -42,7 +42,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/user/**").hasRole("USER")
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/signup/**", "/login/**", "/logout/**", "/internal/**", "/refresh/**").permitAll()
+                        .requestMatchers("/signup/**", "/login/**", "/session/**", "/internal/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2 -> oauth2

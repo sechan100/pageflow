@@ -13,6 +13,7 @@ public enum SessionCode implements ApiCode {
     , LOGIN_REQUIRED("로그인 필요")
     , INVALID_TOKEN("올바르지 않은 토큰")
     , TOKEN_NOT_FOUND("토큰을 찾을 수 없음")
+    , REFRESH_TOKEN_COOKIE_NOT_FOUND("리프레시 토큰 쿠키를 찾을 수 없음")
     ;
     private final String message;
 }

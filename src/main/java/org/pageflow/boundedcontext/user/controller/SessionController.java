@@ -5,7 +5,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.Cookie;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
-import lombok.*;
+import lombok.Builder;
+import lombok.RequiredArgsConstructor;
 import org.pageflow.boundedcontext.user.constants.UserFetchDepth;
 import org.pageflow.boundedcontext.user.domain.UserDomain;
 import org.pageflow.boundedcontext.user.entity.RefreshToken;
@@ -14,11 +15,13 @@ import org.pageflow.boundedcontext.user.model.token.AuthTokens;
 import org.pageflow.boundedcontext.user.model.user.AggregateUser;
 import org.pageflow.boundedcontext.user.model.user.PublicUserInfo;
 import org.pageflow.boundedcontext.user.service.$UserServiceUtil;
+import org.pageflow.global.api.code.GeneralCode;
 import org.pageflow.global.api.code.SessionCode;
 import org.pageflow.global.api.code.exception.BizException;
 import org.pageflow.global.constants.CustomProps;
 import org.pageflow.global.request.RequestContext;
 import org.pageflow.infra.jwt.provider.JwtProvider;
+import org.springframework.web.bind.MissingRequestCookieException;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -89,22 +92,15 @@ public class SessionController {
      * refreshToken으로 새로운 accessToken을 발급한다.
      */
     @Operation(summary = "compact 재발급", description = "refreshToken을 받아서, accessToken을 재발급")
-    @PostMapping("/session/refresh") // 멱등성을 성립하지 않는 요청이라 Post임
-    public AccessTokenResp refresh() {
-        return requestContext.getCookie(RefreshToken.COOKIE_NAME)
-            // 쿠키 존재
-            .map(refreshTokenId -> {
-                AccessToken accessToken = userDomain.refresh(refreshTokenId.getValue());
-                return AccessTokenResp.builder()
-                        .compact(accessToken.getCompact())
-                        .expiredAt(accessToken.getExp().getTime())
-                        .build();
-            })// 쿠키 존재하지 않음
-            .orElseThrow(()-> BizException.builder()
-                    .code(SessionCode.TOKEN_NOT_FOUND)
-                    .message("'" + RefreshToken.COOKIE_NAME + "' 이름을 가진 쿠키가 존재하지 않습니다.")
-                    .build()
-            );
+    @PostMapping("/session/refresh") // 멱등성을 성립하지 않는 요청은 Post로 정의
+    public AccessTokenResp refresh(@CookieValue(RefreshToken.COOKIE_NAME) String refreshTokenId) {
+        // refresh 로직 실행
+        AccessToken accessToken = userDomain.refresh(refreshTokenId);
+        // RETURN
+        return AccessTokenResp.builder()
+                .compact(accessToken.getCompact())
+                .expiredAt(accessToken.getExp().getTime())
+                .build();
     }
     
     
@@ -113,20 +109,19 @@ public class SessionController {
      */
     @Operation(summary = "로그아웃", description = "쿠키로 전달된 refreshTokenId를 받아서, 해당 세션을 무효화")
     @PostMapping("/session/logout")
-    public void logout() {
-        //TODO: refreshToken을 정상적으로 삭제하지 못한 경우의 동작
-        requestContext.getCookie(RefreshToken.COOKIE_NAME)
-                .ifPresent(refreshTokenId -> userDomain.logout(refreshTokenId.getValue()));
-        //TODO: 쿠키가 존재하지 않는 경우의 동작...
+    public void logout(@CookieValue(RefreshToken.COOKIE_NAME) String refreshTokenId) {
+        // 로그아웃 로직 실행
+        userDomain.logout(refreshTokenId);
+        // 쿠키 제거
+        requestContext.removeCookie(RefreshToken.COOKIE_NAME);
     }
     
     
     @Operation(summary = "세션 정보", description = "현재 세션의 정보를 반환")
     @GetMapping("/user/session")
     public Session getSession() {
-        
+        // 사용자 조회
         AggregateUser userAggregate = userServiceUtil.fetchUser(requestContext.getUID(), UserFetchDepth.FULL);
-        
         // 사용자 정보 객체 생성
         PublicUserInfo userInfo = PublicUserInfo.builder()
                 .email(userAggregate.getAccount().getEmail())
@@ -143,6 +138,18 @@ public class SessionController {
                 .build();
     }
     
+    
+    @ExceptionHandler(MissingRequestCookieException.class)
+    public void handleMissingCookie(MissingRequestCookieException e) {
+        if(e.getCookieName().equals(RefreshToken.COOKIE_NAME)){
+            throw new BizException(SessionCode.REFRESH_TOKEN_COOKIE_NOT_FOUND);
+        } else {
+            throw BizException.builder()
+                    .code(GeneralCode.REQUIRE_COOKIE)
+                    .message("'" + e.getCookieName() + "' 쿠키가 필요합니다.")
+                    .build();
+        }
+    }
     
     @Builder record WebLoginRequest(@NotBlank String username, @NotBlank String password){}
     @Builder record AccessTokenResp(String compact, long expiredAt){}

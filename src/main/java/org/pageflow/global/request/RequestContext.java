@@ -111,6 +111,12 @@ public class RequestContext {
         response.addCookie(cookie);
     }
     
+    public void removeCookie(String name) {
+        Cookie cookie = new Cookie(name, "");
+        cookie.setMaxAge(0);
+        response.addCookie(cookie);
+    }
+    
     /**
      * @param redirectUrl redirect할 url
      */

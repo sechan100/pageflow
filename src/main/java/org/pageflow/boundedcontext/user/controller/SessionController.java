@@ -109,11 +109,17 @@ public class SessionController {
      */
     @Operation(summary = "로그아웃", description = "쿠키로 전달된 refreshTokenId를 받아서, 해당 세션을 무효화")
     @PostMapping("/session/logout")
-    public void logout(@CookieValue(RefreshToken.COOKIE_NAME) String refreshTokenId) {
-        // 로그아웃 로직 실행
-        userDomain.logout(refreshTokenId);
-        // 쿠키 제거
-        requestContext.removeCookie(RefreshToken.COOKIE_NAME);
+    public void logout() {
+        requestContext.getCookie(RefreshToken.COOKIE_NAME)
+                // refreshTokenUUID 쿠키 존재시....
+                .ifPresent(cookie -> {
+                    // 로그아웃 로직 실행
+                    userDomain.logout(cookie.getValue());
+                    // 쿠키 제거
+                    requestContext.removeCookie(RefreshToken.COOKIE_NAME);
+                });
+        
+        // 존재하지 않으면 이미 로그아웃된 상태로 간주함 -> 일단 그냥 성공시켜
     }
     
     

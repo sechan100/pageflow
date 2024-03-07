@@ -1,8 +1,6 @@
-package org.pageflow.global.api.response.advice;
+package org.pageflow.global.api.advice;
 
-import lombok.RequiredArgsConstructor;
-import org.pageflow.global.request.RequestContext;
-import org.pageflow.global.api.response.GeneralResponse;
+import org.pageflow.global.api.GeneralResponse;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;
 import org.springframework.http.server.ServerHttpRequest;
@@ -12,10 +10,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
 @RestControllerAdvice(basePackages = "org.pageflow")
-@RequiredArgsConstructor
 public class GeneralResponseAdvice implements ResponseBodyAdvice {
-    
-    private final RequestContext requestContext;
     
     @Override
     public boolean supports(@NonNull MethodParameter returnType, @NonNull Class converterType) {

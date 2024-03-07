@@ -6,7 +6,7 @@ import org.pageflow.boundedcontext.user.entity.Account;
 import org.pageflow.boundedcontext.user.entity.Profile;
 import org.pageflow.boundedcontext.user.model.user.AggregateUser;
 import org.pageflow.boundedcontext.user.repository.AccountRepository;
-import org.pageflow.boundedcontext.user.repository.ProfileRepo;
+import org.pageflow.boundedcontext.user.repository.ProfileRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserCommander {
     
     private final AccountRepository accountRepository;
-    private final ProfileRepo profileRepo;
+    private final ProfileRepository profileRepository;
     
     /**
      * 서로 연관이 없는 새로운 Account와 Profile의 인스턴스를 적절한 순서로 연관관계를 지은 후 저장한다. <br>
@@ -34,7 +34,7 @@ public class UserCommander {
         profile.associateAccount(savedAccount);
         
         // Profile 영속
-        Profile savedProfile = profileRepo.save(profile);
+        Profile savedProfile = profileRepository.save(profile);
         
         return AggregateUser.builder()
                 .fetchDepth(UserFetchDepth.FULL)

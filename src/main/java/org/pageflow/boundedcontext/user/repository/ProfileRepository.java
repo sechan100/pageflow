@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
  *
  * @author         : sechan
  */
-public interface ProfileRepo extends JpaRepository<Profile, Long> {
+public interface ProfileRepository extends JpaRepository<Profile, Long> {
     
     boolean existsByPenname(String penname);
     

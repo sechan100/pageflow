@@ -8,7 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.pageflow.boundedcontext.user.constants.RoleType;
 import org.pageflow.global.constants.CustomProps;
 import org.pageflow.global.api.code.SessionCode;
-import org.pageflow.global.api.code.exception.BizException;
+import org.pageflow.global.api.BizException;
 import org.pageflow.boundedcontext.user.model.token.AccessToken;
 import org.pageflow.util.MilliSeconds;
 import org.springframework.beans.factory.annotation.Value;

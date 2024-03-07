@@ -10,7 +10,7 @@ import org.pageflow.boundedcontext.user.model.oauth.ResourceOwner;
 import org.pageflow.boundedcontext.user.model.principal.InitialAuthenticationPrincipal;
 import org.pageflow.boundedcontext.user.repository.AccountRepository;
 import org.pageflow.boundedcontext.user.repository.SignupCacheRepository;
-import org.pageflow.global.request.Forwarder;
+import org.pageflow.global.api.Forwarder;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;

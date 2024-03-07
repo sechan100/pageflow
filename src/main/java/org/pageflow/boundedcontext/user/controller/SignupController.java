@@ -15,8 +15,8 @@ import org.pageflow.boundedcontext.user.entity.SignupCache;
 import org.pageflow.boundedcontext.user.model.user.AggregateUser;
 import org.pageflow.boundedcontext.user.repository.SignupCacheRepository;
 import org.pageflow.global.api.code.UserCode;
-import org.pageflow.global.api.response.GeneralResponse;
-import org.pageflow.global.request.RequestContext;
+import org.pageflow.global.api.GeneralResponse;
+import org.pageflow.global.api.RequestContext;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 

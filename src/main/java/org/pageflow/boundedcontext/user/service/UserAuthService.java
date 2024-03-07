@@ -8,7 +8,7 @@ import org.pageflow.boundedcontext.user.model.token.AuthTokens;
 import org.pageflow.boundedcontext.user.repository.AccountRepository;
 import org.pageflow.boundedcontext.user.repository.RefreshTokenRepository;
 import org.pageflow.global.api.code.UserCode;
-import org.pageflow.global.api.code.exception.BizException;
+import org.pageflow.global.api.BizException;
 import org.pageflow.global.constants.CustomProps;
 import org.pageflow.infra.jwt.provider.JwtProvider;
 import org.pageflow.util.MilliSeconds;

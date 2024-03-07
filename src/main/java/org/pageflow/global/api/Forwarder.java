@@ -1,4 +1,4 @@
-package org.pageflow.global.request;
+package org.pageflow.global.api;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

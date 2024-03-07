@@ -1,4 +1,4 @@
-package org.pageflow.global.request;
+package org.pageflow.global.api;
 
 
 import com.google.common.base.Preconditions;
@@ -8,8 +8,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.pageflow.boundedcontext.user.model.principal.PageflowPrincipal;
 import org.pageflow.boundedcontext.user.model.principal.SessionPrincipal;
-import org.pageflow.boundedcontext.user.repository.ProfileRepo;
-import org.pageflow.global.api.code.exception.BizException;
+import org.pageflow.boundedcontext.user.repository.ProfileRepository;
+import org.pageflow.global.api.BizException;
 import org.pageflow.util.ForwordBuilder;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -35,16 +35,16 @@ public class RequestContext {
     private final PageflowPrincipal principal;
     private final HttpServletRequest request;
     private final HttpServletResponse response;
-    private final ProfileRepo profileRepo;
+    private final ProfileRepository profileRepository;
     
-    public RequestContext(ProfileRepo profileRepo) {
+    public RequestContext(ProfileRepository profileRepository) {
         
         ServletRequestAttributes servletRequest = ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes()));
         this.request = servletRequest.getRequest();
         this.response = servletRequest.getResponse();
         
         // DI
-        this.profileRepo = profileRepo;
+        this.profileRepository = profileRepository;
         
         // 인증객체 참조
         Authentication authentication = Preconditions.checkNotNull(

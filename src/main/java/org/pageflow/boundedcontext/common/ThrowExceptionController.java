@@ -1,9 +1,9 @@
 package org.pageflow.boundedcontext.common;
 
 import lombok.AllArgsConstructor;
-import org.pageflow.global.request.RequestContext;
-import org.pageflow.global.api.code.exception.BizException;
-import org.pageflow.global.api.response.GeneralResponse;
+import org.pageflow.global.api.RequestContext;
+import org.pageflow.global.api.BizException;
+import org.pageflow.global.api.GeneralResponse;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 

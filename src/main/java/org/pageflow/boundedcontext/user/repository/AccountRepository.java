@@ -1,7 +1,7 @@
 package org.pageflow.boundedcontext.user.repository;
 
-import org.pageflow.boundedcontext.user.entity.Account;
 import org.pageflow.boundedcontext.user.constants.RoleType;
+import org.pageflow.boundedcontext.user.entity.Account;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 

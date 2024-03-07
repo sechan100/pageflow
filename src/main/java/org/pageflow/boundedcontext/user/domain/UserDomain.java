@@ -13,13 +13,13 @@ import org.pageflow.boundedcontext.user.model.token.AccessToken;
 import org.pageflow.boundedcontext.user.model.token.AuthTokens;
 import org.pageflow.boundedcontext.user.model.user.AggregateUser;
 import org.pageflow.boundedcontext.user.repository.AccountRepository;
-import org.pageflow.boundedcontext.user.repository.ProfileRepo;
+import org.pageflow.boundedcontext.user.repository.ProfileRepository;
 import org.pageflow.boundedcontext.user.repository.RefreshTokenRepository;
 import org.pageflow.boundedcontext.user.service.$UserServiceUtil;
 import org.pageflow.boundedcontext.user.service.UserAuthService;
 import org.pageflow.boundedcontext.user.service.UserCommander;
 import org.pageflow.global.api.code.SessionCode;
-import org.pageflow.global.api.code.exception.BizException;
+import org.pageflow.global.api.BizException;
 import org.pageflow.global.constants.CustomProps;
 import org.pageflow.global.entity.DataNotFoundException;
 import org.pageflow.infra.extension.stereotype.Domain;
@@ -39,7 +39,7 @@ public class UserDomain {
     
     private final CustomProps props;
     private final AccountRepository accountRepository;
-    private final ProfileRepo profileRepo;
+    private final ProfileRepository profileRepository;
     private final PasswordEncoder passwordEncoder;
     private final RefreshTokenRepository refreshTokenRepository;
     private final JwtProvider jwtProvider;

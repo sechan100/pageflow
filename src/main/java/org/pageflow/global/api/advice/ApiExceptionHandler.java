@@ -1,8 +1,10 @@
-package org.pageflow.global.api.response.advice;
+package org.pageflow.global.api.advice;
 
-import org.pageflow.global.api.response.GeneralResponse;
+import org.pageflow.global.api.BizException;
+import org.pageflow.global.api.GeneralResponse;
+import org.pageflow.global.api.code.GeneralCode;
 import org.pageflow.global.api.code.InputCode;
-import org.pageflow.global.api.code.exception.BizException;
+import org.springframework.dao.DataAccessException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -57,6 +59,15 @@ public class ApiExceptionHandler {
                 .apiCode(e.getApiCode())
                 .message(e.getMessage())
                 .data(e.getData())
+                .build();
+    }
+    
+    // DataAccessException에 대한 일반적 처리
+    @ExceptionHandler(DataAccessException.class)
+    public GeneralResponse<Object> handleDataAccessException(DataAccessException e) {
+        return GeneralResponse.builder()
+                .apiCode(GeneralCode.DATA_ACCESS_ERROR)
+                .message("데이터에 접근중 알 수 없는 오류가 발생했습니다.")
                 .build();
     }
  

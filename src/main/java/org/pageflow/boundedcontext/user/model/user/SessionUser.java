@@ -9,7 +9,7 @@ import org.pageflow.boundedcontext.user.constants.RoleType;
  */
 @Data
 @Builder
-public class PublicUserInfo {
+public class SessionUser {
     private Long UID;
     private String username;
     private String email;

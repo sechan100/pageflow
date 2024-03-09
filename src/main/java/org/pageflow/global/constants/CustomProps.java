@@ -8,7 +8,9 @@ public record CustomProps(Site site, Email email, Files files, Defaults defaults
     
     public record Site(String baseUrl, String clientProxyPrefix, Integer accessTokenExpireMinutes, Integer refreshTokenExpireDays) {}
     
-    public record Email(String emailVerifySender, String noReplySender) {}
+    public record Email(From from) {
+        public record From(String emailVerify, String noReply) {}
+    }
     
     public record Files(Img img) {
         public record Img(String webUrlPrefix, String directory) {

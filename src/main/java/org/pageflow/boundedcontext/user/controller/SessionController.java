@@ -13,7 +13,7 @@ import org.pageflow.boundedcontext.user.entity.RefreshToken;
 import org.pageflow.boundedcontext.user.model.token.AccessToken;
 import org.pageflow.boundedcontext.user.model.token.AuthTokens;
 import org.pageflow.boundedcontext.user.model.user.AggregateUser;
-import org.pageflow.boundedcontext.user.model.user.PublicUserInfo;
+import org.pageflow.boundedcontext.user.model.user.SessionUser;
 import org.pageflow.boundedcontext.user.service.$UserServiceUtil;
 import org.pageflow.global.api.code.GeneralCode;
 import org.pageflow.global.api.code.SessionCode;
@@ -88,6 +88,7 @@ public class SessionController {
                 .build();
     }
     
+    
     /**
      * refreshToken으로 새로운 accessToken을 발급한다.
      */
@@ -129,7 +130,7 @@ public class SessionController {
         // 사용자 조회
         AggregateUser userAggregate = userServiceUtil.fetchUser(requestContext.getUID(), UserFetchDepth.FULL);
         // 사용자 정보 객체 생성
-        PublicUserInfo userInfo = PublicUserInfo.builder()
+        SessionUser userInfo = SessionUser.builder()
                 .email(userAggregate.getAccount().getEmail())
                 .penname(userAggregate.getProfile().getPenname())
                 .UID(userAggregate.getProfile().getUID())
@@ -159,5 +160,5 @@ public class SessionController {
     
     @Builder record WebLoginRequest(@NotBlank String username, @NotBlank String password){}
     @Builder record AccessTokenResp(String compact, long expiredAt){}
-    @Builder record Session(PublicUserInfo user){}
+    @Builder record Session(SessionUser user){}
 }

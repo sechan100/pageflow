@@ -13,7 +13,7 @@ import org.springframework.data.redis.core.RedisHash;
  */
 @Getter
 @Builder
-@RedisHash(value = "signup", timeToLive = 60 * 60)
+@RedisHash(value = "user-signup", timeToLive = 60 * 60)
 public class SignupCache {
     
     @Id

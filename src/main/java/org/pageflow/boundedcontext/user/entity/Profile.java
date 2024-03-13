@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
-import org.pageflow.global.entity.NoIdBaseEntity;
+import org.pageflow.global.data.entity.NoIdBaseEntity;
 
 
 @Entity

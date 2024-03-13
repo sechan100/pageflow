@@ -6,7 +6,7 @@ import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 import org.pageflow.boundedcontext.user.constants.ProviderType;
 import org.pageflow.boundedcontext.user.constants.RoleType;
-import org.pageflow.global.entity.NoIdBaseEntity;
+import org.pageflow.global.data.entity.NoIdBaseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 

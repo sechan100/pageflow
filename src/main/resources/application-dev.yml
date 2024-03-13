@@ -65,8 +65,7 @@ custom:
     refresh-token-expire-days: 30
   email:
     from:
-      email-verify: verify@pageflow.org
-      no-reply: no-reply@pageflow.org
+      no-reply: noreply@pageflow.org
   defaults:
     user-profile-img: /img/default_profile_img.png
     book-cover-img: /img/default-book-cover-img.png

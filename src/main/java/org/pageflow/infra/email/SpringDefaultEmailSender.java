@@ -1,6 +1,7 @@
 package org.pageflow.infra.email;
 
 import jakarta.mail.MessagingException;
+import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import org.pageflow.global.api.BizException;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Map;
 
 /**
@@ -40,14 +42,20 @@ public class SpringDefaultEmailSender implements EmailSender {
             // 마임 메시지 생성
             MimeMessage mimeMessage = javaMailSender.createMimeMessage();
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, false, "UTF-8");
-            mimeMessageHelper.setTo(request.getTo());
             mimeMessageHelper.setSubject(request.getSubject());
-            mimeMessageHelper.setFrom(request.getFrom());
+            mimeMessageHelper.setFrom(new InternetAddress(
+                    request.getFrom(),
+                    request.getFromName(),
+                    "UTF-8")
+            );
+            mimeMessageHelper.setTo(request.getTo());
             mimeMessageHelper.setText(emailContent, true);
             // 메일 전송
             javaMailSender.send(mimeMessageHelper.getMimeMessage());
         } catch(MessagingException | MailException e) {
             throw new BizException(GeneralCode.FAIL_TO_SEND_EMAIL);
+        } catch(UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
         }
     }
     

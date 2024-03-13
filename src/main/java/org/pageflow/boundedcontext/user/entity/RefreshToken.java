@@ -2,7 +2,7 @@ package org.pageflow.boundedcontext.user.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.pageflow.global.entity.BaseEntity;
+import org.pageflow.global.data.entity.BaseEntity;
 
 /**
  * @author : sechan

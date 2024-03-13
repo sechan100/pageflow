@@ -19,7 +19,7 @@ import org.springframework.util.StringUtils;
  */
 @Service
 @RequiredArgsConstructor
-public class $UserServiceUtil {
+public class UtilityUserService {
     
     private final AccountRepository accountRepository;
     private final ProfileRepository profileRepository;

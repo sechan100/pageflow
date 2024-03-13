@@ -1,4 +1,4 @@
-package org.pageflow.global.entity;
+package org.pageflow.global.data.entity;
 
 /**
  * @author : sechan

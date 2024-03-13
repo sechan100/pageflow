@@ -1,7 +1,7 @@
 package org.pageflow.infra.file.service;
 
-import org.pageflow.global.entity.BaseEntity;
-import org.pageflow.global.entity.DefaultBaseEntity;
+import org.pageflow.global.data.entity.BaseEntity;
+import org.pageflow.global.data.entity.DefaultBaseEntity;
 import org.pageflow.infra.file.constants.FileMetadataType;
 import org.pageflow.infra.file.entity.FileMetadata;
 import org.springframework.web.multipart.MultipartFile;

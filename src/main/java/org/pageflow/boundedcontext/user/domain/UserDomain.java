@@ -15,13 +15,13 @@ import org.pageflow.boundedcontext.user.model.user.AggregateUser;
 import org.pageflow.boundedcontext.user.repository.AccountRepository;
 import org.pageflow.boundedcontext.user.repository.ProfileRepository;
 import org.pageflow.boundedcontext.user.repository.RefreshTokenRepository;
-import org.pageflow.boundedcontext.user.service.$UserServiceUtil;
+import org.pageflow.boundedcontext.user.service.UtilityUserService;
 import org.pageflow.boundedcontext.user.service.UserAuthService;
 import org.pageflow.boundedcontext.user.service.UserCommander;
 import org.pageflow.global.api.code.SessionCode;
 import org.pageflow.global.api.BizException;
 import org.pageflow.global.constants.CustomProps;
-import org.pageflow.global.entity.DataNotFoundException;
+import org.pageflow.global.data.entity.DataNotFoundException;
 import org.pageflow.infra.extension.stereotype.Domain;
 import org.pageflow.infra.jwt.provider.JwtProvider;
 import org.springframework.security.core.Authentication;
@@ -43,7 +43,7 @@ public class UserDomain {
     private final PasswordEncoder passwordEncoder;
     private final RefreshTokenRepository refreshTokenRepository;
     private final JwtProvider jwtProvider;
-    private final $UserServiceUtil userUtil;
+    private final UtilityUserService userUtil;
     private final UserAuthService userAuthService;
     private final UserCommander userCommander;
     

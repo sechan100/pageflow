@@ -1,8 +1,7 @@
-package org.pageflow.global.entity;
+package org.pageflow.global.data.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
@@ -18,14 +17,9 @@ import java.time.LocalDateTime;
  */
 @MappedSuperclass
 @Getter
-@EqualsAndHashCode(of = "id")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
-public abstract class DefaultBaseEntity implements BaseEntity {
-    
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public abstract class NoIdBaseEntity implements BaseEntity {
     
     @CreatedDate
     private LocalDateTime createdDatetime;

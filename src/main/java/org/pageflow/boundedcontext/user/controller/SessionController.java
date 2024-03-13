@@ -14,7 +14,7 @@ import org.pageflow.boundedcontext.user.model.token.AccessToken;
 import org.pageflow.boundedcontext.user.model.token.AuthTokens;
 import org.pageflow.boundedcontext.user.model.user.AggregateUser;
 import org.pageflow.boundedcontext.user.model.user.SessionUser;
-import org.pageflow.boundedcontext.user.service.$UserServiceUtil;
+import org.pageflow.boundedcontext.user.service.UtilityUserService;
 import org.pageflow.global.api.code.GeneralCode;
 import org.pageflow.global.api.code.SessionCode;
 import org.pageflow.global.api.BizException;
@@ -33,7 +33,7 @@ import org.springframework.web.bind.annotation.*;
 public class SessionController {
     
     private final UserDomain userDomain;
-    private final $UserServiceUtil userServiceUtil;
+    private final UtilityUserService userServiceUtil;
     private final RequestContext requestContext;
     private final CustomProps props;
     private final JwtProvider jwtProvider;

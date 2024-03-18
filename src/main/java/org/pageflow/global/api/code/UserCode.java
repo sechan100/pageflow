@@ -32,7 +32,11 @@ public enum UserCode implements ApiCode {
     // OAuth2
     , OAUTH2_SIGNUP_REQUIRED("OAuth2로 회원가입이 필요함")
     
-    ;
+    // 이메일 인증
+    , INVALID_EMAIL_VERIFICATION_REQUEST("이메일 인증코드가 올바르지 않음")
+    , EXPIRED_EMAIL_VERIFICATION_REQUEST("이메일 인증요청 시간이 만료되었습니다.")
+    , ALREADY_VERIFIED_EMAIL("이미 인증된 이메일입니다.");
+    
     public final String message;
     
 }

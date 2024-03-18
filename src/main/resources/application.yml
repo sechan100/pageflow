@@ -3,12 +3,6 @@ spring:
     active: dev
     include:
       - secret
-  thymeleaf:
-    cache: false
-    mode: HTML
-    encoding: UTF-8
-    prefix: classpath:templates
-    suffix: .html
 
   output:
     ansi:

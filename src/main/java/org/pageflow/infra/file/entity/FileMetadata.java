@@ -2,7 +2,7 @@ package org.pageflow.infra.file.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.pageflow.global.data.entity.DefaultBaseEntity;
+import org.pageflow.global.data.DefaultEntity;
 import org.pageflow.infra.file.constants.FileMetadataType;
 
 @Entity
@@ -14,7 +14,7 @@ import org.pageflow.infra.file.constants.FileMetadataType;
         name = "file_metadata",
         indexes = @Index(name = "idx_file_metadata_owner_and_file_metadata_type", columnList = "owner_id, owner_entity_type, file_metadata_type")
 )
-public class FileMetadata extends DefaultBaseEntity {
+public class FileMetadata extends DefaultEntity {
 
     @Column(name = "owner_id")
     private String ownerId;

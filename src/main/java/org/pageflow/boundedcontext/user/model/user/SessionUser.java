@@ -10,7 +10,7 @@ import org.pageflow.boundedcontext.user.constants.RoleType;
 @Data
 @Builder
 public class SessionUser {
-    private Long UID;
+    private Long uid;
     private String username;
     private String email;
     private String penname;

@@ -3,9 +3,9 @@ package org.pageflow.global.security.handler;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
-import org.pageflow.global.api.RequestContext;
 import org.pageflow.global.api.BizException;
 import org.pageflow.global.api.code.SessionCode;
+import org.pageflow.shared.ForwordBuilder;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -14,8 +14,6 @@ import org.springframework.stereotype.Component;
 @AllArgsConstructor
 @Component
 public class PageflowAuthenticationEntryPoint implements AuthenticationEntryPoint {
-    
-    private final RequestContext requestContext;
 
     @Override
     public void commence(
@@ -28,7 +26,8 @@ public class PageflowAuthenticationEntryPoint implements AuthenticationEntryPoin
             /* SecurityFilterChain은, MVC 디스패처보다 먼저 실행되기 때문에 @RestControllerAdvice로 위임되지 않는다.
              * 때문에 이의 처리를 위해 Exception을 처리하여 공통응답을 반환하는 Controller로 직접 forward하는 것.
              * */
-            requestContext.delegateBizExceptionHandling(new BizException(SessionCode.LOGIN_REQUIRED));
+            request.setAttribute(BizException.class.getSimpleName(), SessionCode.LOGIN_REQUIRED.fire());
+            new ForwordBuilder(request, response, "/internal/throw/biz").forward();
         }
         
     }

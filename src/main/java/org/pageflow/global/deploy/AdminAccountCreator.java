@@ -6,8 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.pageflow.global.constants.CustomProps;
 import org.pageflow.boundedcontext.user.constants.RoleType;
 import org.pageflow.boundedcontext.user.dto.SignupForm;
-import org.pageflow.boundedcontext.user.repository.AccountRepository;
-import org.pageflow.boundedcontext.user.domain.AdminDomain;
+import org.pageflow.boundedcontext.user.repository.AccountRepo;
+import org.pageflow.boundedcontext.user.service.AdminDomain;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class AdminAccountCreator {
     
     private final AdminDomain adminDomain;
-    private final AccountRepository accountRepository;
+    private final AccountRepo accountRepo;
     private final CustomProps props;
 
     
@@ -33,7 +33,7 @@ public class AdminAccountCreator {
     @Transactional
     private void createAdminAccount() {
         // 이미 관리자 계정이 존재하면 생성하지 않음
-        if(accountRepository.existsByRole(RoleType.ROLE_ADMIN)) {
+        if(accountRepo.existsByRole(RoleType.ROLE_ADMIN)) {
             return;
         }
         

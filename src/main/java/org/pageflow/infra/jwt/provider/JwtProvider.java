@@ -1,21 +1,20 @@
 package org.pageflow.infra.jwt.provider;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pageflow.boundedcontext.user.constants.RoleType;
-import org.pageflow.global.constants.CustomProps;
-import org.pageflow.global.api.code.SessionCode;
-import org.pageflow.global.api.BizException;
 import org.pageflow.boundedcontext.user.model.token.AccessToken;
-import org.pageflow.util.MilliSeconds;
+import org.pageflow.global.api.BizException;
+import org.pageflow.global.api.code.SessionCode;
+import org.pageflow.global.constants.CustomProps;
+import org.pageflow.shared.TimeIntorducer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
 
@@ -30,13 +29,16 @@ public class JwtProvider {
     private Key signKey;
     private final CustomProps props;
     public static final String ROLE_CLAIM_KEY = "rol";
-    
+
+    @SuppressWarnings("UseOfObsoleteDateTimeApi")
     public AccessToken generateAccessToken(Long UID, RoleType role) {
+        Date issuedAt = new Date();
         Assert.notNull(UID, "UID must not be null");
         Assert.notNull(role, "role must not be null");
-        
-        Date issuedAt = new Date();
-        Date expiredAt = new Date(System.currentTimeMillis() + (MilliSeconds.MINUTE * props.site().accessTokenExpireMinutes()));
+        Date expiredAt = new Date(
+            System.currentTimeMillis() +
+            TimeIntorducer.MilliSeconds.MINUTE * props.site().accessTokenExpireMinutes()
+        );
 
         // 클래임 작성
         Claims claims = Jwts.claims();
@@ -70,7 +72,7 @@ public class JwtProvider {
     
     public Key getSignKey() {
         if(signKey == null){
-            byte[] decodedKey = secretKey.getBytes();
+            byte[] decodedKey = secretKey.getBytes(StandardCharsets.UTF_8);
             signKey = new SecretKeySpec(decodedKey, 0, decodedKey.length, "HmacSHA256");
         }
         return signKey;
@@ -90,7 +92,7 @@ public class JwtProvider {
             throw new BizException(SessionCode.SESSION_EXPIRED);
             
         // 그 외에는 토큰 파싱 실패로 간주
-        } catch(Exception exception) {
+        } catch(JwtException exception) {
             log.error("토큰 파싱 실패: {} ", exception.getMessage());
             throw new BizException(SessionCode.INVALID_TOKEN);
         }

@@ -1,0 +1,5 @@
+<root>
+    <item name='org.springframework.data.jpa.repository.EntityGraph java.lang.String[] attributePaths()'>
+        <annotation name='org.jetbrains.annotations.NonNls'/>
+    </item>
+</root>

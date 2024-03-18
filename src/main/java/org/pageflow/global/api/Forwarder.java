@@ -3,7 +3,7 @@ package org.pageflow.global.api;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.pageflow.util.ForwordBuilder;
+import org.pageflow.shared.ForwordBuilder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
 import org.springframework.web.context.request.RequestContextHolder;

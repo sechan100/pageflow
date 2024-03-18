@@ -1,7 +1,7 @@
 package org.pageflow.infra.file.service;
 
-import org.pageflow.global.data.entity.BaseEntity;
-import org.pageflow.global.data.entity.DefaultBaseEntity;
+import org.pageflow.global.data.Entity;
+import org.pageflow.global.data.DefaultEntity;
 import org.pageflow.infra.file.constants.FileMetadataType;
 import org.pageflow.infra.file.entity.FileMetadata;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,9 +25,9 @@ public interface FileService {
      * @param fileMetadataType 파일 타입
      * @throws org.pageflow.infra.file.exception.FileProcessingException 파일 저장 실패
      */
-    <E extends BaseEntity> FileMetadata upload(MultipartFile file, E ownerEntity, Object ownerId, FileMetadataType fileMetadataType);
+    <E extends Entity> FileMetadata upload(MultipartFile file, E ownerEntity, Object ownerId, FileMetadataType fileMetadataType);
     
-    <E extends DefaultBaseEntity> FileMetadata upload(MultipartFile file, E ownerEntity, FileMetadataType fileMetadataType);
+    <E extends DefaultEntity> FileMetadata upload(MultipartFile file, E ownerEntity, FileMetadataType fileMetadataType);
     
     /**
      * @param filePath 파일 경로

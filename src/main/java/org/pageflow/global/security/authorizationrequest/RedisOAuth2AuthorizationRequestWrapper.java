@@ -3,6 +3,7 @@ package org.pageflow.global.security.authorizationrequest;
 
 import lombok.Builder;
 import lombok.Getter;
+import org.pageflow.global.data.Entity;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
@@ -13,7 +14,7 @@ import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequ
  */
 @Builder
 @RedisHash("oauth2_authorization_request")
-public class RedisOAuth2AuthorizationRequestWrapper {
+public class RedisOAuth2AuthorizationRequestWrapper implements Entity {
     
     @Id
     private String state;

@@ -1,5 +1,6 @@
 package org.pageflow.boundedcontext.user.constants;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.util.Assert;
@@ -7,12 +8,12 @@ import org.springframework.util.Assert;
 import java.util.Arrays;
 import java.util.Collection;
 
+@RequiredArgsConstructor
 public enum RoleType {
     ROLE_ADMIN,
     ROLE_USER,
     ROLE_ANONYMOUS,
     ROLE_MANAGER;
-
     
     // RoleType 값 배열을 받아서 spring security 스펙에 맞는 Collection<? extends GrantedAuthority>타입으로 반환한다.
     public static Collection<? extends GrantedAuthority> getAuthorities(RoleType... roles) {

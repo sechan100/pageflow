@@ -2,8 +2,8 @@ package org.pageflow.infra.file.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.pageflow.global.constants.CustomProps;
-import org.pageflow.global.data.entity.BaseEntity;
-import org.pageflow.global.data.entity.DefaultBaseEntity;
+import org.pageflow.global.data.Entity;
+import org.pageflow.global.data.DefaultEntity;
 import org.pageflow.infra.file.constants.FileMetadataType;
 import org.pageflow.infra.file.entity.FileMetadata;
 import org.pageflow.infra.file.exception.FileProcessingException;
@@ -37,7 +37,7 @@ public class FileServiceImpl implements FileService {
     
     @Override
     @Transactional
-    public <E extends BaseEntity> FileMetadata upload(MultipartFile file, E ownerEntity, Object ownerId, FileMetadataType fileMetadataType) {
+    public <E extends Entity> FileMetadata upload(MultipartFile file, E ownerEntity, Object ownerId, FileMetadataType fileMetadataType) {
         Assert.notNull(file, "file must not be null");
         Assert.notNull(ownerEntity, "ownerEntity must not be null");
         Assert.notNull(ownerId, "ownerId must not be null");
@@ -91,7 +91,7 @@ public class FileServiceImpl implements FileService {
     }
     
     @Override
-    public <E extends DefaultBaseEntity> FileMetadata upload(MultipartFile file, E ownerEntity, FileMetadataType fileMetadataType) {
+    public <E extends DefaultEntity> FileMetadata upload(MultipartFile file, E ownerEntity, FileMetadataType fileMetadataType) {
         return upload(file, ownerEntity, ownerEntity.getId(), fileMetadataType);
     }
     
@@ -133,7 +133,7 @@ public class FileServiceImpl implements FileService {
         }
         
         // ownerEntityType 검사
-        if(!BaseEntity.class.isAssignableFrom(ownerEntityType)) {
+        if(!Entity.class.isAssignableFrom(ownerEntityType)) {
             throw new IllegalArgumentException("ownerEntityType은 BaseEntity의 구현체만 가능합니다.");
         }
         

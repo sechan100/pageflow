@@ -4,22 +4,22 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
-import org.pageflow.global.data.entity.NoIdBaseEntity;
+import org.pageflow.global.data.NoIdEntity;
 
 
 @Entity
 @Getter
 @Setter(AccessLevel.NONE)
 @Builder
-@EqualsAndHashCode(of = "UID", callSuper = false)
+@EqualsAndHashCode(of = "uid", callSuper = false)
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @DynamicUpdate
-public class Profile extends NoIdBaseEntity {
+public class Profile extends NoIdEntity {
     
     // @MapsId: Account의 PK를 Profile의 PK로 사용
     @Id
-    private Long UID;
+    private Long uid;
     
     // 필명
     @Column(unique = true, nullable = false)
@@ -30,7 +30,7 @@ public class Profile extends NoIdBaseEntity {
     
     @JsonIgnore
     @MapsId
-    @JoinColumn(name = "UID")
+    @JoinColumn(name = "uid")
     @OneToOne(optional = false, fetch = FetchType.LAZY)
     private Account account;
     

@@ -10,6 +10,13 @@ spring:
     host: localhost
     port: 6379
 
+  thymeleaf:
+    cache: false
+    mode: HTML
+    encoding: UTF-8
+    prefix: classpath:templates
+    suffix: .html
+
   datasource:
     username: root
     password:

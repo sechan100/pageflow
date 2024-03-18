@@ -3,6 +3,8 @@ package org.pageflow.boundedcontext.user.entity;
 import lombok.Builder;
 import lombok.Getter;
 import org.pageflow.boundedcontext.user.constants.ProviderType;
+import org.pageflow.global.data.Entity;
+import org.pageflow.shared.TimeIntorducer;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 
@@ -13,9 +15,9 @@ import org.springframework.data.redis.core.RedisHash;
  */
 @Getter
 @Builder
-@RedisHash(value = "user-signup", timeToLive = 60 * 60)
-public class SignupCache {
-    
+@RedisHash(value = "user-signup", timeToLive = TimeIntorducer.Seconds.HOUR)
+public class SignupCache implements Entity {
+
     @Id
     private String username;
     

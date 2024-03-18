@@ -6,7 +6,7 @@ import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 import org.pageflow.boundedcontext.user.constants.ProviderType;
 import org.pageflow.boundedcontext.user.constants.RoleType;
-import org.pageflow.global.data.entity.NoIdBaseEntity;
+import org.pageflow.global.data.NoIdEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 
@@ -22,11 +22,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 @Table(indexes = {
         @Index(name = "idx_account_username", columnList = "username", unique = true)
 })
-public class Account extends NoIdBaseEntity {
+public class Account extends NoIdEntity {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long UID;
+    private Long uid;
     
     @Column(unique = true, nullable = false, updatable = false)
     private String username;
@@ -61,7 +61,7 @@ public class Account extends NoIdBaseEntity {
     
     
     // 이메일을 변경하고, 인증 상태를 초기화한다.
-    public void changeEmail(String email) {
+    public void changeEmailAndUnVerify(String email) {
         this.email = email;
         this.emailVerified = false;
     }

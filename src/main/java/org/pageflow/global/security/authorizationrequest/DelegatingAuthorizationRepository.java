@@ -23,8 +23,7 @@ public class DelegatingAuthorizationRepository implements AuthorizationRequestRe
     
     @Override
     public OAuth2AuthorizationRequest loadAuthorizationRequest(HttpServletRequest request) {
-        return repository.findById(getStateParameter(request))
-                .orElseThrow().getRequest();
+        return repository.findById(getStateParameter(request)).get().getRequest();
     }
     
     @Override
@@ -39,10 +38,11 @@ public class DelegatingAuthorizationRepository implements AuthorizationRequestRe
     
     @Override
     public OAuth2AuthorizationRequest removeAuthorizationRequest(HttpServletRequest request, HttpServletResponse response) {
-        return repository.findById(getStateParameter(request)).map(wrapper -> {
-            repository.delete(wrapper);
-            return wrapper.getRequest();
-        }).orElseThrow();
+        RedisOAuth2AuthorizationRequestWrapper wrapper =
+            repository.findById(getStateParameter(request)).get();
+        
+        repository.delete(wrapper);
+        return wrapper.getRequest();
     }
     
     private String getStateParameter(HttpServletRequest request) {

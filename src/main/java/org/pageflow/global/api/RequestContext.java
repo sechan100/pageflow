@@ -34,16 +34,12 @@ public class RequestContext {
     private final PageflowPrincipal principal;
     private final HttpServletRequest request;
     private final HttpServletResponse response;
-    private final ProfileRepo profileRepo;
     
     public RequestContext(ProfileRepo profileRepo) {
         
         ServletRequestAttributes servletRequest = ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes()));
         this.request = servletRequest.getRequest();
         this.response = servletRequest.getResponse();
-        
-        // DI
-        this.profileRepo = profileRepo;
         
         // 인증객체 참조
         Authentication authentication = Preconditions.checkNotNull(

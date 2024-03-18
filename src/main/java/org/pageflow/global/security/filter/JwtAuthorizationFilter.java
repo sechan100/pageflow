@@ -38,37 +38,30 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain
     ){
         // 토큰 추출
-        Optional<String> accessTokenOptional = resolveToken(request);
-        
+        Optional<String> accessTokenOptional = resolveTokenIfExist(request);
         // 토큰 존재성 확인
         if (accessTokenOptional.isEmpty()) {
             filterChain.doFilter(request, response);
             return;
         }
-        
         // 토큰 파싱
         AccessToken accessToken = jwtProvider.parseAccessToken(accessTokenOptional.get());
-        
         // principal 작성
         SessionPrincipal principal = SessionPrincipal.builder()
                 .UID(accessToken.getUID())
                 .build();
-        
         // authentication 작성
         Authentication authentication = new UsernamePasswordAuthenticationToken(
                 principal,
                 null,
                 RoleType.getAuthorities(accessToken.getRole())
         );
-
         // authentication 할당
         SecurityContextHolder.getContext().setAuthentication(authentication);
-    
         filterChain.doFilter(request, response);
     }
 
-    
-    private Optional<String> resolveToken(HttpServletRequest request) {
+    private Optional<String> resolveTokenIfExist(HttpServletRequest request) {
         
         String token = null;
         

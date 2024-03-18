@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
 @RestControllerAdvice(basePackages = "org.pageflow")
-public class GeneralResponseAdvice implements ResponseBodyAdvice {
+public class GeneralResponseAdvice implements ResponseBodyAdvice<Object> {
     
     @Override
     public boolean supports(@NonNull MethodParameter returnType, @NonNull Class converterType) {

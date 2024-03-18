@@ -3,6 +3,7 @@ package org.pageflow.global.api;
 import lombok.Getter;
 import org.pageflow.global.api.code.ApiCode;
 import org.pageflow.global.api.code.GeneralCode;
+import org.springframework.lang.Nullable;
 
 import java.util.Objects;
 
@@ -15,10 +16,11 @@ public class GeneralResponse<T> {
     
     private final ApiCode apiCode;
     private final String message;
+    @Nullable
     private final T data;
     
-    public static <T> GeneralResponse success(T data){
-        return GeneralResponse.builder()
+    public static <T> GeneralResponse<T> success(T data){
+        return builder()
                 .apiCode(GeneralCode.SUCCESS)
                 .message(GeneralCode.SUCCESS.getMessage())
                 .data(data)

@@ -3,6 +3,7 @@ package org.pageflow.global.security;
 import lombok.RequiredArgsConstructor;
 import org.pageflow.boundedcontext.user.security.CustomOAuth2UserService;
 import org.pageflow.global.constants.CustomProps;
+import org.pageflow.global.security.filter.ExceptionDelegatingFilter;
 import org.pageflow.global.security.filter.JwtAuthorizationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +15,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
+import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
@@ -33,6 +35,7 @@ public class SecurityConfig {
     private final AuthenticationEntryPoint pageflowAuthenticationEntryPoint;
     private final AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
     private final JwtAuthorizationFilter jwtAuthorizationFilter;
+    private final ExceptionDelegatingFilter exceptionDelegatingFilter;
     private final AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
     private final AuthorizationRequestRepository<OAuth2AuthorizationRequest> authorizationRequestRepository;
     
@@ -65,6 +68,7 @@ public class SecurityConfig {
                  * */
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
+            .addFilterBefore(exceptionDelegatingFilter, OAuth2LoginAuthenticationFilter.class)
             .addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class)
             .headers(headers -> headers
                 .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)

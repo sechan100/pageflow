@@ -16,7 +16,7 @@ import java.util.*;
  * @author : sechan
  */
 @RestControllerAdvice
-public class ApiExceptionHandler {
+public class ExceptionRestAdvice {
     
     // @Valid를 통한 Spring Bean Validation의 필드의 유효성 검사에 실패한 경우
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -51,28 +51,22 @@ public class ApiExceptionHandler {
                 .data(result)
                 .build();
     }
-    
+
     @ExceptionHandler(BizException.class)
-    public GeneralResponse<Object> handleBizException(BizException e) {
+    public GeneralResponse<Void> handleBizException(BizException e) {
         return GeneralResponse.builder()
                 .apiCode(e.getApiCode())
                 .message(e.getMessage())
                 .data(e.getData())
                 .build();
     }
-    
+
     @ExceptionHandler(DataAccessException.class)
-    public GeneralResponse<Object> handleDataAccessException(DataAccessException e) {
+    public GeneralResponse<Void> handleDataAccessException(DataAccessException e) {
         if(e instanceof EmptyResultDataAccessException){
-            return GeneralResponse.builder()
-                    .apiCode(GeneralCode.DATA_NOT_FOUND)
-                    .message("데이터를 찾을 수 없습니다.")
-                    .build();
+            return new GeneralResponse(GeneralCode.DATA_NOT_FOUND);
         } else {
-            return GeneralResponse.builder()
-                .apiCode(GeneralCode.DATA_ACCESS_ERROR)
-                .message("데이터에 접근중 알 수 없는 오류가 발생했습니다.")
-                .build();
+            return new GeneralResponse(GeneralCode.DATA_ACCESS_ERROR);
         }
     }
  

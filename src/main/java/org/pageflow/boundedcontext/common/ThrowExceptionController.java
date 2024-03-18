@@ -1,9 +1,7 @@
 package org.pageflow.boundedcontext.common;
 
 import lombok.AllArgsConstructor;
-import org.pageflow.global.api.RequestContext;
-import org.pageflow.global.api.BizException;
-import org.pageflow.global.api.GeneralResponse;
+import org.pageflow.shared.SpringMvcExceptionDelegate;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -15,17 +13,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @AllArgsConstructor
 public class ThrowExceptionController {
-    
-    private final RequestContext requestContext;
-    
-    @RequestMapping("/internal/throw/biz")
-     public GeneralResponse<Object> throwBizException() {
-        BizException e = requestContext.getRequestAttr(BizException.class.getSimpleName());
-         return GeneralResponse.builder()
-                 .apiCode(e.getApiCode())
-                 .message(e.getMessage())
-                 .data(e.getData())
-                 .build();
-     }
 
+    private final SpringMvcExceptionDelegate delegate;
+    
+    @RequestMapping("/internal/throw/exception")
+    public void throwBizException() throws Exception {
+        throw delegate.getDelegatedException();
+    }
 }

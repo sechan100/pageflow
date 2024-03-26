@@ -9,9 +9,11 @@ import org.pageflow.book.adapter.in.request.SectionCreateReq;
 import org.pageflow.book.application.BookId;
 import org.pageflow.book.dto.SectionDto;
 import org.pageflow.book.dto.SectionDtoWithContent;
-import org.pageflow.book.port.in.TocNodeUseCase;
+import org.pageflow.book.port.in.SectionWriteUseCase;
+import org.pageflow.book.port.in.TocUseCase;
 import org.pageflow.book.port.in.cmd.CreateSectionCmd;
 import org.pageflow.book.port.in.cmd.UpdateSectionCmd;
+import org.pageflow.common.result.Result;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,7 +27,8 @@ import java.util.UUID;
 @RequestMapping("/user/books/{bookId}/toc/sections")
 @RequiredArgsConstructor
 public class SectionWebAdapter {
-  private final TocNodeUseCase tocNodeUseCase;
+  private final TocUseCase tocUseCase;
+  private final SectionWriteUseCase sectionWriteUseCase;
 
   @PostMapping("")
   @Operation(summary = "섹션 생성")
@@ -33,13 +36,13 @@ public class SectionWebAdapter {
   public SectionDtoWithContent createSection(
     @PathVariable @BookId UUID bookId,
     @RequestBody SectionCreateReq req
-  ){
+  ) {
     CreateSectionCmd cmd = CreateSectionCmd.withTitle(
       bookId,
       req.getParentNodeId(),
       req.getTitle()
     );
-    SectionDtoWithContent sectionDto = tocNodeUseCase.createSection(bookId, cmd);
+    SectionDtoWithContent sectionDto = tocUseCase.createSection(bookId, cmd);
     return sectionDto;
   }
 
@@ -49,8 +52,8 @@ public class SectionWebAdapter {
   public SectionDto getSection(
     @PathVariable @BookId UUID bookId,
     @PathVariable UUID sectionId
-  ){
-    SectionDto section = tocNodeUseCase.querySection(bookId, sectionId);
+  ) {
+    SectionDto section = tocUseCase.getSection(bookId, sectionId);
     return section;
   }
 
@@ -60,26 +63,25 @@ public class SectionWebAdapter {
   public SectionDtoWithContent getSectionWithContent(
     @PathVariable @BookId UUID bookId,
     @PathVariable UUID sectionId
-  ){
-    SectionDtoWithContent section = tocNodeUseCase.querySectionWithContent(bookId, sectionId);
+  ) {
+    SectionDtoWithContent section = sectionWriteUseCase.getSectionWithContent(bookId, sectionId);
     return section;
   }
 
   @PostMapping("/{sectionId}")
   @Operation(summary = "섹션 업데이트")
   @SetBookPermission
-  public SectionDtoWithContent updateSection(
+  public Result<SectionDto> updateSection(
     @PathVariable @BookId UUID bookId,
     @PathVariable UUID sectionId,
     @RequestBody SectionUpdateReq req
-  ){
-    UpdateSectionCmd cmd = UpdateSectionCmd.of(
+  ) {
+    UpdateSectionCmd cmd = UpdateSectionCmd.createCmd(
       sectionId,
-      req.getTitle(),
-      req.getContent()
+      req.getTitle()
     );
-    SectionDtoWithContent section = tocNodeUseCase.updateSection(bookId, cmd);
-    return section;
+    Result<SectionDto> result = sectionWriteUseCase.updateSection(bookId, cmd);
+    return result;
   }
 
   @DeleteMapping("/{sectionId}")
@@ -88,19 +90,15 @@ public class SectionWebAdapter {
   public void deleteSection(
     @PathVariable @BookId UUID bookId,
     @PathVariable UUID sectionId
-  ){
-    tocNodeUseCase.deleteSection(bookId, sectionId);
+  ) {
+    tocUseCase.deleteSection(bookId, sectionId);
   }
-
 
 
   @Data
   public static class SectionUpdateReq {
     @NotBlank
     private String title;
-
-    @NotBlank
-    private String content;
   }
 }
 

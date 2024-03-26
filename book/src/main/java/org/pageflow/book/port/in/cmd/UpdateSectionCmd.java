@@ -15,17 +15,14 @@ import java.util.UUID;
 public class UpdateSectionCmd {
   private final UUID id;
   private final NodeTitle title;
-  private final String content;
 
-  public static UpdateSectionCmd of(
+  public static UpdateSectionCmd createCmd(
     UUID id,
-    String title,
-    String content
+    String title
   ) {
     return new UpdateSectionCmd(
       id,
-      NodeTitle.of(title),
-      content
+      NodeTitle.of(title)
     );
   }
 }

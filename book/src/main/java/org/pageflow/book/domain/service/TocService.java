@@ -16,9 +16,11 @@ import org.pageflow.book.dto.FolderDto;
 import org.pageflow.book.dto.SectionDto;
 import org.pageflow.book.dto.SectionDtoWithContent;
 import org.pageflow.book.dto.TocDto;
-import org.pageflow.book.port.in.TocNodeUseCase;
 import org.pageflow.book.port.in.TocUseCase;
-import org.pageflow.book.port.in.cmd.*;
+import org.pageflow.book.port.in.cmd.CreateFolderCmd;
+import org.pageflow.book.port.in.cmd.CreateSectionCmd;
+import org.pageflow.book.port.in.cmd.RelocateNodeCmd;
+import org.pageflow.book.port.in.cmd.UpdateFolderCmd;
 import org.pageflow.book.port.out.jpa.BookPersistencePort;
 import org.pageflow.book.port.out.jpa.FolderPersistencePort;
 import org.pageflow.book.port.out.jpa.NodePersistencePort;
@@ -40,7 +42,7 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class TocService implements TocUseCase, TocNodeUseCase {
+public class TocService implements TocUseCase {
   private final BookPersistencePort bookPersistencePort;
   private final FolderPersistencePort folderPersistencePort;
   private final SectionPersistencePort sectionPersistencePort;
@@ -100,7 +102,7 @@ public class TocService implements TocUseCase, TocNodeUseCase {
     actions = {"READ"},
     permissionType = BookPermission.class
   )
-  public TocDto.Toc loadToc(@BookId UUID bookId) {
+  public TocDto.Toc getToc(@BookId UUID bookId) {
     List<NodeProjection> nodeProjections = nodePersistencePort.queryNodesByBookId(bookId);
     TocDto.Folder root = buildTree(bookId, nodeProjections);
     return new TocDto.Toc(bookId, root);
@@ -137,7 +139,7 @@ public class TocService implements TocUseCase, TocNodeUseCase {
     actions = {"READ"},
     permissionType = BookPermission.class
   )
-  public FolderDto queryFolder(@BookId UUID bookId, UUID folderId) {
+  public FolderDto getFolder(@BookId UUID bookId, UUID folderId) {
     TocNode node = nodePersistencePort.findById(folderId).get();
     return FolderDto.from(node);
   }
@@ -199,31 +201,9 @@ public class TocService implements TocUseCase, TocNodeUseCase {
     actions = {"READ"},
     permissionType = BookPermission.class
   )
-  public SectionDto querySection(@BookId UUID bookId, UUID sectionId) {
+  public SectionDto getSection(@BookId UUID bookId, UUID sectionId) {
     TocNode node = nodePersistencePort.findById(sectionId).get();
     return SectionDto.from(node);
-  }
-
-  @Override
-  @PermissionRequired(
-    actions = {"READ"},
-    permissionType = BookPermission.class
-  )
-  public SectionDtoWithContent querySectionWithContent(@BookId UUID bookId, UUID sectionId) {
-    Section section = sectionPersistencePort.findById(sectionId).get();
-    return SectionDtoWithContent.from(section);
-  }
-
-  @Override
-  @PermissionRequired(
-    actions = {"EDIT"},
-    permissionType = BookPermission.class
-  )
-  public SectionDtoWithContent updateSection(@BookId UUID bookId, UpdateSectionCmd cmd) {
-    Section section = sectionPersistencePort.findById(cmd.getId()).get();
-    section.changeTitle(cmd.getTitle().getValue());
-    section.updateContent(cmd.getContent());
-    return SectionDtoWithContent.from(section);
   }
 
   @Override

@@ -6,7 +6,6 @@ import org.pageflow.book.adapter.in.aop.SetBookPermission;
 import org.pageflow.book.adapter.in.request.NodeRelocateReq;
 import org.pageflow.book.application.BookId;
 import org.pageflow.book.dto.TocDto;
-import org.pageflow.book.port.in.TocNodeUseCase;
 import org.pageflow.book.port.in.TocUseCase;
 import org.pageflow.book.port.in.cmd.RelocateNodeCmd;
 import org.pageflow.common.result.Result;
@@ -23,15 +22,14 @@ import java.util.UUID;
 @RequestMapping("/user/books/{bookId}/toc")
 @RequiredArgsConstructor
 public class TocWebAdapter {
-  private final TocUseCase tocUsecase;
-  private final TocNodeUseCase tocNodeUseCase;
+  private final TocUseCase tocUseCase;
 
 
   @GetMapping("")
   @Operation(summary = "책 목차 조회")
   @SetBookPermission
   public TocDto.Toc getToc(@PathVariable @BookId UUID bookId) {
-    TocDto.Toc toc = tocUsecase.loadToc(bookId);
+    TocDto.Toc toc = tocUseCase.getToc(bookId);
     return toc;
   }
 
@@ -48,7 +46,7 @@ public class TocWebAdapter {
       req.getDestFolderId(),
       req.getDestIndex()
     );
-    return tocNodeUseCase.relocateNode(bookId, cmd);
+    return tocUseCase.relocateNode(bookId, cmd);
   }
 
 }

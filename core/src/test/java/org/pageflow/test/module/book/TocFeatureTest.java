@@ -10,7 +10,6 @@ import org.pageflow.book.dto.BookDto;
 import org.pageflow.book.dto.FolderDto;
 import org.pageflow.book.dto.SectionDtoWithContent;
 import org.pageflow.book.dto.TocDto;
-import org.pageflow.book.port.in.TocNodeUseCase;
 import org.pageflow.book.port.in.TocUseCase;
 import org.pageflow.book.port.in.cmd.CreateFolderCmd;
 import org.pageflow.book.port.in.cmd.CreateSectionCmd;
@@ -31,7 +30,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class TocFeatureTest {
   private final DataCreator dataCreator;
-  private final TocNodeUseCase tocNodeUseCase;
   private final TocUseCase tocUseCase;
   private final ResourcePermissionContext permissionContext;
   private final NodePersistencePort nodePersistencePort;
@@ -46,7 +44,7 @@ public class TocFeatureTest {
     permissionContext.addResourcePermission(permission);
 
     // toc 생성
-    TocDto.Toc toc = tocUseCase.loadToc(book.getId());
+    TocDto.Toc toc = tocUseCase.getToc(book.getId());
     TocDto.Folder root = toc.getRoot();
     UUID rootFolderId = root.getId();
     FolderDto f1 = createFolder(bookId, rootFolderId);
@@ -70,7 +68,7 @@ public class TocFeatureTest {
     );
 
     // rebalance
-    tocNodeUseCase.relocateNode(
+    tocUseCase.relocateNode(
       bookId,
       RelocateNodeCmd.of(
         bookId,
@@ -98,7 +96,7 @@ public class TocFeatureTest {
     permissionContext.addResourcePermission(permission);
 
     // toc 생성
-    TocDto.Toc toc = tocUseCase.loadToc(book.getId());
+    TocDto.Toc toc = tocUseCase.getToc(book.getId());
     TocDto.Folder root = toc.getRoot();
     UUID rootFolderId = root.getId();
     FolderDto f1 = createFolder(bookId, rootFolderId);
@@ -121,7 +119,7 @@ public class TocFeatureTest {
     );
 
     // rebalance
-    tocNodeUseCase.relocateNode(
+    tocUseCase.relocateNode(
       bookId,
       RelocateNodeCmd.of(
         bookId,
@@ -149,7 +147,7 @@ public class TocFeatureTest {
     permissionContext.addResourcePermission(permission);
 
     // toc 생성
-    TocDto.Toc toc = tocUseCase.loadToc(book.getId());
+    TocDto.Toc toc = tocUseCase.getToc(book.getId());
     TocDto.Folder root = toc.getRoot();
     UUID rootFolderId = root.getId();
     FolderDto f1 = createFolder(bookId, rootFolderId);
@@ -172,7 +170,7 @@ public class TocFeatureTest {
     );
 
     // rebalance
-    tocNodeUseCase.relocateNode(
+    tocUseCase.relocateNode(
       bookId,
       RelocateNodeCmd.of(
         bookId,
@@ -192,14 +190,14 @@ public class TocFeatureTest {
 
 
   private FolderDto createFolder(UUID bookId, UUID parentNodeId) {
-    return tocNodeUseCase.createFolder(bookId, CreateFolderCmd.withoutTitle(
+    return tocUseCase.createFolder(bookId, CreateFolderCmd.withoutTitle(
       bookId,
       parentNodeId
     ));
   }
 
   private SectionDtoWithContent createSection(UUID bookId, UUID parentNodeId) {
-    return tocNodeUseCase.createSection(bookId, CreateSectionCmd.withoutTitle(
+    return tocUseCase.createSection(bookId, CreateSectionCmd.withoutTitle(
       bookId,
       parentNodeId
     ));

@@ -24,7 +24,7 @@ public class TemporaryEntityCleanupScheduler {
   @Scheduled(fixedRate = 60 * 1000)
   public void cleanup() {
     int deletedNum = repository.deleteAllByExpiredAtBefore(System.currentTimeMillis());
-    log.info("Deleted [{}] temporary entities", deletedNum);
+    log.trace("Deleted [{}] temporary entities", deletedNum);
   }
 
 

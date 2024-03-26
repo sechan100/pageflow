@@ -8,7 +8,7 @@ import org.pageflow.book.adapter.in.aop.SetBookPermission;
 import org.pageflow.book.adapter.in.request.CreateFolderReq;
 import org.pageflow.book.application.BookId;
 import org.pageflow.book.dto.FolderDto;
-import org.pageflow.book.port.in.TocNodeUseCase;
+import org.pageflow.book.port.in.TocUseCase;
 import org.pageflow.book.port.in.cmd.CreateFolderCmd;
 import org.pageflow.book.port.in.cmd.UpdateFolderCmd;
 import org.springframework.validation.annotation.Validated;
@@ -24,7 +24,7 @@ import java.util.UUID;
 @RequestMapping("/user/books/{bookId}/toc/folders")
 @RequiredArgsConstructor
 public class FolderWebAdapter {
-  private final TocNodeUseCase tocNodeUseCase;
+  private final TocUseCase tocUseCase;
 
 
   @PostMapping("")
@@ -33,13 +33,13 @@ public class FolderWebAdapter {
   public FolderDto createFolder(
     @PathVariable @BookId UUID bookId,
     @RequestBody CreateFolderReq req
-  ){
+  ) {
     CreateFolderCmd cmd = CreateFolderCmd.withTitle(
       bookId,
       req.getParentNodeId(),
       req.getTitle()
     );
-    FolderDto folderDto = tocNodeUseCase.createFolder(bookId, cmd);
+    FolderDto folderDto = tocUseCase.createFolder(bookId, cmd);
     return folderDto;
   }
 
@@ -49,8 +49,8 @@ public class FolderWebAdapter {
   public FolderDto getFolder(
     @PathVariable @BookId UUID bookId,
     @PathVariable UUID folderId
-  ){
-    FolderDto folder = tocNodeUseCase.queryFolder(bookId, folderId);
+  ) {
+    FolderDto folder = tocUseCase.getFolder(bookId, folderId);
     return folder;
   }
 
@@ -61,12 +61,12 @@ public class FolderWebAdapter {
     @PathVariable @BookId UUID bookId,
     @PathVariable UUID folderId,
     @RequestBody FolderUpdateReq req
-  ){
+  ) {
     UpdateFolderCmd cmd = UpdateFolderCmd.of(
       folderId,
       req.getTitle()
     );
-    FolderDto folderDto = tocNodeUseCase.updateFolder(bookId, cmd);
+    FolderDto folderDto = tocUseCase.updateFolder(bookId, cmd);
     return folderDto;
   }
 
@@ -77,10 +77,9 @@ public class FolderWebAdapter {
   public void deleteFolder(
     @PathVariable @BookId UUID bookId,
     @PathVariable UUID folderId
-  ){
-    tocNodeUseCase.deleteFolder(bookId, folderId);
+  ) {
+    tocUseCase.deleteFolder(bookId, folderId);
   }
-
 
 
   @Data

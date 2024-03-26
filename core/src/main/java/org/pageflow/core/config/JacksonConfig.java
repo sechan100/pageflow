@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.pageflow.common.user.UID;
-import org.pageflow.common.utility.JsonUtility;
 import org.pageflow.core.user.UIDDeserializer;
 import org.pageflow.core.user.UIDSerializer;
 import org.springframework.context.annotation.Bean;
@@ -31,10 +30,5 @@ public class JacksonConfig {
     mapper.registerModule(new JavaTimeModule());
 
     return mapper;
-  }
-
-  @Bean
-  public JsonUtility jsonUtility(ObjectMapper objectMapper) {
-    return new JsonUtility(objectMapper);
   }
 }

@@ -3,8 +3,7 @@ package org.pageflow.boundedcontext.user.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.DynamicUpdate;
-import org.pageflow.global.data.NoIdEntity;
+import org.pageflow.global.data.AutoAuditingEntity;
 
 
 @Entity
@@ -14,8 +13,7 @@ import org.pageflow.global.data.NoIdEntity;
 @EqualsAndHashCode(of = "uid", callSuper = false)
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@DynamicUpdate
-public class Profile extends NoIdEntity {
+public class Profile extends AutoAuditingEntity {
     
     // @MapsId: Account의 PK를 Profile의 PK로 사용
     @Id
@@ -33,9 +31,7 @@ public class Profile extends NoIdEntity {
     @JoinColumn(name = "uid")
     @OneToOne(optional = false, fetch = FetchType.LAZY)
     private Account account;
-    
-    
-    
+
     
     public void changePenname(String penname) {
         this.penname = penname;

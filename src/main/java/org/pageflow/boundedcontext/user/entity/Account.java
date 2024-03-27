@@ -3,10 +3,9 @@ package org.pageflow.boundedcontext.user.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.DynamicUpdate;
 import org.pageflow.boundedcontext.user.constants.ProviderType;
 import org.pageflow.boundedcontext.user.constants.RoleType;
-import org.pageflow.global.data.NoIdEntity;
+import org.pageflow.global.data.AutoAuditingEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 
@@ -18,11 +17,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 @AllArgsConstructor
 @ToString(callSuper = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@DynamicUpdate
 @Table(indexes = {
         @Index(name = "idx_account_username", columnList = "username", unique = true)
 })
-public class Account extends NoIdEntity {
+public class Account extends AutoAuditingEntity {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

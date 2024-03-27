@@ -19,12 +19,12 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
-public abstract class NoIdEntity implements Entity {
+public abstract class AutoAuditingEntity implements Entity {
     
     @CreatedDate
     private LocalDateTime createdDatetime;
     
     @LastModifiedDate
-    private LocalDateTime modifiedDatetime;
+    private LocalDateTime updatedDatetime;
 
 }

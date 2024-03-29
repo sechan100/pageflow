@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
-public abstract class AutoAuditingEntity implements Entity {
+public abstract class AuditingBaseEntity implements Entity {
     
     @CreatedDate
     private LocalDateTime createdDatetime;

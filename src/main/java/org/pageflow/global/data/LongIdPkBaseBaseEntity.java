@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @EqualsAndHashCode(of = "id", callSuper = false)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public abstract class LongIdPkEntity extends AutoAuditingEntity {
+public abstract class LongIdPkBaseBaseEntity extends AuditingBaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

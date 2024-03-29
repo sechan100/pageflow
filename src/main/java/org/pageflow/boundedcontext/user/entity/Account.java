@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.pageflow.boundedcontext.user.constants.ProviderType;
 import org.pageflow.boundedcontext.user.constants.RoleType;
-import org.pageflow.global.data.AutoAuditingEntity;
+import org.pageflow.global.data.AuditingBaseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 
@@ -20,7 +20,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 @Table(indexes = {
         @Index(name = "idx_account_username", columnList = "username", unique = true)
 })
-public class Account extends AutoAuditingEntity {
+public class Account extends AuditingBaseEntity {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

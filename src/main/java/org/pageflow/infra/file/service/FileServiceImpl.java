@@ -3,7 +3,7 @@ package org.pageflow.infra.file.service;
 import lombok.extern.slf4j.Slf4j;
 import org.pageflow.global.constants.CustomProps;
 import org.pageflow.global.data.Entity;
-import org.pageflow.global.data.DefaultEntity;
+import org.pageflow.global.data.LongIdPkBaseBaseEntity;
 import org.pageflow.infra.file.constants.FileMetadataType;
 import org.pageflow.infra.file.entity.FileMetadata;
 import org.pageflow.infra.file.exception.FileProcessingException;
@@ -91,7 +91,7 @@ public class FileServiceImpl implements FileService {
     }
     
     @Override
-    public <E extends DefaultEntity> FileMetadata upload(MultipartFile file, E ownerEntity, FileMetadataType fileMetadataType) {
+    public <E extends LongIdPkBaseBaseEntity> FileMetadata upload(MultipartFile file, E ownerEntity, FileMetadataType fileMetadataType) {
         return upload(file, ownerEntity, ownerEntity.getId(), fileMetadataType);
     }
     

@@ -3,7 +3,7 @@ package org.pageflow.boundedcontext.user.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
-import org.pageflow.global.data.AutoAuditingEntity;
+import org.pageflow.global.data.AuditingBaseEntity;
 
 
 @Entity
@@ -13,7 +13,7 @@ import org.pageflow.global.data.AutoAuditingEntity;
 @EqualsAndHashCode(of = "uid", callSuper = false)
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Profile extends AutoAuditingEntity {
+public class Profile extends AuditingBaseEntity {
     
     // @MapsId: Account의 PK를 Profile의 PK로 사용
     @Id

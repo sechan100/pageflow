@@ -11,6 +11,7 @@ import org.springframework.lang.Nullable;
  * @author : sechan
  */
 @Entity
+@Getter
 @Inheritance(strategy = InheritanceType.JOINED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @DiscriminatorColumn(name = "node_type")
@@ -19,11 +20,9 @@ import org.springframework.lang.Nullable;
 )
 public class OutlineNode extends LongIdPkBaseBaseEntity {
 
-    @Getter
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private Book book;
 
-    @Getter
     @Column(name = "title", nullable = false)
     private String title;
 
@@ -33,7 +32,6 @@ public class OutlineNode extends LongIdPkBaseBaseEntity {
     @SuppressWarnings("ClassReferencesSubclass")
     private Folder parentNode;
 
-    @Getter
     @Column(name = "ordinal_value", nullable = false)
     private Integer ordinalValue;
 

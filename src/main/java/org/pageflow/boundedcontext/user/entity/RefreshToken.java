@@ -2,18 +2,18 @@ package org.pageflow.boundedcontext.user.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.pageflow.global.data.Entity;
+
 
 /**
  * @author : sechan
  */
-@jakarta.persistence.Entity
+@Entity
 @Getter
 @Setter(AccessLevel.NONE)
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class RefreshToken implements Entity {
+public class RefreshToken implements org.pageflow.global.data.Entity {
 
     /**
      * UUID

@@ -6,7 +6,7 @@ import org.pageflow.boundedcontext.user.constants.RoleType;
 import org.pageflow.boundedcontext.user.entity.Account;
 import org.pageflow.boundedcontext.user.entity.EmailVerificationRequest;
 import org.pageflow.boundedcontext.user.entity.RefreshToken;
-import org.pageflow.boundedcontext.user.model.principal.InitialAuthenticationPrincipal;
+import org.pageflow.boundedcontext.user.model.principal.OnlyAuthProcessPrincipal;
 import org.pageflow.boundedcontext.user.model.token.AccessToken;
 import org.pageflow.boundedcontext.user.model.token.AuthTokens;
 import org.pageflow.boundedcontext.user.repository.AccountRepo;
@@ -64,7 +64,7 @@ public class AuthService {
     public AuthTokens formLogin(String username, String password){
         Authentication authentication = authenticate(username, password);
 
-        if(authentication.getPrincipal() instanceof InitialAuthenticationPrincipal principal){
+        if(authentication.getPrincipal() instanceof OnlyAuthProcessPrincipal principal){
             return createSession(principal.getUID(), principal.getRole());
         } else {
             throw new IllegalArgumentException(
@@ -170,13 +170,10 @@ public class AuthService {
         TryQuery<EmailVerificationRequest> findById = TryQuery.of(() -> emailVfyReqRepo.findById(UID).get());
         // case 2) 인증요청 기록이 없는 경우 새로운 인증요청을 생성
         EmailVerificationRequest request = findById.findOrElse(
-            EmailVerificationRequest.builder()
-                .uid(UID)
-                .email(unVerifiedEmail)
-                .authorizationCode(UUID.randomUUID().toString())
-                .build()
+            new EmailVerificationRequest(UID, unVerifiedEmail)
         );
-        request.setEmail(unVerifiedEmail); // 이메일 재지정(다른 이메일로 인증요청을 보냈을 수도 있음)
+        // 이메일 재지정(다른 이메일로 인증요청을 보냈을 수도 있음)
+        request.changeVerificationTargerEmail(unVerifiedEmail);
         
         // 인증요청 기록 저장
         emailVfyReqRepo.save(request);

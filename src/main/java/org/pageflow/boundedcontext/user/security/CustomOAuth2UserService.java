@@ -7,7 +7,7 @@ import org.pageflow.boundedcontext.user.model.oauth.GithubOwner;
 import org.pageflow.boundedcontext.user.model.oauth.GoogleOwner;
 import org.pageflow.boundedcontext.user.model.oauth.NaverOwner;
 import org.pageflow.boundedcontext.user.model.oauth.ResourceOwner;
-import org.pageflow.boundedcontext.user.model.principal.InitialAuthenticationPrincipal;
+import org.pageflow.boundedcontext.user.model.principal.OnlyAuthProcessPrincipal;
 import org.pageflow.boundedcontext.user.repository.AccountRepo;
 import org.pageflow.boundedcontext.user.repository.SignupCacheRepo;
 import org.pageflow.global.api.Forwarder;
@@ -76,7 +76,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         }
         
         // security 스펙상, 제대로 반환을 안하면 AuthenticationException이 발생하므로, 빈 객체를 반환
-        return InitialAuthenticationPrincipal.anonymous();
+        return OnlyAuthProcessPrincipal.dummy();
     }
     
     // 표준화 되지 않은 OAtuh2User를 리소스서버별로 특화된 ResourceOwner 구현체로 변환

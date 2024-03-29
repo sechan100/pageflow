@@ -10,6 +10,7 @@ import org.pageflow.boundedcontext.book.constants.OutlineNodeType;
  * @author : sechan
  */
 @Entity
+@Getter
 @Setter(AccessLevel.NONE)
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

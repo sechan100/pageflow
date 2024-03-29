@@ -22,7 +22,7 @@ public class Profile extends AuditingBaseEntity {
     // 필명
     @Column(unique = true, nullable = false)
     private String penname;
-    
+
     @Column(nullable = false, columnDefinition = "TEXT")
     private String profileImgUrl;
     

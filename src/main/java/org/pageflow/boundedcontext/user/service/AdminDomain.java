@@ -7,6 +7,7 @@ import org.pageflow.boundedcontext.user.dto.SignupForm;
 import org.pageflow.boundedcontext.user.entity.Account;
 import org.pageflow.boundedcontext.user.entity.Profile;
 import org.pageflow.boundedcontext.user.model.user.UserAggregation;
+import org.pageflow.boundedcontext.user.model.utils.EncodedPassword;
 import org.pageflow.global.constants.CustomProps;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -34,13 +35,13 @@ public class AdminDomain {
                 .build();
         
         // 계정 생성
-        Account account = Account.builder()
-                .provider(ProviderType.NATIVE)
-                .email(form.getEmail())
-                .username(form.getUsername())
-                .password(passwordEncoder.encode(form.getPassword()))
-                .role(RoleType.ROLE_ADMIN)
-                .build();
+        Account account = new Account(
+            form.getUsername(),
+            new EncodedPassword(passwordEncoder.encode(form.getPassword())),
+            form.getEmail(),
+            ProviderType.NATIVE,
+            RoleType.ROLE_ADMIN
+        );
         
         return userCommander.saveUser(account, profile);
     }

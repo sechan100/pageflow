@@ -11,6 +11,7 @@ import java.util.List;
  * @author : sechan
  */
 @Entity
+@Getter
 @Setter(AccessLevel.NONE)
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -25,7 +26,6 @@ public class Folder extends OutlineNode {
         orphanRemoval = true
     )
     @OrderBy("ordinalValue ASC")
-    @Getter
     private List<OutlineNode> children = new LinkedList<>();
 
 

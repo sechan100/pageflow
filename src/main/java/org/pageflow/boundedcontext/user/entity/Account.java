@@ -5,31 +5,39 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.pageflow.boundedcontext.user.constants.ProviderType;
 import org.pageflow.boundedcontext.user.constants.RoleType;
+import org.pageflow.boundedcontext.user.model.utils.EncodedPassword;
 import org.pageflow.global.data.AuditingBaseEntity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 
 @Entity
 @Getter
 @Setter(AccessLevel.NONE)
-@Builder
 @EqualsAndHashCode(callSuper = true)
-@AllArgsConstructor
 @ToString(callSuper = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(indexes = {
-        @Index(name = "idx_account_username", columnList = "username", unique = true)
+    @Index(name = "idx_account_username", columnList = "username", unique = true)
 })
 public class Account extends AuditingBaseEntity {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(updatable = false, nullable = false)
     private Long uid;
-    
+
     @Column(unique = true, nullable = false, updatable = false)
     private String username;
-    
+
+    @Getter(AccessLevel.NONE)
+    @Column(nullable = false)
     private String password;
+
+    @Column(nullable = false)
+    private String email;
+
+    @Column(nullable = false)
+    private boolean emailVerified;
     
     /**
      * NATIVE, GOOGLE, KAKAO, NAVER, GITHUB
@@ -43,20 +51,28 @@ public class Account extends AuditingBaseEntity {
      * ROLE_ADMIN, ROLE_MANAGER, ROLE_USER, ROLE_ANONYMOUS
      */
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, updatable = false)
+    @Column(nullable = false)
     private RoleType role;
     
     @JsonIgnore
     @OneToOne(optional = false, fetch = FetchType.LAZY, mappedBy = "account")
     private Profile profile;
-    
-    @Column(nullable = false)
-    private String email;
-    
-    private boolean emailVerified;
-    
-    
-    
+
+    /**
+     * @param username 사용자명
+     * @param encodedPassword 암호화된 비밀번호
+     * @param email 이메일
+     * @param provider 소셜 로그인 제공자
+     * @param role 사용자 권한
+     */
+    public Account(String username, EncodedPassword encodedPassword, String email, ProviderType provider, RoleType role) {
+        this.username = username;
+        this.password = encodedPassword.getEncodedPassword();
+        this.email = email;
+        this.emailVerified = false;
+        this.provider = provider;
+        this.role = role;
+    }
     
     // 이메일을 변경하고, 인증 상태를 초기화한다.
     public void changeEmailAndUnVerify(String email) {
@@ -71,9 +87,13 @@ public class Account extends AuditingBaseEntity {
     public void changePassword(String password) {
         this.password = password;
     }
-    
-    public boolean isPasswordMatched(String password) {
-        return new BCryptPasswordEncoder().matches(password, this.password);
+
+    /**
+     * @param encoder PasswordEncoder
+     * @param rowPassword 인코딩된 비밀번호가 아닌, 사용자가 입력한 비밀번호
+     */
+    public boolean isPasswordMatched(PasswordEncoder encoder, String rowPassword) {
+        return encoder.matches(rowPassword, this.password);
     }
     
     public void associateProfile(Profile profile) {
@@ -82,6 +102,14 @@ public class Account extends AuditingBaseEntity {
         if(profile.getAccount() == null || !profile.getAccount().equals(this)) {
             profile.associateAccount(this);
         }
+    }
+
+    public boolean isEmailVerified() {
+        return emailVerified;
+    }
+
+    public EncodedPassword getEncodedPassword() {
+        return new EncodedPassword(password);
     }
     
 }

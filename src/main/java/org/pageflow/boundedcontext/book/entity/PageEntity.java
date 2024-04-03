@@ -3,8 +3,9 @@ package org.pageflow.boundedcontext.book.entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Lob;
+import jakarta.persistence.Table;
 import lombok.*;
-import org.pageflow.boundedcontext.book.constants.OutlineNodeType;
+import org.pageflow.boundedcontext.book.constants.BookPolicy;
 
 /**
  * @author : sechan
@@ -15,14 +16,16 @@ import org.pageflow.boundedcontext.book.constants.OutlineNodeType;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString(callSuper = true)
-public class Page extends OutlineNode {
+@Table(name = "page")
+public class PageEntity extends ChildNodeEntity {
 
     @Lob
     @Column(nullable = false)
     private String content;
 
-    public Page(Folder parent){
-        super(parent, OutlineNodeType.PAGE);
+    public PageEntity(ParentNodeEntity parent){
+        super(parent, BookPolicy.DEFAULT_PAGE_TITLE);
+        this.content = "BookPolicy.DEFAULT_PAGE_CONTENT;";
     }
 
     public void changeContent(String content) {

@@ -4,19 +4,16 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
-import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
+import lombok.*;
 
 /**
  * Long 타입의 PK를 가지는 엔티티의 추상 클래스
  */
 @MappedSuperclass
 @Getter
-@EqualsAndHashCode(of = "id", callSuper = false)
+@Setter(AccessLevel.NONE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EqualsAndHashCode(callSuper = true)
 public abstract class LongIdPkBaseBaseEntity extends AuditingBaseEntity {
 
     @Id
@@ -24,3 +21,4 @@ public abstract class LongIdPkBaseBaseEntity extends AuditingBaseEntity {
     private Long id;
 
 }
+

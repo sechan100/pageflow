@@ -11,7 +11,7 @@ import org.pageflow.boundedcontext.user.constants.AppAuthority;
 import org.pageflow.boundedcontext.user.constants.UserFetchDepth;
 import org.pageflow.boundedcontext.user.model.token.AccessToken;
 import org.pageflow.boundedcontext.user.model.token.AuthTokens;
-import org.pageflow.boundedcontext.user.model.user.UserAggregation;
+import org.pageflow.boundedcontext.user.model.user.User;
 import org.pageflow.boundedcontext.user.model.user.SessionUser;
 import org.pageflow.boundedcontext.user.service.AuthService;
 import org.pageflow.boundedcontext.user.service.UtilityUserService;
@@ -125,7 +125,7 @@ public class AuthenticationController {
     @Secured(AppAuthority.USER)
     public Session getSession() {
         // 사용자 조회
-        UserAggregation userAggregate = utilityUserService.fetchUser(requestContext.getUID(), UserFetchDepth.FULL);
+        User userAggregate = utilityUserService.fetchUser(requestContext.getUID(), UserFetchDepth.FULL);
         // 사용자 정보 객체 생성
         SessionUser userInfo = SessionUser.builder()
                 .email(userAggregate.getAccount().getEmail())

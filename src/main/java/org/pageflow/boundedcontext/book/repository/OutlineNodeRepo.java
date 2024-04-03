@@ -1,10 +1,19 @@
 package org.pageflow.boundedcontext.book.repository;
 
-import org.pageflow.boundedcontext.book.entity.OutlineNode;
+import jakarta.persistence.OrderBy;
+import org.pageflow.boundedcontext.book.entity.BookEntity;
+import org.pageflow.boundedcontext.book.entity.FolderEntity;
+import org.pageflow.boundedcontext.book.entity.ChildNodeEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
 
 /**
  * @author : sechan
  */
-public interface OutlineNodeRepo extends JpaRepository<OutlineNode, Long> {
+public interface OutlineNodeRepo extends JpaRepository<ChildNodeEntity, Long> {
+    @OrderBy("parent_id")
+    List<ChildNodeEntity> findByBookOrderByParentNode_Id(BookEntity book);
+
+    FolderEntity findByBookAndParentNode(BookEntity book, FolderEntity parentNode);
 }

@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.pageflow.boundedcontext.user.constants.UserFetchDepth;
 import org.pageflow.boundedcontext.user.entity.Account;
 import org.pageflow.boundedcontext.user.entity.Profile;
-import org.pageflow.boundedcontext.user.model.user.UserAggregation;
+import org.pageflow.boundedcontext.user.model.user.User;
 import org.pageflow.boundedcontext.user.repository.AccountRepo;
 import org.pageflow.boundedcontext.user.repository.ProfileRepo;
 import org.springframework.stereotype.Service;
@@ -25,7 +25,7 @@ public class UserCommander {
      * 누가 먼저 영속화되냐, account에 profile이 있냐 profile에 account가 있냐에 따라서 에러가 발생할 수 있기 때문
      */
     @Transactional
-    public UserAggregation saveUser(Account account, Profile profile) {
+    public User saveUser(Account account, Profile profile) {
         
         // Account 먼저 영속
         Account savedAccount = accountRepo.save(account);
@@ -36,7 +36,7 @@ public class UserCommander {
         // Profile 영속
         Profile savedProfile = profileRepo.save(profile);
         
-        return UserAggregation.builder()
+        return User.builder()
                 .fetchDepth(UserFetchDepth.FULL)
                 .account(savedAccount)
                 .profile(savedProfile)

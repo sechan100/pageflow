@@ -9,37 +9,34 @@ import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.pageflow.boundedcontext.user.constants.ProviderType;
 import org.pageflow.boundedcontext.user.constants.RoleType;
-import org.pageflow.boundedcontext.user.service.UserService;
 import org.pageflow.boundedcontext.user.dto.SignupForm;
 import org.pageflow.boundedcontext.user.entity.SignupCache;
-import org.pageflow.boundedcontext.user.model.user.UserAggregation;
+import org.pageflow.boundedcontext.user.model.user.User;
 import org.pageflow.boundedcontext.user.repository.SignupCacheRepo;
+import org.pageflow.boundedcontext.user.service.UserService;
 import org.pageflow.global.api.GeneralResponse;
 import org.pageflow.global.api.RequestContext;
 import org.pageflow.global.api.code.UserCode;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-@Transactional
 @Tag(name = "User", description = "사용자 API")
 public class UserController {
 
     private final RequestContext requestContext;
     private final SignupCacheRepo signupCacheRepo;
     private final UserService userService;
-    
-    
+
     @Operation(summary = "회원가입", description = "새로운 사용자의 회원가입을 요청")
     @PostMapping("/signup")
     public SignupedUser signup(@Valid @RequestBody SignupForm form) {
-        
+
         // 캐싱된 회원가입 데이터가 존재하는지 확인 -> 존재하면 OAuth2로 가입한 사용자
         boolean isOAuth = signupCacheRepo.existsById(form.getUsername());
-        UserAggregation persistedUser;
+        User persistedUser;
         
         // 1. OAuth2 회원가입
         if(isOAuth){

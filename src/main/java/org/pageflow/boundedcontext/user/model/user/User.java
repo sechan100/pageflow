@@ -11,9 +11,9 @@ import org.pageflow.boundedcontext.user.entity.Profile;
  * Account와 Profile 엔티티의 동시 참조
  */
 @Builder
-public class UserAggregation {
+public class User {
     
-    public UserAggregation(UserFetchDepth fetchDepth, Account accountOrProxy, Profile profileOrProxy) {
+    public User(UserFetchDepth fetchDepth, Account accountOrProxy, Profile profileOrProxy) {
         this.fetchDepth = fetchDepth;
         this.account = accountOrProxy;
         this.profile = profileOrProxy;

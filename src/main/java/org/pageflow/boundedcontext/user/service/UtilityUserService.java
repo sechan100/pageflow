@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.pageflow.boundedcontext.user.constants.UserFetchDepth;
 import org.pageflow.boundedcontext.user.constants.UserSignupPolicy;
 import org.pageflow.boundedcontext.user.entity.Profile;
-import org.pageflow.boundedcontext.user.model.user.UserAggregation;
+import org.pageflow.boundedcontext.user.model.user.User;
 import org.pageflow.boundedcontext.user.repository.AccountRepo;
 import org.pageflow.boundedcontext.user.repository.ProfileRepo;
 import org.pageflow.global.api.BizException;
@@ -153,17 +153,17 @@ public class UtilityUserService {
      * @param fetchDepth 프로필 조회 깊이 {@link UserFetchDepth}
      * @return 지정한 수준까지 초기화된 후, JPA 세션이 닫힌 상태의 Profile 인스턴스
      */
-    public UserAggregation fetchUser(Long uid, UserFetchDepth fetchDepth){
+    public User fetchUser(Long uid, UserFetchDepth fetchDepth){
         Preconditions.checkNotNull(uid, "uid must not be null");
         Preconditions.checkNotNull(fetchDepth, "fetchDepth must not be null");
 
         return switch(fetchDepth) {
-            case PROXY -> new UserAggregation(UserFetchDepth.PROXY, accountRepo.getReferenceById(uid), profileRepo.getReferenceById(uid));
-            case PROFILE -> new UserAggregation(UserFetchDepth.PROFILE, accountRepo.getReferenceById(uid), profileRepo.findById(uid).get());
-            case ACCOUNT -> new UserAggregation(UserFetchDepth.ACCOUNT, accountRepo.findById(uid).orElseThrow(), profileRepo.getReferenceById(uid));
+            case PROXY -> new User(UserFetchDepth.PROXY, accountRepo.getReferenceById(uid), profileRepo.getReferenceById(uid));
+            case PROFILE -> new User(UserFetchDepth.PROFILE, accountRepo.getReferenceById(uid), profileRepo.findById(uid).get());
+            case ACCOUNT -> new User(UserFetchDepth.ACCOUNT, accountRepo.findById(uid).orElseThrow(), profileRepo.getReferenceById(uid));
             case FULL -> {
                 Profile profile = profileRepo.findWithAccountByUid(uid);
-                yield new UserAggregation(UserFetchDepth.FULL, profile.getAccount(), profile);
+                yield new User(UserFetchDepth.FULL, profile.getAccount(), profile);
             }
         };
     }

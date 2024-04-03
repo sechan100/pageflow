@@ -6,7 +6,7 @@ import org.pageflow.boundedcontext.user.constants.RoleType;
 import org.pageflow.boundedcontext.user.dto.SignupForm;
 import org.pageflow.boundedcontext.user.entity.Account;
 import org.pageflow.boundedcontext.user.entity.Profile;
-import org.pageflow.boundedcontext.user.model.user.UserAggregation;
+import org.pageflow.boundedcontext.user.model.user.User;
 import org.pageflow.boundedcontext.user.model.utils.EncodedPassword;
 import org.pageflow.global.constants.CustomProps;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -25,7 +25,7 @@ public class AdminDomain {
     private final CustomProps props;
     private final PasswordEncoder passwordEncoder;
     
-    public UserAggregation adminSignup(SignupForm form) {
+    public User adminSignup(SignupForm form) {
         
         // 프로필 생성
         Profile profile = Profile.builder()

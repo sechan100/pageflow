@@ -1,9 +1,8 @@
 package org.pageflow.global.data;
 
-import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.MappedSuperclass;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -17,13 +16,15 @@ import java.time.LocalDateTime;
  */
 @MappedSuperclass
 @Getter
+@Setter(AccessLevel.NONE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EqualsAndHashCode
 @EntityListeners(AuditingEntityListener.class)
 public abstract class AuditingBaseEntity implements Entity {
-    
+
     @CreatedDate
     private LocalDateTime createdDatetime;
-    
+
     @LastModifiedDate
     private LocalDateTime updatedDatetime;
 

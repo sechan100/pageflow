@@ -7,21 +7,21 @@ import org.pageflow.boundedcontext.user.constants.RoleType;
 import org.pageflow.boundedcontext.user.dto.SignupForm;
 import org.pageflow.boundedcontext.user.entity.Account;
 import org.pageflow.boundedcontext.user.entity.Profile;
-import org.pageflow.boundedcontext.user.model.user.UserAggregation;
+import org.pageflow.boundedcontext.user.model.user.User;
 import org.pageflow.boundedcontext.user.model.utils.EncodedPassword;
 import org.pageflow.boundedcontext.user.repository.AccountRepo;
 import org.pageflow.boundedcontext.user.repository.ProfileRepo;
 import org.pageflow.boundedcontext.user.repository.RefreshTokenRepo;
 import org.pageflow.global.constants.CustomProps;
 import org.pageflow.infra.jwt.provider.JwtProvider;
+import org.pageflow.shared.annotation.TransactionalService;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
 
 import java.util.Objects;
 
 
 @Slf4j
-@Service
+@TransactionalService
 @RequiredArgsConstructor
 public class UserService {
 
@@ -40,7 +40,7 @@ public class UserService {
      * 회원가입.
      * form과 OAuth2에 관계없이 SignupForm 객체의 정보를 기반으로 Account와 Profile을 생성한다.
      */
-    public UserAggregation signup(SignupForm form, ProviderType provider, RoleType userRole){
+    public User signup(SignupForm form, ProviderType provider, RoleType userRole){
 
         // username 검사
         userUtil.validateUsername(form.getUsername());

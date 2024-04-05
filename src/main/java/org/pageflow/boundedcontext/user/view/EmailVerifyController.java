@@ -1,5 +1,6 @@
 package org.pageflow.boundedcontext.user.view;
 
+import io.hypersistence.tsid.TSID;
 import lombok.RequiredArgsConstructor;
 import org.pageflow.boundedcontext.user.service.AuthService;
 import org.springframework.stereotype.Controller;
@@ -19,14 +20,14 @@ public class EmailVerifyController {
      * @param code  인증코드(UUID)
      */
     @GetMapping(AuthService.EMAIL_VERIFICATION_URI)
-    public String verifyEmail(Long UID, String email, String code) {
+    public String verifyEmail(TSID UID, String email, String code) {
         authService.verifyEmail(UID, email, code);
         
         return "/user/email-verify-success";
     }
     
     @GetMapping("/send/email")
-    public String sendEmailVerification(Long UID, String email) {
+    public String sendEmailVerification(TSID UID, String email) {
         authService.sendEmailVerificationMail(UID, email);
         
         return "/user/email-verify-success";

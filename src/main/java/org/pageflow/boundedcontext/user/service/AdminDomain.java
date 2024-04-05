@@ -42,7 +42,9 @@ public class AdminDomain {
             ProviderType.NATIVE,
             RoleType.ROLE_ADMIN
         );
-        
+
+        account.setId(1L);
+
         return userCommander.saveUser(account, profile);
     }
 }

@@ -1,9 +1,10 @@
 package org.pageflow.boundedcontext.user.entity;
 
+import io.hypersistence.tsid.TSID;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
-import org.pageflow.global.data.Entity;
+import org.pageflow.global.entity.Entity;
 import org.pageflow.shared.TimeIntorducer;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
@@ -26,8 +27,8 @@ public class EmailVerificationRequest implements Entity {
      */
     private String authorizationCode;
 
-    public EmailVerificationRequest(Long uid, String email){
-        this.uid = uid;
+    public EmailVerificationRequest(TSID uid, String email){
+        this.uid = uid.toLong();
         this.email = email;
         this.authorizationCode = UUID.randomUUID().toString();
     }

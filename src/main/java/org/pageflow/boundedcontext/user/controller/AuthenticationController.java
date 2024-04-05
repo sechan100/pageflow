@@ -1,5 +1,6 @@
 package org.pageflow.boundedcontext.user.controller;
 
+import io.hypersistence.tsid.TSID;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.Cookie;
@@ -73,7 +74,7 @@ public class AuthenticationController {
      */
     private AccessTokenResp allocateSession(AuthTokens authTokens) {
         // 쿠키 설정 및 할당
-        Cookie rfTknUUID = new Cookie(COOKIE_NAME, authTokens.getRefreshToken().getId());
+        Cookie rfTknUUID = new Cookie(COOKIE_NAME, authTokens.getRefreshToken().getId().toString());
         rfTknUUID.setPath(props.site().clientProxyPrefix() + "/session");
         rfTknUUID.setHttpOnly(true); // JS에서 접근 불가
         rfTknUUID.setSecure(false); // HTTPS에서만 전송
@@ -92,7 +93,7 @@ public class AuthenticationController {
      */
     @Operation(summary = "compact 재발급", description = "refreshToken을 받아서, accessToken을 재발급")
     @PostMapping("/session/refresh") // 멱등성을 성립하지 않는 요청은 Post로 정의
-    public AccessTokenResp refresh(@CookieValue(COOKIE_NAME) String refreshTokenId) {
+    public AccessTokenResp refresh(@CookieValue(COOKIE_NAME) TSID refreshTokenId) {
         // refresh 로직 실행
         AccessToken accessToken = authService.refresh(refreshTokenId);
         // RETURN
@@ -112,7 +113,7 @@ public class AuthenticationController {
                 // refreshTokenUUID 쿠키 존재시....
                 .ifPresent(cookie -> {
                     // 로그아웃 로직 실행
-                    authService.logout(cookie.getValue());
+                    authService.logout(TSID.from(cookie.getValue()));
                     // 쿠키 제거
                     requestContext.removeCookie(COOKIE_NAME);
                 });
@@ -130,7 +131,7 @@ public class AuthenticationController {
         SessionUser userInfo = SessionUser.builder()
                 .email(userAggregate.getAccount().getEmail())
                 .penname(userAggregate.getProfile().getPenname())
-                .uid(userAggregate.getProfile().getUid())
+                .uid(userAggregate.getProfile().getId())
                 .username(userAggregate.getAccount().getUsername())
                 .profileImgUrl(userAggregate.getProfile().getProfileImgUrl())
                 .role(userAggregate.getAccount().getRole())

@@ -1,12 +1,15 @@
 package org.pageflow.boundedcontext.user.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.hypersistence.tsid.TSID;
 import jakarta.persistence.*;
 import lombok.*;
 import org.pageflow.boundedcontext.user.constants.ProviderType;
 import org.pageflow.boundedcontext.user.constants.RoleType;
 import org.pageflow.boundedcontext.user.model.utils.EncodedPassword;
-import org.pageflow.global.data.AuditingBaseEntity;
+import org.pageflow.global.entity.AuditingBaseEntity;
+import org.pageflow.global.entity.TsidIdentifiable;
+import org.pageflow.shared.libs.Tsid;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 
@@ -19,12 +22,17 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Table(indexes = {
     @Index(name = "idx_account_username", columnList = "username", unique = true)
 })
-public class Account extends AuditingBaseEntity {
+public class Account extends AuditingBaseEntity implements TsidIdentifiable {
 
+    /**
+     * HACK: Profile에서 @MapsId를 이용해서 외래키를 매핑하려면, @Id 칼럼이 부모가 아닌 Account 자체에 위치해야만한다.
+     */
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Tsid
+    @Setter
+    @Getter(AccessLevel.NONE)
     @Column(updatable = false, nullable = false)
-    private Long uid;
+    private Long id;
 
     @Column(unique = true, nullable = false, updatable = false)
     private String username;
@@ -58,6 +66,7 @@ public class Account extends AuditingBaseEntity {
     @OneToOne(optional = false, fetch = FetchType.LAZY, mappedBy = "account")
     private Profile profile;
 
+
     /**
      * @param username 사용자명
      * @param encodedPassword 암호화된 비밀번호
@@ -73,7 +82,12 @@ public class Account extends AuditingBaseEntity {
         this.provider = provider;
         this.role = role;
     }
-    
+
+    @Override
+    public TSID getId(){
+        return TSID.from(id);
+    }
+
     // 이메일을 변경하고, 인증 상태를 초기화한다.
     public void changeEmailAndUnVerify(String email) {
         this.email = email;
@@ -111,5 +125,4 @@ public class Account extends AuditingBaseEntity {
     public EncodedPassword getEncodedPassword() {
         return new EncodedPassword(password);
     }
-    
 }

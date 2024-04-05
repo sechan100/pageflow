@@ -1,6 +1,7 @@
 package org.pageflow.boundedcontext.user.model.principal;
 
 
+import io.hypersistence.tsid.TSID;
 import org.pageflow.boundedcontext.user.constants.RoleType;
 import org.pageflow.boundedcontext.user.entity.Account;
 import org.pageflow.boundedcontext.user.model.utils.EncodedPassword;
@@ -17,11 +18,11 @@ import java.util.Map;
  */
 public class OnlyAuthProcessPrincipal extends User implements OAuth2User, PageflowPrincipal {
 
-    private final Long UID;
+    private final TSID UID;
     private final String username;
     private final RoleType role;
     
-    public OnlyAuthProcessPrincipal(Long UID, String username, EncodedPassword password, RoleType roleType) {
+    public OnlyAuthProcessPrincipal(TSID UID, String username, EncodedPassword password, RoleType roleType) {
         super(username, password.getEncodedPassword(), RoleType.getAuthorities(roleType));
         this.UID = UID;
         this.username = username;
@@ -30,7 +31,7 @@ public class OnlyAuthProcessPrincipal extends User implements OAuth2User, Pagefl
     
     public static OnlyAuthProcessPrincipal from(Account user) {
         return new OnlyAuthProcessPrincipal(
-            user.getUid(),
+            user.getId(),
             user.getUsername(),
             user.getEncodedPassword(),
             user.getRole()
@@ -45,7 +46,7 @@ public class OnlyAuthProcessPrincipal extends User implements OAuth2User, Pagefl
      */
     public static OnlyAuthProcessPrincipal dummy() {
         return new OnlyAuthProcessPrincipal(
-                0L,
+                new TSID(0),
                 "anonymous",
                 new EncodedPassword("dummay"),
                 RoleType.ROLE_ANONYMOUS
@@ -53,7 +54,7 @@ public class OnlyAuthProcessPrincipal extends User implements OAuth2User, Pagefl
     }
 
     @Override
-    public Long getUID(){
+    public TSID getUID(){
         return UID;
     }
 

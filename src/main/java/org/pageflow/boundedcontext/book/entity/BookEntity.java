@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.pageflow.boundedcontext.book.constants.BookPolicy;
 import org.pageflow.boundedcontext.user.entity.Profile;
-import org.pageflow.global.data.LongIdPkBaseBaseEntity;
+import org.pageflow.global.entity.TsidBaseEntity;
 
 /**
  * @author : sechan
@@ -15,7 +15,7 @@ import org.pageflow.global.data.LongIdPkBaseBaseEntity;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(callSuper = true)
 @Table(name = "book")
-public class BookEntity extends LongIdPkBaseBaseEntity implements ParentNodeEntity {
+public class BookEntity extends TsidBaseEntity implements ParentNodeEntity {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "profile_id")

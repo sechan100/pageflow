@@ -1,23 +1,25 @@
 package org.pageflow.boundedcontext.user.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.hypersistence.tsid.TSID;
 import jakarta.persistence.*;
 import lombok.*;
-import org.pageflow.global.data.AuditingBaseEntity;
+import org.pageflow.global.entity.AuditingBaseEntity;
+import org.pageflow.global.entity.TsidIdentifiable;
 
 
 @Entity
 @Getter
 @Setter(AccessLevel.NONE)
 @Builder
-@EqualsAndHashCode(of = "uid", callSuper = false)
+@EqualsAndHashCode(of = "id", callSuper = false)
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Profile extends AuditingBaseEntity {
+public class Profile extends AuditingBaseEntity implements TsidIdentifiable {
     
     // @MapsId: Account의 PK를 Profile의 PK로 사용
     @Id
-    private Long uid;
+    private Long id;
     
     // 필명
     @Column(unique = true, nullable = false)
@@ -28,10 +30,14 @@ public class Profile extends AuditingBaseEntity {
     
     @JsonIgnore
     @MapsId
-    @JoinColumn(name = "uid")
+    @JoinColumn(name = "id")
     @OneToOne(optional = false, fetch = FetchType.LAZY)
     private Account account;
 
+    @Override
+    public TSID getId() {
+        return TSID.from(id);
+    }
     
     public void changePenname(String penname) {
         this.penname = penname;

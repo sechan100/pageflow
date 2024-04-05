@@ -1,7 +1,7 @@
 package org.pageflow.boundedcontext.user.service;
 
 
-import com.google.common.base.Preconditions;
+import io.hypersistence.tsid.TSID;
 import lombok.RequiredArgsConstructor;
 import org.pageflow.boundedcontext.user.constants.UserFetchDepth;
 import org.pageflow.boundedcontext.user.constants.UserSignupPolicy;
@@ -153,16 +153,15 @@ public class UtilityUserService {
      * @param fetchDepth 프로필 조회 깊이 {@link UserFetchDepth}
      * @return 지정한 수준까지 초기화된 후, JPA 세션이 닫힌 상태의 Profile 인스턴스
      */
-    public User fetchUser(Long uid, UserFetchDepth fetchDepth){
-        Preconditions.checkNotNull(uid, "uid must not be null");
-        Preconditions.checkNotNull(fetchDepth, "fetchDepth must not be null");
+    public User fetchUser(TSID uid_, UserFetchDepth fetchDepth){
+        Long uid = uid_.toLong();
 
         return switch(fetchDepth) {
             case PROXY -> new User(UserFetchDepth.PROXY, accountRepo.getReferenceById(uid), profileRepo.getReferenceById(uid));
             case PROFILE -> new User(UserFetchDepth.PROFILE, accountRepo.getReferenceById(uid), profileRepo.findById(uid).get());
             case ACCOUNT -> new User(UserFetchDepth.ACCOUNT, accountRepo.findById(uid).orElseThrow(), profileRepo.getReferenceById(uid));
             case FULL -> {
-                Profile profile = profileRepo.findWithAccountByUid(uid);
+                Profile profile = profileRepo.findWithAccountById(uid);
                 yield new User(UserFetchDepth.FULL, profile.getAccount(), profile);
             }
         };

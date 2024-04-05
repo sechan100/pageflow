@@ -1,13 +1,13 @@
 package org.pageflow.boundedcontext.book.command;
 
-import org.springframework.context.ApplicationEvent;
+import org.pageflow.boundedcontext.book.model.OutlineParentNode;
+import org.springframework.lang.Nullable;
 
 /**
  * @author : sechan
  */
-public class AddNewPageCmd extends ApplicationEvent {
-
-    public AddNewPageCmd(Object source){
-        super(source);
+public class AddNewPageCmd extends AbstractAddNewChildCmd {
+    public AddNewPageCmd(OutlineParentNode parentOutlineNode, @Nullable String titleOrNull){
+        super(parentOutlineNode, titleOrNull);
     }
 }

@@ -3,7 +3,7 @@ package org.pageflow.boundedcontext.user.entity;
 import lombok.Builder;
 import lombok.Getter;
 import org.pageflow.boundedcontext.user.constants.ProviderType;
-import org.pageflow.global.data.Entity;
+import org.pageflow.global.entity.Entity;
 import org.pageflow.shared.TimeIntorducer;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;

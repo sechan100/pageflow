@@ -1,6 +1,7 @@
 package org.pageflow.boundedcontext.user.controller;
 
 
+import io.hypersistence.tsid.TSID;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -57,7 +58,7 @@ public class UserController {
         
         // 사용자 데이터 반환
         return SignupedUser.builder()
-                .UID(persistedUser.getAccount().getUid())
+                .UID(persistedUser.getAccount().getId())
                 .provider(persistedUser.getAccount().getProvider())
                 .username(persistedUser.getAccount().getUsername())
                 .email(persistedUser.getAccount().getEmail())
@@ -90,7 +91,7 @@ public class UserController {
     
     // RECORDS
     @Builder record SignupedUser(
-            Long UID,
+            TSID UID,
             ProviderType provider,
             String username,
             String email,

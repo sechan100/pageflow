@@ -1,6 +1,6 @@
 package org.pageflow.shared.query;
 
-import org.pageflow.global.data.Entity;
+import org.pageflow.global.entity.Entity;
 import org.springframework.dao.EmptyResultDataAccessException;
 
 import java.util.function.Consumer;

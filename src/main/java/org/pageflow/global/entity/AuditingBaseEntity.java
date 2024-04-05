@@ -1,4 +1,4 @@
-package org.pageflow.global.data;
+package org.pageflow.global.entity;
 
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;

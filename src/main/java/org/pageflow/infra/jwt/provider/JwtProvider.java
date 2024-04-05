@@ -1,5 +1,6 @@
 package org.pageflow.infra.jwt.provider;
 
+import io.hypersistence.tsid.TSID;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +32,7 @@ public class JwtProvider {
     public static final String ROLE_CLAIM_KEY = "rol";
 
     @SuppressWarnings("UseOfObsoleteDateTimeApi")
-    public AccessToken generateAccessToken(Long UID, RoleType role) {
+    public AccessToken generateAccessToken(TSID UID, RoleType role) {
         Date issuedAt = new Date();
         Assert.notNull(UID, "UID must not be null");
         Assert.notNull(role, "role must not be null");
@@ -63,7 +64,7 @@ public class JwtProvider {
         Claims claims = parseToken(accessToken);
         return AccessToken.builder()
                 .compact(accessToken)
-                .UID(Long.valueOf(claims.getSubject()))
+                .UID(TSID.from(claims.getSubject()))
                 .iat(claims.getIssuedAt())
                 .exp(claims.getExpiration())
                 .role(RoleType.valueOf(claims.get(ROLE_CLAIM_KEY).toString()))

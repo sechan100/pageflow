@@ -3,7 +3,7 @@ package org.pageflow.shared.query;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.pageflow.boundedcontext.user.entity.SignupCache;
-import org.pageflow.global.data.Entity;
+import org.pageflow.global.entity.Entity;
 import org.pageflow.shared.JJamException;
 import org.springframework.dao.EmptyResultDataAccessException;
 

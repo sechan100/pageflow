@@ -1,7 +1,7 @@
 package org.pageflow.infra.file.service;
 
-import org.pageflow.global.data.Entity;
-import org.pageflow.global.data.LongIdPkBaseBaseEntity;
+import org.pageflow.global.entity.Entity;
+import org.pageflow.global.entity.TsidBaseEntity;
 import org.pageflow.infra.file.constants.FileMetadataType;
 import org.pageflow.infra.file.entity.FileMetadata;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,7 +27,7 @@ public interface FileService {
      */
     <E extends Entity> FileMetadata upload(MultipartFile file, E ownerEntity, Object ownerId, FileMetadataType fileMetadataType);
     
-    <E extends LongIdPkBaseBaseEntity> FileMetadata upload(MultipartFile file, E ownerEntity, FileMetadataType fileMetadataType);
+    <E extends TsidBaseEntity> FileMetadata upload(MultipartFile file, E ownerEntity, FileMetadataType fileMetadataType);
     
     /**
      * @param filePath 파일 경로

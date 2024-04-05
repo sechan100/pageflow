@@ -1,5 +1,6 @@
 package org.pageflow.boundedcontext.user.model.principal;
 
+import io.hypersistence.tsid.TSID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,12 +13,11 @@ import lombok.Getter;
 @Builder
 @AllArgsConstructor
 public class SessionPrincipal implements PageflowPrincipal {
-    private Long UID;
-    
-    
+    private TSID UID;
+
     public static SessionPrincipal anonymous() {
         return SessionPrincipal.builder()
-                .UID(0L)
+                .UID(TSID.Factory.getTsid())
                 .build();
     }
 }

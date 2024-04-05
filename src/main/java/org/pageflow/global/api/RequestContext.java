@@ -2,6 +2,7 @@ package org.pageflow.global.api;
 
 
 import com.google.common.base.Preconditions;
+import io.hypersistence.tsid.TSID;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -139,7 +140,7 @@ public class RequestContext {
     /**
      * @return 현재 로그인한 사용자의 UID
      */
-    public Long getUID() {
+    public TSID getUID() {
         return principal.getUID();
     }
     

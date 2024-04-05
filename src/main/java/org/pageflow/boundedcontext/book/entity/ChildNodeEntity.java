@@ -2,7 +2,7 @@ package org.pageflow.boundedcontext.book.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.pageflow.global.data.LongIdPkBaseBaseEntity;
+import org.pageflow.global.entity.TsidBaseEntity;
 import org.springframework.lang.Nullable;
 
 import java.util.Objects;
@@ -21,7 +21,7 @@ import java.util.Objects;
     name = "child_node",
     uniqueConstraints = @UniqueConstraint(columnNames = {"parent_id", "ordinal_value"})
 )
-public class ChildNodeEntity extends LongIdPkBaseBaseEntity {
+public class ChildNodeEntity extends TsidBaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false, cascade = CascadeType.MERGE)
     @JoinColumn(name = "book_id", nullable = false)
@@ -43,6 +43,13 @@ public class ChildNodeEntity extends LongIdPkBaseBaseEntity {
     @Column(name = "ordinal_value", nullable = false)
     private Integer ordinalValue;
 
+    /*
+    * REVIEW: childNodeEntity를 생성하기 위해서는 생성자로 Book, 또는 Folder를 전달한다.
+    * 이 때, 부모타입 node의 역정규화 칼럼인 'lastNodeOrdinalValue'를 직접 조작한다.
+    * 이러한 로직이 생성자에 캡슐화되어있기에,
+    * 호출자는 자식을 생성했을 뿐인데 부모 엔티티에 update 쿼리가 발생한다는 사실을 알 수 없다.
+    * JPA 기반에서, 쿼리 예측 가능성은 매우 중요한 문제이다.
+    * */
     protected ChildNodeEntity(ParentNodeEntity parent, String title){
         this.book = parent.getBook();
         this.title = title;

@@ -1,5 +1,6 @@
 package org.pageflow.boundedcontext.user.model.user;
 
+import io.hypersistence.tsid.TSID;
 import lombok.Builder;
 import lombok.Data;
 import org.pageflow.boundedcontext.user.constants.RoleType;
@@ -10,7 +11,7 @@ import org.pageflow.boundedcontext.user.constants.RoleType;
 @Data
 @Builder
 public class SessionUser {
-    private Long uid;
+    private TSID uid;
     private String username;
     private String email;
     private String penname;

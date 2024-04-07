@@ -4,7 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.pageflow.global.api.code.SessionCode;
-import org.pageflow.shared.SpringMvcExceptionDelegate;
+import org.pageflow.shared.utils.SpringMvcExceptionDelegate;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;

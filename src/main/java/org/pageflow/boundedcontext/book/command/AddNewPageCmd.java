@@ -1,6 +1,6 @@
 package org.pageflow.boundedcontext.book.command;
 
-import org.pageflow.boundedcontext.book.model.OutlineParentNode;
+import org.pageflow.boundedcontext.book.domain.OutlineParentNode;
 import org.springframework.lang.Nullable;
 
 /**

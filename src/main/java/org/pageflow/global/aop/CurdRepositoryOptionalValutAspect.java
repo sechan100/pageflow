@@ -1,6 +1,5 @@
 package org.pageflow.global.aop;
 
-import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -16,9 +15,7 @@ import java.util.stream.Collectors;
  */
 @Aspect
 @Component
-@RequiredArgsConstructor
 public class CurdRepositoryOptionalValutAspect {
-
 
     /**
      * Optional으로 반환되는 findById 메소드의 Optional을 이미 까봐서 없으면 NoSuchElementException이 발생히기 전에

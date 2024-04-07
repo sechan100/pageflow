@@ -5,15 +5,15 @@ import org.pageflow.boundedcontext.book.command.AbstractAddNewChildCmd;
 import org.pageflow.boundedcontext.book.command.AddNewFolderCmd;
 import org.pageflow.boundedcontext.book.command.AddNewPageCmd;
 import org.pageflow.boundedcontext.book.entity.*;
-import org.pageflow.boundedcontext.book.model.Outline;
-import org.pageflow.boundedcontext.book.model.OutlineFolder;
-import org.pageflow.boundedcontext.book.model.OutlineParentNode;
+import org.pageflow.boundedcontext.book.domain.Outline;
+import org.pageflow.boundedcontext.book.domain.OutlineFolder;
+import org.pageflow.boundedcontext.book.domain.OutlineParentNode;
 import org.pageflow.boundedcontext.book.repository.BookRepo;
 import org.pageflow.boundedcontext.book.repository.FolderRepo;
 import org.pageflow.boundedcontext.book.repository.ChildNodeRepo;
 import org.pageflow.boundedcontext.book.repository.PageRepo;
-import org.pageflow.boundedcontext.user.entity.Profile;
-import org.pageflow.shared.annotation.TransactionalService;
+import org.pageflow.boundedcontext.user.entity.ProfileEntity;
+import org.pageflow.shared.annotation.CommandService;
 import org.springframework.context.event.EventListener;
 
 import java.util.List;
@@ -21,7 +21,7 @@ import java.util.List;
 /**
  * @author : sechan
  */
-@TransactionalService
+@CommandService
 @RequiredArgsConstructor
 public class OutlineService {
     private final BookRepo bookRepo;
@@ -33,7 +33,7 @@ public class OutlineService {
      * <p> 영속화된 book을 반환한다.</p>
      * @param author 작성자
      */
-    public BookEntity createNewBook(Profile author){
+    public BookEntity createNewBook(ProfileEntity author){
         BookEntity book = bookRepo.save(new BookEntity(author));
         return book;
     }

@@ -3,8 +3,8 @@ package org.pageflow.boundedcontext.book.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.pageflow.boundedcontext.book.constants.BookPolicy;
-import org.pageflow.boundedcontext.user.entity.Profile;
-import org.pageflow.global.entity.TsidBaseEntity;
+import org.pageflow.boundedcontext.user.entity.ProfileEntity;
+import org.pageflow.shared.data.entity.TsidBaseEntity;
 
 /**
  * @author : sechan
@@ -19,7 +19,7 @@ public class BookEntity extends TsidBaseEntity implements ParentNodeEntity {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "profile_id")
-    private Profile author;
+    private ProfileEntity author;
 
     @Setter
     @Column(nullable = false)
@@ -28,7 +28,7 @@ public class BookEntity extends TsidBaseEntity implements ParentNodeEntity {
     @Column(nullable = false)
     private int lastNodeOrdinalValue;
 
-    public BookEntity(Profile author){
+    public BookEntity(ProfileEntity author){
         this.author = author;
         this.title = BookPolicy.DEFAULT_BOOK_TITLE;
     }

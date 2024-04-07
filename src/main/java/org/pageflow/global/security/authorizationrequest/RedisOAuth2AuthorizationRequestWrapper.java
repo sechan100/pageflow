@@ -3,7 +3,7 @@ package org.pageflow.global.security.authorizationrequest;
 
 import lombok.Builder;
 import lombok.Getter;
-import org.pageflow.global.entity.Entity;
+import org.pageflow.shared.data.entity.Entity;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;

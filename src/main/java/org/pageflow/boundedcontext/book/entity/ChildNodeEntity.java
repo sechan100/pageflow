@@ -2,7 +2,7 @@ package org.pageflow.boundedcontext.book.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.pageflow.global.entity.TsidBaseEntity;
+import org.pageflow.shared.data.entity.TsidBaseEntity;
 import org.springframework.lang.Nullable;
 
 import java.util.Objects;

@@ -1,37 +1,36 @@
 package org.pageflow.boundedcontext.user.dto;
 
-
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import lombok.*;
-import org.pageflow.boundedcontext.user.constants.UserSignupPolicy;
+import lombok.Data;
+import org.pageflow.boundedcontext.user.constants.ProviderType;
+import org.pageflow.boundedcontext.user.constants.RoleType;
+import org.pageflow.shared.type.TSID;
 import org.springframework.lang.Nullable;
 
-
-@Getter
-@Setter
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
+/**
+ * @author : sechan
+ */
+@Data
 public class SignupForm {
-    
-    @NotBlank
-    @Pattern(regexp = UserSignupPolicy.USERNAME_REGEX, message = UserSignupPolicy.USERNAME_REGEX_DISCRIPTION)
-    private String username;
-    
-    @NotBlank
-    @Pattern(regexp = UserSignupPolicy.PASSWORD_REGEX, message = UserSignupPolicy.PASSWORD_REGEX_DISCRIPTION)
-    private String password;
-    
-    @Email
-    private String email;
-    
-    @NotBlank
-    @Pattern(regexp = UserSignupPolicy.PENNAME_REGEX, message = UserSignupPolicy.PENNAME_REGEX_DISCRIPTION)
-    private String penname;
-    
+    private final TSID id;
+    private final ProviderType provider;
+    private final RoleType roleType;
+    private final String username;
+    private final String password;
+    private final String email;
+    private final String penname;
     @Nullable
-    private String profileImgUrl;
-    
+    private final String profileImgUrl;
+
+    public static SignupForm from(ApiRevealSignupForm form, TSID uid, ProviderType provider, RoleType roleType) {
+        return new SignupForm(
+            uid,
+            provider,
+            roleType,
+            form.getUsername(),
+            form.getPassword(),
+            form.getEmail(),
+            form.getPenname(),
+            form.getProfileImgUrl()
+        );
+    }
 }

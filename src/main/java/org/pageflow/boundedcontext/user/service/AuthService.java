@@ -1,28 +1,28 @@
 package org.pageflow.boundedcontext.user.service;
 
-import io.hypersistence.tsid.TSID;
 import io.vavr.control.Try;
 import lombok.RequiredArgsConstructor;
 import org.pageflow.boundedcontext.user.constants.RoleType;
-import org.pageflow.boundedcontext.user.entity.Account;
-import org.pageflow.boundedcontext.user.entity.EmailVerificationRequest;
+import org.pageflow.boundedcontext.user.entity.AccountEntity;
+import org.pageflow.boundedcontext.user.cache.EmailVerificationRequest;
 import org.pageflow.boundedcontext.user.entity.RefreshToken;
-import org.pageflow.boundedcontext.user.model.principal.OnlyAuthProcessPrincipal;
-import org.pageflow.boundedcontext.user.model.token.AccessToken;
-import org.pageflow.boundedcontext.user.model.token.AuthTokens;
-import org.pageflow.boundedcontext.user.repository.AccountRepo;
-import org.pageflow.boundedcontext.user.repository.EmailVerificationRequestRepo;
-import org.pageflow.boundedcontext.user.repository.RefreshTokenRepo;
+import org.pageflow.boundedcontext.user.dto.principal.OnlyAuthProcessPrincipal;
+import org.pageflow.boundedcontext.user.dto.token.AccessToken;
+import org.pageflow.boundedcontext.user.dto.token.AuthTokens;
+import org.pageflow.boundedcontext.user.repository.AccountRepository;
+import org.pageflow.boundedcontext.user.repository.EmailVerificationRequestRepository;
+import org.pageflow.boundedcontext.user.repository.RefreshTokenRepository;
 import org.pageflow.global.api.BizException;
 import org.pageflow.global.api.code.SessionCode;
 import org.pageflow.global.api.code.UserCode;
 import org.pageflow.global.constants.CustomProps;
-import org.pageflow.infra.email.EmailRequest;
-import org.pageflow.infra.email.EmailSender;
-import org.pageflow.infra.jwt.provider.JwtProvider;
-import org.pageflow.shared.JJamException;
-import org.pageflow.shared.TimeIntorducer;
-import org.pageflow.shared.query.TryQuery;
+import org.pageflow.shared.infra.email.EmailRequest;
+import org.pageflow.shared.infra.email.EmailSender;
+import org.pageflow.shared.infra.jwt.provider.JwtProvider;
+import org.pageflow.shared.utils.JJamException;
+import org.pageflow.shared.utils.TimeIntorducer;
+import org.pageflow.shared.data.query.TryQuery;
+import org.pageflow.shared.type.TSID;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -44,12 +44,12 @@ import java.util.Map;
 public class AuthService {
     
     private final CustomProps props;
-    private final AccountRepo accountRepo;
-    private final RefreshTokenRepo refreshTokenRepo;
-    private final EmailVerificationRequestRepo emailVfyReqRepo;
+    private final AccountRepository accountRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
+    private final EmailVerificationRequestRepository emailVfyReqRepo;
     private final AuthenticationProvider authenticationProvider;
     private final EmailSender emailSender;
-    private final UtilityUserService userUtil;
+    private final UserValidator userUtil;
     private final JwtProvider jwtProvider;
     
     public static final String EMAIL_VERIFICATION_URI = "/email/verify";
@@ -81,14 +81,14 @@ public class AuthService {
      */
     public AuthTokens oauth2Login(String username){
         // OAuth2로 로그인하는 사용자의 UID를 조회
-        TSID UID = accountRepo.findByUsername(username).getId();
+        TSID UID = accountRepository.findByUsername(username).getId();
 
         // 세션을 생성 후 반환
         return createSession(UID, RoleType.ROLE_USER);
     }
 
     public void logout(TSID refreshTokenId){
-        refreshTokenRepo.deleteById(refreshTokenId.toLong());
+        refreshTokenRepository.deleteById(refreshTokenId.toLong());
     }
 
     /**
@@ -124,14 +124,14 @@ public class AuthService {
             // refreshToken을 생성(새로 생성된 세션 정보를 기록)
             TSID refreshTokenTsid = TSID.Factory.getTsid();
             try {
-                RefreshToken refreshToken = refreshTokenRepo.save(
+                RefreshToken refreshToken = refreshTokenRepository.save(
                     RefreshToken.builder()
                         .id(refreshTokenTsid.toLong()) // TSID
                         .expiredAt( // 만료시간
                             System.currentTimeMillis() + (props.site().refreshTokenExpireDays() * TimeIntorducer.MilliSeconds.DAY)
                         )
                         // UID와 연관관계 매핑(프록시로만 조회하여 굳이 사용하지 않을 Account를 쿼리하지 않고 id로만 매핑)
-                        .account(accountRepo.getReferenceById(UID.toLong()))
+                        .account(accountRepository.getReferenceById(UID.toLong()))
                         .build()
                 );
                 return new AuthTokens(accessToken, refreshToken); // RETURN
@@ -144,7 +144,7 @@ public class AuthService {
      * @throws BizException SESSION_EXPIRED
      */
     public AccessToken refresh(TSID refreshTokenId){
-        Try<RefreshToken> find = Try.of(() -> refreshTokenRepo.findWithAccountById(refreshTokenId.toLong()));
+        Try<RefreshToken> find = Try.of(() -> refreshTokenRepository.findWithAccountById(refreshTokenId.toLong()));
 
         // 세션을 찾지 못한 경우 -> 이미 만료된 세션이라 서버 스케쥴링으로 지워졌을 수 있음
         RefreshToken refreshToken = find.
@@ -157,7 +157,7 @@ public class AuthService {
             .getOrElseThrow(t -> SessionCode.SESSION_EXPIRED.fire());
 
         // 새 토큰을 발급
-        Account user = refreshToken.getAccount();
+        AccountEntity user = refreshToken.getAccount();
         return jwtProvider.generateAccessToken(user.getId(), user.getRole());
     }
     
@@ -167,7 +167,7 @@ public class AuthService {
     @Transactional
     public void sendEmailVerificationMail(TSID UID, String unVerifiedEmail) {
         // case 1) 해당 UID를 가진 사용자가 이미 이메일 인증요청을 보낸 기록이 존재하는 경우 가져옴
-        TryQuery<EmailVerificationRequest> findById = TryQuery.of(() -> emailVfyReqRepo.findById(UID).get());
+        TryQuery<EmailVerificationRequest> findById = TryQuery.of(() -> emailVfyReqRepo.findById(UID.toLong()).get());
         // case 2) 인증요청 기록이 없는 경우 새로운 인증요청을 생성
         EmailVerificationRequest request = findById.findOrElse(
             new EmailVerificationRequest(UID, unVerifiedEmail)
@@ -202,7 +202,7 @@ public class AuthService {
      */
     @Transactional
     public void verifyEmail(TSID UID, String email, String code) {
-        TryQuery<EmailVerificationRequest> findById = TryQuery.of(() -> emailVfyReqRepo.findById(UID).get());
+        TryQuery<EmailVerificationRequest> findById = TryQuery.of(() -> emailVfyReqRepo.findById(UID.toLong()).get());
         
         // 캐쉬 데이터가 없음 -> 인증요청이 만료되었거나 에초에 전송된 요청이 없는 경우 -> 그냥 만료된 것으로 처리
         EmailVerificationRequest cachedRequest = findById
@@ -219,7 +219,7 @@ public class AuthService {
             .predicate(!isEmailMatched,"인증요청된 이메일이 일치하지 않음");
         
         // 인증 처리
-        Account user = accountRepo.findById(UID.toLong()).get();
+        AccountEntity user = accountRepository.findById(UID.toLong()).get();
         if(user.isEmailVerified()){
             throw UserCode.ALREADY_VERIFIED_EMAIL.fire();
         } else {

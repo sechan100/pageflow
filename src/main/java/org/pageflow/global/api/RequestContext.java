@@ -2,15 +2,15 @@ package org.pageflow.global.api;
 
 
 import com.google.common.base.Preconditions;
-import io.hypersistence.tsid.TSID;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.pageflow.boundedcontext.user.model.principal.PageflowPrincipal;
-import org.pageflow.boundedcontext.user.model.principal.SessionPrincipal;
-import org.pageflow.boundedcontext.user.repository.ProfileRepo;
-import org.pageflow.shared.ForwordBuilder;
+import org.pageflow.boundedcontext.user.dto.principal.PageflowPrincipal;
+import org.pageflow.boundedcontext.user.dto.principal.SessionPrincipal;
+import org.pageflow.boundedcontext.user.repository.ProfileRepository;
+import org.pageflow.shared.utils.ForwordBuilder;
+import org.pageflow.shared.type.TSID;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -36,7 +36,7 @@ public class RequestContext {
     private final HttpServletRequest request;
     private final HttpServletResponse response;
     
-    public RequestContext(ProfileRepo profileRepo) {
+    public RequestContext(ProfileRepository profileRepository) {
         
         ServletRequestAttributes servletRequest = ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes()));
         this.request = servletRequest.getRequest();

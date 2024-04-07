@@ -1,7 +1,7 @@
 package org.pageflow.boundedcontext.common;
 
 import lombok.AllArgsConstructor;
-import org.pageflow.shared.SpringMvcExceptionDelegate;
+import org.pageflow.shared.utils.SpringMvcExceptionDelegate;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 

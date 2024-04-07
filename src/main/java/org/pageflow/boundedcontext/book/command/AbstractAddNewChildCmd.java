@@ -1,8 +1,8 @@
 package org.pageflow.boundedcontext.book.command;
 
 import org.pageflow.boundedcontext.book.constants.BookPolicy;
-import org.pageflow.boundedcontext.book.model.OutlineParentNode;
-import org.pageflow.infra.domain.DomainEvent;
+import org.pageflow.boundedcontext.book.domain.OutlineParentNode;
+import org.pageflow.shared.infra.domain.DomainEvent;
 import org.springframework.lang.Nullable;
 
 import java.util.Objects;

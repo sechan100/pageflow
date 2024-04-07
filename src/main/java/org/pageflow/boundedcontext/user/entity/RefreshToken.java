@@ -1,29 +1,28 @@
 package org.pageflow.boundedcontext.user.entity;
 
-import io.hypersistence.tsid.TSID;
 import jakarta.persistence.*;
 import lombok.*;
-import org.pageflow.global.entity.TsidIdentifiable;
-import org.pageflow.shared.libs.Tsid;
+import org.pageflow.shared.data.entity.TsidIdentifiable;
+import org.pageflow.shared.data.tsid.Tsid;
+import org.pageflow.shared.type.TSID;
 
 
 /**
  * @author : sechan
  */
 @Entity
-@Getter
-@Setter(AccessLevel.NONE)
-@Builder
-@AllArgsConstructor
+@Data
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class RefreshToken implements org.pageflow.global.entity.Entity, TsidIdentifiable {
+@Table(name = "refresh_token")
+public class RefreshToken implements org.pageflow.shared.data.entity.Entity, TsidIdentifiable {
 
     @Id
     @Tsid
+    @Getter(AccessLevel.NONE)
     private Long id;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    private Account account;
+    private AccountEntity account;
     
     /**
      * 만료시간(UTC)

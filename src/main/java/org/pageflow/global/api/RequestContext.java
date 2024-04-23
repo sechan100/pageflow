@@ -2,15 +2,13 @@ package org.pageflow.global.api;
 
 
 import com.google.common.base.Preconditions;
+import jakarta.servlet.DispatcherType;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.pageflow.boundedcontext.user.dto.principal.PageflowPrincipal;
-import org.pageflow.boundedcontext.user.dto.principal.SessionPrincipal;
-import org.pageflow.boundedcontext.user.repository.ProfileRepository;
-import org.pageflow.shared.utils.ForwordBuilder;
-import org.pageflow.shared.type.TSID;
+import org.pageflow.boundedcontext.auth.application.dto.Principal;
+import org.pageflow.boundedcontext.user.domain.UID;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,7 +18,6 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.io.IOException;
-import java.util.Objects;
 import java.util.Optional;
 
 
@@ -32,13 +29,15 @@ import java.util.Optional;
 @Slf4j
 public class RequestContext {
     
-    private final PageflowPrincipal principal;
+    private final Principal.Base principal;
     private final HttpServletRequest request;
     private final HttpServletResponse response;
     
-    public RequestContext(ProfileRepository profileRepository) {
-        
-        ServletRequestAttributes servletRequest = ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes()));
+    public RequestContext() {
+        ServletRequestAttributes servletRequest = Preconditions.checkNotNull(
+            ((ServletRequestAttributes)RequestContextHolder.getRequestAttributes()),
+            "DispatcherServlet이 아직 요청을 처리하지 않은 상태입니다. 'RequestContextHolder.getRequestAttributes()이 null'"
+        );
         this.request = servletRequest.getRequest();
         this.response = servletRequest.getResponse();
         
@@ -50,31 +49,23 @@ public class RequestContext {
         
         // 인증상태 점검
         Preconditions.checkState(
-                /*
-                 * AnonymousAuthenticationToken이어도 authenticated 필드는 true임
-                 * 쉽게 생각해서,
-                 * Token 내부의 authenticated 필드 -> Provider에 의해서 검증되었냐 안되었냐 여부
-                 * Token 타입 -> 인증 타입(form, OAuth2, 익명)
-                 * */
-                authentication.isAuthenticated(),
-                "Authentication(인증객체)의 authenticated 필드가 false입니다. " +
-                        "AuthenticationProvider가 정상적으로 작동하지 않았거나, 임의로 필드가 변경되었을 수 있습니다."
+            authentication.isAuthenticated(), """
+            Authentication.authenticated == 'false'
+            정상적으로 인증제공자를 통과한 인증객체는, 유형에 관계없이 isAuthenticated() == true입니다.
+            tip: AuthenticationProvider가 정상적으로 작동하지 않았거나, 임의로 필드가 변경되었을 수 있습니다."""
         );
-        
-        
-        // 사용자 타입 분류
+
         // 익명 사용자
         if(authentication instanceof AnonymousAuthenticationToken) {
-            this.principal = SessionPrincipal.anonymous();
-            
+            this.principal = Principal.Session.anonymous();
         // 인증된 사용자
         } else {
             Object principal = authentication.getPrincipal();
             Preconditions.checkArgument(
-                    PageflowPrincipal.class.isAssignableFrom(principal.getClass()),
+                    Principal.Base.class.isAssignableFrom(principal.getClass()),
                     "처리할 수 없는 Principal 객체타입: " + principal.getClass().getName()
             );
-            this.principal = (PageflowPrincipal) principal;
+            this.principal = (Principal.Base) principal;
             }
         }
     
@@ -123,32 +114,27 @@ public class RequestContext {
             log.error("{}로 redirect에 실패했습니다: {}", redirectUrl, e.getMessage());
         }
     }
-    
-    /**
-     * @param forwardUrl forward할 url
-     * @return forwardBuilder
-     */
-    public ForwordBuilder forwardBuilder(String forwardUrl) {
-        try {
-            return new ForwordBuilder(request, response, forwardUrl);
-        } catch (Exception e) {
-            log.error("{}로 forward하지 못했습니다: {}", forwardUrl, e.getMessage());
-            throw e;
-        }
-    }
-    
+
     /**
      * @return 현재 로그인한 사용자의 UID
      */
-    public TSID getUID() {
-        return principal.getUID();
+    public UID getUID() {
+        return principal.getUid();
     }
-    
-    /**
-     * BizException을 처리하여 반환해주는 컨트롤러로 매핑함
-     */
-    public void delegateBizExceptionHandling(BizException e){
-        request.setAttribute(BizException.class.getSimpleName(), e);
-        forwardBuilder("/internal/throw/biz").forward();
+
+    public HttpServletRequest getRequest() {
+        return request;
+    }
+
+    public HttpServletResponse getResponse() {
+        return response;
+    }
+
+    public DispatcherType getDispatcherType() {
+        return request.getDispatcherType();
+    }
+
+    public boolean isCommitted() {
+        return response.isCommitted();
     }
 }

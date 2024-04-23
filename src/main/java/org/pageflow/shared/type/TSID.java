@@ -24,6 +24,7 @@
 
 package org.pageflow.shared.type;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.springframework.lang.Nullable;
 
 import java.io.Serial;
@@ -69,6 +70,7 @@ import java.util.function.IntSupplier;
  *
  * @see <a href="https://en.wikipedia.org/wiki/Snowflake_ID">Snowflake ID</a>
  */
+@JsonSerialize(using = TSIDSerializer.class)
 @SuppressWarnings({"MagicCharacter", "MagicNumber", "NumericCastThatLosesPrecision", "StandardVariableNames", "DuplicateExpressions"})
 public final class TSID implements Serializable, Comparable<TSID> {
 

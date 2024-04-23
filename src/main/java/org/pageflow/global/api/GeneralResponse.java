@@ -2,10 +2,7 @@ package org.pageflow.global.api;
 
 import lombok.Getter;
 import org.pageflow.global.api.code.ApiCode;
-import org.pageflow.global.api.code.GeneralCode;
 import org.springframework.lang.Nullable;
-
-import java.util.Objects;
 
 /**
  * GeneralResponse
@@ -13,61 +10,29 @@ import java.util.Objects;
  */
 @Getter
 public class GeneralResponse<T> {
-    
-    private final ApiCode apiCode;
+
+    private final String title;
+    private final int code;
     private final String message;
+    private final String detail;
     @Nullable
     private final T data;
-    
-    public static <T> GeneralResponse<T> success(T data){
-        return builder()
-                .apiCode(GeneralCode.SUCCESS)
-                .message(GeneralCode.SUCCESS.getMessage())
-                .data(data)
-                .build();
-    }
-    
-    public GeneralResponse(ApiCode apiCode){
-        this.apiCode = apiCode;
+
+
+    private GeneralResponse(ApiCode apiCode, String feedback, @Nullable T data){
+        this.title = apiCode.getTitle();
+        this.code = apiCode.getCode();
         this.message = apiCode.getMessage();
-        this.data = null;
-    }
-    
-    private GeneralResponse(ApiCode apiCode, String message, T data){
-        this.apiCode = apiCode;
-        this.message = message;
+        this.detail = feedback;
         this.data = data;
     }
-    
-    public static <T> Builder<T> builder(){
-        return new Builder<>();
+
+    public static <T> GeneralResponse<T> of(ApiCode apiCode, String feedback, @Nullable T data){
+        return new GeneralResponse<>(apiCode, feedback, data);
     }
-    
-    
-    public static class Builder<T> {
-        private ApiCode apiCode;
-        private String message;
-        private T data;
-        
-        public Builder apiCode(ApiCode apiCode){
-            this.apiCode = apiCode;
-            return this;
-        }
-        
-        public Builder message(String message){
-            this.message = message;
-            return this;
-        }
-        
-        public Builder data(T data){
-            this.data = data;
-            return this;
-        }
-        
-        public GeneralResponse<T> build(){
-            String message = Objects.requireNonNullElse(this.message, apiCode.getMessage());
-            return new GeneralResponse<>(apiCode, message, data);
-        }
+
+    public static <T> GeneralResponse<T> withoutFeedback(ApiCode apiCode, @Nullable T data){
+        return new GeneralResponse<>(apiCode, apiCode.getFeedback(), data);
     }
-  
+
 }

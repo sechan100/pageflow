@@ -1,19 +1,19 @@
-package org.pageflow.boundedcontext.book.repository;
-
-import jakarta.persistence.OrderBy;
-import org.pageflow.boundedcontext.book.entity.BookEntity;
-import org.pageflow.boundedcontext.book.entity.ChildNodeEntity;
-import org.pageflow.boundedcontext.book.entity.FolderEntity;
-import org.springframework.data.jpa.repository.JpaRepository;
-
-import java.util.List;
-
-/**
- * @author : sechan
- */
-public interface ChildNodeRepo extends JpaRepository<ChildNodeEntity, Long> {
-    @OrderBy("parent_id")
-    List<ChildNodeEntity> findByBookOrderByParentNode_Id(BookEntity book);
-
-    FolderEntity findByBookAndParentNode(BookEntity book, FolderEntity parentNode);
-}
+//package org.pageflow.boundedcontext.book.repository;
+//
+//import jakarta.persistence.OrderBy;
+//import org.pageflow.boundedcontext.book.entity.BookJpaEntity;
+//import org.pageflow.boundedcontext.book.entity.ChildNodeJpaEntity;
+//import org.pageflow.boundedcontext.book.entity.FolderJpaEntity;
+//import org.springframework.data.jpa.repository.JpaRepository;
+//
+//import java.util.List;
+//
+///**
+// * @author : sechan
+// */
+//public interface ChildNodeRepo extends JpaRepository<ChildNodeJpaEntity, Long> {
+//    @OrderBy("parent_id")
+//    List<ChildNodeJpaEntity> findByBookOrderByParentNode_Id(BookJpaEntity book);
+//
+//    FolderJpaEntity findByBookAndParentNode(BookJpaEntity book, FolderJpaEntity parentNode);
+//}

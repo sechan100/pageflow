@@ -1,11 +1,11 @@
 package org.pageflow.global.advice;
 
-import org.pageflow.global.api.BizException;
+import lombok.extern.slf4j.Slf4j;
+import org.pageflow.global.api.ApiException;
 import org.pageflow.global.api.GeneralResponse;
-import org.pageflow.global.api.code.GeneralCode;
-import org.pageflow.global.api.code.InputCode;
-import org.springframework.dao.DataAccessException;
-import org.springframework.dao.EmptyResultDataAccessException;
+import org.pageflow.global.api.code.Code4;
+import org.pageflow.global.api.code.Code5;
+import org.springframework.http.converter.HttpMessageConversionException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -15,8 +15,22 @@ import java.util.*;
 /**
  * @author : sechan
  */
+@Slf4j
 @RestControllerAdvice
+@SuppressWarnings("HardcodedLineSeparator")
 public class ExceptionRestAdvice {
+
+    @ExceptionHandler(ApiException.class)
+    public GeneralResponse<?> handleApiException(ApiException e) {
+        return e.getGr();
+    }
+
+    @ExceptionHandler(Throwable.class)
+    public GeneralResponse<Void> handleException(Throwable e) {
+        log.debug("Throwable을 advice에서 INTERNAL_SERVER_ERROR로 처리 \n ====================[ EXCEPTION ]====================", e);
+        return GeneralResponse.withoutFeedback(Code5.INTERNAL_SERVER_ERROR, null);
+    }
+
     
     // @Valid를 통한 Spring Bean Validation의 필드의 유효성 검사에 실패한 경우
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -46,28 +60,19 @@ public class ExceptionRestAdvice {
             result.put(fieldName, errorMessageArray);
         });
         
-        return GeneralResponse.builder()
-                .apiCode(InputCode.FIELD_VALIDATION)
-                .data(result)
-                .build();
+        return GeneralResponse.withoutFeedback(Code4.FIELD_VALIDATION_FAIL, result);
     }
 
-    @ExceptionHandler(BizException.class)
-    public GeneralResponse<Void> handleBizException(BizException e) {
-        return GeneralResponse.builder()
-                .apiCode(e.getApiCode())
-                .message(e.getMessage())
-                .data(e.getData())
-                .build();
+    @ExceptionHandler(NoSuchElementException.class)
+    public GeneralResponse<Void> handleNoSuchElementException(NoSuchElementException e) {
+        log.debug("NoSuchElementException의 경우 Spring Date 스펙에서 사용하는 Optional에서 발생했을 가능성이 농후하니, Optional에서 발생하는지 먼저 확인할 것");
+        // 어디서 발생한지 모르는 범용적인 예외이니, 상세한 정보를 제공하지 않는다.
+        return GeneralResponse.withoutFeedback(Code5.INTERNAL_SERVER_ERROR, null);
     }
 
-    @ExceptionHandler(DataAccessException.class)
-    public GeneralResponse<Void> handleDataAccessException(DataAccessException e) {
-        if(e instanceof EmptyResultDataAccessException){
-            return new GeneralResponse(GeneralCode.DATA_NOT_FOUND);
-        } else {
-            return new GeneralResponse(GeneralCode.DATA_ACCESS_ERROR);
-        }
+    @ExceptionHandler(HttpMessageConversionException.class)
+    public GeneralResponse<Void> handleHttpMessageConversionException(HttpMessageConversionException e) {
+        return GeneralResponse.withoutFeedback(Code4.FIELD_PARSE_FAIL, null);
     }
  
 }

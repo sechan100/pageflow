@@ -42,12 +42,17 @@ public interface ApiCode {
     String getMessage();
     String getFeedback();
 
+
     /**
      * Unexposable Code의 경우, 이 메소드를 통해서 해당 값을 대체할 ApiCode를 반환한다. .
      * @apiNote 음수 code를 가진 ApiCode는 반드시 해당 메소드를 Override하여야한다.
      */
     default ApiCode substituteForRedacted(){
         return this;
+    }
+
+    default boolean isExposable(){
+        return this.getCode() > 0;
     }
 
     String name();

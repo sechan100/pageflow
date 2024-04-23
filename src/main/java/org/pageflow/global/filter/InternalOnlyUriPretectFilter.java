@@ -21,7 +21,7 @@ public class InternalOnlyUriPretectFilter extends OncePerRequestFilter {
         boolean isInternalOnly = uri.startsWith(INTERNAL_PATH_PREFIX);
 
         if(isInternalOnly && request.getDispatcherType() != DispatcherType.FORWARD){
-            throw Code2.INVALID_REQUEST.fire();
+            throw Code2.PROTECTED_URI_ACCESS.fire();
         } else {
             filterChain.doFilter(request, response);
         }

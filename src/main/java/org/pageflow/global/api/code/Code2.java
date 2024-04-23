@@ -28,7 +28,7 @@ public enum Code2 implements ApiCode {
 
     // 2500: 메타 요청
     , INVALID_REQUEST(2500, "올바르지 않은 요청", "올바르지 않은 요청입니다.")
-    , PRIVATE_URI_ACCESS(-2501, "internal-only uri 접근 불가", "요청정보가 올바르지 않습니다."){
+    , PROTECTED_URI_ACCESS(-2501, "internal-only uri 접근 불가", "요청정보가 올바르지 않습니다."){
           @Override
           public ApiCode substituteForRedacted() {
               return INVALID_REQUEST;

@@ -5,6 +5,7 @@ import org.pageflow.boundedcontext.auth.adapter.in.web.JwtAuthorizationFilter;
 import org.pageflow.boundedcontext.auth.port.in.TokenUseCase;
 import org.pageflow.global.filter.ApiExceptionCatchAndDelegatingFilter;
 import org.pageflow.global.filter.InFilterForwardedRequestCeaseFilter;
+import org.pageflow.global.filter.InternalOnlyUriPretectFilter;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,36 +15,48 @@ import org.springframework.context.annotation.Configuration;
  * 자동등록하지 않은 필터는 SecurityFilterChain에 명시적으로 세팅하여 관리한다.
  */
 @Configuration
-public class ServletFilterBeanConfig {
+public class FilterBeanConfig {
+
 
     @Bean
     public JwtAuthorizationFilter jwtAuthorizationFilter(TokenUseCase tokenUseCase) {
         return new JwtAuthorizationFilter(tokenUseCase);
     }
     @Bean
-    public FilterRegistrationBean<Filter> preventRegisterJwtAuthorizationFilter(JwtAuthorizationFilter filter) {
+    public FilterRegistrationBean<JwtAuthorizationFilter> preventRegisterJwtAuthorizationFilter(JwtAuthorizationFilter filter) {
         return preventsFilterAutoRegistration(filter);
     }
+
 
     @Bean
     public ApiExceptionCatchAndDelegatingFilter throwableDelegatingFilter() {
         return new ApiExceptionCatchAndDelegatingFilter();
     }
     @Bean
-    public FilterRegistrationBean<Filter> preventRegisterThrowableDelegatingFilter(ApiExceptionCatchAndDelegatingFilter filter) {
+    public FilterRegistrationBean<ApiExceptionCatchAndDelegatingFilter> preventRegisterThrowableDelegatingFilter(ApiExceptionCatchAndDelegatingFilter filter) {
         return preventsFilterAutoRegistration(filter);
     }
+
 
     @Bean
     public InFilterForwardedRequestCeaseFilter inFilterForwardedRequestCeaseFilter() {
         return new InFilterForwardedRequestCeaseFilter();
     }
     @Bean
-    public FilterRegistrationBean<InFilterForwardedRequestCeaseFilter> registrationBeanOfInFilterForwardedRequestCeaseFilter(
-        InFilterForwardedRequestCeaseFilter filter
-    ) {
+    public FilterRegistrationBean<InFilterForwardedRequestCeaseFilter> registrationBeanInFilterForwardedRequestCeaseFilter(InFilterForwardedRequestCeaseFilter filter) {
         return preventsFilterAutoRegistration(filter);
     }
+
+
+    @Bean
+    public InternalOnlyUriPretectFilter internalOnlyUriPretectFilter() {
+        return new InternalOnlyUriPretectFilter();
+    }
+    @Bean
+    public FilterRegistrationBean<InternalOnlyUriPretectFilter> preventRegisterInternalOnlyUriPretectFilter(InternalOnlyUriPretectFilter filter) {
+        return preventsFilterAutoRegistration(filter);
+    }
+
 
 
 

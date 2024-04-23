@@ -5,6 +5,7 @@ import org.pageflow.boundedcontext.auth.adapter.in.web.JwtAuthorizationFilter;
 import org.pageflow.boundedcontext.auth.application.springsecurity.oauth2.OAuth2Service;
 import org.pageflow.global.filter.ApiExceptionCatchAndDelegatingFilter;
 import org.pageflow.global.filter.InFilterForwardedRequestCeaseFilter;
+import org.pageflow.global.filter.InternalOnlyUriPretectFilter;
 import org.pageflow.global.property.AppProps;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,12 +18,12 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
-import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.header.HeaderWriterFilter;
 import org.springframework.security.web.session.SessionManagementFilter;
 
 @EnableWebSecurity
@@ -37,6 +38,7 @@ public class SecurityConfig {
     private final JwtAuthorizationFilter jwtAuthorizationFilter;
     private final ApiExceptionCatchAndDelegatingFilter apiExceptionCatchAndDelegatingFilter;
     private final InFilterForwardedRequestCeaseFilter inFilterForwardedRequestCeaseFilter;
+    private final InternalOnlyUriPretectFilter internalOnlyUriPretectFilter;
     // oauth2
     private final OAuth2Service OAuth2Service;
     private final AuthorizationRequestRepository<OAuth2AuthorizationRequest> authorizationRequestRepository;
@@ -88,19 +90,21 @@ public class SecurityConfig {
              * 2. SecurityContextHolderFilter
              * 3. HeaderWriterFilter
              * 4. (CUSTOM) ApiExceptionCatchAndDelegatingFilter
-             * 5. (CUSTOM) JwtAuthorizationFilter
-             * 6. OAuth2AuthorizationRequestRedirectFilter
-             * 7. OAuth2LoginAuthenticationFilter
-             * 8. UsernamePasswordAuthenticationFilter
-             * 9. RequestCacheAwareFilter
-             * 10. SecurityContextHolderAwareRequestFilter
-             * 11. AnonymousAuthenticationFilter
-             * 12. SessionManagementFilter
-             * 15. (CUSTOM) InFilterForwardedRequestCeaseFilter
-             * 13. ExceptionTranslationFilter
-             * 14. AuthorizationFilter
+             * 5. (CUSTOM) InternalOnlyUriPretectFilter
+             * 6. (CUSTOM) JwtAuthorizationFilter
+             * 7. OAuth2AuthorizationRequestRedirectFilter
+             * 8. OAuth2LoginAuthenticationFilter
+             * 9. UsernamePasswordAuthenticationFilter
+             * 10. RequestCacheAwareFilter
+             * 11. SecurityContextHolderAwareRequestFilter
+             * 12. AnonymousAuthenticationFilter
+             * 15. SessionManagementFilter
+             * 13. (CUSTOM) InFilterForwardedRequestCeaseFilter
+             * 14. ExceptionTranslationFilter
+             * 15. AuthorizationFilter
              */
-            .addFilterBefore(apiExceptionCatchAndDelegatingFilter, OAuth2AuthorizationRequestRedirectFilter.class)
+            .addFilterAfter(apiExceptionCatchAndDelegatingFilter, HeaderWriterFilter.class)
+            .addFilterAfter(internalOnlyUriPretectFilter, ApiExceptionCatchAndDelegatingFilter.class)
             .addFilterAfter(jwtAuthorizationFilter, ApiExceptionCatchAndDelegatingFilter.class)
             .addFilterAfter(inFilterForwardedRequestCeaseFilter, SessionManagementFilter.class)
             .headers(headers -> headers

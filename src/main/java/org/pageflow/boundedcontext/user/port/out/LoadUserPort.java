@@ -1,4 +1,4 @@
-package org.pageflow.boundedcontext.user.application.port.out;
+package org.pageflow.boundedcontext.user.port.out;
 
 import org.pageflow.boundedcontext.user.domain.UID;
 import org.pageflow.boundedcontext.user.domain.User;

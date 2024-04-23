@@ -1,7 +1,7 @@
-package org.pageflow.boundedcontext.user.application.port.out;
+package org.pageflow.boundedcontext.user.port.out;
 
-import org.pageflow.boundedcontext.user.application.port.in.SignupCmd;
 import org.pageflow.boundedcontext.user.domain.User;
+import org.pageflow.boundedcontext.user.port.in.SignupCmd;
 
 /**
  * @author : sechan

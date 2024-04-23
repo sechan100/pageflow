@@ -6,8 +6,8 @@ import org.pageflow.boundedcontext.user.adapter.in.web.UserRes;
 import org.pageflow.boundedcontext.user.adapter.out.persistence.entity.AccountJpaEntity;
 import org.pageflow.boundedcontext.user.adapter.out.persistence.entity.ProfileJpaEntity;
 import org.pageflow.boundedcontext.user.application.dto.UserDto;
-import org.pageflow.boundedcontext.user.application.port.in.SignupCmd;
 import org.pageflow.boundedcontext.user.domain.*;
+import org.pageflow.boundedcontext.user.port.in.SignupCmd;
 import org.pageflow.global.config.MapStructConfig;
 
 /**

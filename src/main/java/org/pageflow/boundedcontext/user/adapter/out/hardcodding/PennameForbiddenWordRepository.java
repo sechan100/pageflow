@@ -1,7 +1,7 @@
 package org.pageflow.boundedcontext.user.adapter.out.hardcodding;
 
-import org.pageflow.boundedcontext.user.application.port.out.PennameForbiddenWordPort;
 import org.pageflow.boundedcontext.user.domain.Penname;
+import org.pageflow.boundedcontext.user.port.out.PennameForbiddenWordPort;
 import org.pageflow.global.api.code.Code4;
 import org.springframework.stereotype.Repository;
 

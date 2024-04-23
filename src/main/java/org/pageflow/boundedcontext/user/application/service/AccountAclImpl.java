@@ -1,4 +1,4 @@
-package org.pageflow.boundedcontext.user.ohs;
+package org.pageflow.boundedcontext.user.application.service;
 
 import lombok.RequiredArgsConstructor;
 import org.pageflow.boundedcontext.auth.application.acl.AccountAcl;

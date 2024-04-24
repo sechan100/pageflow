@@ -14,11 +14,11 @@ import java.io.IOException;
  * @author : sechan
  */
 public class InternalOnlyUriPretectFilter extends OncePerRequestFilter {
-    public static final String INTERNAL_PATH_PREFIX = "/PRIVATE";
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String uri = request.getRequestURI();
-        boolean isInternalOnly = uri.startsWith(INTERNAL_PATH_PREFIX);
+        boolean isInternalOnly = uri.startsWith(UriPrefix.PRIVATE);
 
         if(isInternalOnly && request.getDispatcherType() != DispatcherType.FORWARD){
             throw Code2.PROTECTED_URI_ACCESS.fire();

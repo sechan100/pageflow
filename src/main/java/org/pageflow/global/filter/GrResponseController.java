@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 @AllArgsConstructor
 public class GrResponseController {
 
-    static final String SEND_GR_ANY_WHERE_ENDPOINT = "/PRIVATE/send-response/gr";
+    static final String SEND_GR_ANY_WHERE_ENDPOINT = UriPrefix.PRIVATE + "/send-response/gr";
     @RequestMapping(SEND_GR_ANY_WHERE_ENDPOINT)
     public GeneralResponse<?> responseGr(HttpServletRequest request){
         return(GeneralResponse<?>) request.getAttribute(ApiExceptionCatchAndDelegatingFilter.GENERAL_RESPONSE_REQUEST_ATTR);

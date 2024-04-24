@@ -13,6 +13,7 @@ import org.pageflow.boundedcontext.auth.port.in.SessionUseCase;
 import org.pageflow.global.api.ApiAccess;
 import org.pageflow.global.api.RequestContext;
 import org.pageflow.global.api.code.Code1;
+import org.pageflow.global.filter.InternalOnlyUriPretectFilter;
 import org.pageflow.global.property.AppProps;
 import org.pageflow.shared.annotation.WebAdapter;
 import org.springframework.security.access.annotation.Secured;
@@ -36,7 +37,7 @@ public class AuthWebAdapter {
     private final SessionUseCase sessionUseCase;
 
 
-    public static final String LOGIN_PATH = "/PRIVATE/auth/login/tokens";
+    public static final String LOGIN_PATH = InternalOnlyUriPretectFilter.INTERNAL_PATH_PREFIX + "/auth/login/tokens";
     public static final String ACCOUNT_REQUEST_ATTR_KEY = "authedAccount";
     @Hidden
     @RequestMapping(LOGIN_PATH)

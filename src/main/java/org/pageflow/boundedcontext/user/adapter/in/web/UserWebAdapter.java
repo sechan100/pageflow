@@ -21,6 +21,7 @@ import org.pageflow.global.api.ApiAccess;
 import org.pageflow.global.api.GeneralResponse;
 import org.pageflow.global.api.RequestContext;
 import org.pageflow.global.api.code.Code2;
+import org.pageflow.global.filter.UriPrefix;
 import org.pageflow.global.property.AppProps;
 import org.pageflow.shared.annotation.WebAdapter;
 import org.springframework.security.access.annotation.Secured;
@@ -74,7 +75,7 @@ public class UserWebAdapter {
     }
 
 
-    public static final String PRE_SIGNUP_PATH = "/PRIVATE/oauth2/pre-signup";
+    public static final String PRE_SIGNUP_PATH = UriPrefix.PRIVATE + "/oauth2/pre-signup";
     public static final String RESOURCE_OWNER_REQUEST_ATTR_KEY = "resourceOwner";
 
     /**

@@ -37,16 +37,17 @@ public class AuthWebAdapter {
     private final SessionUseCase sessionUseCase;
 
 
+    public static final String SPRING_SECURITY_FORM_LOGIN_URI = UriPrefix.PRIVATE + "/auth/login";
     @Operation(summary = "로그인", description = "로그인을 요청하고, accessToken을 발급한다.")
-    @PostMapping("/auth/login")
+    @PostMapping(SPRING_SECURITY_FORM_LOGIN_URI)
     private Res.AccessToken SpringSecurityLogin(String username, String password) {
         throw new UnsupportedOperationException("Spring Security에서 제공");
     }
 
-    public static final String LOGIN_PATH = UriPrefix.PRIVATE + "/auth/login/tokens";
+    public static final String LOGIN_URI = UriPrefix.PRIVATE + "/auth/login/tokens";
     public static final String ACCOUNT_REQUEST_ATTR_KEY = "authedAccount";
     @Hidden
-    @RequestMapping(LOGIN_PATH)
+    @RequestMapping(SPRING_SECURITY_FORM_LOGIN_URI)
     public Res.AccessToken login() {
         Account account = requestContext.getRequestAttr(ACCOUNT_REQUEST_ATTR_KEY);
         // LOGIN

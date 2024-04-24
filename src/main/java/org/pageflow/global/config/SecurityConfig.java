@@ -1,6 +1,7 @@
 package org.pageflow.global.config;
 
 import lombok.RequiredArgsConstructor;
+import org.pageflow.boundedcontext.auth.adapter.in.web.AuthWebAdapter;
 import org.pageflow.boundedcontext.auth.adapter.in.web.JwtAuthorizationFilter;
 import org.pageflow.boundedcontext.auth.application.springsecurity.oauth2.OAuth2Service;
 import org.pageflow.global.filter.ApiExceptionCatchAndDelegatingFilter;
@@ -68,7 +69,7 @@ public class SecurityConfig {
                 .failureHandler(loginFailureHandler)
             )
             .formLogin(form -> form
-                .loginProcessingUrl("/auth/login")
+                .loginProcessingUrl(AuthWebAdapter.SPRING_SECURITY_FORM_LOGIN_URI)
                 .permitAll()
                 .successHandler(loginSuccessHalder)
                 .failureHandler(loginFailureHandler)

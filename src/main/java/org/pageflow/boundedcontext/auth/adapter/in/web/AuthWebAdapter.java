@@ -13,7 +13,7 @@ import org.pageflow.boundedcontext.auth.port.in.SessionUseCase;
 import org.pageflow.global.api.ApiAccess;
 import org.pageflow.global.api.RequestContext;
 import org.pageflow.global.api.code.Code1;
-import org.pageflow.global.filter.InternalOnlyUriPretectFilter;
+import org.pageflow.global.filter.UriPrefix;
 import org.pageflow.global.property.AppProps;
 import org.pageflow.shared.annotation.WebAdapter;
 import org.springframework.security.access.annotation.Secured;
@@ -37,7 +37,13 @@ public class AuthWebAdapter {
     private final SessionUseCase sessionUseCase;
 
 
-    public static final String LOGIN_PATH = InternalOnlyUriPretectFilter.INTERNAL_PATH_PREFIX + "/auth/login/tokens";
+    @Operation(summary = "로그인", description = "로그인을 요청하고, accessToken을 발급한다.")
+    @PostMapping("/auth/login")
+    private Res.AccessToken SpringSecurityLogin(String username, String password) {
+        throw new UnsupportedOperationException("Spring Security에서 제공");
+    }
+
+    public static final String LOGIN_PATH = UriPrefix.PRIVATE + "/auth/login/tokens";
     public static final String ACCOUNT_REQUEST_ATTR_KEY = "authedAccount";
     @Hidden
     @RequestMapping(LOGIN_PATH)

@@ -8,16 +8,16 @@ import org.springframework.lang.Nullable;
 public class ApiException extends RuntimeException {
 
     private final ApiCode origin;
-    private final GeneralResponse<?> gr;
+    private final ApiResponse<?> apiResponse;
 
-    private ApiException(ApiCode origin, GeneralResponse<?> gr){
+    private ApiException(ApiCode origin, ApiResponse<?> apiResponse){
         super("ApiException: " + origin.getTitle() + "(" + origin.getMessage() + ")");
         this.origin = origin;
-        this.gr = gr;
+        this.apiResponse = apiResponse;
     }
 
     public <T> ApiException(ApiCode apiCode, @Nullable String feedback, @Nullable T data){
-        this(apiCode, GeneralResponse.of(apiCode, feedback, data));
+        this(apiCode, ApiResponse.of(apiCode, feedback, data));
     }
 
 }

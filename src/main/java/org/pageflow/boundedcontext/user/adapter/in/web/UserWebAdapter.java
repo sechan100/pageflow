@@ -18,7 +18,7 @@ import org.pageflow.boundedcontext.user.port.in.UserUseCase;
 import org.pageflow.boundedcontext.user.shared.ProviderType;
 import org.pageflow.boundedcontext.user.shared.UserMapper;
 import org.pageflow.global.api.ApiAccess;
-import org.pageflow.global.api.GeneralResponse;
+import org.pageflow.global.api.ApiResponse;
 import org.pageflow.global.api.RequestContext;
 import org.pageflow.global.api.code.Code2;
 import org.pageflow.global.filter.UriPrefix;
@@ -83,7 +83,7 @@ public class UserWebAdapter {
      */
     @Hidden
     @GetMapping(PRE_SIGNUP_PATH)
-    public GeneralResponse<UserRes.PreSignuped> preSignup() {
+    public ApiResponse<UserRes.PreSignuped> preSignup() {
         OAuth2ResourceOwner owner = requestContext.getRequestAttr(RESOURCE_OWNER_REQUEST_ATTR_KEY);
         boolean isAlreadyPreSignuped = preSignupRepo.existsById(owner.getUsername());
 
@@ -103,7 +103,7 @@ public class UserWebAdapter {
             .penname(owner.getNickname())
             .build();
 
-        return GeneralResponse.withoutFeedback(
+        return ApiResponse.withoutFeedback(
             Code2.OAUTH2_SIGNUP_REQUIRED,
             result
         );

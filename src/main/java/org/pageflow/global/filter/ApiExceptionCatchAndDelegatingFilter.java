@@ -22,7 +22,7 @@ import java.io.IOException;
 @Slf4j
 @RequiredArgsConstructor
 public class ApiExceptionCatchAndDelegatingFilter extends OncePerRequestFilter {
-    static final String GENERAL_RESPONSE_REQUEST_ATTR = "ApiExceptionDelegatingFilter.gr";
+    static final String Api_RESPONSE_REQUEST_ATTR = "ApiExceptionDelegatingFilter.gr";
 
     @Override
     protected void doFilterInternal(
@@ -35,9 +35,9 @@ public class ApiExceptionCatchAndDelegatingFilter extends OncePerRequestFilter {
         } catch(ApiException apiException) {
             try {
                 log.warn("Filter 안에서 발생한 ApiException을 SpringMVC로 위임하여, 즉시 api 응답: {}", apiException.getMessage());
-                request.setAttribute(GENERAL_RESPONSE_REQUEST_ATTR, apiException.getGr());
+                request.setAttribute(Api_RESPONSE_REQUEST_ATTR, apiException.getApiResponse());
                 request
-                    .getRequestDispatcher(GrResponseController.SEND_GR_ANY_WHERE_ENDPOINT)
+                    .getRequestDispatcher(DirectApiResponseController.SEND_GR_ANY_WHERE_ENDPOINT)
                     .forward(request, response);
             } catch (ServletException | IOException ex) {
                 throw new RuntimeException(ex);

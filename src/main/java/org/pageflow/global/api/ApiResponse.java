@@ -5,11 +5,10 @@ import org.pageflow.global.api.code.ApiCode;
 import org.springframework.lang.Nullable;
 
 /**
- * GeneralResponse
  * @author : sechan
  */
 @Getter
-public class GeneralResponse<T> {
+public class ApiResponse<T> {
 
     private final String title;
     private final int code;
@@ -19,7 +18,7 @@ public class GeneralResponse<T> {
     private final T data;
 
 
-    private GeneralResponse(ApiCode apiCode, String feedback, @Nullable T data){
+    private ApiResponse(ApiCode apiCode, String feedback, @Nullable T data){
         this.detail = feedback;
         this.data = data;
 
@@ -36,12 +35,12 @@ public class GeneralResponse<T> {
         this.message = _apiCode.getMessage();
     }
 
-    public static <T> GeneralResponse<T> of(ApiCode apiCode, String feedback, @Nullable T data){
-        return new GeneralResponse<>(apiCode, feedback, data);
+    public static <T> ApiResponse<T> of(ApiCode apiCode, String feedback, @Nullable T data){
+        return new ApiResponse<>(apiCode, feedback, data);
     }
 
-    public static <T> GeneralResponse<T> withoutFeedback(ApiCode apiCode, @Nullable T data){
-        return new GeneralResponse<>(apiCode, apiCode.getFeedback(), data);
+    public static <T> ApiResponse<T> withoutFeedback(ApiCode apiCode, @Nullable T data){
+        return new ApiResponse<>(apiCode, apiCode.getFeedback(), data);
     }
 
 

@@ -1,6 +1,7 @@
-package org.pageflow.global.api.code;
+package org.pageflow.global.api.init;
 
 import lombok.extern.slf4j.Slf4j;
+import org.pageflow.global.api.code.ApiCode;
 import org.pageflow.global.initialize.RuntimeInitializer;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;

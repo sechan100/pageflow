@@ -1,4 +1,4 @@
-package org.pageflow.global.api;
+package org.pageflow.global.api.code;
 
 import lombok.Getter;
 import lombok.Value;

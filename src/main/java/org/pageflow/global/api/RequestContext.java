@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.pageflow.boundedcontext.auth.application.dto.Principal;
 import org.pageflow.boundedcontext.user.domain.UID;
+import org.pageflow.global.api.code.Code1;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -32,7 +33,8 @@ public class RequestContext {
     private final Principal.Base principal;
     private final HttpServletRequest request;
     private final HttpServletResponse response;
-    
+
+
     public RequestContext() {
         ServletRequestAttributes servletRequest = Preconditions.checkNotNull(
             ((ServletRequestAttributes)RequestContextHolder.getRequestAttributes()),
@@ -117,9 +119,12 @@ public class RequestContext {
 
     /**
      * @return 현재 로그인한 사용자의 UID
+     * @apiNote 만약 로그인된 사용자가 아닌 경우 Code1.LOGIN_REQUIRED을 발생함.
      */
     public UID getUID() {
-        return principal.getUid();
+        UID uid = principal.getUid();
+        if(!uid.equals(UID.from(0L))) throw Code1.LOGIN_REQUIRED.fire();
+        else return uid;
     }
 
     public HttpServletRequest getRequest() {

@@ -17,6 +17,7 @@ import java.util.Map;
 public abstract class Principal {
     public interface Base {
         UID getUid();
+        RoleType getRole();
     }
 
     /**
@@ -81,6 +82,11 @@ public abstract class Principal {
         @Override
         public UID getUid() {
             return authedAccount.getUid();
+        }
+
+        @Override
+        public RoleType getRole() {
+            return authedAccount.getRole();
         }
     }
 

@@ -1,7 +1,7 @@
 package org.pageflow.boundedcontext.auth.application.service;
 
 import lombok.RequiredArgsConstructor;
-import org.pageflow.boundedcontext.auth.application.acl.AccountAcl;
+import org.pageflow.boundedcontext.auth.application.acl.LoadAccountAcl;
 import org.pageflow.boundedcontext.auth.application.dto.Principal;
 import org.pageflow.boundedcontext.auth.application.dto.Token;
 import org.pageflow.boundedcontext.auth.domain.AccessToken;
@@ -28,7 +28,7 @@ public class AuthService implements SessionUseCase, TokenUseCase {
 
     private final CmdSessionPort cmdSessionPort;
     private final LoadSessionPort loadSessionPort;
-    private final AccountAcl accountAcl;
+    private final LoadAccountAcl loadAccountAcl;
     private final AuthMapper mapper;
 
     @Override

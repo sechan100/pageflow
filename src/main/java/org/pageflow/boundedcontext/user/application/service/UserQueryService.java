@@ -1,12 +1,16 @@
 package org.pageflow.boundedcontext.user.application.service;
 
 import lombok.RequiredArgsConstructor;
-import org.pageflow.boundedcontext.auth.application.acl.AccountAcl;
+import org.pageflow.boundedcontext.auth.application.acl.LoadAccountAcl;
+import org.pageflow.boundedcontext.auth.application.acl.LoadSessionUserAcl;
 import org.pageflow.boundedcontext.auth.domain.Account;
 import org.pageflow.boundedcontext.auth.domain.EncryptedPassword;
 import org.pageflow.boundedcontext.user.adapter.out.persistence.entity.AccountJpaEntity;
 import org.pageflow.boundedcontext.user.adapter.out.persistence.repository.AccountJpaRepository;
+import org.pageflow.boundedcontext.user.application.dto.UserDto;
 import org.pageflow.boundedcontext.user.domain.UID;
+import org.pageflow.global.api.code.Code3;
+import org.pageflow.shared.type.TSID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,7 +22,7 @@ import java.util.Optional;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class AccountAclImpl implements AccountAcl {
+public class UserQueryService implements LoadAccountAcl, LoadSessionUserAcl {
     private final AccountJpaRepository accountJpaRepository;
 
 
@@ -42,5 +46,19 @@ public class AccountAclImpl implements AccountAcl {
             entity.getEmail(),
             entity.getRole()
         );
+    }
+
+    @Override
+    public UserDto.Session loadSessionUser(UID uid) {
+        return accountJpaRepository.findWithProfileById(uid.toLong())
+            .map(entity -> UserDto.Session.builder()
+                .uid(TSID.from(entity.getId()))
+                .username(entity.getUsername())
+                .email(entity.getEmail())
+                .isEmailVerified(entity.isEmailVerified())
+                .penname(entity.getProfile().getPenname())
+                .profileImageUrl(entity.getProfile().getProfileImgUrl())
+                .build()
+            ).orElseThrow(() -> Code3.DATA_NOT_FOUND.feedback("사용자를 찾을 수 없습니다"));
     }
 }

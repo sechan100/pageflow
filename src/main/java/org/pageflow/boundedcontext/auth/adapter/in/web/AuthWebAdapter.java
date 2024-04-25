@@ -5,11 +5,14 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.pageflow.boundedcontext.auth.application.acl.LoadSessionUserAcl;
 import org.pageflow.boundedcontext.auth.application.dto.Token;
 import org.pageflow.boundedcontext.auth.domain.Account;
 import org.pageflow.boundedcontext.auth.domain.SessionId;
 import org.pageflow.boundedcontext.auth.port.in.LoginCmd;
 import org.pageflow.boundedcontext.auth.port.in.SessionUseCase;
+import org.pageflow.boundedcontext.user.application.dto.UserDto;
+import org.pageflow.boundedcontext.user.domain.UID;
 import org.pageflow.global.api.ApiAccess;
 import org.pageflow.global.api.RequestContext;
 import org.pageflow.global.api.code.Code1;
@@ -35,6 +38,7 @@ public class AuthWebAdapter {
     private final AppProps props;
     private final RequestContext requestContext;
     private final SessionUseCase sessionUseCase;
+    private final LoadSessionUserAcl loadSessionUserAcl;
 
 
     public static final String SPRING_SECURITY_FORM_LOGIN_URI = UriPrefix.PRIVATE + "/auth/login";
@@ -97,15 +101,27 @@ public class AuthWebAdapter {
             .build();
     }
 
-    @Secured(ApiAccess.USER) // USER 권한이 있어야만 로그아웃 가능
+    @Secured(ApiAccess.USER)
     @Operation(summary = "로그아웃", description = "쿠키로 전달된 sessionId를 받아서, 해당 세션을 무효화")
     @PostMapping("/auth/session/logout")
     public void logout() {
-        requestContext.getCookie(SESSION_ID_COOKIE_NAME).ifPresent(cookie ->
-        {
-            sessionUseCase.logout(SessionId.from(cookie.getValue()));
-            requestContext.removeCookie(SESSION_ID_COOKIE_NAME);
-        });
+        requestContext.getCookie(SESSION_ID_COOKIE_NAME)
+            .ifPresent(cookie -> {
+                sessionUseCase.logout(SessionId.from(cookie.getValue()));
+                requestContext.removeCookie(SESSION_ID_COOKIE_NAME);
+            });
     }
+
+    @Secured(ApiAccess.USER)
+    @Operation(summary = "세션정보 가져오기", description = "accessToken에 저장된 UID를 기반으로 사용자의 세션 정보를 조회")
+    @PostMapping("/auth/session/info")
+    public Res.SessionInfo getSession(){
+        UID uid = requestContext.getUID();
+        UserDto.Session sessionUser = loadSessionUserAcl.loadSessionUser(uid);
+        return Res.SessionInfo.builder()
+            .user(sessionUser)
+            .build();
+    }
+
 
 }

@@ -17,7 +17,7 @@ import org.pageflow.global.api.FeedbackTemplate;
 @AllArgsConstructor
 public enum Code1 implements ApiCode {
     // 1000: LOGIN
-      LOGIN_REQUIRED(1000,"로그인 필요", "로그인이 필요합니다!")
+      LOGIN_REQUIRED(1000, "로그인 필요", "로그인이 필요합니다!")
 
     // 1100: LOGOUT
 

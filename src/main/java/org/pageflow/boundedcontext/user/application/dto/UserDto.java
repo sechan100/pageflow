@@ -15,10 +15,11 @@ public abstract class UserDto {
         TSID uid;
         String username;
         String email;
-        boolean emailVerified;
+        boolean isEmailVerified;
         ProviderType provider;
         RoleType role;
         String penname;
         String profileImageUrl;
     }
+
 }

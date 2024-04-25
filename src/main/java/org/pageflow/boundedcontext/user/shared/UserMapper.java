@@ -18,7 +18,7 @@ public interface UserMapper {
     @Mapping(target = "username", source = "cmd.username.value")
     @Mapping(target = "email", source = "cmd.email.value")
     @Mapping(target = "penname", source = "cmd.penname.value")
-    @Mapping(target = "emailVerified", expression = "java(cmd.getEmail().isVerified())")
+    @Mapping(target = "isEmailVerified", expression = "java(cmd.getEmail().isVerified())")
     @Mapping(target = "profileImageUrl", source = "cmd.profileImage.value")
     @Mapping(target = "uid", expression = "java(uid.getValue())")
     UserDto.Signup signupDto_UidAndsignupCmd(UID uid, SignupCmd cmd);

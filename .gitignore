@@ -38,19 +38,16 @@ out/
 .vscode/
 
 
-### security ###
+### custom ###
 src/main/resources/application-prod.yml
 src/main/resources/application-secret.yml
-src/main/react/**/node_modules/
-src/main/react/**/build/
+src/main/generated
 /caches/
 /daemon/
 /jdks/
 /native/
 /wrapper/
 dump.rdb
-src/main/resources/static/js/node_modules/
-/src/main/resources/static/js/node_modules/
 .gitsecret/keys/random_seed
 !*.secret
 .env.ci

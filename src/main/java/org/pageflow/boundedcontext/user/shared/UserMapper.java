@@ -2,7 +2,6 @@ package org.pageflow.boundedcontext.user.shared;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.pageflow.boundedcontext.user.adapter.in.web.UserRes;
 import org.pageflow.boundedcontext.user.adapter.out.persistence.entity.AccountJpaEntity;
 import org.pageflow.boundedcontext.user.adapter.out.persistence.entity.ProfileJpaEntity;
 import org.pageflow.boundedcontext.user.application.dto.UserDto;
@@ -23,15 +22,13 @@ public interface UserMapper {
     @Mapping(target = "uid", expression = "java(uid.getValue())")
     UserDto.Signup signupDto_UidAndsignupCmd(UID uid, SignupCmd cmd);
 
-    UserRes.Signup resSignup_dtoSignup(UserDto.Signup dto);
-
     default User user_jpaEntities(AccountJpaEntity a, ProfileJpaEntity p){
         return new User(
             UID.from(a.getId()),
             Username.of(a.getUsername()),
             Email.of(a.getEmail(), a.isEmailVerified()),
             Penname.of(p.getPenname()),
-            ProfileImage.of(p.getProfileImgUrl())
+            ProfileImage.of(p.getProfileImageUrl())
         );
     }
 }

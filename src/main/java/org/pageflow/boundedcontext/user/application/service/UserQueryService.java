@@ -51,14 +51,15 @@ public class UserQueryService implements LoadAccountAcl, LoadSessionUserAcl {
     @Override
     public UserDto.Session loadSessionUser(UID uid) {
         return accountJpaRepository.findWithProfileById(uid.toLong())
-            .map(entity -> UserDto.Session.builder()
-                .uid(TSID.from(entity.getId()))
-                .username(entity.getUsername())
-                .email(entity.getEmail())
-                .isEmailVerified(entity.isEmailVerified())
-                .penname(entity.getProfile().getPenname())
-                .profileImageUrl(entity.getProfile().getProfileImgUrl())
-                .build()
+            .map(entity -> new UserDto.Session(
+                TSID.from(entity.getId()),
+                entity.getUsername(),
+                entity.getEmail(),
+                entity.isEmailVerified(),
+                entity.getRole(),
+                entity.getProfile().getPenname(),
+                entity.getProfile().getProfileImageUrl()
+                )
             ).orElseThrow(() -> Code3.DATA_NOT_FOUND.feedback("사용자를 찾을 수 없습니다"));
     }
 }

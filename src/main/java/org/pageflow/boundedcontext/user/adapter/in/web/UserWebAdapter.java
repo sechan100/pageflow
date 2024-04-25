@@ -45,7 +45,7 @@ public class UserWebAdapter {
     @Secured(ApiAccess.ANONYMOUS)
     @Operation(summary = "회원가입", description = "새로운 사용자의 회원가입을 요청")
     @PostMapping("/signup")
-    public UserRes.Signup signup(@Valid @RequestBody UserReq.SignupForm form) {
+    public Res.Signup signup(@Valid @RequestBody UserReq.SignupForm form) {
         Optional<OAuth2PreSignupCache> loaded = preSignupRepo.findById(form.getUsername());
 
         String profileImageUrl;
@@ -71,7 +71,11 @@ public class UserWebAdapter {
         );
 
         UserDto.Signup result = userUsecase.signup(cmd);
-        return mapper.resSignup_dtoSignup(result);
+        return new Res.Signup(
+            result.getUsername(),
+            result.getEmail(),
+            result.getPenname()
+        );
     }
 
 
@@ -83,7 +87,7 @@ public class UserWebAdapter {
      */
     @Hidden
     @GetMapping(PRE_SIGNUP_PATH)
-    public ApiResponse<UserRes.PreSignuped> preSignup() {
+    public ApiResponse<Res.PreSignuped> preSignup() {
         OAuth2ResourceOwner owner = requestContext.getRequestAttr(RESOURCE_OWNER_REQUEST_ATTR_KEY);
         boolean isAlreadyPreSignuped = preSignupRepo.existsById(owner.getUsername());
 
@@ -97,11 +101,11 @@ public class UserWebAdapter {
             );
         }
 
-        UserRes.PreSignuped result = UserRes.PreSignuped.builder()
-            .username(owner.getUsername())
-            .email(owner.getEmail())
-            .penname(owner.getNickname())
-            .build();
+        Res.PreSignuped result = new Res.PreSignuped(
+            owner.getUsername(),
+            owner.getEmail(),
+            owner.getNickname()
+        );
 
         return ApiResponse.withoutFeedback(
             Code2.OAUTH2_SIGNUP_REQUIRED,

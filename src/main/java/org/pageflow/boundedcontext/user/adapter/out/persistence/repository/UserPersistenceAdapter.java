@@ -37,7 +37,7 @@ public class UserPersistenceAdapter implements CmdUserPort, LoadUserPort, UserEx
 
         ProfileJpaEntity p = a.getProfile();
         p.setPenname(user.getPenname().toString());
-        p.setProfileImgUrl(user.getProfileImage().getValue());
+        p.setProfileImageUrl(user.getProfileImage().getValue());
     }
 
     @Override
@@ -48,7 +48,7 @@ public class UserPersistenceAdapter implements CmdUserPort, LoadUserPort, UserEx
         ProfileJpaEntity profile = ProfileJpaEntity.builder()
             .id(uid)
             .penname(cmd.getPenname().toString())
-            .profileImgUrl(cmd.getProfileImage().getValue())
+            .profileImageUrl(cmd.getProfileImage().getValue())
             .build();
 
         // 계정 생성
@@ -94,7 +94,7 @@ public class UserPersistenceAdapter implements CmdUserPort, LoadUserPort, UserEx
             Username.of(a.getUsername()),
             Email.of(a.getEmail(), a.isEmailVerified()),
             Penname.of(p.getPenname()),
-            ProfileImage.of(p.getProfileImgUrl())
+            ProfileImage.of(p.getProfileImageUrl())
         );
     }
 }

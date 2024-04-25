@@ -25,7 +25,7 @@ public class ProfileJpaEntity extends BaseJpaEntity {
     private String penname;
 
     @Column(nullable = false, columnDefinition = "TEXT")
-    private String profileImgUrl;
+    private String profileImageUrl;
 
     @JsonIgnore
     @MapsId

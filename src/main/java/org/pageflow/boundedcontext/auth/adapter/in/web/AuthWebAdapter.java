@@ -78,10 +78,10 @@ public class AuthWebAdapter {
         // 할당
         requestContext.setCookie(sessionIdCookie);
 
-        return Res.AccessToken.builder()
-                .compact(at.getCompact())
-                .exp(at.getExp().getEpochSecond())
-                .build();
+        return new Res.AccessToken(
+            at.getCompact(),
+            at.getExp().toEpochMilli()
+        );
     }
 
     @Secured(ApiAccess.USER)
@@ -96,10 +96,10 @@ public class AuthWebAdapter {
         // REFRESH
         Token.AccessTokenDto at = sessionUseCase.refresh(SessionId.from(rtCookieOp.get().getValue()));
 
-        return Res.AccessToken.builder()
-            .compact(at.getCompact())
-            .exp(at.getExp().getEpochSecond())
-            .build();
+        return new Res.AccessToken(
+            at.getCompact(),
+            at.getExp().getEpochSecond()
+        );
     }
 
     @Secured(ApiAccess.USER)
@@ -119,9 +119,9 @@ public class AuthWebAdapter {
     public Res.SessionInfo getSession(){
         UID uid = requestContext.getUID();
         UserDto.Session sessionUser = loadSessionUserAcl.loadSessionUser(uid);
-        return Res.SessionInfo.builder()
-            .user(sessionUser)
-            .build();
+        return new Res.SessionInfo(
+            sessionUser
+        );
     }
 
 

@@ -1,7 +1,7 @@
 package org.pageflow.boundedcontext.user.shared;
 
 import javax.annotation.processing.Generated;
-import org.pageflow.boundedcontext.user.adapter.in.web.UserRes;
+import org.pageflow.boundedcontext.auth.shared.RoleType;
 import org.pageflow.boundedcontext.user.application.dto.UserDto;
 import org.pageflow.boundedcontext.user.domain.Email;
 import org.pageflow.boundedcontext.user.domain.Penname;
@@ -9,11 +9,12 @@ import org.pageflow.boundedcontext.user.domain.ProfileImage;
 import org.pageflow.boundedcontext.user.domain.UID;
 import org.pageflow.boundedcontext.user.domain.Username;
 import org.pageflow.boundedcontext.user.port.in.SignupCmd;
+import org.pageflow.shared.type.TSID;
 import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2024-04-25T17:36:10+0900",
+    date = "2024-04-25T18:06:10+0900",
     comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.8 (Homebrew)"
 )
 @Component
@@ -25,35 +26,27 @@ public class UserMapperImpl implements UserMapper {
             return null;
         }
 
-        UserDto.Signup.SignupBuilder signup = UserDto.Signup.builder();
-
+        String username = null;
+        String email = null;
+        String penname = null;
+        String profileImageUrl = null;
+        ProviderType provider = null;
+        RoleType role = null;
         if ( cmd != null ) {
-            signup.username( cmdUsernameValue( cmd ) );
-            signup.email( cmdEmailValue( cmd ) );
-            signup.penname( cmdPennameValue( cmd ) );
-            signup.profileImageUrl( cmdProfileImageValue( cmd ) );
-            signup.provider( cmd.getProvider() );
-            signup.role( cmd.getRole() );
-        }
-        signup.isEmailVerified( cmd.getEmail().isVerified() );
-        signup.uid( uid.getValue() );
-
-        return signup.build();
-    }
-
-    @Override
-    public UserRes.Signup resSignup_dtoSignup(UserDto.Signup dto) {
-        if ( dto == null ) {
-            return null;
+            username = cmdUsernameValue( cmd );
+            email = cmdEmailValue( cmd );
+            penname = cmdPennameValue( cmd );
+            profileImageUrl = cmdProfileImageValue( cmd );
+            provider = cmd.getProvider();
+            role = cmd.getRole();
         }
 
-        UserRes.Signup.SignupBuilder signup = UserRes.Signup.builder();
+        boolean isEmailVerified = cmd.getEmail().isVerified();
+        TSID uid1 = uid.getValue();
 
-        signup.username( dto.getUsername() );
-        signup.email( dto.getEmail() );
-        signup.penname( dto.getPenname() );
+        UserDto.Signup signup = new UserDto.Signup( uid1, username, email, isEmailVerified, provider, role, penname, profileImageUrl );
 
-        return signup.build();
+        return signup;
     }
 
     private String cmdUsernameValue(SignupCmd signupCmd) {

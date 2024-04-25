@@ -2,7 +2,6 @@ package org.pageflow.global.api.code;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.pageflow.global.api.ApiException;
 
 /**
  * <p>LEVEL: 2000</p>

@@ -1,9 +1,12 @@
-package org.pageflow.global.api;
+package org.pageflow.global.api.code;
 
 import lombok.Getter;
-import org.pageflow.global.api.code.ApiCode;
+import org.pageflow.global.api.ApiResponse;
 import org.springframework.lang.Nullable;
 
+/**
+ * ApiCode의 구현체인 enum을 통해서만 생성
+ */
 @Getter
 public class ApiException extends RuntimeException {
 
@@ -16,7 +19,7 @@ public class ApiException extends RuntimeException {
         this.apiResponse = apiResponse;
     }
 
-    public <T> ApiException(ApiCode apiCode, @Nullable String feedback, @Nullable T data){
+    <T> ApiException(ApiCode apiCode, @Nullable String feedback, @Nullable T data){
         this(apiCode, ApiResponse.of(apiCode, feedback, data));
     }
 

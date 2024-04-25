@@ -1,8 +1,8 @@
 package org.pageflow.global.advice;
 
 import lombok.extern.slf4j.Slf4j;
-import org.pageflow.global.api.ApiException;
 import org.pageflow.global.api.ApiResponse;
+import org.pageflow.global.api.code.ApiException;
 import org.pageflow.global.api.code.Code4;
 import org.pageflow.global.api.code.Code5;
 import org.springframework.http.converter.HttpMessageConversionException;

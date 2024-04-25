@@ -2,7 +2,6 @@ package org.pageflow.global.api.code;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.pageflow.global.api.ApiException;
 import org.pageflow.global.api.FeedbackTemplate;
 
 import java.util.function.Function;

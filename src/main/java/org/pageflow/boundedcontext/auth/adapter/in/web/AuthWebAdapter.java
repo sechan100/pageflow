@@ -20,6 +20,7 @@ import org.pageflow.global.filter.UriPrefix;
 import org.pageflow.global.property.AppProps;
 import org.pageflow.shared.annotation.WebAdapter;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -114,7 +115,7 @@ public class AuthWebAdapter {
 
     @Secured(ApiAccess.USER)
     @Operation(summary = "세션정보 가져오기", description = "accessToken에 저장된 UID를 기반으로 사용자의 세션 정보를 조회")
-    @PostMapping("/auth/session/info")
+    @GetMapping("/auth/session/info")
     public Res.SessionInfo getSession(){
         UID uid = requestContext.getUID();
         UserDto.Session sessionUser = loadSessionUserAcl.loadSessionUser(uid);

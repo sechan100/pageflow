@@ -42,7 +42,7 @@ public class AuthWebAdapter {
     private final LoadSessionUserAcl loadSessionUserAcl;
 
 
-    public static final String SPRING_SECURITY_FORM_LOGIN_URI = UriPrefix.PRIVATE + "/auth/login";
+    public static final String SPRING_SECURITY_FORM_LOGIN_URI = "/auth/login";
     @Operation(summary = "로그인", description = "로그인을 요청하고, accessToken을 발급한다.")
     @PostMapping(SPRING_SECURITY_FORM_LOGIN_URI)
     private Res.AccessToken SpringSecurityLogin(String username, String password) {

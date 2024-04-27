@@ -25,6 +25,6 @@ public enum Code6 implements ApiCode {
     private final String feedback;
 
     public ApiException fire() {
-        return new ApiException(this, this.getFeedback(), null);
+        return new ApiException(this, this.getFeedback(), null, null);
     }
 }

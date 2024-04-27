@@ -82,8 +82,8 @@ public final class AccessToken {
         );
 
         Claims claims = tryParse
-            .recover(ExpiredJwtException.class, e -> {throw Code1.ACCESS_TOKEN_EXPIRED.fire();})
-            .recover(JwtException.class, e -> {throw Code1.INVALID_ACCESS_TOKEN.fire();})
+            .recover(ExpiredJwtException.class, e -> {throw Code1.ACCESS_TOKEN_EXPIRED.fire(e);})
+            .recover(JwtException.class, e -> {throw Code1.INVALID_ACCESS_TOKEN.fire(e);})
             .get();
 
         return new AccessToken(claims);

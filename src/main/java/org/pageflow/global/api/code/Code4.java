@@ -53,6 +53,6 @@ public enum Code4 implements ApiCode {
     }
 
     public ApiException feedback(String feedback) {
-        return new ApiException(this, feedback, null);
+        return new ApiException(this, feedback, null, null);
     }
 }

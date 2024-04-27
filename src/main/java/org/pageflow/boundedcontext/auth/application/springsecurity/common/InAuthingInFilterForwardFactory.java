@@ -13,7 +13,7 @@ public abstract class InAuthingInFilterForwardFactory {
 
     public static Forward getLoginFoward(Account alreadyAuthedAccount) {
         return Forward.confrimInServletRequestContext()
-            .path(AuthWebAdapter.SPRING_SECURITY_FORM_LOGIN_URI)
+            .path(AuthWebAdapter.LOGIN_URI)
             .requestAttr(AuthWebAdapter.ACCOUNT_REQUEST_ATTR_KEY, alreadyAuthedAccount);
     }
 

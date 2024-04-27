@@ -36,6 +36,6 @@ public enum Code3 implements ApiCode {
     }
 
     public ApiException feedback(String feedback) {
-        return new ApiException(this, feedback, null);
+        return new ApiException(this, feedback, null, null);
     }
 }

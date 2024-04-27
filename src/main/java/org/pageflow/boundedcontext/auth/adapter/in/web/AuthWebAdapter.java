@@ -52,7 +52,7 @@ public class AuthWebAdapter {
     public static final String LOGIN_URI = UriPrefix.PRIVATE + "/auth/login/tokens";
     public static final String ACCOUNT_REQUEST_ATTR_KEY = "authedAccount";
     @Hidden
-    @RequestMapping(SPRING_SECURITY_FORM_LOGIN_URI)
+    @RequestMapping(LOGIN_URI)
     public Res.AccessToken login() {
         Account account = requestContext.getRequestAttr(ACCOUNT_REQUEST_ATTR_KEY);
         // LOGIN

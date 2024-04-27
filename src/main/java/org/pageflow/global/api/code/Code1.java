@@ -39,6 +39,10 @@ public enum Code1 implements ApiCode {
     private final String feedback;
 
     public ApiException fire() {
-        return new ApiException(this, this.getFeedback(), null);
+        return new ApiException(this, this.getFeedback(), null, null);
+    }
+
+    public ApiException fire(Throwable cause) {
+        return new ApiException(this, this.getFeedback(), null, cause);
     }
 }

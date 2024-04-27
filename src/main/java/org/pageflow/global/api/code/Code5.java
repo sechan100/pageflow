@@ -40,6 +40,6 @@ public enum Code5 implements ApiCode {
     }
 
     public ApiException fire() {
-        return new ApiException(this, this.getFeedback(), null);
+        return new ApiException(this, this.getFeedback(), null, null);
     }
 }

@@ -11,14 +11,10 @@ public class ApiException extends RuntimeException {
     private final ApiCode origin;
     private final ApiResponse<?> apiResponse;
 
-    private ApiException(ApiCode origin, ApiResponse<?> apiResponse){
-        super("ApiException: " + origin.getTitle() + "(" + origin.getMessage() + ")");
+    <T> ApiException(ApiCode origin, @Nullable String feedback, @Nullable T data, @Nullable Throwable cause){
+        super("ApiException: " + origin.getTitle() + "(" + origin.getMessage() + ")", cause);
         this.origin = origin;
-        this.apiResponse = apiResponse;
-    }
-
-    <T> ApiException(ApiCode apiCode, @Nullable String feedback, @Nullable T data){
-        this(apiCode, ApiResponse.of(apiCode, feedback, data));
+        this.apiResponse = ApiResponse.of(origin, feedback, data);
     }
 
     public ApiCode getOriginApiCode() {

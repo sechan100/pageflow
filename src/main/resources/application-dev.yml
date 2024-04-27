@@ -69,7 +69,7 @@ logging:
     org:
       pageflow: DEBUG
       springframework:
-        security: DEBUG
+        security: INFO
 
 custom:
   site:

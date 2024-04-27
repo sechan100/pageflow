@@ -22,6 +22,7 @@ public class ExceptionRestAdvice {
 
     @ExceptionHandler(ApiException.class)
     public ApiResponse<?> handleApiException(ApiException e) {
+        log.trace("ApiException을 advice에서 처리 \n ====================[ EXCEPTION ]====================", e);
         return e.getApiResponse();
     }
 
@@ -65,7 +66,7 @@ public class ExceptionRestAdvice {
 
     @ExceptionHandler(NoSuchElementException.class)
     public ApiResponse<Void> handleNoSuchElementException(NoSuchElementException e) {
-        log.debug("NoSuchElementException의 경우 Spring Date 스펙에서 사용하는 Optional에서 발생했을 가능성이 농후하니, Optional에서 발생하는지 먼저 확인할 것");
+        log.warn("NoSuchElementException의 경우 Spring Date 스펙에서 사용하는 Optional에서 발생했을 가능성이 농후하니, Optional에서 발생하는지 먼저 확인할 것");
         // 어디서 발생한지 모르는 범용적인 예외이니, 상세한 정보를 제공하지 않는다.
         return ApiResponse.withoutFeedback(Code5.INTERNAL_SERVER_ERROR, null);
     }

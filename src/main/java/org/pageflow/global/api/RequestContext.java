@@ -123,7 +123,7 @@ public class RequestContext {
      */
     public UID getUID() {
         UID uid = principal.getUid();
-        if(!uid.equals(UID.from(0L))) throw Code1.LOGIN_REQUIRED.fire();
+        if(uid.equals(UID.from(0L))) throw Code1.LOGIN_REQUIRED.fire();
         else return uid;
     }
 

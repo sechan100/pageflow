@@ -2,11 +2,11 @@ package org.pageflow.boundedcontext.user.shared;
 
 import javax.annotation.processing.Generated;
 import org.pageflow.boundedcontext.auth.shared.RoleType;
+import org.pageflow.boundedcontext.common.value.Email;
+import org.pageflow.boundedcontext.common.value.UID;
 import org.pageflow.boundedcontext.user.application.dto.UserDto;
-import org.pageflow.boundedcontext.user.domain.Email;
 import org.pageflow.boundedcontext.user.domain.Penname;
 import org.pageflow.boundedcontext.user.domain.ProfileImage;
-import org.pageflow.boundedcontext.user.domain.UID;
 import org.pageflow.boundedcontext.user.domain.Username;
 import org.pageflow.boundedcontext.user.port.in.SignupCmd;
 import org.pageflow.shared.type.TSID;
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2024-04-27T12:09:39+0900",
+    date = "2024-04-28T21:07:55+0900",
     comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.8 (Homebrew)"
 )
 @Component

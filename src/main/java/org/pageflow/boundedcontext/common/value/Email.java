@@ -1,4 +1,4 @@
-package org.pageflow.boundedcontext.user.domain;
+package org.pageflow.boundedcontext.common.value;
 
 import lombok.Getter;
 import org.pageflow.global.api.code.Code4;

@@ -2,7 +2,7 @@ package org.pageflow.boundedcontext.auth.domain;
 
 import lombok.Value;
 import org.pageflow.boundedcontext.auth.shared.RoleType;
-import org.pageflow.boundedcontext.user.domain.UID;
+import org.pageflow.boundedcontext.common.value.UID;
 
 /**
  * @author : sechan

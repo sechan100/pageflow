@@ -1,4 +1,4 @@
-package org.pageflow.boundedcontext.user.domain;
+package org.pageflow.boundedcontext.common.value;
 
 import org.pageflow.shared.type.SingleValueWrapper;
 import org.pageflow.shared.type.TSID;

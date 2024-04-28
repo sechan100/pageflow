@@ -8,12 +8,12 @@ import org.pageflow.boundedcontext.auth.domain.AccessToken;
 import org.pageflow.boundedcontext.auth.domain.RefreshToken;
 import org.pageflow.boundedcontext.auth.domain.Session;
 import org.pageflow.boundedcontext.auth.domain.SessionId;
-import org.pageflow.boundedcontext.user.domain.UID;
+import org.pageflow.boundedcontext.common.value.UID;
 import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2024-04-27T12:09:39+0900",
+    date = "2024-04-28T20:51:27+0900",
     comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.8 (Homebrew)"
 )
 @Component

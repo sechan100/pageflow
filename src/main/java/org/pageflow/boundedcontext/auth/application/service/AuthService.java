@@ -11,8 +11,7 @@ import org.pageflow.boundedcontext.auth.domain.SessionId;
 import org.pageflow.boundedcontext.auth.port.in.LoginCmd;
 import org.pageflow.boundedcontext.auth.port.in.SessionUseCase;
 import org.pageflow.boundedcontext.auth.port.in.TokenUseCase;
-import org.pageflow.boundedcontext.auth.port.out.CmdSessionPort;
-import org.pageflow.boundedcontext.auth.port.out.LoadSessionPort;
+import org.pageflow.boundedcontext.auth.port.out.SessionPersistencePort;
 import org.pageflow.boundedcontext.auth.shared.AuthMapper;
 import org.pageflow.global.api.code.Code1;
 import org.pageflow.shared.annotation.UseCase;
@@ -26,8 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class AuthService implements SessionUseCase, TokenUseCase {
 
-    private final CmdSessionPort cmdSessionPort;
-    private final LoadSessionPort loadSessionPort;
+    private final SessionPersistencePort sessionPersistencePort;
     private final LoadAccountAcl loadAccountAcl;
     private final AuthMapper mapper;
 
@@ -37,7 +35,7 @@ public class AuthService implements SessionUseCase, TokenUseCase {
 
         // 세션 로그인 후 영속
         Session session = Session.login(account.getUid(), account.getRole());
-        cmdSessionPort.save(session);
+        sessionPersistencePort.save(session);
 
         // 최초 AccessToken 발급(refresh)
         AccessToken accessToken = session.refresh();
@@ -51,7 +49,7 @@ public class AuthService implements SessionUseCase, TokenUseCase {
     @Override
     public Token.AccessTokenDto refresh(SessionId sessionId){
         // 세션 로드. 조회 실패시, scheduling에 의해 삭제된 '만료세션'으로 간주.
-        Session session = loadSessionPort.load(sessionId).orElseThrow(
+        Session session = sessionPersistencePort.load(sessionId).orElseThrow(
             Code1.SESSION_EXPIRED::fire
         );
 
@@ -63,7 +61,7 @@ public class AuthService implements SessionUseCase, TokenUseCase {
     @Override
     public void logout(SessionId sessionId){
         // 만약, 해당 세션이 이미 존재하지 않아서 삭제할 수 없는 경우, 그냥 아무동작을 하지 않는다.(이미 삭제된 것과 마찬가지)
-        cmdSessionPort.delete(sessionId);
+        sessionPersistencePort.delete(sessionId);
     }
 
     @Override

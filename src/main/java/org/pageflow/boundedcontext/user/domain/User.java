@@ -2,6 +2,8 @@ package org.pageflow.boundedcontext.user.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.pageflow.boundedcontext.common.value.Email;
+import org.pageflow.boundedcontext.common.value.UID;
 import org.pageflow.shared.annotation.AggregateRoot;
 
 /**

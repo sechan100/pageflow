@@ -7,7 +7,7 @@ import io.jsonwebtoken.Jwts;
 import io.vavr.control.Try;
 import lombok.Value;
 import org.pageflow.boundedcontext.auth.shared.RoleType;
-import org.pageflow.boundedcontext.user.domain.UID;
+import org.pageflow.boundedcontext.common.value.UID;
 import org.pageflow.global.api.code.Code1;
 import org.pageflow.global.property.PropsAware;
 

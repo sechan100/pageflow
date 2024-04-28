@@ -9,6 +9,7 @@ import org.pageflow.boundedcontext.common.value.UID;
 import org.pageflow.boundedcontext.user.adapter.out.persistence.entity.AccountJpaEntity;
 import org.pageflow.boundedcontext.user.adapter.out.persistence.repository.AccountJpaRepository;
 import org.pageflow.boundedcontext.user.application.dto.UserDto;
+import org.pageflow.boundedcontext.user.domain.Email;
 import org.pageflow.global.api.code.Code3;
 import org.pageflow.shared.type.TSID;
 import org.springframework.stereotype.Service;
@@ -27,25 +28,15 @@ public class UserQueryService implements LoadAccountAcl, LoadSessionUserAcl {
 
 
     @Override
-    public Optional<Account> loadAccount(String username) {
+    public Optional<Account> load(String username) {
         Optional<AccountJpaEntity> op = accountJpaRepository.findByUsername(username);
         return op.map(this::toAccount);
     }
 
     @Override
-    public Optional<Account> loadAccount(UID uid) {
+    public Optional<Account> load(UID uid) {
         Optional<AccountJpaEntity> op = accountJpaRepository.findById(uid.toLong());
         return op.map(this::toAccount);
-    }
-
-    private Account toAccount(AccountJpaEntity entity) {
-        return new Account(
-            UID.from(entity.getId()),
-            entity.getUsername(),
-            EncryptedPassword.of(entity.getPassword()),
-            entity.getEmail(),
-            entity.getRole()
-        );
     }
 
     @Override
@@ -61,5 +52,16 @@ public class UserQueryService implements LoadAccountAcl, LoadSessionUserAcl {
                 entity.getProfile().getProfileImageUrl()
                 )
             ).orElseThrow(() -> Code3.DATA_NOT_FOUND.feedback("사용자를 찾을 수 없습니다"));
+    }
+
+    private Account toAccount(AccountJpaEntity entity) {
+        return new Account(
+            UID.from(entity.getId()),
+            entity.getUsername(),
+            EncryptedPassword.of(entity.getPassword()),
+            Email.of(entity.getEmail()),
+            entity.isEmailVerified(),
+            entity.getRole()
+        );
     }
 }

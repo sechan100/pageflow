@@ -1,4 +1,4 @@
-package org.pageflow.boundedcontext.auth.application.springsecurity.oauth2.owner;
+package org.pageflow.boundedcontext.auth.springsecurity.oauth2.owner;
 
 import org.pageflow.boundedcontext.user.shared.ProviderType;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;

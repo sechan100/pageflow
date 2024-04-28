@@ -1,6 +1,5 @@
-package org.pageflow.boundedcontext.common.value;
+package org.pageflow.boundedcontext.user.domain;
 
-import lombok.Getter;
 import org.pageflow.global.api.code.Code4;
 import org.pageflow.shared.type.SingleValueWrapper;
 
@@ -8,25 +7,14 @@ import org.pageflow.shared.type.SingleValueWrapper;
  * @author : sechan
  */
 public class Email extends SingleValueWrapper<String> {
-    @Getter
-    private final boolean isVerified;
 
-    private Email(String value, boolean isVerified){
+    private Email(String value){
         super(value);
-        this.isVerified = isVerified;
     }
 
-    public static Email of(String value, boolean isVerified){
+    public static Email of(String value){
         validate(value);
-        return new Email(value, isVerified);
-    }
-
-    public static Email ofVerified(String value){
-        return of(value, true);
-    }
-
-    public static Email ofUnverified(String value){
-        return of(value, false);
+        return new Email(value);
     }
 
     private static void validate(String email) {

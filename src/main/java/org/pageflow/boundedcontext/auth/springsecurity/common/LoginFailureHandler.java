@@ -1,4 +1,4 @@
-package org.pageflow.boundedcontext.auth.application.springsecurity.common;
+package org.pageflow.boundedcontext.auth.springsecurity.common;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

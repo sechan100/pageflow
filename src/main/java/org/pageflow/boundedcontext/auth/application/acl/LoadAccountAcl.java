@@ -9,6 +9,6 @@ import java.util.Optional;
  * @author : sechan
  */
 public interface LoadAccountAcl {
-    Optional<Account> loadAccount(String username);
-    Optional<Account> loadAccount(UID uid);
+    Optional<Account> load(String username);
+    Optional<Account> load(UID uid);
 }

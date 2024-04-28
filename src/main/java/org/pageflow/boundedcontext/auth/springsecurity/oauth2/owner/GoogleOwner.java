@@ -1,33 +1,33 @@
-package org.pageflow.boundedcontext.auth.application.springsecurity.oauth2.owner;
+package org.pageflow.boundedcontext.auth.springsecurity.oauth2.owner;
 
 import org.pageflow.boundedcontext.user.shared.ProviderType;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
-public class GithubOwner extends AbstractOwner {
-
-
-    public GithubOwner(OAuth2User oAuth2User, ClientRegistration clientRegistration) {
+public class GoogleOwner extends AbstractOwner {
+    
+    
+    public GoogleOwner(OAuth2User oAuth2User, ClientRegistration clientRegistration) {
         super(oAuth2User.getAttributes(), oAuth2User, clientRegistration);
     }
-
+    
     @Override
     public String getId() {
-        return (String) getAttributes().get("id");
+        return (String) getAttributes().get("sub");
     }
-
+    
     @Override
     public String getProfileImgUrl() {
-        return (String) getAttributes().get("avatar_url");
+        return (String) getAttributes().get("picture");
     }
 
     @Override
     public String getNickname() {
-        return (String) getAttributes().get("login");
+        return (String) getAttributes().get("name");
     }
 
     @Override
     public ProviderType getProviderType() {
-        return ProviderType.GITHUB;
+        return ProviderType.GOOGLE;
     }
 }

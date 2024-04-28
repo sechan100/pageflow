@@ -1,8 +1,8 @@
-package org.pageflow.boundedcontext.auth.application.springsecurity.common;
+package org.pageflow.boundedcontext.auth.springsecurity.common;
 
 import org.pageflow.boundedcontext.auth.adapter.in.web.AuthWebAdapter;
-import org.pageflow.boundedcontext.auth.application.springsecurity.oauth2.owner.OAuth2ResourceOwner;
 import org.pageflow.boundedcontext.auth.domain.Account;
+import org.pageflow.boundedcontext.auth.springsecurity.oauth2.owner.OAuth2ResourceOwner;
 import org.pageflow.boundedcontext.user.adapter.in.web.UserWebAdapter;
 import org.pageflow.shared.utility.Forward;
 

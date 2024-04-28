@@ -1,6 +1,6 @@
 package org.pageflow.boundedcontext.user.domain;
 
-import org.pageflow.boundedcontext.auth.application.springsecurity.common.PasswordEncoderConfig;
+import org.pageflow.boundedcontext.auth.springsecurity.common.PasswordEncoderConfig;
 import org.pageflow.global.api.code.Code4;
 import org.pageflow.shared.type.SingleValueWrapper;
 import org.springframework.security.crypto.password.PasswordEncoder;

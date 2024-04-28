@@ -1,4 +1,4 @@
-package org.pageflow.boundedcontext.auth.application.springsecurity.form;
+package org.pageflow.boundedcontext.auth.springsecurity.form;
 
 
 import org.springframework.context.annotation.Bean;

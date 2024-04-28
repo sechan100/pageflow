@@ -1,4 +1,4 @@
-package org.pageflow.boundedcontext.auth.application.springsecurity.oauth2.authorizationrequest;
+package org.pageflow.boundedcontext.auth.springsecurity.oauth2.authorizationrequest;
 
 import org.springframework.data.repository.CrudRepository;
 

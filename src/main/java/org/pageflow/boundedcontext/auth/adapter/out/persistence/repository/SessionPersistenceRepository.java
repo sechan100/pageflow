@@ -7,7 +7,6 @@ import org.pageflow.boundedcontext.auth.domain.RefreshToken;
 import org.pageflow.boundedcontext.auth.domain.Session;
 import org.pageflow.boundedcontext.auth.domain.SessionId;
 import org.pageflow.boundedcontext.auth.port.out.SessionPersistencePort;
-import org.pageflow.boundedcontext.auth.shared.AuthMapper;
 import org.pageflow.boundedcontext.common.value.UID;
 import org.pageflow.boundedcontext.user.adapter.out.persistence.repository.AccountJpaRepository;
 import org.pageflow.shared.annotation.PersistenceAdapter;
@@ -25,8 +24,6 @@ import java.util.Optional;
 public class SessionPersistenceRepository implements SessionPersistencePort {
     private final SessionJpaRepository sessionJpaRepo;
     private final AccountJpaRepository accountJpaRepo;
-    private final AuthMapper mapper;
-
 
 
     @Override
@@ -49,7 +46,6 @@ public class SessionPersistenceRepository implements SessionPersistencePort {
         Optional<SessionJpaEntity> entity =  sessionJpaRepo.findById(sid.toLong());
         return entity.map(this::toSession);
     }
-
 
 
     private SessionJpaEntity toEntity(Session session){

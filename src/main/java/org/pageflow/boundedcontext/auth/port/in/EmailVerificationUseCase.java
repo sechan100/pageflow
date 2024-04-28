@@ -1,7 +1,6 @@
 package org.pageflow.boundedcontext.auth.port.in;
 
-import org.pageflow.boundedcontext.auth.domain.EmailVerification;
-import org.pageflow.boundedcontext.common.value.Email;
+import org.pageflow.boundedcontext.common.value.UID;
 
 import java.util.UUID;
 
@@ -9,7 +8,7 @@ import java.util.UUID;
  * @author : sechan
  */
 public interface EmailVerificationUseCase {
-    void sendVerificationEmail(Email email);
-    void verify(EmailVerification.Id evId, UUID code);
-    void unverify(Email email);
+    void sendVerificationEmail(UID uid);
+    void verify(UID uid, UUID code);
+    void unverify(UID uid);
 }

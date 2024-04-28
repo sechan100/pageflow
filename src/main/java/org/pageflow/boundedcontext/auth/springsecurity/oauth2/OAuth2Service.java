@@ -1,15 +1,15 @@
-package org.pageflow.boundedcontext.auth.application.springsecurity.oauth2;
+package org.pageflow.boundedcontext.auth.springsecurity.oauth2;
 
 
 import lombok.RequiredArgsConstructor;
 import org.pageflow.boundedcontext.auth.application.acl.LoadAccountAcl;
 import org.pageflow.boundedcontext.auth.application.dto.Principal;
-import org.pageflow.boundedcontext.auth.application.springsecurity.common.InAuthingInFilterForwardFactory;
-import org.pageflow.boundedcontext.auth.application.springsecurity.oauth2.owner.GithubOwner;
-import org.pageflow.boundedcontext.auth.application.springsecurity.oauth2.owner.GoogleOwner;
-import org.pageflow.boundedcontext.auth.application.springsecurity.oauth2.owner.NaverOwner;
-import org.pageflow.boundedcontext.auth.application.springsecurity.oauth2.owner.OAuth2ResourceOwner;
 import org.pageflow.boundedcontext.auth.domain.Account;
+import org.pageflow.boundedcontext.auth.springsecurity.common.InAuthingInFilterForwardFactory;
+import org.pageflow.boundedcontext.auth.springsecurity.oauth2.owner.GithubOwner;
+import org.pageflow.boundedcontext.auth.springsecurity.oauth2.owner.GoogleOwner;
+import org.pageflow.boundedcontext.auth.springsecurity.oauth2.owner.NaverOwner;
+import org.pageflow.boundedcontext.auth.springsecurity.oauth2.owner.OAuth2ResourceOwner;
 import org.pageflow.global.filter.InFilterForwardManager;
 import org.pageflow.shared.utility.Forward;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
@@ -29,7 +29,7 @@ import java.util.Optional;
 public class OAuth2Service implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 
     private final InFilterForwardManager inFilterForwardManager;
-    private final LoadAccountAcl loadAccountAcl;
+    private final LoadAccountAcl accountAcl;
 
 
     /**
@@ -43,7 +43,7 @@ public class OAuth2Service implements OAuth2UserService<OAuth2UserRequest, OAuth
 
         // social login provider 별로 인증객체를 분리하여 처리
         OAuth2ResourceOwner owner = convertToResourceOwnerImpl(oAuth2User, clientRegistration);
-        Optional<Account> loaded = loadAccountAcl.loadAccount(owner.getUsername());
+        Optional<Account> loaded = accountAcl.load(owner.getUsername());
 
         // case 1) 회원정보가 이미 존재하는 경우 -> 로그인처리
         if(loaded.isPresent()) {

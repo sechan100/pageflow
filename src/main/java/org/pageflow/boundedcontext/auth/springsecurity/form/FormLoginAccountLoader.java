@@ -1,4 +1,4 @@
-package org.pageflow.boundedcontext.auth.application.springsecurity.form;
+package org.pageflow.boundedcontext.auth.springsecurity.form;
 
 
 import lombok.RequiredArgsConstructor;
@@ -17,12 +17,12 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class FormLoginAccountLoader implements UserDetailsService {
 
-    private final LoadAccountAcl loadAccountAcl;
+    private final LoadAccountAcl accountAcl;
 
     @Override
     @Transactional(readOnly = true)
     public Principal.OnlyInAuthing loadUserByUsername(String username) {
-        Account account = loadAccountAcl.loadAccount(username).orElseThrow(
+        Account account = accountAcl.load(username).orElseThrow(
             () -> new UsernameNotFoundException("User not found with username: " + username)
         );
 

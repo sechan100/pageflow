@@ -2,8 +2,8 @@ package org.pageflow.boundedcontext.user.application.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.pageflow.boundedcontext.common.value.Email;
 import org.pageflow.boundedcontext.user.application.dto.UserDto;
+import org.pageflow.boundedcontext.user.domain.Email;
 import org.pageflow.boundedcontext.user.domain.User;
 import org.pageflow.boundedcontext.user.domain.Username;
 import org.pageflow.boundedcontext.user.port.in.SignupCmd;

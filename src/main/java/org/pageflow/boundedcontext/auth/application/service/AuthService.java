@@ -26,7 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class AuthService implements SessionUseCase, TokenUseCase {
 
     private final SessionPersistencePort sessionPersistencePort;
-    private final LoadAccountAcl loadAccountAcl;
+    private final LoadAccountAcl accountAcl;
     private final AuthMapper mapper;
 
     @Override

@@ -1,6 +1,7 @@
 package org.pageflow.boundedcontext.auth.port.out;
 
 import org.pageflow.boundedcontext.auth.domain.EmailVerification;
+import org.pageflow.boundedcontext.common.value.UID;
 
 import java.util.Optional;
 
@@ -8,6 +9,7 @@ import java.util.Optional;
  * @author : sechan
  */
 public interface EmailVerificationPersistencePort {
-    void save(EmailVerification emailVerification);
-    Optional<EmailVerification> load(EmailVerification.Id id);
+    EmailVerification save(EmailVerification emailVerification);
+    Optional<EmailVerification> load(UID id);
+    void delete(EmailVerification ev);
 }

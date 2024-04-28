@@ -3,7 +3,7 @@ package org.pageflow.global.config;
 import lombok.RequiredArgsConstructor;
 import org.pageflow.boundedcontext.auth.adapter.in.web.AuthWebAdapter;
 import org.pageflow.boundedcontext.auth.adapter.in.web.JwtAuthorizationFilter;
-import org.pageflow.boundedcontext.auth.application.springsecurity.oauth2.OAuth2Service;
+import org.pageflow.boundedcontext.auth.springsecurity.oauth2.OAuth2Service;
 import org.pageflow.global.filter.ApiExceptionCatchAndDelegatingFilter;
 import org.pageflow.global.filter.InFilterForwardedRequestCeaseFilter;
 import org.pageflow.global.filter.InternalOnlyUriPretectFilter;

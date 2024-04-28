@@ -50,6 +50,7 @@ public class AppProps {
         @FieldDefaults(makeFinal = true, level = AccessLevel.PUBLIC)
         public static class From {
             String noReply;
+            String defaultFromName;
         }
     }
 

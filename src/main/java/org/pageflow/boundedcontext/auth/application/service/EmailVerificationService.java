@@ -1,13 +1,15 @@
 package org.pageflow.boundedcontext.auth.application.service;
 
 import lombok.RequiredArgsConstructor;
+import org.pageflow.boundedcontext.auth.adapter.in.web.EmailVerificationWebAdapter;
 import org.pageflow.boundedcontext.auth.domain.EmailVerification;
 import org.pageflow.boundedcontext.auth.port.in.EmailVerificationUseCase;
 import org.pageflow.boundedcontext.auth.port.out.EmailVerificationPersistencePort;
-import org.pageflow.boundedcontext.auth.port.out.VerificationEmailSendCmd;
-import org.pageflow.boundedcontext.auth.port.out.VerificationEmailSendPort;
 import org.pageflow.boundedcontext.common.value.Email;
+import org.pageflow.boundedcontext.email.core.SendMailCmd;
+import org.pageflow.boundedcontext.email.core.SendMailPort;
 import org.pageflow.global.api.code.Code1;
+import org.pageflow.global.property.AppProps;
 import org.pageflow.shared.annotation.UseCase;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,8 +22,9 @@ import java.util.UUID;
 @Transactional
 @RequiredArgsConstructor
 public class EmailVerificationService implements EmailVerificationUseCase {
+    private final AppProps props;
     private final EmailVerificationPersistencePort emailVerificationPersistencePort;
-    private final VerificationEmailSendPort emailSendPort;
+    private final SendMailPort sendMailPort;
 
     @Override
     public void sendVerificationEmail(Email email) {
@@ -29,13 +32,19 @@ public class EmailVerificationService implements EmailVerificationUseCase {
         emailVerificationPersistencePort.save(ev);
 
         // 이메일 비동기 전송
-        emailSendPort.sendVerificationEmail(
-            new VerificationEmailSendCmd(
-                ev.getId().toString(),
-                email.toString(),
-                ev.getAuthCode().toString()
-            )
-        );
+        SendMailCmd cmd = SendMailCmd.builder()
+            .to(email.toString())
+            .from(props.email.from.noReply, props.email.from.defaultFromName)
+            .subject("이메일 인증 요청")
+            .templatePath("email-verification")
+            .addVar("email", email.toString())
+            .addVar("authCode", ev.getAuthCode().toString())
+            .addVar("evId", ev.getId().toString())
+            .addVar("serverHost", props.site.baseUrl)
+            .addVar("verificationUri", EmailVerificationWebAdapter.EMAIL_VERIFICATION_URI)
+            .build();
+
+        sendMailPort.sendEmail(cmd);
     }
 
     @Override

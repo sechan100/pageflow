@@ -84,6 +84,7 @@ custom:
   email:
     from:
       no-reply: noreply@pageflow.org
+      default-from-name: 페이지플로우
   admin:
     username: sechan100
     password: sechan100

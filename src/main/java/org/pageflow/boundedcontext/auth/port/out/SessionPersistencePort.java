@@ -8,6 +8,9 @@ import java.util.Optional;
 /**
  * @author : sechan
  */
-public interface LoadSessionPort {
+public interface SessionPersistencePort {
     Optional<Session> load(SessionId sid);
+    void save(Session session);
+    void delete(Session session);
+    void delete(SessionId sessionId);
 }

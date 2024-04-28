@@ -6,11 +6,10 @@ import org.pageflow.boundedcontext.auth.adapter.out.persistence.entity.SessionJp
 import org.pageflow.boundedcontext.auth.domain.RefreshToken;
 import org.pageflow.boundedcontext.auth.domain.Session;
 import org.pageflow.boundedcontext.auth.domain.SessionId;
-import org.pageflow.boundedcontext.auth.port.out.CmdSessionPort;
-import org.pageflow.boundedcontext.auth.port.out.LoadSessionPort;
+import org.pageflow.boundedcontext.auth.port.out.SessionPersistencePort;
 import org.pageflow.boundedcontext.auth.shared.AuthMapper;
+import org.pageflow.boundedcontext.common.value.UID;
 import org.pageflow.boundedcontext.user.adapter.out.persistence.repository.AccountJpaRepository;
-import org.pageflow.boundedcontext.user.domain.UID;
 import org.pageflow.shared.annotation.PersistenceAdapter;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,7 +22,7 @@ import java.util.Optional;
 @PersistenceAdapter
 @Transactional
 @RequiredArgsConstructor
-public class SessionRepository implements LoadSessionPort, CmdSessionPort {
+public class SessionPersistenceRepository implements SessionPersistencePort {
     private final SessionJpaRepository sessionJpaRepo;
     private final AccountJpaRepository accountJpaRepo;
     private final AuthMapper mapper;

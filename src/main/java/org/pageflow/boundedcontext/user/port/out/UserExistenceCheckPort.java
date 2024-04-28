@@ -1,6 +1,6 @@
 package org.pageflow.boundedcontext.user.port.out;
 
-import org.pageflow.boundedcontext.user.domain.Email;
+import org.pageflow.boundedcontext.common.value.Email;
 import org.pageflow.boundedcontext.user.domain.Username;
 
 /**

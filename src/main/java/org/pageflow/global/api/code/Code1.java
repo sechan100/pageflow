@@ -29,7 +29,8 @@ public enum Code1 implements ApiCode {
     , ACCESS_TOKEN_EXPIRED(1410,"AccessToken 만료", FeedbackTemplate.getINSTANCE().getCanNotFeedback())
     , INVALID_ACCESS_TOKEN(1411,"accessToken jwt 파싱 실패", FeedbackTemplate.getINSTANCE().getCanNotFeedback())
 
-
+    // 1700: 이메일 인증
+    , EMAIL_VERIFICATION_AUTH_CODE_MISMATCH(1700, "이메일 인증 코드 불일치", "이메일 인증코드가 일치하지 않습니다.")
 
 
     // ######################

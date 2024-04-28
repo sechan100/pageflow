@@ -1,7 +1,7 @@
 package org.pageflow.boundedcontext.auth.application.acl;
 
 import org.pageflow.boundedcontext.auth.domain.Account;
-import org.pageflow.boundedcontext.user.domain.UID;
+import org.pageflow.boundedcontext.common.value.UID;
 
 import java.util.Optional;
 

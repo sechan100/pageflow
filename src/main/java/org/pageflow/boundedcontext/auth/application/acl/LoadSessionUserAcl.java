@@ -1,7 +1,7 @@
 package org.pageflow.boundedcontext.auth.application.acl;
 
+import org.pageflow.boundedcontext.common.value.UID;
 import org.pageflow.boundedcontext.user.application.dto.UserDto;
-import org.pageflow.boundedcontext.user.domain.UID;
 
 /**
  * @author : sechan

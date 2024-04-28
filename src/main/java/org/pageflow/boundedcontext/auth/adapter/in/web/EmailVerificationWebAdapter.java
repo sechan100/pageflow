@@ -15,6 +15,6 @@ public class EmailVerificationWebAdapter {
 
     public static final String EMAIL_VERIFICATION_URI = "/email/verify";
     public void verifyEmail(String email) {
-        emailVerificationService.verifyEmail(email);
+
     }
 }

@@ -9,13 +9,12 @@ import org.pageflow.boundedcontext.user.domain.Email;
 /**
  * @author : sechan
  */
+@Getter
 @AllArgsConstructor
 public class Account {
-    @Getter
     private UID uid;
     private String username;
     private EncryptedPassword password;
-    @Getter
     private Email email;
     private boolean isEmailVerified;
     private RoleType role;

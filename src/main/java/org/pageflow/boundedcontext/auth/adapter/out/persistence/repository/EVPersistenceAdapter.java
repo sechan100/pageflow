@@ -4,10 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.pageflow.boundedcontext.auth.adapter.out.persistence.entity.EVRedisEntity;
 import org.pageflow.boundedcontext.auth.domain.EmailVerification;
 import org.pageflow.boundedcontext.auth.port.out.EmailVerificationPersistencePort;
+import org.pageflow.boundedcontext.common.value.UID;
 import org.pageflow.shared.annotation.PersistenceAdapter;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * @author : sechan
@@ -19,24 +21,31 @@ public class EVPersistenceAdapter implements EmailVerificationPersistencePort {
     private final EVRedisRepository evRedisRepository;
 
 
-    @Override
-    public void save(EmailVerification emailVerification) {
-        // 인증되지 않은 경우
-        if(!emailVerification.isVerified()){
-            evRedisRepository.save(toEntity(emailVerification));
-        }
 
+    @Override
+    public EmailVerification save(EmailVerification emailVerification) {
+        EVRedisEntity entity = toEntity(emailVerification);
+        evRedisRepository.save(entity);
+        return emailVerification;
     }
 
     @Override
-    public Optional<EmailVerification> load(EmailVerification.Id id) {
-        return Optional.empty();
+    @Transactional(readOnly = true)
+    public Optional<EmailVerification> load(UID id) {
+        return evRedisRepository.findById(id.toLong())
+            .map(entity -> new EmailVerification(id, UUID.fromString(entity.getAuthCode())));
     }
+
+    @Override
+    public void delete(EmailVerification ev) {
+        evRedisRepository.deleteById(ev.getUid().toLong());
+    }
+
+
 
     private EVRedisEntity toEntity(EmailVerification emailVerification) {
         return EVRedisEntity.builder()
-            .id(emailVerification.getId().getValue())
-            .email(emailVerification.getEmail())
+            .uid(emailVerification.getUid().toLong())
             .authCode(emailVerification.getAuthCode().toString())
             .build();
     }

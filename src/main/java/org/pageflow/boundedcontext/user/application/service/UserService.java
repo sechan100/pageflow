@@ -12,7 +12,6 @@ import org.pageflow.boundedcontext.user.port.out.CmdUserPort;
 import org.pageflow.boundedcontext.user.port.out.LoadUserPort;
 import org.pageflow.boundedcontext.user.port.out.PennameForbiddenWordPort;
 import org.pageflow.boundedcontext.user.port.out.UserExistenceCheckPort;
-import org.pageflow.boundedcontext.user.shared.UserMapper;
 import org.pageflow.global.api.code.Code4;
 import org.pageflow.shared.annotation.UseCase;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,7 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService implements UserUseCase {
     private final LoadUserPort loadUserPort;
     private final CmdUserPort cmdUserPort;
-    private final UserMapper mapper;
     private final UserExistenceCheckPort isExistPort;
     private final PennameForbiddenWordPort pennameForbiddenWordPort;
 
@@ -54,7 +52,7 @@ public class UserService implements UserUseCase {
          * 로직이 간단하다.
          */
         User user = cmdUserPort.signup(cmd);
-        return mapper.signupDto_UidAndsignupCmd(user.getUid(), cmd);
+        return toSignupDto(user, cmd);
     }
 
 
@@ -67,10 +65,23 @@ public class UserService implements UserUseCase {
     }
 
     private void checkUniqueEmail(Email email){
-        if(isExistPort.isExist(Email.ofVerified(email.getValue()))){
+        if(isExistPort.isExist(Email.of(email.getValue()))){
             throw Code4.UNIQUE_FIELD_DUPLICATED
                 .feedback(t -> t.getEmail_duplicate());
         }
+    }
+
+    private UserDto.Signup toSignupDto(User user, SignupCmd cmd){
+        return new UserDto.Signup(
+            user.getUid().getValue(),
+            user.getUsername().toString(),
+            user.getEmail().toString(),
+            user.isEmailVerified(),
+            cmd.getProvider(),
+            cmd.getRole(),
+            user.getPenname().toString(),
+            user.getProfileImage().toString()
+        );
     }
 
 }

@@ -12,7 +12,7 @@ public interface AccountJpaRepository extends BaseJpaRepository<AccountJpaEntity
 
     boolean existsByUsername(String username);
 
-    boolean existsByEmailAndEmailVerified(String email, boolean emailVerified);
+    boolean existsByEmail(String email);
 
     boolean existsByRole(RoleType roleType);
 

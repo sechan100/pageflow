@@ -6,5 +6,5 @@ import org.springframework.data.repository.CrudRepository;
 /**
  * @author : sechan
  */
-public interface EVRedisRepository extends CrudRepository<EVRedisEntity, String> {
+public interface EVRedisRepository extends CrudRepository<EVRedisEntity, Long> {
 }

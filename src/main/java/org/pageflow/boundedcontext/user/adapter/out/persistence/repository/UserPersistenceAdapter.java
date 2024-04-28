@@ -34,7 +34,6 @@ public class UserPersistenceAdapter implements CmdUserPort, LoadUserPort, UserEx
 
         a.setUsername(user.getUsername().toString());
         a.setEmail(user.getEmail().toString());
-        a.setEmailVerified(user.getEmail().isVerified());
 
         ProfileJpaEntity p = a.getProfile();
         p.setPenname(user.getPenname().toString());
@@ -58,7 +57,7 @@ public class UserPersistenceAdapter implements CmdUserPort, LoadUserPort, UserEx
             .username(cmd.getUsername().toString())
             .password(cmd.getPassword().toString())
             .email(cmd.getEmail().toString())
-            .emailVerified(cmd.getEmail().isVerified())
+            .emailVerified(false)
             .provider(cmd.getProvider())
             .role(cmd.getRole())
             .build();
@@ -85,7 +84,7 @@ public class UserPersistenceAdapter implements CmdUserPort, LoadUserPort, UserEx
 
     @Override
     public boolean isExist(Email email) {
-        return accountJpaRepo.existsByEmailAndEmailVerified(email.toString(), email.isVerified());
+        return accountJpaRepo.existsByEmail(email.toString());
     }
 
 
@@ -93,7 +92,8 @@ public class UserPersistenceAdapter implements CmdUserPort, LoadUserPort, UserEx
         return new User(
             UID.from(a.getId()),
             Username.of(a.getUsername()),
-            Email.of(a.getEmail(), a.isEmailVerified()),
+            Email.of(a.getEmail()),
+            a.isEmailVerified(),
             Penname.of(p.getPenname()),
             ProfileImage.of(p.getProfileImageUrl())
         );

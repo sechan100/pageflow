@@ -16,7 +16,6 @@ import org.pageflow.boundedcontext.user.domain.*;
 import org.pageflow.boundedcontext.user.port.in.SignupCmd;
 import org.pageflow.boundedcontext.user.port.in.UserUseCase;
 import org.pageflow.boundedcontext.user.shared.ProviderType;
-import org.pageflow.boundedcontext.user.shared.UserMapper;
 import org.pageflow.global.api.ApiAccess;
 import org.pageflow.global.api.ApiResponse;
 import org.pageflow.global.api.RequestContext;
@@ -40,7 +39,6 @@ public class UserWebAdapter {
     private final RequestContext requestContext;
     private final OAuth2PresignupRedisRepo preSignupRepo;
     private final UserUseCase userUsecase;
-    private final UserMapper mapper;
 
     @Secured(ApiAccess.ANONYMOUS)
     @Operation(summary = "회원가입", description = "새로운 사용자의 회원가입을 요청")
@@ -63,7 +61,7 @@ public class UserWebAdapter {
         SignupCmd cmd = new SignupCmd(
             Username.of(form.getUsername()),
             Password.encrypt(form.getPassword()),
-            Email.ofUnverified(form.getEmail()),
+            Email.of(form.getEmail()),
             Penname.of(form.getPenname()),
             RoleType.ROLE_USER,
             provider,

@@ -13,7 +13,7 @@ public class EmailVerification {
     private final UID uid;
     private final UUID authCode;
 
-    private EmailVerification(UID uid, UUID authCode) {
+    public EmailVerification(UID uid, UUID authCode) {
         this.uid = uid;
         this.authCode = authCode;
     }

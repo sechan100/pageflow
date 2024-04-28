@@ -36,7 +36,7 @@ public class AdminAccountCreater implements RuntimeInitializer {
         SignupCmd cmd = new SignupCmd(
             Username.of(admin.username),
             Password.encrypt(admin.password),
-            Email.ofVerified(admin.email),
+            Email.of(admin.email),
             Penname.of(admin.penname),
             RoleType.ROLE_ADMIN,
             ProviderType.NATIVE,

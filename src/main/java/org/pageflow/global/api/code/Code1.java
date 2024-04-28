@@ -31,6 +31,7 @@ public enum Code1 implements ApiCode {
 
     // 1700: 이메일 인증
     , EMAIL_VERIFICATION_AUTH_CODE_MISMATCH(1700, "이메일 인증 코드 불일치", "이메일 인증코드가 일치하지 않습니다.")
+    , APPLIED_EMAIL_VERIFICATION_NOT_FOUND(1701, "요청된 이메일 인증 정보가 없음", "이메일 인증 요청정보가 없습니다.")
 
 
     // ######################

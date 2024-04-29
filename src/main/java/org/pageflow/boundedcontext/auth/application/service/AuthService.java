@@ -14,13 +14,13 @@ import org.pageflow.boundedcontext.auth.port.in.TokenUseCase;
 import org.pageflow.boundedcontext.auth.port.out.SessionPersistencePort;
 import org.pageflow.boundedcontext.auth.shared.AuthMapper;
 import org.pageflow.global.api.code.Code1;
-import org.pageflow.shared.annotation.UseCase;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author : sechan
  */
-@UseCase
+@Service
 @Transactional
 @RequiredArgsConstructor
 public class AuthService implements SessionUseCase, TokenUseCase {

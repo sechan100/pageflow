@@ -4,12 +4,11 @@ import lombok.Getter;
 import org.pageflow.boundedcontext.auth.shared.RoleType;
 import org.pageflow.boundedcontext.common.value.UID;
 import org.pageflow.global.api.code.Code1;
-import org.pageflow.shared.annotation.AggregateRoot;
+
 
 /**
  * @author : sechan
  */
-@AggregateRoot
 public class Session {
     @Getter
     private final SessionId id;

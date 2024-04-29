@@ -13,12 +13,12 @@ import org.pageflow.boundedcontext.user.port.out.LoadUserPort;
 import org.pageflow.boundedcontext.user.port.out.PennameForbiddenWordPort;
 import org.pageflow.boundedcontext.user.port.out.UserExistenceCheckPort;
 import org.pageflow.global.api.code.Code4;
-import org.pageflow.shared.annotation.UseCase;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
 @Slf4j
-@UseCase
+@Service
 @Transactional
 @RequiredArgsConstructor
 public class UserService implements UserUseCase {

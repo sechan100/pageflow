@@ -15,6 +15,7 @@ public class RoleHierarchyConfig {
         RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
         roleHierarchy.setHierarchy("ROLE_ADMIN > ROLE_MANAGER");
         roleHierarchy.setHierarchy("ROLE_MANAGER > ROLE_USER");
+        roleHierarchy.setHierarchy("ROLE_USER > ROLE_ANONYMOUS");
         return roleHierarchy;
     }
 

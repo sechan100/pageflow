@@ -121,7 +121,7 @@ public class RequestContext {
      * @return 현재 로그인한 사용자의 UID
      * @apiNote 만약 로그인된 사용자가 아닌 경우 Code1.LOGIN_REQUIRED을 발생함.
      */
-    public UID getUID() {
+    public UID getUid() {
         UID uid = principal.getUid();
         if(uid.equals(UID.from(0L))) throw Code1.LOGIN_REQUIRED.fire();
         else return uid;

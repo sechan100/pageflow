@@ -14,7 +14,7 @@ import org.pageflow.boundedcontext.email.core.SendMailPort;
 import org.pageflow.global.api.code.Code1;
 import org.pageflow.global.api.code.Code3;
 import org.pageflow.global.property.AppProps;
-import org.pageflow.shared.annotation.UseCase;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
@@ -22,7 +22,7 @@ import java.util.UUID;
 /**
  * @author : sechan
  */
-@UseCase
+@Service
 @Transactional
 @RequiredArgsConstructor
 public class EmailVerificationService implements EmailVerificationUseCase {
@@ -49,7 +49,7 @@ public class EmailVerificationService implements EmailVerificationUseCase {
             .to(email)
             .from(props.email.from.noReply, props.email.from.defaultFromName)
             .subject("이메일 인증 요청")
-            .templatePath("email-verification")
+            .templatePath("/email-verification")
             .addVar("email", email)
             .addVar("authCode", ev.getAuthCode().toString())
             .addVar("uid", uid.toString())

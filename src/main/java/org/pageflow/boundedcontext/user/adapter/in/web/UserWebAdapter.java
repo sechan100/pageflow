@@ -22,15 +22,15 @@ import org.pageflow.global.api.RequestContext;
 import org.pageflow.global.api.code.Code2;
 import org.pageflow.global.filter.UriPrefix;
 import org.pageflow.global.property.AppProps;
-import org.pageflow.shared.annotation.WebAdapter;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Optional;
 
-@WebAdapter
+@RestController
 @RequiredArgsConstructor
 @Tag(name = "User", description = "사용자 API")
 public class UserWebAdapter {

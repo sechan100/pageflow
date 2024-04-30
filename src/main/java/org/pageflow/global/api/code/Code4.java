@@ -23,7 +23,6 @@ import java.util.function.Function;
 @Getter
 @AllArgsConstructor
 public enum Code4 implements ApiCode {
-
     // 4100: 기본적인 유효성 에러
       INVALID_FIELD(4100, "유효하지 않은 입력값", "올바른 값을 입력해주세요.")
     , MISSING_FIELD(4101, "요청에 필요한 필드가 Null 또는 Empty임.", "데이터를 모두 입력해주세요.")
@@ -38,8 +37,11 @@ public enum Code4 implements ApiCode {
     // 4300: Spring Bean Validation 에러
     , FIELD_VALIDATION_FAIL(4300, "필드 유효성 검사 실패", "올바른 값을 입력해주세요.")
 
-    // 4400: 필드 해석 실패
-    , FIELD_PARSE_FAIL(4400, "필드 파싱 실패; 잘못된 형식", "입력 데이터 형식이 올바르지 않습니다.")
+    // 4400: primitive type이 아닌 입력값
+    , INVALID_FILE(4410, "유효하지 않은 파일", "올바른 파일을 업로드해주세요.")
+
+    // 4800: 필드 해석 실패
+    , FIELD_PARSE_FAIL(4800, "필드 파싱 실패; 잘못된 형식", "입력 데이터 형식이 올바르지 않습니다.")
 
 
     // ######################

@@ -40,10 +40,10 @@ public class AdminAccountCreater implements RuntimeInitializer {
             Penname.of(admin.penname),
             RoleType.ROLE_ADMIN,
             ProviderType.NATIVE,
-            ProfileImage.of(props.user.defaultProfileImageUri)
+            ProfileImageUrl.of(props.user.defaultProfileImageUri)
         );
 
-        UserDto.Signup result = userUsecase.signup(cmd);
+        UserDto.Default result = userUsecase.signup(cmd);
 
         log.info("관리자 계정을 생성했습니다. {}", JsonUtility.toJson(result));
     }

@@ -5,14 +5,14 @@ import org.pageflow.shared.type.SingleValueWrapper;
 /**
  * @author : sechan
  */
-public class ProfileImage extends SingleValueWrapper<String> {
+public class ProfileImageUrl extends SingleValueWrapper<String> {
 
-    private ProfileImage(String value) {
+    private ProfileImageUrl(String value) {
         super(value);
     }
 
-    public static ProfileImage of(String value) {
-        return new ProfileImage(value);
+    public static ProfileImageUrl of(String value) {
+        return new ProfileImageUrl(value);
     }
 
     public boolean isExternalImage() {

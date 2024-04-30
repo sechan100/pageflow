@@ -2,16 +2,21 @@ package org.pageflow.boundedcontext.user.application.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.pageflow.boundedcontext.auth.port.in.EmailVerificationUseCase;
+import org.pageflow.boundedcontext.common.value.UID;
 import org.pageflow.boundedcontext.user.application.dto.UserDto;
 import org.pageflow.boundedcontext.user.domain.Email;
+import org.pageflow.boundedcontext.user.domain.Penname;
 import org.pageflow.boundedcontext.user.domain.User;
 import org.pageflow.boundedcontext.user.domain.Username;
+import org.pageflow.boundedcontext.user.port.in.ProfileImageFile;
 import org.pageflow.boundedcontext.user.port.in.SignupCmd;
 import org.pageflow.boundedcontext.user.port.in.UserUseCase;
-import org.pageflow.boundedcontext.user.port.out.CmdUserPort;
 import org.pageflow.boundedcontext.user.port.out.LoadUserPort;
 import org.pageflow.boundedcontext.user.port.out.PennameForbiddenWordPort;
+import org.pageflow.boundedcontext.user.port.out.UserCommandPort;
 import org.pageflow.boundedcontext.user.port.out.UserExistenceCheckPort;
+import org.pageflow.global.api.code.Code3;
 import org.pageflow.global.api.code.Code4;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,9 +28,10 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class UserService implements UserUseCase {
     private final LoadUserPort loadUserPort;
-    private final CmdUserPort cmdUserPort;
+    private final UserCommandPort userCmdPort;
     private final UserExistenceCheckPort isExistPort;
     private final PennameForbiddenWordPort pennameForbiddenWordPort;
+    private final EmailVerificationUseCase emailVerificationUseCase;
 
     /**
      * <P>OAuth2로 회원가입을 하게되면, 요청이 2번에 걸쳐서 처리된다.</P>
@@ -38,7 +44,7 @@ public class UserService implements UserUseCase {
      * </P>
      */
     @Override
-    public UserDto.Signup signup(SignupCmd cmd) {
+    public UserDto.Default signup(SignupCmd cmd) {
         // 중복 검사
         checkUniqueUsername(cmd.getUsername());
         checkUniqueEmail(cmd.getEmail());
@@ -51,10 +57,29 @@ public class UserService implements UserUseCase {
          * 때문에 SignupCmd와의 불일치가 발생한다. 하지만 이것만을 위해서 따로 signup 전용 도메인 객체를 만들기에는
          * 로직이 간단하다.
          */
-        User user = cmdUserPort.signup(cmd);
-        return toSignupDto(user, cmd);
+        User user = userCmdPort.signup(cmd);
+        return toDto(user);
     }
 
+    @Override
+    public UserDto.Default changeEmail(UID uid, Email email) {
+        checkUniqueEmail(email);
+        User user = loadUserPort.load(uid).orElseThrow(() -> Code3.DATA_NOT_FOUND.feedback("사용자를 찾을 수 없습니다."));
+        user.changeEmail(email);
+        userCmdPort.save(user);
+        emailVerificationUseCase.unverify(uid);
+        return toDto(user);
+    }
+
+    @Override
+    public UserDto.Default changePenname(UID uid, Penname penname) {
+        return null;
+    }
+
+    @Override
+    public UserDto.Default changeProfileImage(UID uid, ProfileImageFile file) {
+        return null;
+    }
 
 
     private void checkUniqueUsername(Username username){
@@ -71,16 +96,15 @@ public class UserService implements UserUseCase {
         }
     }
 
-    private UserDto.Signup toSignupDto(User user, SignupCmd cmd){
-        return new UserDto.Signup(
+    private UserDto.Default toDto(User user){
+        return new UserDto.Default(
             user.getUid().getValue(),
             user.getUsername().toString(),
             user.getEmail().toString(),
             user.isEmailVerified(),
-            cmd.getProvider(),
-            cmd.getRole(),
+            user.getRole(),
             user.getPenname().toString(),
-            user.getProfileImage().toString()
+            user.getProfileImageUrl().toString()
         );
     }
 

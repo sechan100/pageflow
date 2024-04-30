@@ -2,7 +2,6 @@ package org.pageflow.boundedcontext.user.application.dto;
 
 import lombok.Value;
 import org.pageflow.boundedcontext.auth.shared.RoleType;
-import org.pageflow.boundedcontext.user.shared.ProviderType;
 import org.pageflow.shared.type.TSID;
 
 /**
@@ -11,12 +10,11 @@ import org.pageflow.shared.type.TSID;
 public abstract class UserDto {
 
     @Value
-    public static class Signup {
+    public static class Default {
         TSID uid;
         String username;
         String email;
         boolean isEmailVerified;
-        ProviderType provider;
         RoleType role;
         String penname;
         String profileImageUrl;

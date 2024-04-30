@@ -13,5 +13,5 @@ public class SignupCmd {
     Penname penname;
     RoleType role;
     ProviderType provider;
-    ProfileImage profileImage;
+    ProfileImageUrl profileImageUrl;
 }

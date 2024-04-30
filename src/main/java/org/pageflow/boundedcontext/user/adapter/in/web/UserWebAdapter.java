@@ -65,10 +65,10 @@ public class UserWebAdapter {
             Penname.of(form.getPenname()),
             RoleType.ROLE_USER,
             provider,
-            ProfileImage.of(profileImageUrl)
+            ProfileImageUrl.of(profileImageUrl)
         );
 
-        UserDto.Signup result = userUsecase.signup(cmd);
+        UserDto.Default result = userUsecase.signup(cmd);
         return new Res.Signup(
             result.getUsername(),
             result.getEmail(),

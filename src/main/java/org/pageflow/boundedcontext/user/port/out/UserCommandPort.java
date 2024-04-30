@@ -6,7 +6,7 @@ import org.pageflow.boundedcontext.user.port.in.SignupCmd;
 /**
  * @author : sechan
  */
-public interface CmdUserPort {
+public interface UserCommandPort {
     void save(User user);
     User signup(SignupCmd cmd);
 }

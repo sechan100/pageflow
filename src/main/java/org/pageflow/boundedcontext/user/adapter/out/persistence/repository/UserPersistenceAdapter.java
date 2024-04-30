@@ -6,8 +6,8 @@ import org.pageflow.boundedcontext.user.adapter.out.persistence.entity.AccountJp
 import org.pageflow.boundedcontext.user.adapter.out.persistence.entity.ProfileJpaEntity;
 import org.pageflow.boundedcontext.user.domain.*;
 import org.pageflow.boundedcontext.user.port.in.SignupCmd;
-import org.pageflow.boundedcontext.user.port.out.CmdUserPort;
 import org.pageflow.boundedcontext.user.port.out.LoadUserPort;
+import org.pageflow.boundedcontext.user.port.out.UserCommandPort;
 import org.pageflow.boundedcontext.user.port.out.UserExistenceCheckPort;
 import org.pageflow.shared.annotation.PersistenceAdapter;
 import org.pageflow.shared.jpa.RequiredDataNotFoundException;
@@ -22,7 +22,7 @@ import java.util.Optional;
 @PersistenceAdapter
 @Transactional
 @RequiredArgsConstructor
-public class UserPersistenceAdapter implements CmdUserPort, LoadUserPort, UserExistenceCheckPort {
+public class UserPersistenceAdapter implements UserCommandPort, LoadUserPort, UserExistenceCheckPort {
     private final AccountJpaRepository accountJpaRepo;
     private final ProfileJpaRepository profileJpaRepo;
 
@@ -37,7 +37,7 @@ public class UserPersistenceAdapter implements CmdUserPort, LoadUserPort, UserEx
 
         ProfileJpaEntity p = a.getProfile();
         p.setPenname(user.getPenname().toString());
-        p.setProfileImageUrl(user.getProfileImage().getValue());
+        p.setProfileImageUrl(user.getProfileImageUrl().getValue());
     }
 
     @Override
@@ -48,7 +48,7 @@ public class UserPersistenceAdapter implements CmdUserPort, LoadUserPort, UserEx
         ProfileJpaEntity profile = ProfileJpaEntity.builder()
             .id(uid)
             .penname(cmd.getPenname().toString())
-            .profileImageUrl(cmd.getProfileImage().getValue())
+            .profileImageUrl(cmd.getProfileImageUrl().getValue())
             .build();
 
         // 계정 생성
@@ -95,7 +95,7 @@ public class UserPersistenceAdapter implements CmdUserPort, LoadUserPort, UserEx
             Email.of(a.getEmail()),
             a.isEmailVerified(),
             Penname.of(p.getPenname()),
-            ProfileImage.of(p.getProfileImageUrl())
+            ProfileImageUrl.of(p.getProfileImageUrl())
         );
     }
 }

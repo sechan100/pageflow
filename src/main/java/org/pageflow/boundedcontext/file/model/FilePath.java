@@ -70,7 +70,7 @@ public class FilePath {
     }
 
     public String getWebUri(){
-        return getWebUriPrefix() +getStaticPath();
+        return getWebUriPrefix() + getStaticPath();
     }
 
 

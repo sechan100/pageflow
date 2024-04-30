@@ -1,6 +1,5 @@
 package org.pageflow.boundedcontext.file.model;
 
-import com.google.common.base.Preconditions;
 import lombok.Value;
 import org.pageflow.boundedcontext.file.shared.FileOwnerType;
 import org.pageflow.boundedcontext.file.shared.FileType;
@@ -14,18 +13,12 @@ import org.pageflow.shared.type.TSID;
 @Value
 public class FileIdentity {
     TSID ownerId;
-    FileOwnerType ownerType;
+    FileOwnerType fileOwnerType;
     FileType fileType;
 
     public FileIdentity(TSID ownerId, FileOwnerType ownerType, FileType fileType) {
-        Preconditions.checkState(
-            fileType.isAvailableOwner(ownerType),
-            "FileOwnerType:%s는 FileType:%s에 대한 소유자로 사용할 수 없습니다.",
-            ownerType,
-            fileType
-        );
         this.ownerId = ownerId;
-        this.ownerType = ownerType;
+        this.fileOwnerType = ownerType;
         this.fileType = fileType;
     }
 }

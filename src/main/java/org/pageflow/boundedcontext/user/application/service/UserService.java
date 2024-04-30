@@ -4,11 +4,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pageflow.boundedcontext.auth.port.in.EmailVerificationUseCase;
 import org.pageflow.boundedcontext.common.value.UID;
+import org.pageflow.boundedcontext.file.model.FilePath;
+import org.pageflow.boundedcontext.file.model.FileUploadCmd;
+import org.pageflow.boundedcontext.file.service.FileService;
+import org.pageflow.boundedcontext.file.shared.FileType;
 import org.pageflow.boundedcontext.user.application.dto.UserDto;
-import org.pageflow.boundedcontext.user.domain.Email;
-import org.pageflow.boundedcontext.user.domain.Penname;
-import org.pageflow.boundedcontext.user.domain.User;
-import org.pageflow.boundedcontext.user.domain.Username;
+import org.pageflow.boundedcontext.user.domain.*;
 import org.pageflow.boundedcontext.user.port.in.ProfileImageFile;
 import org.pageflow.boundedcontext.user.port.in.SignupCmd;
 import org.pageflow.boundedcontext.user.port.in.UserUseCase;
@@ -28,6 +29,9 @@ public class UserService implements UserUseCase {
     private final UserPersistencePort userPersistePort;
     private final PennameForbiddenWordPort pennameForbiddenWordPort;
     private final EmailVerificationUseCase emailVerificationUseCase;
+    private final FileService fileService;
+
+
 
     /**
      * <P>OAuth2로 회원가입을 하게되면, 요청이 2번에 걸쳐서 처리된다.</P>
@@ -60,7 +64,7 @@ public class UserService implements UserUseCase {
     @Override
     public UserDto.Default changeEmail(UID uid, Email email) {
         checkUniqueEmail(email);
-        User user = userPersistePort.loadUser(uid).orElseThrow(() -> Code3.DATA_NOT_FOUND.feedback("사용자를 찾을 수 없습니다."));
+        User user = load(uid);
         user.changeEmail(email);
         userPersistePort.saveUser(user);
         emailVerificationUseCase.unverify(uid);
@@ -69,14 +73,39 @@ public class UserService implements UserUseCase {
 
     @Override
     public UserDto.Default changePenname(UID uid, Penname penname) {
-        return null;
+        pennameForbiddenWordPort.validateForbiddenWord(penname);
+        User user = load(uid);
+        user.changePenname(penname);
+        userPersistePort.saveUser(user);
+        return toDto(user);
     }
 
     @Override
     public UserDto.Default changeProfileImage(UID uid, ProfileImageFile file) {
-        return null;
+        User user = load(uid);
+        ProfileImageUrl oldImageUrl = user.getProfileImageUrl();
+        // 외부서버 이미지가 아닌 경우, 기존 이미지를 삭제
+        if(oldImageUrl.isInternalImage()){
+            fileService.delete(oldImageUrl.getValue());
+        }
+        // 새 이미지 업로드
+        FileUploadCmd cmd = new FileUploadCmd(
+            uid.getValue(),
+            FileType.USER.PROFILE_IMAGE,
+            file.getValue()
+        );
+        FilePath path = fileService.upload(cmd);
+        // 도메인 변경
+        user.changeProfileImageUrl(ProfileImageUrl.of(path.getWebUri()));
+        userPersistePort.saveUser(user);
+        return toDto(user);
     }
 
+
+
+    private User load(UID uid){
+        return userPersistePort.loadUser(uid).orElseThrow(() -> Code3.DATA_NOT_FOUND.feedback("사용자를 찾을 수 없습니다."));
+    }
 
     private void checkUniqueUsername(Username username){
         if(userPersistePort.isUserExistByEmail(username)){
@@ -85,7 +114,7 @@ public class UserService implements UserUseCase {
         }
     }
 
-    private void checkUniqueEmail(Email email){
+    private void checkUniqueEmail(Email email) {
         if(userPersistePort.isUserExistByEmail(Email.of(email.getValue()))){
             throw Code4.UNIQUE_FIELD_DUPLICATED
                 .feedback(t -> t.getEmail_duplicate());

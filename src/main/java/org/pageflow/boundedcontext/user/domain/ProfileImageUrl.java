@@ -16,7 +16,11 @@ public class ProfileImageUrl extends SingleValueWrapper<String> {
     }
 
     public boolean isExternalImage() {
-        return !value.startsWith("/"); // 외부 이미지는 외부서버 도메인으로 시작함 (not URI)
+        return !isInternalImage();
+    }
+
+    public boolean isInternalImage() {
+        return value.startsWith("/"); // 외부 이미지는 외부서버 도메인으로 시작함 (not URI)
     }
 
 }

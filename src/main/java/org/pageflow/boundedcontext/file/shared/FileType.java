@@ -1,26 +1,21 @@
 package org.pageflow.boundedcontext.file.shared;
 
+import lombok.Getter;
 
 /**
  * @author : sechan
  */
-public enum FileType {
-    PROFILE_IMAGE(FileOwnerType.USER),
-    ;
+public interface FileType {
+    FileOwnerType getOwnerType();
 
 
-    private final FileOwnerType[] availableOwnerTypes;
+    enum USER implements FileType {
+        PROFILE_IMAGE
+        ;
 
-    FileType(FileOwnerType... ownerTypes) {
-        this.availableOwnerTypes = ownerTypes;
+        @Getter
+        private static final FileOwnerType ownerType = FileOwnerType.USER;
     }
 
-    public boolean isAvailableOwner(FileOwnerType ownerType) {
-        for (FileOwnerType availableOwnerType : availableOwnerTypes) {
-            if (availableOwnerType == ownerType) {
-                return true;
-            }
-        }
-        return false;
-    }
 }
+

@@ -20,6 +20,8 @@ public class User {
     private Penname penname;
     private ProfileImageUrl profileImageUrl;
 
+
+
     public void changeEmail(Email email) {
         this.email = email;
         this.isEmailVerified = false;
@@ -29,7 +31,7 @@ public class User {
         this.penname = penname;
     }
 
-    public void changeProfileImage(ProfileImageUrl profileImageUrl) {
+    public void changeProfileImageUrl(ProfileImageUrl profileImageUrl) {
         this.profileImageUrl = profileImageUrl;
     }
 

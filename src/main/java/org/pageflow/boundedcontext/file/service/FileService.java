@@ -3,7 +3,7 @@ package org.pageflow.boundedcontext.file.service;
 import lombok.RequiredArgsConstructor;
 import org.pageflow.boundedcontext.file.model.FileIdentity;
 import org.pageflow.boundedcontext.file.model.FilePath;
-import org.pageflow.boundedcontext.file.model.UploadCmd;
+import org.pageflow.boundedcontext.file.model.FileUploadCmd;
 import org.pageflow.boundedcontext.file.persistence.FileData;
 import org.pageflow.boundedcontext.file.persistence.FileDataJpaRepository;
 import org.pageflow.boundedcontext.file.shared.FileOwnerType;
@@ -26,7 +26,7 @@ public class FileService {
 
 
 
-    public FilePath upload(final UploadCmd cmd) {
+    public FilePath upload(final FileUploadCmd cmd) {
         String originalFilename = cmd.getFile().getOriginalFilename();
         assert originalFilename != null; // UploadCmd에서 이미 Runtime 검증
 
@@ -42,7 +42,7 @@ public class FileService {
             .extension(filePath.getExtension())
             .size(cmd.getFile().getSize())
             .ownerId(cmd.getFileIdentity().getOwnerId().toLong())
-            .ownerType(cmd.getFileIdentity().getOwnerType())
+            .ownerType(cmd.getFileIdentity().getFileOwnerType())
             .fileType(cmd.getFileIdentity().getFileType())
             .staticParent(filePath.getStaticParent())
             .build();

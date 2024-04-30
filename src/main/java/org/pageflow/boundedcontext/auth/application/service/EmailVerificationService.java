@@ -2,11 +2,10 @@ package org.pageflow.boundedcontext.auth.application.service;
 
 import lombok.RequiredArgsConstructor;
 import org.pageflow.boundedcontext.auth.adapter.in.web.EmailVerificationWebAdapter;
-import org.pageflow.boundedcontext.auth.application.acl.CmdAccountAcl;
-import org.pageflow.boundedcontext.auth.application.acl.LoadAccountAcl;
 import org.pageflow.boundedcontext.auth.domain.Account;
 import org.pageflow.boundedcontext.auth.domain.EmailVerification;
 import org.pageflow.boundedcontext.auth.port.in.EmailVerificationUseCase;
+import org.pageflow.boundedcontext.auth.port.out.AccountPersistencePort;
 import org.pageflow.boundedcontext.auth.port.out.EmailVerificationPersistencePort;
 import org.pageflow.boundedcontext.common.value.UID;
 import org.pageflow.boundedcontext.email.core.SendMailCmd;
@@ -28,8 +27,7 @@ import java.util.UUID;
 public class EmailVerificationService implements EmailVerificationUseCase {
     private final AppProps props;
     private final EmailVerificationPersistencePort emailVerificationPersistencePort;
-    private final CmdAccountAcl cmdAccountAcl;
-    private final LoadAccountAcl loadAccountAcl;
+    private final AccountPersistencePort accountPersistencePort;
     private final SendMailPort sendMailPort;
 
     @Override
@@ -40,7 +38,7 @@ public class EmailVerificationService implements EmailVerificationUseCase {
                 return emailVerificationPersistencePort.save(newEV);
             });
 
-        String email = loadAccountAcl.load(ev.getUid())
+        String email = accountPersistencePort.loadAccount(ev.getUid())
             .orElseThrow(() -> Code3.DATA_NOT_FOUND.feedback("사용자를 찾을 수 없습니다."))
             .getEmail().toString();
 
@@ -63,7 +61,7 @@ public class EmailVerificationService implements EmailVerificationUseCase {
     public void verify(UID uid, UUID code) {
         EmailVerification ev = emailVerificationPersistencePort.load(uid)
             .orElseThrow(() -> Code1.APPLIED_EMAIL_VERIFICATION_NOT_FOUND.fire());
-        Account account = loadAccountAcl.load(ev.getUid())
+        Account account = accountPersistencePort.loadAccount(ev.getUid())
             .orElseThrow(() -> Code3.DATA_NOT_FOUND.feedback("사용자를 찾을 수 없습니다."));
 
         // 인증코드 일치 확인
@@ -73,14 +71,14 @@ public class EmailVerificationService implements EmailVerificationUseCase {
 
         account.verifyEmail();
         emailVerificationPersistencePort.delete(ev);
-        cmdAccountAcl.save(account);
+        accountPersistencePort.saveAccount(account);
     }
 
     @Override
     public void unverify(UID uid) {
-        Account account = loadAccountAcl.load(uid)
+        Account account = accountPersistencePort.loadAccount(uid)
             .orElseThrow(() -> Code3.DATA_NOT_FOUND.feedback("사용자를 찾을 수 없습니다."));
         account.unverifyEmail();
-        cmdAccountAcl.save(account);
+        accountPersistencePort.saveAccount(account);
     }
 }

@@ -3,7 +3,7 @@ package org.pageflow.boundedcontext.auth.adapter.out.persistence.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.pageflow.boundedcontext.auth.shared.RoleType;
-import org.pageflow.boundedcontext.user.adapter.out.persistence.entity.AccountJpaEntity;
+import org.pageflow.boundedcontext.user.adapter.out.persistence.jpa.AccountJpaEntity;
 import org.pageflow.shared.jpa.JpaEntity;
 
 

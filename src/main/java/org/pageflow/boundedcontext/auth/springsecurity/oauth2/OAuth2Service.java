@@ -2,9 +2,9 @@ package org.pageflow.boundedcontext.auth.springsecurity.oauth2;
 
 
 import lombok.RequiredArgsConstructor;
-import org.pageflow.boundedcontext.auth.application.acl.LoadAccountAcl;
 import org.pageflow.boundedcontext.auth.application.dto.Principal;
 import org.pageflow.boundedcontext.auth.domain.Account;
+import org.pageflow.boundedcontext.auth.port.out.AccountPersistencePort;
 import org.pageflow.boundedcontext.auth.springsecurity.common.InAuthingInFilterForwardFactory;
 import org.pageflow.boundedcontext.auth.springsecurity.oauth2.owner.GithubOwner;
 import org.pageflow.boundedcontext.auth.springsecurity.oauth2.owner.GoogleOwner;
@@ -29,7 +29,7 @@ import java.util.Optional;
 public class OAuth2Service implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 
     private final InFilterForwardManager inFilterForwardManager;
-    private final LoadAccountAcl accountAcl;
+    private final AccountPersistencePort accountAcl;
 
 
     /**
@@ -43,7 +43,7 @@ public class OAuth2Service implements OAuth2UserService<OAuth2UserRequest, OAuth
 
         // social login provider 별로 인증객체를 분리하여 처리
         OAuth2ResourceOwner owner = convertToResourceOwnerImpl(oAuth2User, clientRegistration);
-        Optional<Account> loaded = accountAcl.load(owner.getUsername());
+        Optional<Account> loaded = accountAcl.loadAccount(owner.getUsername());
 
         // case 1) 회원정보가 이미 존재하는 경우 -> 로그인처리
         if(loaded.isPresent()) {

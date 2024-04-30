@@ -1,4 +1,4 @@
-package org.pageflow.boundedcontext.user.adapter.out.persistence.entity;
+package org.pageflow.boundedcontext.user.adapter.out.persistence.jpa;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;

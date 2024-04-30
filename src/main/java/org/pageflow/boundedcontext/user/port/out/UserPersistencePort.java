@@ -12,10 +12,10 @@ import java.util.Optional;
  * @author : sechan
  */
 public interface UserPersistencePort {
-    Optional<User> load(UID uid);
-    void save(User user);
+    Optional<User> loadUser(UID uid);
+    User saveUser(User user);
     User signup(SignupCmd cmd);
 
-    boolean isExist(Username username);
-    boolean isExist(Email email);
+    boolean isUserExistByEmail(Username username);
+    boolean isUserExistByEmail(Email email);
 }

@@ -1,7 +1,6 @@
 package org.pageflow.boundedcontext.auth.application.service;
 
 import lombok.RequiredArgsConstructor;
-import org.pageflow.boundedcontext.auth.application.acl.LoadAccountAcl;
 import org.pageflow.boundedcontext.auth.application.dto.Principal;
 import org.pageflow.boundedcontext.auth.application.dto.Token;
 import org.pageflow.boundedcontext.auth.domain.AccessToken;
@@ -11,6 +10,7 @@ import org.pageflow.boundedcontext.auth.domain.SessionId;
 import org.pageflow.boundedcontext.auth.port.in.LoginCmd;
 import org.pageflow.boundedcontext.auth.port.in.SessionUseCase;
 import org.pageflow.boundedcontext.auth.port.in.TokenUseCase;
+import org.pageflow.boundedcontext.auth.port.out.AccountPersistencePort;
 import org.pageflow.boundedcontext.auth.port.out.SessionPersistencePort;
 import org.pageflow.boundedcontext.auth.shared.AuthMapper;
 import org.pageflow.global.api.code.Code1;
@@ -26,7 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class AuthService implements SessionUseCase, TokenUseCase {
 
     private final SessionPersistencePort sessionPersistencePort;
-    private final LoadAccountAcl accountAcl;
+    private final AccountPersistencePort accountAcl;
     private final AuthMapper mapper;
 
     @Override

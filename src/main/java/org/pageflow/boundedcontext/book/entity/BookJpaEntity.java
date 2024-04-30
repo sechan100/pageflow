@@ -3,7 +3,7 @@
 //import jakarta.persistence.*;
 //import lombok.*;
 //import org.pageflow.boundedcontext.book.constants.BookPolicy;
-//import org.pageflow.boundedcontext.user.adapter.out.persistence.entity.ProfileJpaEntity;
+//import org.pageflow.boundedcontext.user.adapter.out.persistence.jpa.ProfileJpaEntity;
 //import org.pageflow.shared.jpa.BaseJpaEntity;
 //
 ///**

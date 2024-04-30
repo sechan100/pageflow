@@ -1,6 +1,5 @@
-package org.pageflow.boundedcontext.user.adapter.out.persistence.repository;
+package org.pageflow.boundedcontext.user.adapter.out.persistence.jpa;
 
-import org.pageflow.boundedcontext.user.adapter.out.persistence.entity.ProfileJpaEntity;
 import org.pageflow.shared.jpa.repository.BaseJpaRepository;
 import org.springframework.data.jpa.repository.EntityGraph;
 

@@ -60,9 +60,9 @@ public class UserService implements UserUseCase {
     @Override
     public UserDto.Default changeEmail(UID uid, Email email) {
         checkUniqueEmail(email);
-        User user = userPersistePort.load(uid).orElseThrow(() -> Code3.DATA_NOT_FOUND.feedback("사용자를 찾을 수 없습니다."));
+        User user = userPersistePort.loadUser(uid).orElseThrow(() -> Code3.DATA_NOT_FOUND.feedback("사용자를 찾을 수 없습니다."));
         user.changeEmail(email);
-        userPersistePort.save(user);
+        userPersistePort.saveUser(user);
         emailVerificationUseCase.unverify(uid);
         return toDto(user);
     }
@@ -79,14 +79,14 @@ public class UserService implements UserUseCase {
 
 
     private void checkUniqueUsername(Username username){
-        if(userPersistePort.isExist(username)){
+        if(userPersistePort.isUserExistByEmail(username)){
             throw Code4.UNIQUE_FIELD_DUPLICATED
                 .feedback(t -> t.getUsername_duplicate());
         }
     }
 
     private void checkUniqueEmail(Email email){
-        if(userPersistePort.isExist(Email.of(email.getValue()))){
+        if(userPersistePort.isUserExistByEmail(Email.of(email.getValue()))){
             throw Code4.UNIQUE_FIELD_DUPLICATED
                 .feedback(t -> t.getEmail_duplicate());
         }

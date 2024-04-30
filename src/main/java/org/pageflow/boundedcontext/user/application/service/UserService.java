@@ -45,7 +45,7 @@ public class UserService implements UserUseCase, AdminUseCase {
      * </P>
      */
     @Override
-    public UserDto.Default signup(SignupCmd cmd) {
+    public UserDto.User signup(SignupCmd cmd) {
         // 중복 검사
         checkUniqueUsername(cmd.getUsername());
         checkUniqueEmail(cmd.getEmail());
@@ -65,7 +65,7 @@ public class UserService implements UserUseCase, AdminUseCase {
     }
 
     @Override
-    public UserDto.Default changeEmail(UID uid, Email email) {
+    public UserDto.User changeEmail(UID uid, Email email) {
         checkUniqueEmail(email);
         User user = load(uid);
         user.changeEmail(email);
@@ -75,7 +75,7 @@ public class UserService implements UserUseCase, AdminUseCase {
     }
 
     @Override
-    public UserDto.Default changePenname(UID uid, Penname penname) {
+    public UserDto.User changePenname(UID uid, Penname penname) {
         forbiddenWordPort.checkPennameAnyContains(penname);
         User user = load(uid);
         user.changePenname(penname);
@@ -84,7 +84,7 @@ public class UserService implements UserUseCase, AdminUseCase {
     }
 
     @Override
-    public UserDto.Default changeProfileImage(UID uid, ProfileImageFile file) {
+    public UserDto.User changeProfileImage(UID uid, ProfileImageFile file) {
         User user = load(uid);
         ProfileImageUrl oldImageUrl = user.getProfileImageUrl();
         // 외부서버 이미지가 아닌 경우, 기존 이미지를 삭제
@@ -99,7 +99,7 @@ public class UserService implements UserUseCase, AdminUseCase {
         );
         FilePath path = fileService.upload(cmd);
         // 도메인 변경
-        user.changeProfileImageUrl(ProfileImageUrl.of(path.getWebUri()));
+        user.changeProfileImageUrl(ProfileImageUrl.of(path.getWebUrl()));
         userPersistePort.saveUser(user);
         return toDto(user);
     }
@@ -108,7 +108,7 @@ public class UserService implements UserUseCase, AdminUseCase {
 
 
     @Override
-    public UserDto.Default registerAdmin(SignupCmd cmd) {
+    public UserDto.User registerAdmin(SignupCmd cmd) {
         User user = userPersistePort.signup(cmd);
         return toDto(user);
     }
@@ -133,8 +133,8 @@ public class UserService implements UserUseCase, AdminUseCase {
         }
     }
 
-    private UserDto.Default toDto(User user){
-        return new UserDto.Default(
+    private UserDto.User toDto(User user){
+        return new UserDto.User(
             user.getUid().getValue(),
             user.getUsername().toString(),
             user.getEmail().toString(),

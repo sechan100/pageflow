@@ -9,8 +9,9 @@ import org.pageflow.shared.type.TSID;
  */
 public abstract class UserDto {
 
+    // user domain의 필트와 동일
     @Value
-    public static class Default {
+    public static class User {
         TSID uid;
         String username;
         String email;

@@ -24,7 +24,9 @@ public class Penname extends SingleValueWrapper<String> {
     }
 
     private static void validate(String penname) {
-        assert penname!=null;
+        if(penname == null || penname.isEmpty()){
+            throw Code4.EMPTY_VALUE.feedback("필명을 입력해주세요.");
+        }
         if(!penname.matches(REGEX)){
             throw Code4.FORMAT_MISMATCH.feedback(t -> t.getPenname_RegexMismatch());
         }

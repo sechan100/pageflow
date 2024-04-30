@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
  */
 @Value
 public class FilePath {
-    private static final Pattern REGEX = Pattern.compile(
+    private static final Pattern STATIC_PATH_REGEX = Pattern.compile(
         "^/\\d{4}/\\d{1,2}/\\d{1,2}/[\\w\\-]+\\.\\w+$"
     );
 
@@ -28,13 +28,21 @@ public class FilePath {
         this.extension = extension;
     }
 
-    public static FilePath fromWebUri(String webUri){
+    private FilePath(String staticPath){
+        checkIsStaticPath(staticPath);
+        String[] split = staticPath.split("/");
+        this.staticParent = "/" + split[1] + "/" + split[2] + "/" + split[3];
+        this.filename = split[4].split("\\.")[0];
+        this.extension = split[4].split("\\.")[1];
+    }
+
+    public static FilePath fromWebUrl(String webUrl){
         Preconditions.checkState(
-            isWebUri(webUri),
-            "올바른 WebUri 형식이 아닙니다."
+            isWebUrl(webUrl),
+            "올바른 내부 서버 WebUrl 형식이 아닙니다."
         );
-        return new FilePath(webUri.substring(
-            PropsAware.use().file.webUriPrefix.length()
+        return new FilePath(webUrl.substring(
+            PropsAware.use().file.webBaseUrl.length()
         ));
     }
 
@@ -52,14 +60,6 @@ public class FilePath {
         return new FilePath(staticPath);
     }
 
-    private FilePath(String staticPath){
-        checkIsStaticPath(staticPath);
-        String[] split = staticPath.split("/");
-        this.staticParent = split[0] + "/" + split[1] + "/" + split[2];
-        this.filename = split[3].split("\\.")[0];
-        this.extension = split[3].split("\\.")[1];
-    }
-
 
     public String getStaticPath(){
         return staticParent + "/" + filename + "." + extension;
@@ -69,14 +69,14 @@ public class FilePath {
         return getParent() + getStaticPath();
     }
 
-    public String getWebUri(){
-        return getWebUriPrefix() + getStaticPath();
+    public String getWebUrl(){
+        return getWebBaseUrl() + getStaticPath();
     }
 
 
 
-    private static String getWebUriPrefix(){
-        return PropsAware.use().file.webUriPrefix;
+    private static String getWebBaseUrl(){
+        return PropsAware.use().file.webBaseUrl;
     }
 
     private static String getParent(){
@@ -91,14 +91,14 @@ public class FilePath {
     }
 
     private static boolean isStaticPath(String path){
-        return REGEX.matcher(path).matches();
+        return STATIC_PATH_REGEX.matcher(path).matches();
     }
 
-    private static boolean isWebUri(String encodedUri) {
-        String webUriPrefix = getWebUriPrefix();
-        if(encodedUri.startsWith(webUriPrefix)){
-            String withoutWebUriPrefix = encodedUri.substring(webUriPrefix.length());
-            return isStaticPath(withoutWebUriPrefix);
+    private static boolean isWebUrl(String encodedUri) {
+        String webBaseUrl = getWebBaseUrl();
+        if(encodedUri.startsWith(webBaseUrl)){
+            String withoutWebBaseUrl = encodedUri.substring(webBaseUrl.length());
+            return isStaticPath(withoutWebBaseUrl);
         }
         return false;
     }

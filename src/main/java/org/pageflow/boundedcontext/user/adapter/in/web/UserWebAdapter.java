@@ -9,10 +9,12 @@ import lombok.RequiredArgsConstructor;
 import org.pageflow.boundedcontext.auth.shared.RoleType;
 import org.pageflow.boundedcontext.auth.springsecurity.common.InAuthingInFilterForwardFactory;
 import org.pageflow.boundedcontext.auth.springsecurity.oauth2.owner.OAuth2ResourceOwner;
+import org.pageflow.boundedcontext.common.value.UID;
 import org.pageflow.boundedcontext.user.adapter.out.cache.entity.OAuth2PreSignupCache;
 import org.pageflow.boundedcontext.user.adapter.out.cache.repository.OAuth2PresignupRedisRepo;
 import org.pageflow.boundedcontext.user.application.dto.UserDto;
 import org.pageflow.boundedcontext.user.domain.*;
+import org.pageflow.boundedcontext.user.port.in.ProfileImageFile;
 import org.pageflow.boundedcontext.user.port.in.SignupCmd;
 import org.pageflow.boundedcontext.user.port.in.UserUseCase;
 import org.pageflow.boundedcontext.user.shared.ProviderType;
@@ -23,22 +25,22 @@ import org.pageflow.global.api.code.Code2;
 import org.pageflow.global.filter.UriPrefix;
 import org.pageflow.global.property.AppProps;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
 @Tag(name = "User", description = "사용자 API")
 public class UserWebAdapter {
-
     private final AppProps props;
     private final RequestContext requestContext;
     private final OAuth2PresignupRedisRepo preSignupRepo;
     private final UserUseCase userUsecase;
+
+
 
     @Secured(ApiAccess.ANONYMOUS)
     @Operation(summary = "회원가입", description = "새로운 사용자의 회원가입을 요청")
@@ -55,7 +57,7 @@ public class UserWebAdapter {
             preSignupRepo.delete(cache);
         } else {
             provider = ProviderType.NATIVE;
-            profileImageUrl = props.user.defaultProfileImageUri;
+            profileImageUrl = props.user.defaultProfileImageUrl;
         }
 
         SignupCmd cmd = new SignupCmd(
@@ -68,7 +70,7 @@ public class UserWebAdapter {
             ProfileImageUrl.of(profileImageUrl)
         );
 
-        UserDto.Default result = userUsecase.signup(cmd);
+        UserDto.User result = userUsecase.signup(cmd);
         return new Res.Signup(
             result.getUsername(),
             result.getEmail(),
@@ -76,10 +78,8 @@ public class UserWebAdapter {
         );
     }
 
-
     public static final String PRE_SIGNUP_PATH = UriPrefix.PRIVATE + "/oauth2/pre-signup";
     public static final String RESOURCE_OWNER_REQUEST_ATTR_KEY = "resourceOwner";
-
     /**
      * {@link InAuthingInFilterForwardFactory#getOAuth2PreSignupForward(OAuth2ResourceOwner)}
      */
@@ -108,6 +108,47 @@ public class UserWebAdapter {
         return ApiResponse.withoutFeedback(
             Code2.OAUTH2_SIGNUP_REQUIRED,
             result
+        );
+    }
+
+    @PostMapping("/user/profile/email")
+    public Res.SessionUser changeEmail(@RequestBody Map<String, String> form){ // "email"
+        UID uid = requestContext.getUid();
+        Email email = Email.of(form.get("email"));
+
+        UserDto.User result = userUsecase.changeEmail(uid, email);
+        return toSessionUser(result);
+    }
+
+    @PostMapping("/user/profile/penname")
+    public Res.SessionUser changePenname(@RequestBody Map<String, String> form){ // "penname"
+        UID uid = requestContext.getUid();
+        Penname penname = Penname.of(form.get("penname"));
+
+        UserDto.User result = userUsecase.changePenname(uid, penname);
+        return toSessionUser(result);
+    }
+
+    @PostMapping("/user/profile/profile-image")
+    public Res.SessionUser changeProfileImage(@RequestPart MultipartFile file){
+        UID uid = requestContext.getUid();
+        ProfileImageFile profileImageFile = ProfileImageFile.of(file);
+
+        UserDto.User result = userUsecase.changeProfileImage(uid, profileImageFile);
+        return toSessionUser(result);
+    }
+
+
+
+    private Res.SessionUser toSessionUser(UserDto.User user){
+        return new Res.SessionUser(
+            user.getUid(),
+            user.getUsername(),
+            user.getEmail(),
+            user.isEmailVerified(),
+            user.getRole(),
+            user.getPenname(),
+            user.getProfileImageUrl()
         );
     }
 }

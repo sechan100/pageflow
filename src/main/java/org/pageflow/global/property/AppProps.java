@@ -38,7 +38,7 @@ public class AppProps {
     @AllArgsConstructor
     @FieldDefaults(makeFinal = true, level = AccessLevel.PUBLIC)
     public static class User {
-        String defaultProfileImageUri;
+        String defaultProfileImageUrl;
     }
 
     @AllArgsConstructor
@@ -65,11 +65,11 @@ public class AppProps {
 
     @FieldDefaults(makeFinal = true, level = AccessLevel.PUBLIC)
     public static class File {
-        String webUriPrefix;
+        String webBaseUrl;
         String parent;
 
-        public File(String webUriPrefix, String parent) {
-            this.webUriPrefix = UriUtility.addStartSlashAndRemoveEndSlash(webUriPrefix);
+        public File(String webBaseUrl, String parent) {
+            this.webBaseUrl = webBaseUrl;
             this.parent = UriUtility.addStartSlashAndRemoveEndSlash(parent);
         }
 

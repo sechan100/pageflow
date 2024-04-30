@@ -30,7 +30,9 @@ public class Username extends SingleValueWrapper<String> {
 
 
     private static void validate(String username){
-        assert username != null;
+        if(username == null || username.isEmpty()){
+            throw Code4.EMPTY_VALUE.feedback("아이디를 입력해주세요.");
+        }
 
         // 정규식 검사
         if(!REGEX.matcher(username).matches()){

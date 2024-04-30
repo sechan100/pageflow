@@ -1,5 +1,7 @@
 package org.pageflow.boundedcontext.user.domain;
 
+import org.pageflow.global.api.code.Code4;
+import org.pageflow.global.property.PropsAware;
 import org.pageflow.shared.type.SingleValueWrapper;
 
 /**
@@ -7,11 +9,16 @@ import org.pageflow.shared.type.SingleValueWrapper;
  */
 public class ProfileImageUrl extends SingleValueWrapper<String> {
 
+    private static final String INTERNAL_IMAGE_PREFIX = PropsAware.use().file.webBaseUrl;
+
     private ProfileImageUrl(String value) {
         super(value);
     }
 
     public static ProfileImageUrl of(String value) {
+        if(value == null || value.isEmpty()){
+            throw Code4.EMPTY_VALUE.feedback("프로필 이미지 url이 없습니다.");
+        }
         return new ProfileImageUrl(value);
     }
 
@@ -20,7 +27,7 @@ public class ProfileImageUrl extends SingleValueWrapper<String> {
     }
 
     public boolean isInternalImage() {
-        return value.startsWith("/"); // 외부 이미지는 외부서버 도메인으로 시작함 (not URI)
+        return value.startsWith(INTERNAL_IMAGE_PREFIX);
     }
 
 }

@@ -26,6 +26,7 @@ public enum Code4 implements ApiCode {
     // 4100: 기본적인 유효성 에러
       INVALID_FIELD(4100, "유효하지 않은 입력값", "올바른 값을 입력해주세요.")
     , MISSING_FIELD(4101, "요청에 필요한 필드가 Null 또는 Empty임.", "데이터를 모두 입력해주세요.")
+    , EMPTY_VALUE(4102, "null, empty한 값 입력", "데이터를 입력해주세요.")
     , FORMAT_MISMATCH(4110, "형식 불일치(정규식, 길이, etc.)", "올바른 값 형식이 아닙니다.")
     , VALUE_OUT_OF_RANGE(4120, "숫자형 필드에서 정해둔 범위를 벗어난 값이 입력됨", "올바른 범위의 값을 입력해주세요.")
     , INVALID_ENUM_VALUE(4130, "열거형에 존재하지 않는 값이 입력됨", "올바른 값을 입력해주세요.")

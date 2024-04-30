@@ -15,7 +15,7 @@ public class StaticResourceHalderConfig implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry
-            .addResourceHandler(props.file.webUriPrefix + "/**")
+            .addResourceHandler(props.file.webBaseUrl + "/**")
             .addResourceLocations("file:" + props.file.parent + "/");
     }
 }

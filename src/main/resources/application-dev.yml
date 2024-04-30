@@ -25,7 +25,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     properties:
       hibernate:
         show_sql: true
@@ -80,16 +80,16 @@ custom:
   auth:
     # defined in application-secret.yml
   user:
-    default-profile-image-uri: /static/images/default-profile-image.png
+    default-profile-image-url: '${custom.site.base-url}/img/default-profile-image.png'
   email:
     from:
       no-reply: noreply@pageflow.org
       default-from-name: 페이지플로우
   admin:
-    username: sechan100
-    password: sechan100
-    penname: 너무행복해
+    username: admin100
+    password: admin100
+    penname: 관리자
     email: pagefloworg@gmail.com
   file:
-    web-uri-prefix: /static/files/
-    parent: /Users/sechan/local/uploads/
+    web-base-url: '${custom.site.base-url}/resources/image'
+    parent: /Users/sechan/local/uploads/image

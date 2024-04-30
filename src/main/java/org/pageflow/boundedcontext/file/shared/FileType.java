@@ -7,14 +7,14 @@ import lombok.Getter;
  */
 public interface FileType {
     FileOwnerType getOwnerType();
-
+    String name();
 
     enum USER implements FileType {
         PROFILE_IMAGE
         ;
 
         @Getter
-        private static final FileOwnerType ownerType = FileOwnerType.USER;
+        private final FileOwnerType ownerType = FileOwnerType.USER;
     }
 
 }

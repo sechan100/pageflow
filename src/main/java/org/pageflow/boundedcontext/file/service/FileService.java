@@ -43,7 +43,7 @@ public class FileService {
             .size(cmd.getFile().getSize())
             .ownerId(cmd.getFileIdentity().getOwnerId().toLong())
             .ownerType(cmd.getFileIdentity().getFileOwnerType())
-            .fileType(cmd.getFileIdentity().getFileType())
+            .fileType(cmd.getFileIdentity().getFileType().name())
             .staticParent(filePath.getStaticParent())
             .build();
         repository.persist(fileData);
@@ -76,10 +76,10 @@ public class FileService {
     }
 
     /**
-     * @param webUri /{webUrlPrefix}/{YYYY}/{MM}/{DD}/{UUID}.{ext}
+     * @param webUrl /{webUrl}/{YYYY}/{MM}/{DD}/{UUID}.{ext}
      */
-    public void delete(String webUri){
-        FilePath filePath = FilePath.fromWebUri(webUri);
+    public void delete(String webUrl){
+        FilePath filePath = FilePath.fromWebUrl(webUrl);
         deleteByFilePath(filePath);
     }
 

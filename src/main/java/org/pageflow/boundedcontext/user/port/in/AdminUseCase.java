@@ -6,5 +6,5 @@ import org.pageflow.boundedcontext.user.application.dto.UserDto;
  * @author : sechan
  */
 public interface AdminUseCase {
-    UserDto.Default registerAdmin(SignupCmd cmd);
+    UserDto.User registerAdmin(SignupCmd cmd);
 }

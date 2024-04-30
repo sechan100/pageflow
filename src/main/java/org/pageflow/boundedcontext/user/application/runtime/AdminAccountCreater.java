@@ -6,8 +6,8 @@ import org.pageflow.boundedcontext.auth.shared.RoleType;
 import org.pageflow.boundedcontext.user.adapter.out.persistence.jpa.AccountJpaRepository;
 import org.pageflow.boundedcontext.user.application.dto.UserDto;
 import org.pageflow.boundedcontext.user.domain.*;
+import org.pageflow.boundedcontext.user.port.in.AdminUseCase;
 import org.pageflow.boundedcontext.user.port.in.SignupCmd;
-import org.pageflow.boundedcontext.user.port.in.UserUseCase;
 import org.pageflow.boundedcontext.user.shared.ProviderType;
 import org.pageflow.global.initialize.RuntimeInitializer;
 import org.pageflow.global.property.AppProps;
@@ -22,7 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @RequiredArgsConstructor
 public class AdminAccountCreater implements RuntimeInitializer {
-    private final UserUseCase userUsecase;
+    private final AdminUseCase adminUseCase;
     private final AccountJpaRepository accountJpaRepo;
     private final AppProps props;
 
@@ -40,10 +40,10 @@ public class AdminAccountCreater implements RuntimeInitializer {
             Penname.of(admin.penname),
             RoleType.ROLE_ADMIN,
             ProviderType.NATIVE,
-            ProfileImageUrl.of(props.user.defaultProfileImageUri)
+            ProfileImageUrl.of(props.user.defaultProfileImageUrl)
         );
 
-        UserDto.Default result = userUsecase.signup(cmd);
+        UserDto.User result = adminUseCase.registerAdmin(cmd);
 
         log.info("관리자 계정을 생성했습니다. {}", JsonUtility.toJson(result));
     }

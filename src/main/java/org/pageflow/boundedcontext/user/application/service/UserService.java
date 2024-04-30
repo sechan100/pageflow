@@ -12,10 +12,8 @@ import org.pageflow.boundedcontext.user.domain.Username;
 import org.pageflow.boundedcontext.user.port.in.ProfileImageFile;
 import org.pageflow.boundedcontext.user.port.in.SignupCmd;
 import org.pageflow.boundedcontext.user.port.in.UserUseCase;
-import org.pageflow.boundedcontext.user.port.out.LoadUserPort;
 import org.pageflow.boundedcontext.user.port.out.PennameForbiddenWordPort;
-import org.pageflow.boundedcontext.user.port.out.UserCommandPort;
-import org.pageflow.boundedcontext.user.port.out.UserExistenceCheckPort;
+import org.pageflow.boundedcontext.user.port.out.UserPersistencePort;
 import org.pageflow.global.api.code.Code3;
 import org.pageflow.global.api.code.Code4;
 import org.springframework.stereotype.Service;
@@ -27,9 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @RequiredArgsConstructor
 public class UserService implements UserUseCase {
-    private final LoadUserPort loadUserPort;
-    private final UserCommandPort userCmdPort;
-    private final UserExistenceCheckPort isExistPort;
+    private final UserPersistencePort userPersistePort;
     private final PennameForbiddenWordPort pennameForbiddenWordPort;
     private final EmailVerificationUseCase emailVerificationUseCase;
 
@@ -57,16 +53,16 @@ public class UserService implements UserUseCase {
          * 때문에 SignupCmd와의 불일치가 발생한다. 하지만 이것만을 위해서 따로 signup 전용 도메인 객체를 만들기에는
          * 로직이 간단하다.
          */
-        User user = userCmdPort.signup(cmd);
+        User user = userPersistePort.signup(cmd);
         return toDto(user);
     }
 
     @Override
     public UserDto.Default changeEmail(UID uid, Email email) {
         checkUniqueEmail(email);
-        User user = loadUserPort.load(uid).orElseThrow(() -> Code3.DATA_NOT_FOUND.feedback("사용자를 찾을 수 없습니다."));
+        User user = userPersistePort.load(uid).orElseThrow(() -> Code3.DATA_NOT_FOUND.feedback("사용자를 찾을 수 없습니다."));
         user.changeEmail(email);
-        userCmdPort.save(user);
+        userPersistePort.save(user);
         emailVerificationUseCase.unverify(uid);
         return toDto(user);
     }
@@ -83,14 +79,14 @@ public class UserService implements UserUseCase {
 
 
     private void checkUniqueUsername(Username username){
-        if(isExistPort.isExist(username)){
+        if(userPersistePort.isExist(username)){
             throw Code4.UNIQUE_FIELD_DUPLICATED
                 .feedback(t -> t.getUsername_duplicate());
         }
     }
 
     private void checkUniqueEmail(Email email){
-        if(isExistPort.isExist(Email.of(email.getValue()))){
+        if(userPersistePort.isExist(Email.of(email.getValue()))){
             throw Code4.UNIQUE_FIELD_DUPLICATED
                 .feedback(t -> t.getEmail_duplicate());
         }

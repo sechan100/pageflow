@@ -6,9 +6,7 @@ import org.pageflow.boundedcontext.user.adapter.out.persistence.entity.AccountJp
 import org.pageflow.boundedcontext.user.adapter.out.persistence.entity.ProfileJpaEntity;
 import org.pageflow.boundedcontext.user.domain.*;
 import org.pageflow.boundedcontext.user.port.in.SignupCmd;
-import org.pageflow.boundedcontext.user.port.out.LoadUserPort;
-import org.pageflow.boundedcontext.user.port.out.UserCommandPort;
-import org.pageflow.boundedcontext.user.port.out.UserExistenceCheckPort;
+import org.pageflow.boundedcontext.user.port.out.UserPersistencePort;
 import org.pageflow.shared.annotation.PersistenceAdapter;
 import org.pageflow.shared.jpa.RequiredDataNotFoundException;
 import org.pageflow.shared.type.TSID;
@@ -22,7 +20,7 @@ import java.util.Optional;
 @PersistenceAdapter
 @Transactional
 @RequiredArgsConstructor
-public class UserPersistenceAdapter implements UserCommandPort, LoadUserPort, UserExistenceCheckPort {
+public class UserPersistenceAdapter implements UserPersistencePort {
     private final AccountJpaRepository accountJpaRepo;
     private final ProfileJpaRepository profileJpaRepo;
 
@@ -92,6 +90,7 @@ public class UserPersistenceAdapter implements UserCommandPort, LoadUserPort, Us
         return new User(
             UID.from(a.getId()),
             Username.of(a.getUsername()),
+            a.getRole(),
             Email.of(a.getEmail()),
             a.isEmailVerified(),
             Penname.of(p.getPenname()),

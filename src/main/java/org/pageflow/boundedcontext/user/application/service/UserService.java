@@ -10,6 +10,7 @@ import org.pageflow.boundedcontext.file.service.FileService;
 import org.pageflow.boundedcontext.file.shared.FileType;
 import org.pageflow.boundedcontext.user.application.dto.UserDto;
 import org.pageflow.boundedcontext.user.domain.*;
+import org.pageflow.boundedcontext.user.port.in.AdminUseCase;
 import org.pageflow.boundedcontext.user.port.in.ProfileImageFile;
 import org.pageflow.boundedcontext.user.port.in.SignupCmd;
 import org.pageflow.boundedcontext.user.port.in.UserUseCase;
@@ -25,7 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class UserService implements UserUseCase {
+public class UserService implements UserUseCase, AdminUseCase {
     private final UserPersistencePort userPersistePort;
     private final CheckForbiddenWordPort forbiddenWordPort;
     private final EmailVerificationUseCase emailVerificationUseCase;
@@ -105,6 +106,15 @@ public class UserService implements UserUseCase {
 
 
 
+
+    @Override
+    public UserDto.Default registerAdmin(SignupCmd cmd) {
+        User user = userPersistePort.signup(cmd);
+        return toDto(user);
+    }
+
+
+
     private User load(UID uid){
         return userPersistePort.loadUser(uid).orElseThrow(() -> Code3.DATA_NOT_FOUND.feedback("사용자를 찾을 수 없습니다."));
     }
@@ -134,5 +144,4 @@ public class UserService implements UserUseCase {
             user.getProfileImageUrl().toString()
         );
     }
-
 }

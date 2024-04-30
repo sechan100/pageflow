@@ -1,18 +1,22 @@
 package org.pageflow.boundedcontext.user.adapter.out.hardcodding;
 
 import org.pageflow.boundedcontext.user.domain.Penname;
-import org.pageflow.boundedcontext.user.port.out.PennameForbiddenWordPort;
+import org.pageflow.boundedcontext.user.domain.Username;
+import org.pageflow.boundedcontext.user.port.out.CheckForbiddenWordPort;
 import org.pageflow.global.api.code.Code4;
-import org.springframework.stereotype.Repository;
+import org.pageflow.shared.annotation.PersistenceAdapter;
 
 import java.util.Set;
 
 /**
  * @author : sechan
  */
-@Repository
-public class PennameForbiddenWordRepository implements PennameForbiddenWordPort {
-    public static final Set<String> FORBIDDEN_PENNAME_WORDS =
+@PersistenceAdapter
+public class ForbiddenWordRepository implements CheckForbiddenWordPort {
+    private static final Set<String> USERNAME = Set.of(
+        "admin","administrator","anonymous","pageflow"
+    );
+    private static final Set<String> PENNAME =
             Set.of(
                     "admin","administrator","anonymous","pageflow","관리자","어드민","페이지플로우","패이지플로우","매니저",
                     "패플","도우미","고객센터","고객센타","고객샌터","고객샌타","한게임","한개임","운영자","엔토이","앤토이","씨펄",
@@ -32,12 +36,26 @@ public class PennameForbiddenWordRepository implements PennameForbiddenWordPort 
 
 
     @Override
-    public void validateForbiddenWord(Penname penname) {
-        for(String forbiddenWord : FORBIDDEN_PENNAME_WORDS) {
-            if(penname.getValue().contains(forbiddenWord)) {
+    public void checkPennameAnyContains(Penname penname) {
+        String pennameValue = penname.getValue();
+        for(String forbiddenWord : PENNAME) {
+            if(pennameValue.contains(forbiddenWord)) {
                 throw
                     Code4.CONTAINS_FORBIDDEN_WORD.feedback(t ->
                         t.getPenname_containsForbiddenWord(forbiddenWord)
+                    );
+            }
+        }
+    }
+
+    @Override
+    public void checkUsernameAnyContains(Username username) {
+        String usernameValue = username.getValue();
+        for(String forbiddenWord : USERNAME) {
+            if(usernameValue.contains(forbiddenWord)) {
+                throw
+                    Code4.CONTAINS_FORBIDDEN_WORD.feedback(t ->
+                        t.getUsername_containsForbiddenWord(forbiddenWord)
                     );
             }
         }

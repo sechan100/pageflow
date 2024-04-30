@@ -13,7 +13,7 @@ import org.pageflow.boundedcontext.user.domain.*;
 import org.pageflow.boundedcontext.user.port.in.ProfileImageFile;
 import org.pageflow.boundedcontext.user.port.in.SignupCmd;
 import org.pageflow.boundedcontext.user.port.in.UserUseCase;
-import org.pageflow.boundedcontext.user.port.out.PennameForbiddenWordPort;
+import org.pageflow.boundedcontext.user.port.out.CheckForbiddenWordPort;
 import org.pageflow.boundedcontext.user.port.out.UserPersistencePort;
 import org.pageflow.global.api.code.Code3;
 import org.pageflow.global.api.code.Code4;
@@ -27,7 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class UserService implements UserUseCase {
     private final UserPersistencePort userPersistePort;
-    private final PennameForbiddenWordPort pennameForbiddenWordPort;
+    private final CheckForbiddenWordPort forbiddenWordPort;
     private final EmailVerificationUseCase emailVerificationUseCase;
     private final FileService fileService;
 
@@ -48,8 +48,10 @@ public class UserService implements UserUseCase {
         // 중복 검사
         checkUniqueUsername(cmd.getUsername());
         checkUniqueEmail(cmd.getEmail());
-        // 필명 금지어 검사
-        pennameForbiddenWordPort.validateForbiddenWord(cmd.getPenname());
+
+        // 금지어 검사
+        forbiddenWordPort.checkPennameAnyContains(cmd.getPenname());
+        forbiddenWordPort.checkUsernameAnyContains(cmd.getUsername());
 
         /* REVIEW: input port로 쓰인 SignupCmd를 도메인 모델로의 변환없이 그대로 out port로 내보내고있다.
          * signup시에는 auth 도메인과 같은 곳에서 사용될 데이터들도 어쩔 수 없이 같이 저장하야하지만, 해당 bounded에서는
@@ -73,7 +75,7 @@ public class UserService implements UserUseCase {
 
     @Override
     public UserDto.Default changePenname(UID uid, Penname penname) {
-        pennameForbiddenWordPort.validateForbiddenWord(penname);
+        forbiddenWordPort.checkPennameAnyContains(penname);
         User user = load(uid);
         user.changePenname(penname);
         userPersistePort.saveUser(user);

@@ -9,10 +9,12 @@
 ///**
 // * @author : sechan
 // */
+//@Data
 //@Entity
-//@Getter
-//@Setter(AccessLevel.NONE)
+//@Builder
 //@NoArgsConstructor(access = AccessLevel.PROTECTED)
+//@AllArgsConstructor(access = AccessLevel.PROTECTED)
+//@EqualsAndHashCode(of = "id", callSuper = false)
 //@Table(name = "book")
 //public class BookJpaEntity extends BaseJpaEntity {
 //
@@ -23,7 +25,6 @@
 //    @JoinColumn(name = "profile_id")
 //    private ProfileJpaEntity author;
 //
-//    @Setter
 //    @Column(nullable = false)
 //    private String title;
 //

@@ -1,4 +1,4 @@
-package org.pageflow.boundedcontext.book.constants;
+package org.pageflow.boundedcontext.book.shared.constants;
 
 /**
  * @author : sechan

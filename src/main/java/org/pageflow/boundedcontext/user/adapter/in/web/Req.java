@@ -7,7 +7,7 @@ import lombok.Data;
 /**
  * @author : sechan
  */
-public abstract class UserReq {
+abstract class Req {
 
     @Data
     public static class SignupForm {

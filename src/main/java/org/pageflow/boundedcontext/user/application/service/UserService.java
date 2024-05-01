@@ -104,7 +104,13 @@ public class UserService implements UserUseCase, AdminUseCase {
         return toDto(user);
     }
 
-
+    @Override
+    public UserDto.User changeProfileImage(UID uid, ProfileImageUrl url) {
+        User user = load(uid);
+        user.changeProfileImageUrl(url);
+        userPersistePort.saveUser(user);
+        return toDto(user);
+    }
 
 
     @Override

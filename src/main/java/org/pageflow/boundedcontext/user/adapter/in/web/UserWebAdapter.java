@@ -45,7 +45,7 @@ public class UserWebAdapter {
     @Secured(ApiAccess.ANONYMOUS)
     @Operation(summary = "회원가입", description = "새로운 사용자의 회원가입을 요청")
     @PostMapping("/signup")
-    public Res.Signup signup(@Valid @RequestBody UserReq.SignupForm form) {
+    public Res.Signup signup(@Valid @RequestBody Req.SignupForm form) {
         Optional<OAuth2PreSignupCache> loaded = preSignupRepo.findById(form.getUsername());
 
         String profileImageUrl;
@@ -129,12 +129,28 @@ public class UserWebAdapter {
         return toSessionUser(result);
     }
 
+    /**
+     * 프로필 이미지를 서버에 업로드하고, 로그인 중인 사용자의 ProfileImageUrl을 변경한다.
+     * @param file 프로필 이미지 파일
+     */
     @PostMapping("/user/profile/profile-image")
     public Res.SessionUser changeProfileImage(@RequestPart MultipartFile file){
         UID uid = requestContext.getUid();
         ProfileImageFile profileImageFile = ProfileImageFile.of(file);
 
         UserDto.User result = userUsecase.changeProfileImage(uid, profileImageFile);
+        return toSessionUser(result);
+    }
+
+    /**
+     * 로그인 중인 사용자의 ProfileImageUrl을 기본 이미지로 변경한다.
+     */
+    @DeleteMapping("/user/profile/profile-image")
+    public Res.SessionUser changeProfileImageToDefault(){
+        UID uid = requestContext.getUid();
+        ProfileImageUrl profileImageUrl = ProfileImageUrl.of(props.user.defaultProfileImageUrl);
+
+        UserDto.User result = userUsecase.changeProfileImage(uid, profileImageUrl);
         return toSessionUser(result);
     }
 

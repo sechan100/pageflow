@@ -14,7 +14,7 @@ public final class Title extends SingleValueWrapper<String> {
 
     private static void validate(String value) {
         if(value == null || value.isEmpty()){
-            throw Code4.EMPTY_VALUE.feedback("책의 제목이 없습니다.");
+            throw Code4.EMPTY_VALUE.feedback("제목이 없습니다.");
         }
     }
 }

@@ -4,14 +4,13 @@ package org.pageflow.boundedcontext.book.domain;
  * @author : sechan
  */
 public class Book {
-
-    private final BookId bookId;
+    private final BookId id;
     private Title title;
     private CoverImageUrl coverImageUrl;
 
 
-    private Book(BookId bookId, Title title, CoverImageUrl coverImageUrl) {
-        this.bookId = bookId;
+    private Book(BookId id, Title title, CoverImageUrl coverImageUrl) {
+        this.id = id;
         this.title = title;
         this.coverImageUrl = coverImageUrl;
     }

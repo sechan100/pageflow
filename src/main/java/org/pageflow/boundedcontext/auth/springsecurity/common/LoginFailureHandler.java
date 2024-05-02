@@ -23,7 +23,7 @@ public class LoginFailureHandler implements AuthenticationFailureHandler {
             case "UsernameNotFoundException":
                 throw Code3.DATA_NOT_FOUND.feedback("존재하지 않는 아이디입니다.");
             case "BadCredentialsException":
-                throw Code4.INVALID_FIELD.feedback(t->t.getPassword_notMatch());
+                throw Code4.INVALID_VALUE.feedback(t->t.getPassword_notMatch());
             default:
                 throw exception;
         }

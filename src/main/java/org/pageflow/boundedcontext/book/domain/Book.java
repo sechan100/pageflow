@@ -5,20 +5,20 @@ package org.pageflow.boundedcontext.book.domain;
  */
 public class Book {
 
-    private final BID bid;
+    private final BookId bookId;
     private Title title;
     private CoverImageUrl coverImageUrl;
 
 
-    private Book(BID bid, Title title, CoverImageUrl coverImageUrl) {
-        this.bid = bid;
+    private Book(BookId bookId, Title title, CoverImageUrl coverImageUrl) {
+        this.bookId = bookId;
         this.title = title;
         this.coverImageUrl = coverImageUrl;
     }
 
 
     public Book create(Title title, CoverImageUrl coverImageUrl){
-        return new Book(BID.random(), title, coverImageUrl);
+        return new Book(BookId.random(), title, coverImageUrl);
     }
 
     public void changeTitle(Title title){

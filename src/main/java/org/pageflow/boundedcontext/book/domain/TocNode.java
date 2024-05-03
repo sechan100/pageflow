@@ -1,21 +1,17 @@
 package org.pageflow.boundedcontext.book.domain;
 
+
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
 /**
- * TocNode인 Folder와 Page를 위한 추상화.
+ * Folder인지 Page인지 크게 중요하지 않은, 단지 해당 위치에 노드가 존재한다는 것을 표현하기위한 값 객체
  * @author : sechan
  */
-public class TocNode {
+@Getter
+@RequiredArgsConstructor
+public final class TocNode implements INode {
     private final NodeId id;
-    private String title;
-
-
-    public TocNode(NodeId id, String title) {
-        this.id = id;
-        this.title = title;
-    }
-
-
-    public NodeId getId() {
-        return id;
-    }
+    private final Title title;
+    private final TocNodeType type;
 }

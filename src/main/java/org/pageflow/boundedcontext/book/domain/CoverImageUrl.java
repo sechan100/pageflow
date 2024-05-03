@@ -11,10 +11,6 @@ public final class CoverImageUrl extends SingleValueWrapper<String> {
 
     public CoverImageUrl(String value) {
         super(value);
-        validate(value);
-    }
-
-    private static void validate(String value) {
         if(value == null || value.isEmpty()){
             throw Code4.EMPTY_VALUE.feedback("커버 이미지 url이 없습니다.");
         }

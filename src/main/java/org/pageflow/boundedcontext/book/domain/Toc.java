@@ -9,10 +9,10 @@ import java.util.List;
  */
 public class Toc {
     private final BookId bookId;
-    private final List<TocNode> nodes;
+    private final List<Page> nodes;
 
 
-    public Toc(BookId bookId, List<TocNode> nodes) {
+    public Toc(BookId bookId, List<Page> nodes) {
         this.bookId = bookId;
         this.nodes = new LinkedList<>(nodes);
     }

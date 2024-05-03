@@ -9,6 +9,6 @@ import org.pageflow.boundedcontext.book.domain.NodeId;
 @Value
 public class ReparentCmd {
     NodeId nodeId;
-    NodeId destinationFolder;
-    int destinationIndex;
+    NodeId destFolder;
+    int destIndex;
 }

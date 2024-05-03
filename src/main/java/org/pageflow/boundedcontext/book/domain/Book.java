@@ -1,8 +1,11 @@
 package org.pageflow.boundedcontext.book.domain;
 
+import org.pageflow.boundedcontext.common.annotation.AggregateRoot;
+
 /**
  * @author : sechan
  */
+@AggregateRoot
 public class Book {
     private final BookId id;
     private Title title;
@@ -20,7 +23,7 @@ public class Book {
         return new Book(BookId.random(), title, coverImageUrl);
     }
 
-    public void changeTitle(Title title){
+    public void changeTitle(Title title) {
         this.title = title;
     }
 

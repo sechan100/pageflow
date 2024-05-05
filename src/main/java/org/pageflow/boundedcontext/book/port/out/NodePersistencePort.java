@@ -1,9 +1,9 @@
 package org.pageflow.boundedcontext.book.port.out;
 
-import org.pageflow.boundedcontext.book.domain.Folder;
-import org.pageflow.boundedcontext.book.domain.NodeEntity;
 import org.pageflow.boundedcontext.book.domain.NodeId;
-import org.pageflow.boundedcontext.book.domain.Page;
+import org.pageflow.boundedcontext.book.domain.aggregateroot.Folder;
+import org.pageflow.boundedcontext.book.domain.aggregateroot.NodeEntity;
+import org.pageflow.boundedcontext.book.domain.aggregateroot.Page;
 
 import java.util.Optional;
 

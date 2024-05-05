@@ -1,5 +1,8 @@
-package org.pageflow.boundedcontext.book.domain;
+package org.pageflow.boundedcontext.book.domain.aggregateroot;
 
+import org.pageflow.boundedcontext.book.domain.BookId;
+import org.pageflow.boundedcontext.book.domain.CoverImageUrl;
+import org.pageflow.boundedcontext.book.domain.Title;
 import org.pageflow.boundedcontext.common.annotation.AggregateRoot;
 
 /**
@@ -12,7 +15,11 @@ public class Book {
     private CoverImageUrl coverImageUrl;
 
 
-    private Book(BookId id, Title title, CoverImageUrl coverImageUrl) {
+    private Book(
+        BookId id,
+        Title title,
+        CoverImageUrl coverImageUrl
+    ) {
         this.id = id;
         this.title = title;
         this.coverImageUrl = coverImageUrl;
@@ -30,16 +37,5 @@ public class Book {
     public void changeCoverImageUrl(CoverImageUrl coverImageUrl){
         this.coverImageUrl = coverImageUrl;
     }
-
-
-
-
-
-
-
-
-
-
-
 
 }

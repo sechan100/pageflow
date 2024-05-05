@@ -1,6 +1,10 @@
-package org.pageflow.boundedcontext.book.domain;
+package org.pageflow.boundedcontext.book.domain.aggregateroot;
 
 import lombok.Getter;
+import org.pageflow.boundedcontext.book.domain.INode;
+import org.pageflow.boundedcontext.book.domain.NodeId;
+import org.pageflow.boundedcontext.book.domain.Title;
+import org.pageflow.boundedcontext.book.domain.TocNodeType;
 import org.pageflow.boundedcontext.common.annotation.AggregateRoot;
 import org.pageflow.global.api.code.Code4;
 import org.springframework.lang.Nullable;
@@ -26,6 +30,7 @@ public final class Folder extends NodeEntity {
         }
     }
 
+
     public static Folder create(Title title) {
         return new Folder(NodeId.random(), title, null);
     }
@@ -37,7 +42,7 @@ public final class Folder extends NodeEntity {
      */
     public void reparent(INode node, int dest) {
         assert node != null;
-        validateDestination(dest, childNodes.size() + 1); // 새로운 노드가 추기되므로, size + 1을 기준으로 판단
+        validateDestination(dest, childNodes.size() + 1); // 새로운 노드가 추가되므로, size + 1을 기준으로 판단
         childNodes.add(dest-1, node);
     }
 

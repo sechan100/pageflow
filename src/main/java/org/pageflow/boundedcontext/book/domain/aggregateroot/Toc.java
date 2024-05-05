@@ -1,4 +1,6 @@
-package org.pageflow.boundedcontext.book.domain;
+package org.pageflow.boundedcontext.book.domain.aggregateroot;
+
+import org.pageflow.boundedcontext.book.domain.BookId;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -16,5 +18,8 @@ public class Toc {
         this.bookId = bookId;
         this.nodes = new LinkedList<>(nodes);
     }
+
+
+
 
 }

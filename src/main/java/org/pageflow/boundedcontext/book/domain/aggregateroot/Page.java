@@ -1,5 +1,8 @@
-package org.pageflow.boundedcontext.book.domain;
+package org.pageflow.boundedcontext.book.domain.aggregateroot;
 
+import org.pageflow.boundedcontext.book.domain.NodeId;
+import org.pageflow.boundedcontext.book.domain.Title;
+import org.pageflow.boundedcontext.book.domain.TocNodeType;
 import org.pageflow.boundedcontext.common.annotation.AggregateRoot;
 
 /**
@@ -7,7 +10,7 @@ import org.pageflow.boundedcontext.common.annotation.AggregateRoot;
  * @author : sechan
  */
 @AggregateRoot
-public class Page extends NodeEntity {
+public final class Page extends NodeEntity {
     private String content;
 
 

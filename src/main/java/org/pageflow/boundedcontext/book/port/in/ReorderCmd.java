@@ -8,9 +8,8 @@ import org.pageflow.boundedcontext.book.domain.NodeId;
  * @author : sechan
  */
 @Value
-public class ReparentCmd {
+public class ReorderCmd {
     BookId bookId;
-    NodeId folderId;
     NodeId nodeId;
     int dest;
 }

@@ -11,6 +11,7 @@ public interface TocUseCase {
     TocDto.Node createFolder(CreateFolderCmd cmd);
     TocDto.Node createPage(CreatePageCmd cmd);
     TocDto.Node changeTitle(NodeId id, Title title);
-    TocDto.Node reparent(ReparentCmd cmd);
+    void reorder(ReorderCmd cmd);
+    void reparent(ReparentCmd cmd);
     void deleteNode(NodeId id);
 }

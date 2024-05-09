@@ -51,10 +51,19 @@ public enum Code4 implements ApiCode {
     private final String feedback;
 
     public ApiException feedback(Function<FeedbackTemplate, String> feedbackSupplier) {
-        return feedback(feedbackSupplier.apply(FeedbackTemplate.getINSTANCE()));
+        return feedback(feedbackSupplier.apply(FeedbackTemplate.getINSTANCE()), null);
+    }
+
+    public ApiException feedback(Function<FeedbackTemplate, String> feedbackSupplier, Throwable cause) {
+        return feedback(feedbackSupplier.apply(FeedbackTemplate.getINSTANCE()), cause);
     }
 
     public ApiException feedback(String feedback) {
         return new ApiException(this, feedback, null, null);
     }
+
+    public ApiException feedback(String feedback, Throwable cause) {
+        return new ApiException(this, feedback, null, cause);
+    }
+
 }

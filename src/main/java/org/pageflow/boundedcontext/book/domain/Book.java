@@ -1,8 +1,5 @@
-package org.pageflow.boundedcontext.book.domain.aggregateroot;
+package org.pageflow.boundedcontext.book.domain;
 
-import org.pageflow.boundedcontext.book.domain.BookId;
-import org.pageflow.boundedcontext.book.domain.CoverImageUrl;
-import org.pageflow.boundedcontext.book.domain.Title;
 import org.pageflow.boundedcontext.common.annotation.AggregateRoot;
 
 /**

@@ -20,6 +20,7 @@ public class TransactionalCacheManagerImpl implements TransactionalCacheManager,
         isSynchronizationActive.set(Boolean.FALSE);
     }
 
+    @Override
     public void cachify(String key, Object value) {
         Map<String, Object> cache = cacheThreadLocal.get();
         if(cache == null) {
@@ -34,6 +35,7 @@ public class TransactionalCacheManagerImpl implements TransactionalCacheManager,
         }
     }
 
+    @Override
     public Object get(String key) {
         Map<String, Object> cache = cacheThreadLocal.get();
         if(cache == null) {

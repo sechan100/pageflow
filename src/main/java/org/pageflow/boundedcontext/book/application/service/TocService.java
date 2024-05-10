@@ -7,6 +7,7 @@ import org.pageflow.boundedcontext.book.domain.*;
 import org.pageflow.boundedcontext.book.domain.toc.Toc;
 import org.pageflow.boundedcontext.book.port.in.*;
 import org.pageflow.boundedcontext.book.port.out.NodePersistencePort;
+import org.pageflow.boundedcontext.book.port.out.TocPersistencePort;
 import org.pageflow.global.api.code.Code3;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class TocService implements TocUseCase {
     private final NodePersistencePort persistPort;
+    private final TocPersistencePort tocPort;
 
 
     @Override
@@ -44,16 +46,16 @@ public class TocService implements TocUseCase {
 
     @Override
     public void reparent(ReparentCmd cmd) {
-        Toc toc = persistPort.loadToc(cmd.getBookId());
+        Toc toc = tocPort.loadToc(cmd.getBookId());
         toc.reparent(cmd.getFolderId(), cmd.getNodeId(), cmd.getDest());
-        persistPort.saveToc(toc);
+        tocPort.saveToc(toc);
     }
 
     @Override
     public void reorder(ReorderCmd cmd) {
-        Toc toc = persistPort.loadToc(cmd.getBookId());
+        Toc toc = tocPort.loadToc(cmd.getBookId());
         toc.reorder(cmd.getNodeId(), cmd.getDest());
-        persistPort.saveToc(toc);
+        tocPort.saveToc(toc);
     }
 
 

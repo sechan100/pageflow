@@ -37,6 +37,9 @@ public abstract class NodeJpaEntity extends BaseJpaEntity {
     @JoinColumn(name = "parent_id")
     private FolderJpaEntity parentNode;
 
+    @Column(nullable = false)
+    private Integer ov;
+
 
     protected NodeJpaEntity(
         Long id,

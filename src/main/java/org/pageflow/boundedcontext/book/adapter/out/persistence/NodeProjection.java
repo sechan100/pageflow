@@ -1,15 +1,15 @@
 package org.pageflow.boundedcontext.book.adapter.out.persistence;
 
-import lombok.Data;
+import lombok.Value;
 import org.pageflow.boundedcontext.book.adapter.out.persistence.jpa.NodeJpaEntity;
 
 /**
  * @author : sechan
  */
-@Data
+@Value
 public class NodeProjection {
-    private final Long id;
-    private final Long parentId;
-    private final int ordinal;
-    private final Class<? extends NodeJpaEntity> type;
+    Long id;
+    Long parentId;
+    int ov;
+    Class<? extends NodeJpaEntity> type;
 }

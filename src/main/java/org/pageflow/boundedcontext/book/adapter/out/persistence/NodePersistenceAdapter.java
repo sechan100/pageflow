@@ -4,20 +4,15 @@ package org.pageflow.boundedcontext.book.adapter.out.persistence;
 import lombok.RequiredArgsConstructor;
 import org.pageflow.boundedcontext.book.adapter.out.persistence.jpa.*;
 import org.pageflow.boundedcontext.book.domain.*;
-import org.pageflow.boundedcontext.book.domain.toc.Toc;
-import org.pageflow.boundedcontext.book.domain.toc.TocFolder;
-import org.pageflow.boundedcontext.book.domain.toc.TocNode;
-import org.pageflow.boundedcontext.book.domain.toc.TocPage;
 import org.pageflow.boundedcontext.book.port.in.CreateFolderCmd;
 import org.pageflow.boundedcontext.book.port.in.CreatePageCmd;
 import org.pageflow.boundedcontext.book.port.out.NodePersistencePort;
 import org.pageflow.global.api.code.Code3;
-import org.pageflow.shared.transaction.TransactionalCacheManager;
 import org.pageflow.shared.type.TSID;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.Optional;
 
 /**
  * @author : sechan
@@ -26,12 +21,9 @@ import java.util.*;
 @Transactional
 @RequiredArgsConstructor
 public class NodePersistenceAdapter implements NodePersistencePort {
-    private static final String TOC_CACHE_KEY = "NodePersistenceAdapter.TocNodeMapCache";
-
     private final BookJpaRepository bookRepo;
     private final NodeJpaRepository nodeRepo;
     private final FolderJpaRepository folderRepo;
-    private final TransactionalCacheManager cacheManager;
 
 
 
@@ -39,43 +31,6 @@ public class NodePersistenceAdapter implements NodePersistencePort {
     public Optional<NodeAr> loadNode(NodeId id) {
         return nodeRepo.findById(id.toLong())
             .map(this::toNodeAr);
-    }
-
-    @Override
-    public Toc loadToc(BookId bookId) {
-        List<NodeProjection> nodeProjections = nodeRepo.queryNodesByBookId(bookId.toLong());
-        Map<NodeId, TocNode> nodeMap = new HashMap<>();
-
-        for(NodeProjection p : nodeProjections) {
-            NodeId nodeId = NodeId.from(p.getId());
-            TocNode node;
-            if(p.getType().equals(FolderJpaEntity.class)){
-                node = new TocFolder(nodeId, p.getOrdinal());
-            } else {
-                node = new TocPage(nodeId, p.getOrdinal());
-            }
-            nodeMap.put(nodeId, node);
-        }
-
-        TocFolder root = null;
-        for(NodeProjection p : nodeProjections){
-            NodeId nodeId = NodeId.from(p.getId());
-            NodeId parentId = p.getParentId() != null ? NodeId.from(p.getParentId()) : null;
-
-            // root folder
-            if (parentId == null) {
-                root = (TocFolder) nodeMap.get(nodeId);
-            // child node
-            } else {
-                TocFolder parentNode = (TocFolder) nodeMap.get(parentId);
-                parentNode.addAccordingToOrdinal(nodeMap.get(nodeId));
-            }
-        }
-        assert root!=null;
-
-        // caching
-        cacheManager.cachify(TOC_CACHE_KEY, root.cloneTree());
-        return new Toc(bookId, root);
     }
 
     @Override
@@ -109,14 +64,6 @@ public class NodePersistenceAdapter implements NodePersistencePort {
             .orElseThrow(() -> Code3.DATA_NOT_FOUND.feedback("node를 찾을 수 없습니다."));
         nodeRepo.merge(entity);
         return node;
-    }
-
-    @Override
-    public Toc saveToc(Toc toc) {
-        Set<TocFolder> muts = toc.getMutations();
-        for(TocFolder mut : muts){
-            // 가져온거 캐싱해두고 비교하기!
-        }
     }
 
     @Override
@@ -166,14 +113,6 @@ public class NodePersistenceAdapter implements NodePersistencePort {
         } else {
             assert false : "Unknown node type";
             throw new IllegalArgumentException("Unknown node type");
-        }
-    }
-
-    private TocNode toTocNode(NodeProjection p){
-        if(p.getType().isAssignableFrom(FolderJpaEntity.class)){
-            return new TocFolder(NodeId.from(p.getId()), p.getOrdinal());
-        } else {
-            return new TocPage(NodeId.from(p.getId()), p.getOrdinal());
         }
     }
 

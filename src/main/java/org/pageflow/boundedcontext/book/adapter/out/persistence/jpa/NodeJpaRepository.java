@@ -10,6 +10,6 @@ import java.util.List;
  * @author : sechan
  */
 public interface NodeJpaRepository extends BaseJpaRepository<NodeJpaEntity, Long> {
-     @Query("SELECT new org.pageflow.boundedcontext.book.adapter.out.persistence.NodeProjection(n.id, n.parentNode.id TYPE(n)) FROM NodeJpaEntity n WHERE n.bookId = :bookId")
+     @Query("SELECT new org.pageflow.boundedcontext.book.adapter.out.persistence.NodeProjection(n.id, n.parentNode.id, n.ov, TYPE(n)) FROM NodeJpaEntity n WHERE n.book.id = :bookId")
      List<NodeProjection> queryNodesByBookId(Long bookId);
 }

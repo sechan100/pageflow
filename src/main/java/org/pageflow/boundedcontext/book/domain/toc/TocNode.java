@@ -1,21 +1,41 @@
 package org.pageflow.boundedcontext.book.domain.toc;
 
-import lombok.Getter;
 import org.pageflow.boundedcontext.book.domain.NodeId;
 
 /**
  * @author : sechan
  */
-@Getter
 public abstract class TocNode {
     protected final NodeId id;
-    protected int ordinal;
+    protected int ov; // signed value
 
-    protected TocNode(NodeId id, int ordinal) {
+    protected TocNode(NodeId id, int ov) {
         this.id = id;
-        this.ordinal = ordinal;
+        this.ov = ov;
     }
 
-    abstract protected TocNode deepClone();
+    abstract TocNode deepClone();
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof TocNode)) return false;
+
+        TocNode tocNode = (TocNode) o;
+
+        return id.equals(tocNode.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
+
+    public NodeId getId() {
+        return id;
+    }
+
+    public int getOv() {
+        return ov;
+    }
 }

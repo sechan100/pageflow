@@ -9,15 +9,15 @@ import org.pageflow.boundedcontext.common.annotation.AggregateRoot;
 @AggregateRoot
 public final class TocPage extends TocNode {
 
-    public TocPage(NodeId id, int ordinal){
-        super(id, ordinal);
+    public TocPage(NodeId id, int ov){
+        super(id, ov);
     }
 
 
 
     @Override
     protected TocNode deepClone() {
-        return new TocPage(id, ordinal);
+        return new TocPage(id, ov);
     }
 
 }

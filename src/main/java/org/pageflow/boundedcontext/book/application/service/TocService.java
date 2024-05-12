@@ -8,7 +8,7 @@ import org.pageflow.boundedcontext.book.domain.toc.Toc;
 import org.pageflow.boundedcontext.book.port.in.*;
 import org.pageflow.boundedcontext.book.port.out.NodePersistencePort;
 import org.pageflow.boundedcontext.book.port.out.TocPersistencePort;
-import org.pageflow.global.api.code.Code3;
+import org.pageflow.global.flow.code.Case3;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,7 +38,7 @@ public class TocService implements TocUseCase {
 
     @Override
     public TocDto.Node changeTitle(NodeId id, Title title) {
-        NodeAr node = persistPort.loadNode(id).orElseThrow(()->Code3.DATA_NOT_FOUND.feedback("노드를 찾을 수 없습니다."));
+        NodeAr node = persistPort.loadNode(id).orElseThrow(()-> Case3.DATA_NOT_FOUND.feedback("노드를 찾을 수 없습니다."));
         node.changeTitle(title);
         persistPort.saveNode(node);
         return toDto(node);

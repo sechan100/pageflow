@@ -13,6 +13,10 @@ public final class TocPage extends TocNode {
         super(id, ov);
     }
 
+    public TocPage(NodeId id){
+        this(id, 0);
+    }
+
 
 
     @Override

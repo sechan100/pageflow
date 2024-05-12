@@ -1,7 +1,9 @@
 package org.pageflow.boundedcontext.book.domain.toc;
 
+import io.vavr.control.Option;
 import org.pageflow.boundedcontext.book.domain.NodeId;
-import org.pageflow.global.api.code.Code3;
+import org.pageflow.global.flow.code.Case3;
+import org.pageflow.global.flow.code.DomainException;
 import org.springframework.lang.Nullable;
 
 import java.util.*;
@@ -11,7 +13,7 @@ import java.util.stream.Stream;
  * @author : sechan
  */
 public final class TocFolder extends TocNode {
-    private static final int DEFAULT_OV_OFFSET = 10_000_000;
+    public static final int OV_OFFSET = 10_000_000;
     // package-private
     final List<TocNode> children;
 
@@ -19,6 +21,10 @@ public final class TocFolder extends TocNode {
 
     public TocFolder(NodeId id, int ov) {
         this(id, ov, null);
+    }
+
+    public TocFolder(NodeId id){
+        this(id, 0);
     }
 
     public TocFolder(NodeId id, int ov, @Nullable List<TocNode> childNodes) {
@@ -36,7 +42,7 @@ public final class TocFolder extends TocNode {
         return children.stream()
             .filter(node -> node.getId().equals(id))
             .findFirst()
-            .orElseThrow(() -> Code3.DATA_NOT_FOUND.feedback(String.format("해당 id(%d)를 가진 노드를 찾을 수 없습니다.", id.toLong())));
+            .orElseThrow(() -> Case3.DATA_NOT_FOUND.feedback(String.format("해당 id(%d)를 가진 노드를 찾을 수 없습니다.", id.toLong())));
     }
 
     public int size() {
@@ -49,8 +55,27 @@ public final class TocFolder extends TocNode {
 
     public void addChild(int dest, TocNode target) {
         children.add(dest, target);
-        int prevOv = children.get(dest-1).getOv();
-        int nextOv = children.get(dest+1).getOv();
+        int prevOv;
+        int nextOv;
+
+        // 앞뒤 다 없는 경우
+        if(children.size() == 1){
+            prevOv = 0;
+            nextOv = 0;
+        // 뒤만 있음
+        } else if(dest == 0){
+            nextOv = children.get(1).getOv();
+            prevOv = nextOv - 2*OV_OFFSET;
+        // 앞만 있음
+        } else if(dest == children.size()-1){
+            prevOv = children.get(dest-1).getOv();
+            nextOv = prevOv + 2*OV_OFFSET;
+        // 앞뒤 다 있음
+        } else {
+            prevOv = children.get(dest-1).getOv();
+            nextOv = children.get(dest+1).getOv();
+        }
+
         // 추가한 위치의 앞뒤 노드의 ov의 차가 '단위ov(1)'인 경우 -> 더이상 공간이 없음
         if(nextOv - prevOv == 1){
             rebalanceOv();
@@ -68,16 +93,16 @@ public final class TocFolder extends TocNode {
         // 홀
         if(size() % 2 != 0){
             for(int i = 1; i <= approximatelyCenter; i++){
-                children.get(approximatelyCenter - i).ov = - DEFAULT_OV_OFFSET * i;
-                children.get(approximatelyCenter + i).ov = + DEFAULT_OV_OFFSET * i;
+                children.get(approximatelyCenter - i).ov = -OV_OFFSET * i;
+                children.get(approximatelyCenter + i).ov = +OV_OFFSET * i;
             }
         // 짝
         } else {
             for(int i = 1; i <= approximatelyCenter-1; i++){
-                children.get(approximatelyCenter - i).ov = - DEFAULT_OV_OFFSET * i;
-                children.get(approximatelyCenter + i).ov = + DEFAULT_OV_OFFSET * i;
+                children.get(approximatelyCenter - i).ov = -OV_OFFSET * i;
+                children.get(approximatelyCenter + i).ov = +OV_OFFSET * i;
             }
-            children.get(0).ov = - DEFAULT_OV_OFFSET * approximatelyCenter;
+            children.get(0).ov = -OV_OFFSET * approximatelyCenter;
         }
     }
 
@@ -92,11 +117,11 @@ public final class TocFolder extends TocNode {
         addChild(dest, target);
     }
 
-    public void addLast(TocNode target) {
+    public void addChildLast(TocNode target) {
         addChild(children.size(), target);
     }
 
-    public void reorder(int dest, TocNode reorderTarget) {
+    void reorder(int dest, TocNode reorderTarget) {
         removeChild(reorderTarget);
         addChild(dest, reorderTarget);
     }
@@ -108,15 +133,29 @@ public final class TocFolder extends TocNode {
      * @return 찾은 노드
      */
     public TocNode findNode(NodeId nodeId) {
+        if(id.equals(nodeId)){
+            return this;
+        }
+        TocNode result = recursiveFindNode(nodeId);
+        if(result != null){
+            return result;
+        } else {
+            throw Case3.DATA_NOT_FOUND.feedback(
+                "노드를 찾을 수 없습니다. (id: %s)".formatted(nodeId)
+            );
+        }
+    }
+    private TocNode recursiveFindNode(NodeId nodeId) {
         for(TocNode node : children){
             if(node.getId().equals(nodeId)){
                 return node;
             }
-            if(node instanceof TocFolder folder){
-                return folder.findNode(nodeId);
+            if(node instanceof TocFolder folder && folder.size() > 0){
+                TocNode result = folder.recursiveFindNode(nodeId);
+                if(result != null) return result;
             }
         }
-        throw Code3.DATA_NOT_FOUND.feedback("해당 id를 가진 노드를 찾을 수 없습니다.");
+        return null;
     }
 
     /**
@@ -124,20 +163,37 @@ public final class TocFolder extends TocNode {
      * @param nodeId 찾을 노드의 id
      * @return 찾은 노드의 부모 노드
      */
-    public TocFolder findParentNode(NodeId nodeId) {
+    public Option<TocFolder> findParentNode(NodeId nodeId) {
+        if(id.equals(nodeId)){
+            throw new IllegalArgumentException("TocFolder는 자기 자신의 부모를 참조할 수 없습니다.");
+        }
+        TocFolder result = recursiveFindParentNode(nodeId);
+        if(result != null){
+            return result;
+        } else {
+            throw DomainException.builder()
+                    .apiCode(Case3.DATA_NOT_FOUND)
+        }
+    }
+    private TocFolder recursiveFindParentNode(NodeId nodeId) {
         for(TocNode node : children){
-            if(node instanceof TocFolder folder){
-                if(folder.children.stream().anyMatch(n -> n.getId().equals(nodeId))){
-                    return folder;
-                }
-                return folder.findParentNode(nodeId);
+            if(node.getId().equals(nodeId)){
+                return this;
+            }
+            if(node instanceof TocFolder folder && folder.size() > 0){
+                TocFolder result = folder.recursiveFindParentNode(nodeId);
+                if(result != null) return result;
             }
         }
-        throw Code3.DATA_NOT_FOUND.feedback("해당 id를 가진 노드의 부모 노드를 찾을 수 없습니다.");
+        return null;
     }
 
     public Stream<TocNode> chidrenStream(){
         return children.stream();
+    }
+
+    public List<TocNode> getChildren() {
+        return Collections.unmodifiableList(children);
     }
 
     /**

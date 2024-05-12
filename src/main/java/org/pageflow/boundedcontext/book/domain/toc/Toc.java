@@ -4,8 +4,8 @@ import io.vavr.control.Try;
 import org.pageflow.boundedcontext.book.domain.BookId;
 import org.pageflow.boundedcontext.book.domain.NodeId;
 import org.pageflow.boundedcontext.common.annotation.AggregateRoot;
-import org.pageflow.global.api.code.Code3;
-import org.pageflow.global.api.code.Code4;
+import org.pageflow.global.flow.code.Case3;
+import org.pageflow.global.flow.code.Case4;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -41,7 +41,7 @@ public class Toc {
             folder.reorder(dest, target);
             raiseEvent(new ReorderEvent(nodeId));
         } catch(IndexOutOfBoundsException e){
-            throw Code4.INVALID_VALUE.feedback("재정렬 대상 인덱스가 범위를 벗어났습니다.", e);
+            throw Case4.INVALID_VALUE.feedback("재정렬 대상 인덱스가 범위를 벗어났습니다.", e);
         }
     }
 
@@ -56,7 +56,7 @@ public class Toc {
         if(root.findNode(folderId) instanceof TocFolder f){
             folder = f;
         } else {
-            throw Code3.DATA_NOT_FOUND.feedback("노드의 새로운 부모로 지정된 노드가 '폴더'가 아닙니다.");
+            throw Case3.DATA_NOT_FOUND.feedback("노드의 새로운 부모로 지정된 노드가 '폴더'가 아닙니다.");
         }
         // 이동대상 부모
         TocFolder targetNodeParent = root.findParentNode(nodeId);
@@ -67,7 +67,7 @@ public class Toc {
         if(target instanceof TocFolder reparentTargetAsFolder){
             Try.of(() -> reparentTargetAsFolder.findNode(folderId))
                 .onSuccess(n -> {
-                    throw Code4.INVALID_VALUE.feedback("자기자신의 하위 폴더로는 이동할 수 없습니다.");
+                    throw Case4.INVALID_VALUE.feedback("자기자신의 하위 폴더로는 이동할 수 없습니다.");
                 });
         }
         // 이동
@@ -76,6 +76,10 @@ public class Toc {
         raiseEvent(new ReparentEvent(folderId, nodeId));
     }
 
+
+    public BookId getBookId() {
+        return bookId;
+    }
 
     public TocFolder getRoot() {
         return root;

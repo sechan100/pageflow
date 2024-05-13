@@ -1,7 +1,8 @@
 package org.pageflow.boundedcontext.user.domain;
 
-import org.pageflow.global.api.code.Code4;
+import org.pageflow.boundedcontext.common.exception.InputValueException;
 import org.pageflow.shared.type.SingleValueWrapper;
+import org.springframework.util.StringUtils;
 
 import java.util.regex.Pattern;
 
@@ -17,26 +18,29 @@ public class Username extends SingleValueWrapper<String> {
         , MIN_LENGTH, MAX_LENGTH
     );
 
-
-
     private Username(String value){
         super(value);
     }
 
-    public static Username of(String value){
+    public static Username from(String value) {
         validate(value);
         return new Username(value);
     }
 
 
-    private static void validate(String username){
-        if(username == null || username.isEmpty()){
-            throw Code4.EMPTY_VALUE.feedback("아이디를 입력해주세요.");
-        }
 
-        // 정규식 검사
+    private static void validate(String username){
+        if(!StringUtils.hasText(username)){
+            throw InputValueException.builder()
+                .message("아이디를 입력해주세요.")
+                .field("username", null)
+                .build();
+        }
         if(!REGEX.matcher(username).matches()){
-            throw Code4.FORMAT_MISMATCH.feedback(t -> t.getUsername_regexMismatch());
+            throw InputValueException.builder()
+                .message(REGEX_DESCRIPTION)
+                .field("username", username)
+                .build();
         }
     }
 }

@@ -16,5 +16,6 @@ import org.springframework.data.redis.core.RedisHash;
 public class EVRedisEntity {
     @Id
     private Long uid;
+    private String email;
     private String authCode; // uuid
 }

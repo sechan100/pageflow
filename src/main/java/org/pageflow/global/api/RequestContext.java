@@ -9,7 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.pageflow.boundedcontext.auth.application.dto.Principal;
 import org.pageflow.boundedcontext.common.value.UID;
-import org.pageflow.global.api.code.Code1;
+import org.pageflow.global.api.code.ApiCode1;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -123,7 +123,7 @@ public class RequestContext {
      */
     public UID getUid() {
         UID uid = principal.getUid();
-        if(uid.equals(UID.from(0L))) throw Code1.LOGIN_REQUIRED.fire();
+        if(uid.equals(UID.from(0L))) throw ApiCode1.LOGIN_REQUIRED.fire();
         else return uid;
     }
 

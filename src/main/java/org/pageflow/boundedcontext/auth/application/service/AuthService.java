@@ -7,13 +7,13 @@ import org.pageflow.boundedcontext.auth.domain.AccessToken;
 import org.pageflow.boundedcontext.auth.domain.Account;
 import org.pageflow.boundedcontext.auth.domain.Session;
 import org.pageflow.boundedcontext.auth.domain.SessionId;
+import org.pageflow.boundedcontext.auth.domain.exception.SessionExpiredException;
 import org.pageflow.boundedcontext.auth.port.in.LoginCmd;
 import org.pageflow.boundedcontext.auth.port.in.SessionUseCase;
 import org.pageflow.boundedcontext.auth.port.in.TokenUseCase;
 import org.pageflow.boundedcontext.auth.port.out.AccountPersistencePort;
 import org.pageflow.boundedcontext.auth.port.out.SessionPersistencePort;
 import org.pageflow.boundedcontext.auth.shared.AuthMapper;
-import org.pageflow.global.api.code.Code1;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,9 +49,8 @@ public class AuthService implements SessionUseCase, TokenUseCase {
     @Override
     public Token.AccessTokenDto refresh(SessionId sessionId){
         // 세션 로드. 조회 실패시, scheduling에 의해 삭제된 '만료세션'으로 간주.
-        Session session = sessionPersistencePort.load(sessionId).orElseThrow(
-            Code1.SESSION_EXPIRED::fire
-        );
+        Session session = sessionPersistencePort.load(sessionId)
+            .orElseThrow(() -> new SessionExpiredException(sessionId));
 
         // 새 토큰을 발급
         AccessToken at = session.refresh();
@@ -65,7 +64,7 @@ public class AuthService implements SessionUseCase, TokenUseCase {
     }
 
     @Override
-    public Principal.Session parseAndGetSession(String accessTokenCompact) {
+    public Principal.Session extractPrincipalFromAccessToken(String accessTokenCompact) {
         AccessToken accessToken = AccessToken.parse(accessTokenCompact);
         return mapper.principalSession_accessToken(accessToken);
     }

@@ -14,7 +14,7 @@ import org.pageflow.boundedcontext.user.application.dto.UserDto;
 import org.pageflow.boundedcontext.user.domain.*;
 import org.pageflow.boundedcontext.user.port.in.SignupCmd;
 import org.pageflow.boundedcontext.user.port.out.UserPersistencePort;
-import org.pageflow.global.api.code.Code3;
+import org.pageflow.global.api.code.ApiCode3;
 import org.pageflow.shared.annotation.PersistenceAdapter;
 import org.pageflow.shared.jpa.RequiredDataNotFoundException;
 import org.pageflow.shared.type.TSID;
@@ -120,13 +120,13 @@ public class UserPersistenceAdapter implements UserPersistencePort, AccountPersi
                     entity.getProfile().getPenname(),
                     entity.getProfile().getProfileImageUrl()
                 )
-            ).orElseThrow(() -> Code3.DATA_NOT_FOUND.feedback("사용자를 찾을 수 없습니다"));
+            ).orElseThrow(() -> ApiCode3.DATA_NOT_FOUND.feedback("사용자를 찾을 수 없습니다"));
     }
 
     @Override
     public Account saveAccount(Account account) {
         AccountJpaEntity entity = accountJpaRepository.findById(account.getUid().toLong())
-            .orElseThrow(() -> Code3.DATA_NOT_FOUND.feedback("사용자를 찾을 수 없습니다"));
+            .orElseThrow(() -> ApiCode3.DATA_NOT_FOUND.feedback("사용자를 찾을 수 없습니다"));
         entity.setRole(account.getRole());
         entity.setPassword(account.getPassword().toString());
         entity.setEmailVerified(account.isEmailVerified());
@@ -140,7 +140,7 @@ public class UserPersistenceAdapter implements UserPersistencePort, AccountPersi
             UID.from(entity.getId()),
             entity.getUsername(),
             EncryptedPassword.of(entity.getPassword()),
-            Email.of(entity.getEmail()),
+            Email.from(entity.getEmail()),
             entity.isEmailVerified(),
             entity.getRole()
         );
@@ -151,10 +151,10 @@ public class UserPersistenceAdapter implements UserPersistencePort, AccountPersi
             UID.from(a.getId()),
             Username.of(a.getUsername()),
             a.getRole(),
-            Email.of(a.getEmail()),
+            Email.from(a.getEmail()),
             a.isEmailVerified(),
-            Penname.of(p.getPenname()),
-            ProfileImageUrl.of(p.getProfileImageUrl())
+            Penname.from(p.getPenname()),
+            ProfileImageUrl.from(p.getProfileImageUrl())
         );
     }
 }

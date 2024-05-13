@@ -14,7 +14,7 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-public enum Code6 implements ApiCode {
+public enum ApiCode6 implements ApiCode {
 
 
 

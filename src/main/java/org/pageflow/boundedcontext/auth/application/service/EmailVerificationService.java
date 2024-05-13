@@ -4,14 +4,15 @@ import lombok.RequiredArgsConstructor;
 import org.pageflow.boundedcontext.auth.adapter.in.web.EmailVerificationWebAdapter;
 import org.pageflow.boundedcontext.auth.domain.Account;
 import org.pageflow.boundedcontext.auth.domain.EmailVerification;
+import org.pageflow.boundedcontext.auth.domain.exception.EmailVerificationAuthCodeMisMatchException;
+import org.pageflow.boundedcontext.auth.domain.exception.RequireSendVerificationEmailException;
 import org.pageflow.boundedcontext.auth.port.in.EmailVerificationUseCase;
 import org.pageflow.boundedcontext.auth.port.out.AccountPersistencePort;
 import org.pageflow.boundedcontext.auth.port.out.EmailVerificationPersistencePort;
 import org.pageflow.boundedcontext.common.value.UID;
 import org.pageflow.boundedcontext.email.core.SendMailCmd;
 import org.pageflow.boundedcontext.email.core.SendMailPort;
-import org.pageflow.global.api.code.Code1;
-import org.pageflow.global.api.code.Code3;
+import org.pageflow.boundedcontext.user.domain.Email;
 import org.pageflow.global.property.AppProps;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,21 +35,18 @@ public class EmailVerificationService implements EmailVerificationUseCase {
     public void sendVerificationEmail(UID uid) {
         EmailVerification ev = emailVerificationPersistencePort.load(uid)
             .orElseGet(() -> {
-                EmailVerification newEV = EmailVerification.apply(uid);
+                Email email = accountPersistencePort.loadAccount(uid).get().getEmail();
+                EmailVerification newEV = EmailVerification.apply(uid, email);
                 return emailVerificationPersistencePort.save(newEV);
             });
 
-        String email = accountPersistencePort.loadAccount(ev.getUid())
-            .orElseThrow(() -> Code3.DATA_NOT_FOUND.feedback("사용자를 찾을 수 없습니다."))
-            .getEmail().toString();
-
         // 이메일 비동기 전송
         SendMailCmd sendMailCmd = SendMailCmd.builder()
-            .to(email)
+            .to(ev.getEmail().toString())
             .from(props.email.from.noReply, props.email.from.defaultFromName)
             .subject("이메일 인증 요청")
             .templatePath("/email-verification")
-            .addVar("email", email)
+            .addVar("email", ev.getEmail().toString())
             .addVar("authCode", ev.getAuthCode().toString())
             .addVar("uid", uid.toString())
             .addVar("serverHost", props.site.baseUrl)
@@ -60,13 +58,12 @@ public class EmailVerificationService implements EmailVerificationUseCase {
     @Override
     public void verify(UID uid, UUID code) {
         EmailVerification ev = emailVerificationPersistencePort.load(uid)
-            .orElseThrow(() -> Code1.APPLIED_EMAIL_VERIFICATION_NOT_FOUND.fire());
-        Account account = accountPersistencePort.loadAccount(ev.getUid())
-            .orElseThrow(() -> Code3.DATA_NOT_FOUND.feedback("사용자를 찾을 수 없습니다."));
+            .orElseThrow(() -> new RequireSendVerificationEmailException(uid));
+        Account account = accountPersistencePort.loadAccount(ev.getUid()).get();
 
         // 인증코드 일치 확인
         if(!ev.getAuthCode().equals(code)){
-            throw Code1.EMAIL_VERIFICATION_AUTH_CODE_MISMATCH.fire();
+            throw new EmailVerificationAuthCodeMisMatchException(code);
         }
 
         account.verifyEmail();
@@ -76,8 +73,7 @@ public class EmailVerificationService implements EmailVerificationUseCase {
 
     @Override
     public void unverify(UID uid) {
-        Account account = accountPersistencePort.loadAccount(uid)
-            .orElseThrow(() -> Code3.DATA_NOT_FOUND.feedback("사용자를 찾을 수 없습니다."));
+        Account account = accountPersistencePort.loadAccount(uid).get();
         account.unverifyEmail();
         accountPersistencePort.saveAccount(account);
     }

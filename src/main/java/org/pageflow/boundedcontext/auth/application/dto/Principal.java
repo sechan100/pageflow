@@ -62,7 +62,7 @@ public abstract class Principal {
                     UID.from(0L),
                     "dummy",
                     EncryptedPassword.of("dummy"),
-                    Email.of("dummy@pageflow.org"),
+                    Email.from("dummy@pageflow.org"),
                     false,
                     RoleType.ROLE_ANONYMOUS
                 ),

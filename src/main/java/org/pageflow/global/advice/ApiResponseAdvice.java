@@ -1,7 +1,7 @@
 package org.pageflow.global.advice;
 
 import org.pageflow.global.api.ApiResponse;
-import org.pageflow.global.api.code.Code2;
+import org.pageflow.global.api.code.ApiCode2;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;
 import org.springframework.http.server.ServerHttpRequest;
@@ -28,7 +28,7 @@ public class ApiResponseAdvice implements ResponseBodyAdvice<Object> {
             @NonNull ServerHttpRequest request,
             @NonNull ServerHttpResponse response
     ) {
-        return ApiResponse.withoutFeedback(Code2.SUCCESS, body);
+        return ApiResponse.withoutFeedback(ApiCode2.SUCCESS, body);
     }
     
 }

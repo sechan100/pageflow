@@ -3,7 +3,7 @@ package org.pageflow.boundedcontext.auth.springsecurity.oauth2.authorizationrequ
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.pageflow.global.api.code.Code2;
+import org.pageflow.global.api.code.ApiCode2;
 import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.stereotype.Service;
@@ -55,7 +55,7 @@ public class InMemoryAuthorizationRepository implements AuthorizationRequestRepo
             repository.delete(wrapperOp.get());
             return wrapperOp.get();
         } else {
-            throw Code2.INVALID_OAUTH2_STATE.fire();
+            throw ApiCode2.INVALID_OAUTH2_STATE.fire();
         }
     }
 

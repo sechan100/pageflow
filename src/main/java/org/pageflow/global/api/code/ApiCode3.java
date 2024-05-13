@@ -14,7 +14,7 @@ import java.util.function.Function;
  */
 @Getter
 @AllArgsConstructor
-public enum Code3 implements ApiCode {
+public enum ApiCode3 implements ApiCode {
     // 3000: 데이터베이스
       DATA_NOT_FOUND(3000, "요청된 데이터를 찾을 수 없음", "데이터를 찾을 수 없습니다.")
 

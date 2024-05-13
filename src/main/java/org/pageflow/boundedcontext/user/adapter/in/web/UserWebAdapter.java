@@ -21,7 +21,7 @@ import org.pageflow.boundedcontext.user.shared.ProviderType;
 import org.pageflow.global.api.ApiAccess;
 import org.pageflow.global.api.ApiResponse;
 import org.pageflow.global.api.RequestContext;
-import org.pageflow.global.api.code.Code2;
+import org.pageflow.global.api.code.ApiCode2;
 import org.pageflow.global.filter.UriPrefix;
 import org.pageflow.global.property.AppProps;
 import org.springframework.security.access.annotation.Secured;
@@ -63,11 +63,11 @@ public class UserWebAdapter {
         SignupCmd cmd = new SignupCmd(
             Username.of(form.getUsername()),
             Password.encrypt(form.getPassword()),
-            Email.of(form.getEmail()),
-            Penname.of(form.getPenname()),
+            Email.from(form.getEmail()),
+            Penname.from(form.getPenname()),
             RoleType.ROLE_USER,
             provider,
-            ProfileImageUrl.of(profileImageUrl)
+            ProfileImageUrl.from(profileImageUrl)
         );
 
         UserDto.User result = userUsecase.signup(cmd);
@@ -106,7 +106,7 @@ public class UserWebAdapter {
         );
 
         return ApiResponse.withoutFeedback(
-            Code2.OAUTH2_SIGNUP_REQUIRED,
+            ApiCode2.OAUTH2_SIGNUP_REQUIRED,
             result
         );
     }
@@ -114,7 +114,7 @@ public class UserWebAdapter {
     @PostMapping("/user/profile/email")
     public Res.SessionUser changeEmail(@RequestBody Map<String, String> form){ // "email"
         UID uid = requestContext.getUid();
-        Email email = Email.of(form.get("email"));
+        Email email = Email.from(form.get("email"));
 
         UserDto.User result = userUsecase.changeEmail(uid, email);
         return toSessionUser(result);
@@ -123,7 +123,7 @@ public class UserWebAdapter {
     @PostMapping("/user/profile/penname")
     public Res.SessionUser changePenname(@RequestBody Map<String, String> form){ // "penname"
         UID uid = requestContext.getUid();
-        Penname penname = Penname.of(form.get("penname"));
+        Penname penname = Penname.from(form.get("penname"));
 
         UserDto.User result = userUsecase.changePenname(uid, penname);
         return toSessionUser(result);
@@ -148,7 +148,7 @@ public class UserWebAdapter {
     @DeleteMapping("/user/profile/profile-image")
     public Res.SessionUser changeProfileImageToDefault(){
         UID uid = requestContext.getUid();
-        ProfileImageUrl profileImageUrl = ProfileImageUrl.of(props.user.defaultProfileImageUrl);
+        ProfileImageUrl profileImageUrl = ProfileImageUrl.from(props.user.defaultProfileImageUrl);
 
         UserDto.User result = userUsecase.changeProfileImage(uid, profileImageUrl);
         return toSessionUser(result);

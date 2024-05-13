@@ -19,7 +19,7 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-public enum Code5 implements ApiCode {
+public enum ApiCode5 implements ApiCode {
     // 5000: 서버 프로그램 에러
       INTERNAL_SERVER_ERROR(5000,"서버 에러; 로그 참고.")
 

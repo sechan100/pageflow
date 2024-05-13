@@ -1,9 +1,9 @@
 package org.pageflow.boundedcontext.user.adapter.out.hardcodding;
 
+import org.pageflow.boundedcontext.common.exception.InputValueException;
 import org.pageflow.boundedcontext.user.domain.Penname;
 import org.pageflow.boundedcontext.user.domain.Username;
 import org.pageflow.boundedcontext.user.port.out.CheckForbiddenWordPort;
-import org.pageflow.global.api.code.Code4;
 import org.pageflow.shared.annotation.PersistenceAdapter;
 
 import java.util.Set;
@@ -30,33 +30,33 @@ public class ForbiddenWordRepository implements CheckForbiddenWordPort {
                     "씨방","씨방새","씨버럴","씨벌","씨보랄","씨보럴","씨부랄","씨부럴","씨부리","씨불","씨브랄","씨파","씨팍","씨팔",
                     "야캠","와레즈","원조교재","원조교제",
                     "젖탱이","젼나","조까","졸라","좃","좆","지랄","지미랄","창녀","창년","창놈","창뇬","캠색","캠섹","페니스","페티쉬",
-                    "폰색","폰쌕","헨타이","호로새끼","호빠","호스테스바","호스트바","화상색","화상섹","자살","청산가리","청산가루",
+                    "폰색","폰쌕","헨타이","호로새끼","호빠","호스테스바","화상섹","자살","청산가리","청산가루",
                     "븅신", "븅딱", "느금마"
             );
 
 
     @Override
-    public void checkPennameAnyContains(Penname penname) {
+    public void checkPennameContainsForbiddenWord(Penname penname) {
         String pennameValue = penname.getValue();
         for(String forbiddenWord : PENNAME) {
             if(pennameValue.contains(forbiddenWord)) {
-                throw
-                    Code4.CONTAINS_FORBIDDEN_WORD.feedback(t ->
-                        t.getPenname_containsForbiddenWord(forbiddenWord)
-                    );
+                throw InputValueException.builder()
+                    .message("'%s'은(는) 필명에 포함될 수 없습니다. 다른 필명을 사용해주세요.", forbiddenWord)
+                    .field("penname", pennameValue)
+                    .build();
             }
         }
     }
 
     @Override
-    public void checkUsernameAnyContains(Username username) {
+    public void checkUsernameContainsForbiddenWord(Username username) {
         String usernameValue = username.getValue();
         for(String forbiddenWord : USERNAME) {
             if(usernameValue.contains(forbiddenWord)) {
-                throw
-                    Code4.CONTAINS_FORBIDDEN_WORD.feedback(t ->
-                        t.getUsername_containsForbiddenWord(forbiddenWord)
-                    );
+                throw InputValueException.builder()
+                    .message("'%s'은(는) 아이디에 포함될 수 없습니다. 다른 아이디를 사용해주세요.", forbiddenWord)
+                    .field("username", usernameValue)
+                    .build();
             }
         }
     }

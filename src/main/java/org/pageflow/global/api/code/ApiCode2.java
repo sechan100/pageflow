@@ -14,7 +14,7 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-public enum Code2 implements ApiCode {
+public enum ApiCode2 implements ApiCode {
     // 2000: 성공
       SUCCESS(2000, "성공", "요청이 성공적으로 처리되었습니다.")
 

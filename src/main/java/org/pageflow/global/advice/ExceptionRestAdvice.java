@@ -2,9 +2,9 @@ package org.pageflow.global.advice;
 
 import lombok.extern.slf4j.Slf4j;
 import org.pageflow.global.api.ApiResponse;
+import org.pageflow.global.api.code.ApiCode4;
+import org.pageflow.global.api.code.ApiCode5;
 import org.pageflow.global.api.code.ApiException;
-import org.pageflow.global.api.code.Code4;
-import org.pageflow.global.api.code.Code5;
 import org.springframework.http.converter.HttpMessageConversionException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -29,7 +29,7 @@ public class ExceptionRestAdvice {
     @ExceptionHandler(Throwable.class)
     public ApiResponse<Void> handleException(Throwable e) {
         log.debug("Throwable을 advice에서 INTERNAL_SERVER_ERROR로 처리 \n ====================[ EXCEPTION ]====================", e);
-        return ApiResponse.withoutFeedback(Code5.INTERNAL_SERVER_ERROR, null);
+        return ApiResponse.withoutFeedback(ApiCode5.INTERNAL_SERVER_ERROR, null);
     }
 
     
@@ -61,19 +61,19 @@ public class ExceptionRestAdvice {
             result.put(fieldName, errorMessageArray);
         });
         
-        return ApiResponse.withoutFeedback(Code4.FIELD_VALIDATION_FAIL, result);
+        return ApiResponse.withoutFeedback(ApiCode4.FIELD_VALIDATION_FAIL, result);
     }
 
     @ExceptionHandler(NoSuchElementException.class)
     public ApiResponse<Void> handleNoSuchElementException(NoSuchElementException e) {
         log.warn("NoSuchElementException의 경우 Spring Date 스펙에서 사용하는 Optional에서 발생했을 가능성이 농후하니, Optional에서 발생하는지 먼저 확인할 것");
         // 어디서 발생한지 모르는 범용적인 예외이니, 상세한 정보를 제공하지 않는다.
-        return ApiResponse.withoutFeedback(Code5.INTERNAL_SERVER_ERROR, null);
+        return ApiResponse.withoutFeedback(ApiCode5.INTERNAL_SERVER_ERROR, null);
     }
 
     @ExceptionHandler(HttpMessageConversionException.class)
     public ApiResponse<Void> handleHttpMessageConversionException(HttpMessageConversionException e) {
-        return ApiResponse.withoutFeedback(Code4.FIELD_PARSE_FAIL, null);
+        return ApiResponse.withoutFeedback(ApiCode4.FIELD_PARSE_FAIL, null);
     }
  
 }

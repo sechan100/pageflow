@@ -7,7 +7,7 @@ import org.pageflow.boundedcontext.book.domain.*;
 import org.pageflow.boundedcontext.book.port.in.CreateFolderCmd;
 import org.pageflow.boundedcontext.book.port.in.CreatePageCmd;
 import org.pageflow.boundedcontext.book.port.out.NodePersistencePort;
-import org.pageflow.global.api.code.Code3;
+import org.pageflow.global.api.code.ApiCode3;
 import org.pageflow.shared.type.TSID;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -61,7 +61,7 @@ public class NodePersistenceAdapter implements NodePersistencePort {
     @Override
     public <N extends NodeAr> N saveNode(N node) {
         NodeJpaEntity entity = nodeRepo.findById(node.getId().toLong())
-            .orElseThrow(() -> Code3.DATA_NOT_FOUND.feedback("node를 찾을 수 없습니다."));
+            .orElseThrow(() -> ApiCode3.DATA_NOT_FOUND.feedback("node를 찾을 수 없습니다."));
         nodeRepo.merge(entity);
         return node;
     }

@@ -2,13 +2,12 @@ package org.pageflow.boundedcontext.auth.domain;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.vavr.control.Try;
 import lombok.Value;
+import org.pageflow.boundedcontext.auth.domain.exception.AccessTokenExpiredException;
 import org.pageflow.boundedcontext.auth.shared.RoleType;
 import org.pageflow.boundedcontext.common.value.UID;
-import org.pageflow.global.api.code.Code1;
 import org.pageflow.global.property.PropsAware;
 
 import javax.crypto.spec.SecretKeySpec;
@@ -82,8 +81,7 @@ public final class AccessToken {
         );
 
         Claims claims = tryParse
-            .recover(ExpiredJwtException.class, e -> {throw Code1.ACCESS_TOKEN_EXPIRED.fire(e);})
-            .recover(JwtException.class, e -> {throw Code1.INVALID_ACCESS_TOKEN.fire(e);})
+            .recover(ExpiredJwtException.class, e -> {throw new AccessTokenExpiredException(e);})
             .get();
 
         return new AccessToken(claims);

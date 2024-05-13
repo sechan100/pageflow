@@ -22,7 +22,7 @@ import java.util.function.Function;
  */
 @Getter
 @AllArgsConstructor
-public enum Code4 implements ApiCode {
+public enum ApiCode4 implements ApiCode {
     // 4100: 기본적인 유효성 에러
       INVALID_VALUE(4100, "유효하지 않은 값", "올바른 값을 입력해주세요.")
     , EMPTY_VALUE(4102, "null, empty한 값 입력", "데이터를 입력해주세요.")

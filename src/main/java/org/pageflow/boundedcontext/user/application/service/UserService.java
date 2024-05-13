@@ -10,14 +10,14 @@ import org.pageflow.boundedcontext.file.service.FileService;
 import org.pageflow.boundedcontext.file.shared.FileType;
 import org.pageflow.boundedcontext.user.application.dto.UserDto;
 import org.pageflow.boundedcontext.user.domain.*;
+import org.pageflow.boundedcontext.user.domain.exception.UniqueFieldDuplicatedException;
 import org.pageflow.boundedcontext.user.port.in.AdminUseCase;
 import org.pageflow.boundedcontext.user.port.in.ProfileImageFile;
 import org.pageflow.boundedcontext.user.port.in.SignupCmd;
 import org.pageflow.boundedcontext.user.port.in.UserUseCase;
 import org.pageflow.boundedcontext.user.port.out.CheckForbiddenWordPort;
 import org.pageflow.boundedcontext.user.port.out.UserPersistencePort;
-import org.pageflow.global.api.code.Code3;
-import org.pageflow.global.api.code.Code4;
+import org.pageflow.global.api.code.ApiCode3;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,8 +51,8 @@ public class UserService implements UserUseCase, AdminUseCase {
         checkUniqueEmail(cmd.getEmail());
 
         // 금지어 검사
-        forbiddenWordPort.checkPennameAnyContains(cmd.getPenname());
-        forbiddenWordPort.checkUsernameAnyContains(cmd.getUsername());
+        forbiddenWordPort.checkPennameContainsForbiddenWord(cmd.getPenname());
+        forbiddenWordPort.checkUsernameContainsForbiddenWord(cmd.getUsername());
 
         /* REVIEW: input port로 쓰인 SignupCmd를 도메인 모델로의 변환없이 그대로 out port로 내보내고있다.
          * signup시에는 auth 도메인과 같은 곳에서 사용될 데이터들도 어쩔 수 없이 같이 저장하야하지만, 해당 bounded에서는
@@ -76,7 +76,7 @@ public class UserService implements UserUseCase, AdminUseCase {
 
     @Override
     public UserDto.User changePenname(UID uid, Penname penname) {
-        forbiddenWordPort.checkPennameAnyContains(penname);
+        forbiddenWordPort.checkPennameContainsForbiddenWord(penname);
         User user = load(uid);
         user.changePenname(penname);
         userPersistePort.saveUser(user);
@@ -99,7 +99,7 @@ public class UserService implements UserUseCase, AdminUseCase {
         );
         FilePath path = fileService.upload(cmd);
         // 도메인 변경
-        user.changeProfileImageUrl(ProfileImageUrl.of(path.getWebUrl()));
+        user.changeProfileImageUrl(ProfileImageUrl.from(path.getWebUrl()));
         userPersistePort.saveUser(user);
         return toDto(user);
     }
@@ -122,20 +122,18 @@ public class UserService implements UserUseCase, AdminUseCase {
 
 
     private User load(UID uid){
-        return userPersistePort.loadUser(uid).orElseThrow(() -> Code3.DATA_NOT_FOUND.feedback("사용자를 찾을 수 없습니다."));
+        return userPersistePort.loadUser(uid).orElseThrow(() -> ApiCode3.DATA_NOT_FOUND.feedback("사용자를 찾을 수 없습니다."));
     }
 
     private void checkUniqueUsername(Username username){
         if(userPersistePort.isUserExistByEmail(username)){
-            throw Code4.UNIQUE_FIELD_DUPLICATED
-                .feedback(t -> t.getUsername_duplicate());
+            throw new UniqueFieldDuplicatedException("username", username.getValue());
         }
     }
 
     private void checkUniqueEmail(Email email) {
-        if(userPersistePort.isUserExistByEmail(Email.of(email.getValue()))){
-            throw Code4.UNIQUE_FIELD_DUPLICATED
-                .feedback(t -> t.getEmail_duplicate());
+        if(userPersistePort.isUserExistByEmail(Email.from(email.getValue()))){
+            throw new UniqueFieldDuplicatedException("email", email.getValue());
         }
     }
 

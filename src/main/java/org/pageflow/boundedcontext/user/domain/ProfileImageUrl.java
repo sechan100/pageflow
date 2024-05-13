@@ -1,8 +1,9 @@
 package org.pageflow.boundedcontext.user.domain;
 
-import org.pageflow.global.api.code.Code4;
+import org.pageflow.boundedcontext.common.exception.InputValueException;
 import org.pageflow.global.property.PropsAware;
 import org.pageflow.shared.type.SingleValueWrapper;
+import org.springframework.util.StringUtils;
 
 /**
  * @author : sechan
@@ -15,10 +16,8 @@ public class ProfileImageUrl extends SingleValueWrapper<String> {
         super(value);
     }
 
-    public static ProfileImageUrl of(String value) {
-        if(value == null || value.isEmpty()){
-            throw Code4.EMPTY_VALUE.feedback("프로필 이미지 url이 없습니다.");
-        }
+    public static ProfileImageUrl from(String value) {
+        validate(value);
         return new ProfileImageUrl(value);
     }
 
@@ -28,6 +27,16 @@ public class ProfileImageUrl extends SingleValueWrapper<String> {
 
     public boolean isInternalImage() {
         return value.startsWith(INTERNAL_IMAGE_PREFIX);
+    }
+
+
+    private static void validate(String value) {
+        if(!StringUtils.hasText(value)){
+            throw InputValueException.builder()
+                .message("프로필 이미지 URL을 입력해주세요.")
+                .field("profileImageUrl", value)
+                .build();
+        }
     }
 
 }

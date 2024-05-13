@@ -1,9 +1,9 @@
 package org.pageflow.boundedcontext.auth.domain;
 
 import lombok.Getter;
+import org.pageflow.boundedcontext.auth.domain.exception.SessionExpiredException;
 import org.pageflow.boundedcontext.auth.shared.RoleType;
 import org.pageflow.boundedcontext.common.value.UID;
-import org.pageflow.global.api.code.Code1;
 
 
 /**
@@ -37,7 +37,7 @@ public class Session {
 
     public AccessToken refresh() {
         if(refreshToken.isExpired()){
-            throw Code1.SESSION_EXPIRED.fire();
+            throw new SessionExpiredException(id);
         }
 
         return AccessToken.issue(

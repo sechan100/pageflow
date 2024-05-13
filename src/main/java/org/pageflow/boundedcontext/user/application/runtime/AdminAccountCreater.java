@@ -36,11 +36,11 @@ public class AdminAccountCreater implements RuntimeInitializer {
         SignupCmd cmd = new SignupCmd(
             Username.of(admin.username),
             Password.encrypt(admin.password),
-            Email.of(admin.email),
-            Penname.of(admin.penname),
+            Email.from(admin.email),
+            Penname.from(admin.penname),
             RoleType.ROLE_ADMIN,
             ProviderType.NATIVE,
-            ProfileImageUrl.of(props.user.defaultProfileImageUrl)
+            ProfileImageUrl.from(props.user.defaultProfileImageUrl)
         );
 
         UserDto.User result = adminUseCase.registerAdmin(cmd);

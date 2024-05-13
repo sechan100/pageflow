@@ -15,7 +15,7 @@ import org.pageflow.boundedcontext.common.value.UID;
 import org.pageflow.boundedcontext.user.application.dto.UserDto;
 import org.pageflow.global.api.ApiAccess;
 import org.pageflow.global.api.RequestContext;
-import org.pageflow.global.api.code.Code1;
+import org.pageflow.global.api.code.ApiCode1;
 import org.pageflow.global.filter.UriPrefix;
 import org.pageflow.global.property.AppProps;
 import org.springframework.security.access.annotation.Secured;
@@ -90,7 +90,7 @@ public class AuthWebAdapter {
     public Res.AccessToken refresh(HttpServletRequest request) {
         Optional<Cookie> rtCookieOp = requestContext.getCookie(SESSION_ID_COOKIE_NAME);
         if(rtCookieOp.isEmpty()){
-            throw Code1.SESSION_ID_COOKIE_NOT_FOUND.fire();
+            throw ApiCode1.SESSION_ID_COOKIE_NOT_FOUND.fire();
         }
 
         // REFRESH

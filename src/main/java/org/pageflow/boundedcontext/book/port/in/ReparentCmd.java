@@ -10,7 +10,7 @@ import org.pageflow.boundedcontext.book.domain.NodeId;
 @Value
 public class ReparentCmd {
     BookId bookId;
-    NodeId folderId;
     NodeId nodeId;
-    int dest;
+    NodeId destfolderId;
+    int destOrder;
 }

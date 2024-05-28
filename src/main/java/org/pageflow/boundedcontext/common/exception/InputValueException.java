@@ -8,13 +8,13 @@ import org.springframework.lang.Nullable;
  */
 @Getter
 public class InputValueException extends DomainException {
-    private final String field;
+    private final String fieldName;
     @Nullable
-    private final Object value;
+    private final String value;
 
-    private InputValueException(String message, String field, @Nullable Object value) {
+    private InputValueException(String fieldName, @Nullable String value, String message) {
         super(message);
-        this.field = field;
+        this.fieldName = fieldName;
         this.value = value;
     }
 
@@ -29,15 +29,15 @@ public class InputValueException extends DomainException {
         Builder2 message(String message, String... args);
     }
     public interface Builder2 {
-        Builder3 field(String name, @Nullable Object value);
+        Builder3 field(String name, @Nullable String value);
     }
     public interface Builder3 {
         InputValueException build();
     }
     public static class Builder implements Builder1, Builder2, Builder3 {
+        private String fieldName;
+        private String value;
         private String message;
-        private String field;
-        private Object value;
 
         @Override
         public Builder2 message(String message) {
@@ -52,15 +52,15 @@ public class InputValueException extends DomainException {
         }
 
         @Override
-        public Builder3 field(String name, @Nullable Object value) {
-            this.field = name;
+        public Builder3 field(String name, @Nullable String value) {
+            this.fieldName = name;
             this.value = value;
             return this;
         }
 
         @Override
         public InputValueException build() {
-            return new InputValueException(message, field, value);
+            return new InputValueException(fieldName, value, message);
         }
     }
 

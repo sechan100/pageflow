@@ -1,79 +1,161 @@
 package org.pageflow.boundedcontext.book.domain.toc;
 
-import io.vavr.control.Option;
-import org.pageflow.boundedcontext.book.domain.NodeId;
-import org.pageflow.global.flow.code.Case3;
-import org.pageflow.global.flow.code.DomainException;
-import org.springframework.lang.Nullable;
 
-import java.util.*;
-import java.util.stream.Stream;
+import io.vavr.collection.Tree;
+import org.pageflow.boundedcontext.book.domain.NodeId;
+import org.springframework.lang.NonNull;
+import org.springframework.util.Assert;
+
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.NoSuchElementException;
 
 /**
  * @author : sechan
  */
-public final class TocFolder extends TocNode {
+public class TocFolder extends AbstractChild implements TocParent, TocChild {
     public static final int OV_OFFSET = 10_000_000;
-    // package-private
-    final List<TocNode> children;
 
+    private final List<TocChild> children;
 
-
-    public TocFolder(NodeId id, int ov) {
-        this(id, ov, null);
-    }
 
     public TocFolder(NodeId id){
-        this(id, 0);
+        this(id, null, 0, null);
     }
 
-    public TocFolder(NodeId id, int ov, @Nullable List<TocNode> childNodes) {
-        super(id, ov);
-        if(!(childNodes==null || childNodes.isEmpty())){
-            this.children = new LinkedList<>(childNodes);
-        } else {
-            this.children = new LinkedList<>();
+    public TocFolder(@NonNull NodeId id, TocParent parent, int ov, List<TocChild> children) {
+        super(id, parent, ov);
+        this.children = children == null ? new LinkedList<>() : new LinkedList<>(children);
+    }
+
+
+    @Override
+    public void reorder(int dest, TocChild target) {
+        Assert.isTrue(children.contains(target), "해당 노드는 이 폴더의 자식이 아닙니다.");
+        _removeChild(target);
+        addChild(dest, target);
+        target._registerMoved();
+    }
+
+    @Override
+    public void reparent(int dest, TocChild target) {
+        Assert.isTrue(!children.contains(target), "이미 자식인 childNode를 reparent할 수 없습니다.");
+        // target이 this의 Ancestor인 경우를 검사
+        if(target instanceof TocParent targetNodeAsParent){
+            Assert.isTrue(
+                !this._isDescendantOf(targetNodeAsParent),
+                "이동 대상이 this의 조상인 경우, 이동이 불가능합니다."
+            );
         }
+        // 원래의 부모에서 targetNode를 제거
+        target.getParent()._removeChild(target);
+        addChild(dest, target);
+        target._registerMoved();
     }
 
-
-
-    public TocNode get(NodeId id) {
+    /**
+     * @throws NoSuchElementException nodeId에 해당하는 노드가 존재하지 않는 경우
+     */
+    @Override
+    public TocChild getChild(NodeId id) {
         return children.stream()
             .filter(node -> node.getId().equals(id))
             .findFirst()
-            .orElseThrow(() -> Case3.DATA_NOT_FOUND.feedback(String.format("해당 id(%d)를 가진 노드를 찾을 수 없습니다.", id.toLong())));
+            .get();
     }
 
+    @Override
     public int size() {
         return children.size();
     }
 
-    public boolean removeChild(TocNode target) {
-        return children.remove(target);
+    @Override
+    public void _addAccordingToOv(TocChild child) {
+        int dest = 0;
+        for(TocChild node : children){
+            if(node.getOv() > child.getOv()){
+                break;
+            }
+            dest++;
+        }
+        addChild(dest, child);
     }
 
-    public void addChild(int dest, TocNode target) {
+    @Override
+    public TocNode findNode(NodeId nodeId) {
+        if(getId().equals(nodeId)){
+            return this;
+        }
+        TocChild result = _recursiveFindNode(nodeId);
+        if(result != null){
+            return result;
+        } else {
+            throw new IllegalArgumentException("toc 트리에 nodeId(%s)에 해당하는 노드가 존재하지 않습니다.".formatted(nodeId));
+        }
+    }
+
+    @Override
+    public List<TocChild> getChildren() {
+        return Collections.unmodifiableList(children);
+    }
+
+    @Override
+    public List<TocChild> flatten(){
+        List<TocChild> result = new LinkedList<>();
+        for(TocChild child : children){
+            result.add(child);
+            if(child instanceof TocParent parent){
+                result.addAll(parent.flatten());
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public boolean isSameTree(TocParent other){
+        return this._toVavrTree().equals(other._toVavrTree());
+    }
+
+    @Override
+    public String drawTree(){
+        Tree tree = _toVavrTree();
+        return tree.draw();
+    }
+
+    @Override
+    public void _addChildLast(TocChild child) {
+        addChild(children.size(), child);
+    }
+
+    private void addChild(int dest, TocChild target) {
         children.add(dest, target);
+        setChildParent(target);
         int prevOv;
         int nextOv;
 
-        // 앞뒤 다 없는 경우
-        if(children.size() == 1){
+        try {
+            // 앞뒤 다 없는 경우
+            if(children.size() == 1){
+                prevOv = 0;
+                nextOv = 0;
+                // 뒤만 있음
+            } else if(dest == 0){
+                nextOv = children.get(1).getOv();
+                prevOv = Math.addExact(nextOv, -2*OV_OFFSET);
+                // 앞만 있음
+            } else if(dest == children.size()-1){
+                prevOv = children.get(dest-1).getOv();
+                nextOv = Math.addExact(prevOv, 2*OV_OFFSET);
+                // 앞뒤 다 있음
+            } else {
+                prevOv = children.get(dest-1).getOv();
+                nextOv = children.get(dest+1).getOv();
+            }
+            // 32비트 정수 자료형 언더, 오버플로우
+        } catch (ArithmeticException e){
             prevOv = 0;
-            nextOv = 0;
-        // 뒤만 있음
-        } else if(dest == 0){
-            nextOv = children.get(1).getOv();
-            prevOv = nextOv - 2*OV_OFFSET;
-        // 앞만 있음
-        } else if(dest == children.size()-1){
-            prevOv = children.get(dest-1).getOv();
-            nextOv = prevOv + 2*OV_OFFSET;
-        // 앞뒤 다 있음
-        } else {
-            prevOv = children.get(dest-1).getOv();
-            nextOv = children.get(dest+1).getOv();
+            nextOv = 1;
         }
 
         // 추가한 위치의 앞뒤 노드의 ov의 차가 '단위ov(1)'인 경우 -> 더이상 공간이 없음
@@ -82,197 +164,68 @@ public final class TocFolder extends TocNode {
             return;
         }
         // rebalance가 필요하지 않은 경우
-        target.ov = (prevOv + nextOv) / 2; // floor
+        target._setOv(
+            (prevOv + nextOv) / 2 // floor
+        );
+    }
+
+    protected void setChildParent(TocChild target){
+        target._setParent(this);
     }
 
     private void rebalanceOv(){
         int approximatelyCenter = children.size()/2;
         // 정중앙에 근사한 노드의 ov를 0으로 초기화
-        children.get(approximatelyCenter).ov = 0;
+        children.get(approximatelyCenter)._setOv(0);
 
         // 홀
         if(size() % 2 != 0){
             for(int i = 1; i <= approximatelyCenter; i++){
-                children.get(approximatelyCenter - i).ov = -OV_OFFSET * i;
-                children.get(approximatelyCenter + i).ov = +OV_OFFSET * i;
+                children.get(approximatelyCenter - i)._setOv(-OV_OFFSET * i);
+                children.get(approximatelyCenter + i)._setOv(+OV_OFFSET * i);
             }
-        // 짝
+            // 짝
         } else {
             for(int i = 1; i <= approximatelyCenter-1; i++){
-                children.get(approximatelyCenter - i).ov = -OV_OFFSET * i;
-                children.get(approximatelyCenter + i).ov = +OV_OFFSET * i;
+                children.get(approximatelyCenter - i)._setOv(-OV_OFFSET * i);
+                children.get(approximatelyCenter + i)._setOv(+OV_OFFSET * i);
             }
-            children.get(0).ov = -OV_OFFSET * approximatelyCenter;
+            children.get(0)._setOv(-OV_OFFSET * approximatelyCenter);
         }
-    }
-
-    public void addAccordingToOv(TocNode target) {
-        int dest = 0;
-        for(TocNode node : children){
-            if(node.getOv() > target.getOv()){
-                break;
-            }
-            dest++;
-        }
-        addChild(dest, target);
-    }
-
-    public void addChildLast(TocNode target) {
-        addChild(children.size(), target);
-    }
-
-    void reorder(int dest, TocNode reorderTarget) {
-        removeChild(reorderTarget);
-        addChild(dest, reorderTarget);
-    }
-
-
-    /**
-     * startFolder에서부터 시작하여 하위 모든 노드를 탐색하여 nodeId와 일치하는 id를 가진 node를 찾는다.
-     * @param nodeId 찾을 노드의 id
-     * @return 찾은 노드
-     */
-    public TocNode findNode(NodeId nodeId) {
-        if(id.equals(nodeId)){
-            return this;
-        }
-        TocNode result = recursiveFindNode(nodeId);
-        if(result != null){
-            return result;
-        } else {
-            throw Case3.DATA_NOT_FOUND.feedback(
-                "노드를 찾을 수 없습니다. (id: %s)".formatted(nodeId)
-            );
-        }
-    }
-    private TocNode recursiveFindNode(NodeId nodeId) {
-        for(TocNode node : children){
-            if(node.getId().equals(nodeId)){
-                return node;
-            }
-            if(node instanceof TocFolder folder && folder.size() > 0){
-                TocNode result = folder.recursiveFindNode(nodeId);
-                if(result != null) return result;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * startFolder에서부터 시작하여 하위 모든 노드를 탐색하여 nodeId와 일치하는 id를 가진 node의 부모 노드를 찾는다.
-     * @param nodeId 찾을 노드의 id
-     * @return 찾은 노드의 부모 노드
-     */
-    public Option<TocFolder> findParentNode(NodeId nodeId) {
-        if(id.equals(nodeId)){
-            throw new IllegalArgumentException("TocFolder는 자기 자신의 부모를 참조할 수 없습니다.");
-        }
-        TocFolder result = recursiveFindParentNode(nodeId);
-        if(result != null){
-            return result;
-        } else {
-            throw DomainException.builder()
-                    .apiCode(Case3.DATA_NOT_FOUND)
-        }
-    }
-    private TocFolder recursiveFindParentNode(NodeId nodeId) {
-        for(TocNode node : children){
-            if(node.getId().equals(nodeId)){
-                return this;
-            }
-            if(node instanceof TocFolder folder && folder.size() > 0){
-                TocFolder result = folder.recursiveFindParentNode(nodeId);
-                if(result != null) return result;
-            }
-        }
-        return null;
-    }
-
-    public Stream<TocNode> chidrenStream(){
-        return children.stream();
-    }
-
-    public List<TocNode> getChildren() {
-        return Collections.unmodifiableList(children);
-    }
-
-    /**
-     * @return 현재 node의 위치로부터 모든 하위 트리를 복사한다.
-     */
-    @Override
-    public TocNode deepClone(){
-        List<TocNode> clonedChildren = new LinkedList<>();
-        for(TocNode child : children){
-            clonedChildren.add(child.deepClone());
-        }
-        return new TocFolder(id, ov, clonedChildren);
-    }
-
-    public List<TocNode> flatten(){
-        List<TocNode> result = new LinkedList<>();
-        for(TocNode child : children){
-            result.add(child);
-            if(child instanceof TocFolder folder){
-                result.addAll(folder.flatten());
-            }
-        }
-        return result;
-    }
-
-    public List<TocFolder> flattenOnlyFolder() {
-        List<TocFolder> result = new LinkedList<>();
-        for(TocNode child : children){
-            if(child instanceof TocFolder folder){
-                result.add(folder);
-                result.addAll(folder.flattenOnlyFolder());
-            }
-        }
-        return result;
-    }
-
-    public Map<NodeId, TocFolder> indexingDescendantFolders() {
-        Map<NodeId, TocFolder> result = new HashMap<>();
-        for(TocNode child : children){
-            if(child instanceof TocFolder folder){
-                result.put(folder.getId(), folder);
-                result.putAll(folder.indexingDescendantFolders());
-            }
-        }
-        return result;
     }
 
     @Override
-    public boolean equals(Object o) {
-        if(this == o) return true;
-        if(!(o instanceof TocFolder)) return false;
-
-        TocFolder folder = (TocFolder) o;
-        if(!id.equals(folder.id)) return false;
-        if(children.size() != folder.children.size()) return false;
-
-        int size = children.size();
-        for(int i = 0; i< size; i++){
-            if(!children.get(i).equals(folder.children.get(i))){
-                return false;
-            }
-        }
-
-        return true;
+    public Tree.Node<NodeId> _toVavrTree(){
+        return Tree.of(
+            getId(),
+            children.stream()
+                .map(TocChild::_toVavrTree)
+                .toList()
+        );
     }
 
-    public boolean isReordered(TocFolder original) {
-        if(children.size() != original.children.size()) return true;
-        int size = children.size();
-        for(int i = 0; i< size; i++){
-            if(!children.get(i).equals(original.children.get(i))){
-                return true;
-            }
-        }
+    @Override
+    public boolean _isDescendantOf(TocParent parent) {
         return false;
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hashCode(children);
+    public TocChild _recursiveFindNode(NodeId nodeId) {
+        for(TocChild node : children){
+            if(node.getId().equals(nodeId)){
+                return node;
+            }
+            if(node instanceof TocParent parent && parent.size() > 0){
+                TocChild result = parent._recursiveFindNode(nodeId);
+                if(result != null) return result;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public void _removeChild(TocChild target) {
+        children.remove(target);
+        target._setParent(null);
     }
 }

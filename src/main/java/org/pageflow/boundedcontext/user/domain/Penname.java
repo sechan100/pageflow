@@ -39,5 +39,4 @@ public class Penname extends SingleValueWrapper<String> {
         }
     }
 
-
 }

@@ -17,7 +17,6 @@ import org.pageflow.boundedcontext.user.port.in.SignupCmd;
 import org.pageflow.boundedcontext.user.port.in.UserUseCase;
 import org.pageflow.boundedcontext.user.port.out.CheckForbiddenWordPort;
 import org.pageflow.boundedcontext.user.port.out.UserPersistencePort;
-import org.pageflow.global.api.code.ApiCode3;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -122,7 +121,7 @@ public class UserService implements UserUseCase, AdminUseCase {
 
 
     private User load(UID uid){
-        return userPersistePort.loadUser(uid).orElseThrow(() -> ApiCode3.DATA_NOT_FOUND.feedback("사용자를 찾을 수 없습니다."));
+        return userPersistePort.loadUser(uid).get();
     }
 
     private void checkUniqueUsername(Username username){

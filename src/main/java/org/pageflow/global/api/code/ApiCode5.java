@@ -1,7 +1,7 @@
 package org.pageflow.global.api.code;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 /**
  * <p>LEVEL: 5000</p>
@@ -18,10 +18,10 @@ import lombok.Getter;
  * @author : sechan
  */
 @Getter
-@AllArgsConstructor
+@RequiredArgsConstructor
 public enum ApiCode5 implements ApiCode {
     // 5000: 서버 프로그램 에러
-      INTERNAL_SERVER_ERROR(5000,"서버 에러; 로그 참고.")
+      INTERNAL_SERVER_ERROR(5000,"서버 에러")
 
     // 5100: 인프라 시스템 에러
     , FILE_SYSTEM_ERROR(5100, "파일시스템 에러")
@@ -35,11 +35,9 @@ public enum ApiCode5 implements ApiCode {
     ;
     private final int code;
     private final String message;
-    public String getFeedback() {
-        return "현재 서버가 원활하지 않습니다. 잠시후 다시 시도해주세요.";
-    }
+    private final Class<?> dataType;
 
-    public ApiException fire() {
-        return new ApiException(this, this.getFeedback(), null, null);
+    ApiCode5(int code, String message) {
+        this(code, message, null);
     }
 }

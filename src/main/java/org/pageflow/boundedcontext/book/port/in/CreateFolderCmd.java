@@ -11,11 +11,15 @@ import org.springframework.lang.Nullable;
  */
 @Getter
 public class CreateFolderCmd {
-    private static final Title DEFAULT_TITLE = new Title("새 폴더");
+    private static final Title DEFAULT_TITLE = Title.from("새 폴더");
 
     private final BookId bookId;
     private final NodeId parentNodeId;
     private final Title title;
+
+    public CreateFolderCmd(BookId bookId, NodeId parentNodeId) {
+        this(bookId, parentNodeId, null);
+    }
 
     public CreateFolderCmd(
         BookId bookId,

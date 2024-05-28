@@ -3,8 +3,6 @@ package org.pageflow.global.api.code;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import java.util.function.Function;
-
 /**
  * <p>LEVEL: 3000</p>
  * <p>
@@ -16,10 +14,10 @@ import java.util.function.Function;
 @AllArgsConstructor
 public enum ApiCode3 implements ApiCode {
     // 3000: 데이터베이스
-      DATA_NOT_FOUND(3000, "요청된 데이터를 찾을 수 없음", "데이터를 찾을 수 없습니다.")
+      DATA_NOT_FOUND(3000, "요청된 데이터를 찾을 수 없음")
 
     // 3400: 파일
-    , FILE_NOT_FOUND(3400, "요청된 파일을 찾을 수 없음", "파일을 찾을 수 없습니다.")
+    , FILE_NOT_FOUND(3400, "요청된 파일을 찾을 수 없음")
 
 
 
@@ -29,14 +27,10 @@ public enum ApiCode3 implements ApiCode {
     ;
     private final int code;
     private final String message;
-    private final String feedback;
+    private final Class<?> dataType;
 
-    public ApiException feedback(Function<FeedbackTemplate, String> feedbackSupplier) {
-        return feedback(feedbackSupplier.apply(FeedbackTemplate.getINSTANCE()));
-    }
-
-    public ApiException feedback(String feedback) {
-        return new ApiException(this, feedback, null, null);
+    ApiCode3(int code, String message) {
+        this(code, message, null);
     }
 
 }

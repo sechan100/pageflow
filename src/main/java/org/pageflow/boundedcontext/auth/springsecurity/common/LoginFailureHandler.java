@@ -2,8 +2,10 @@ package org.pageflow.boundedcontext.auth.springsecurity.common;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.pageflow.global.api.ResDataTypes;
 import org.pageflow.global.api.code.ApiCode3;
 import org.pageflow.global.api.code.ApiCode4;
+import org.pageflow.global.api.exception.ApiException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
@@ -21,9 +23,9 @@ public class LoginFailureHandler implements AuthenticationFailureHandler {
     ){
         switch(exception.getClass().getSimpleName()){
             case "UsernameNotFoundException":
-                throw ApiCode3.DATA_NOT_FOUND.feedback("존재하지 않는 아이디입니다.");
+                throw new ApiException(ApiCode3.DATA_NOT_FOUND);
             case "BadCredentialsException":
-                throw ApiCode4.INVALID_VALUE.feedback(t->t.getPassword_notMatch());
+                throw new ApiException(ApiCode4.BAD_CREDENTIALS, new ResDataTypes.FieldName("user-password"));
             default:
                 throw exception;
         }

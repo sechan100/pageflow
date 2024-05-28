@@ -3,7 +3,8 @@ package org.pageflow.global.api.code;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import java.util.function.Function;
+import static org.pageflow.global.api.ResDataTypes.FieldName;
+import static org.pageflow.global.api.ResDataTypes.FieldValidation;
 
 /**
  * <p>LEVEL: 4000</p>
@@ -23,47 +24,28 @@ import java.util.function.Function;
 @Getter
 @AllArgsConstructor
 public enum ApiCode4 implements ApiCode {
+    // 4000: http 스펙
+      MISSING_REQUEST_PARAMETER(4000, "필수 요청 파라미터 누락")
+    , REQUIRED_COOKIE_NOT_FOUND(4001, "필수 쿠키 누락", FieldName.class)
+
     // 4100: 기본적인 유효성 에러
-      INVALID_VALUE(4100, "유효하지 않은 값", "올바른 값을 입력해주세요.")
-    , EMPTY_VALUE(4102, "null, empty한 값 입력", "데이터를 입력해주세요.")
-    , FORMAT_MISMATCH(4110, "형식 불일치(정규식, 길이, etc.)", "올바른 값 형식이 아닙니다.")
-    , VALUE_OUT_OF_RANGE(4120, "숫자형에서 제한된 범위를 벗어난 값이 입력됨", "올바른 범위의 값을 입력해주세요.")
-    , INVALID_ENUM_VALUE(4130, "열거형에 존재하지 않는 값이 입력됨", "올바른 값을 입력해주세요.")
+    , FIELD_VALIDATION_FAIL(4100, "필드 유효성 검사 실패", FieldValidation.class)
 
-    // 4200: 도메인 요구사항
-    , UNIQUE_FIELD_DUPLICATED(4200, "unique 칼럼 중복", "이미 존재하는 값입니다. 다른 값을 입력해주세요.")
-    , CONTAINS_FORBIDDEN_WORD(4210, "금지어 포함", "사용할 수 없는 단어가 포함되어 있습니다. 다른 값을 입력해주세요.")
+    // 4200: 범용 도메인 요구사항
+    , BAD_CREDENTIALS(4210, "자격증명 실패", FieldName.class)
 
-    // 4300: Spring Bean Validation 에러
-    , FIELD_VALIDATION_FAIL(4300, "필드 유효성 검사 실패", "올바른 값을 입력해주세요.")
-
-    // 4400: primitive type이 아닌 입력값
-    , INVALID_FILE(4410, "유효하지 않은 파일", "올바른 파일을 업로드해주세요.")
-
-    // 4800: 필드 해석 실패
-    , FIELD_PARSE_FAIL(4800, "필드 파싱 실패; 잘못된 형식", "입력 데이터 형식이 올바르지 않습니다.")
+    // 4500: 구체 도메인 요구사항
+    , UNIQUE_FIELD_DUPLICATED(4510, "unique 칼럼 중복")
+    , CONTAINS_FORBIDDEN_WORD(4511, "금지어 포함")
 
 
-    // ######################
     ;
     private final int code;
     private final String message;
-    private final String feedback;
+    private final Class<?> dataType;
 
-    public ApiException feedback(Function<FeedbackTemplate, String> feedbackSupplier) {
-        return feedback(feedbackSupplier.apply(FeedbackTemplate.getINSTANCE()), null);
-    }
-
-    public ApiException feedback(Function<FeedbackTemplate, String> feedbackSupplier, Throwable cause) {
-        return feedback(feedbackSupplier.apply(FeedbackTemplate.getINSTANCE()), cause);
-    }
-
-    public ApiException feedback(String feedback) {
-        return new ApiException(this, feedback, null, null);
-    }
-
-    public ApiException feedback(String feedback, Throwable cause) {
-        return new ApiException(this, feedback, null, cause);
+    ApiCode4(int code, String message) {
+        this(code, message, null);
     }
 
 }

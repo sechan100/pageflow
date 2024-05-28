@@ -61,7 +61,7 @@ public class UserWebAdapter {
         }
 
         SignupCmd cmd = new SignupCmd(
-            Username.of(form.getUsername()),
+            Username.from(form.getUsername()),
             Password.encrypt(form.getPassword()),
             Email.from(form.getEmail()),
             Penname.from(form.getPenname()),
@@ -105,10 +105,7 @@ public class UserWebAdapter {
             owner.getNickname()
         );
 
-        return ApiResponse.withoutFeedback(
-            ApiCode2.OAUTH2_SIGNUP_REQUIRED,
-            result
-        );
+        return new ApiResponse(ApiCode2.OAUTH2_SIGNUP_REQUIRED, result);
     }
 
     @PostMapping("/user/profile/email")

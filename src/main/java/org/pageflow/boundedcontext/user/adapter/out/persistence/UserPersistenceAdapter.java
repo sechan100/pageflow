@@ -14,7 +14,6 @@ import org.pageflow.boundedcontext.user.application.dto.UserDto;
 import org.pageflow.boundedcontext.user.domain.*;
 import org.pageflow.boundedcontext.user.port.in.SignupCmd;
 import org.pageflow.boundedcontext.user.port.out.UserPersistencePort;
-import org.pageflow.global.api.code.ApiCode3;
 import org.pageflow.shared.annotation.PersistenceAdapter;
 import org.pageflow.shared.jpa.RequiredDataNotFoundException;
 import org.pageflow.shared.type.TSID;
@@ -120,13 +119,12 @@ public class UserPersistenceAdapter implements UserPersistencePort, AccountPersi
                     entity.getProfile().getPenname(),
                     entity.getProfile().getProfileImageUrl()
                 )
-            ).orElseThrow(() -> ApiCode3.DATA_NOT_FOUND.feedback("사용자를 찾을 수 없습니다"));
+            ).get();
     }
 
     @Override
     public Account saveAccount(Account account) {
-        AccountJpaEntity entity = accountJpaRepository.findById(account.getUid().toLong())
-            .orElseThrow(() -> ApiCode3.DATA_NOT_FOUND.feedback("사용자를 찾을 수 없습니다"));
+        AccountJpaEntity entity = accountJpaRepository.findById(account.getUid().toLong()).get();
         entity.setRole(account.getRole());
         entity.setPassword(account.getPassword().toString());
         entity.setEmailVerified(account.isEmailVerified());
@@ -149,7 +147,7 @@ public class UserPersistenceAdapter implements UserPersistencePort, AccountPersi
     private User toUser(AccountJpaEntity a, ProfileJpaEntity p){
         return new User(
             UID.from(a.getId()),
-            Username.of(a.getUsername()),
+            Username.from(a.getUsername()),
             a.getRole(),
             Email.from(a.getEmail()),
             a.isEmailVerified(),

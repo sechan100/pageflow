@@ -12,7 +12,7 @@ import org.springframework.lang.Nullable;
  */
 @Getter
 public class CreatePageCmd {
-    private static final Title DEFAULT_TITLE = new Title("새 페이지");
+    private static final Title DEFAULT_TITLE = Title.from("새 페이지");
     private static final String DEFAULT_CONTENT = "내용을 입력해주세요.";
 
     private final BookId bookId;

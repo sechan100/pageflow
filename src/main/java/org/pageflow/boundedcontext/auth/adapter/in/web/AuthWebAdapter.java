@@ -15,7 +15,9 @@ import org.pageflow.boundedcontext.common.value.UID;
 import org.pageflow.boundedcontext.user.application.dto.UserDto;
 import org.pageflow.global.api.ApiAccess;
 import org.pageflow.global.api.RequestContext;
-import org.pageflow.global.api.code.ApiCode1;
+import org.pageflow.global.api.ResDataTypes;
+import org.pageflow.global.api.code.ApiCode4;
+import org.pageflow.global.api.exception.ApiException;
 import org.pageflow.global.filter.UriPrefix;
 import org.pageflow.global.property.AppProps;
 import org.springframework.security.access.annotation.Secured;
@@ -89,8 +91,12 @@ public class AuthWebAdapter {
     @PostMapping("/auth/session/refresh")
     public Res.AccessToken refresh(HttpServletRequest request) {
         Optional<Cookie> rtCookieOp = requestContext.getCookie(SESSION_ID_COOKIE_NAME);
+        // TODO: 나중에 MissingRequestCookieException으로 한번에 받아서 처리하는 코드로 변경
         if(rtCookieOp.isEmpty()){
-            throw ApiCode1.SESSION_ID_COOKIE_NOT_FOUND.fire();
+            throw new ApiException(
+                ApiCode4.REQUIRED_COOKIE_NOT_FOUND,
+                new ResDataTypes.FieldName(SESSION_ID_COOKIE_NAME)
+            );
         }
 
         // REFRESH

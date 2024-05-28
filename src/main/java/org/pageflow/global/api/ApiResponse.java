@@ -2,7 +2,10 @@ package org.pageflow.global.api;
 
 import lombok.Getter;
 import org.pageflow.global.api.code.ApiCode;
+import org.pageflow.global.api.exception.ApiResponseDataTypeMisMatchException;
 import org.springframework.lang.Nullable;
+
+import java.util.Objects;
 
 /**
  * @author : sechan
@@ -13,35 +16,28 @@ public class ApiResponse<T> {
     private final String title;
     private final int code;
     private final String message;
-    private final String detail;
     @Nullable
     private final T data;
 
 
-    private ApiResponse(ApiCode apiCode, String feedback, @Nullable T data){
-        this.detail = feedback;
-        this.data = data;
-
-        // substitute for Redacted One, if it is not exposable
-        ApiCode _apiCode;
-        if(!apiCode.isExposable()){
-            _apiCode = apiCode.substituteForRedacted();
-        } else {
-            _apiCode = apiCode;
+    public ApiResponse(ApiCode apiCode, @Nullable T data){
+        Class<?> expectedDataType = Objects.requireNonNullElse(apiCode.getDataType(), NullDataType.class);
+        Class<?> actualDataType = Objects.requireNonNullElse(data, new NullDataType()).getClass();
+        if(!expectedDataType.isAssignableFrom(actualDataType)){
+            throw new ApiResponseDataTypeMisMatchException(expectedDataType, actualDataType);
         }
-
-        this.title = _apiCode.getTitle();
-        this.code = _apiCode.getCode();
-        this.message = _apiCode.getMessage();
+        this.title = apiCode.getTitle();
+        this.code = apiCode.getCode();
+        this.message = apiCode.getMessage();
+        this.data = data;
     }
 
-    public static <T> ApiResponse<T> of(ApiCode apiCode, String feedback, @Nullable T data){
-        return new ApiResponse<>(apiCode, feedback, data);
+    public ApiResponse(ApiCode apiCode){
+        this(apiCode, null);
     }
 
-    public static <T> ApiResponse<T> withoutFeedback(ApiCode apiCode, @Nullable T data){
-        return new ApiResponse<>(apiCode, apiCode.getFeedback(), data);
-    }
+}
 
-
+// ApiResponse의 dataType이 null인 경우를 표현하기 위한 타입 객체
+class NullDataType {
 }

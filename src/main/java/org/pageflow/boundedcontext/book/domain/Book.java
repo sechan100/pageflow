@@ -1,31 +1,32 @@
 package org.pageflow.boundedcontext.book.domain;
 
-import org.pageflow.boundedcontext.common.annotation.AggregateRoot;
+
+import lombok.Getter;
 
 /**
  * @author : sechan
  */
-@AggregateRoot
+@Getter
 public class Book {
     private final BookId id;
+    private final Author author;
     private Title title;
     private CoverImageUrl coverImageUrl;
 
 
-    private Book(
+    public Book(
         BookId id,
+        Author author,
         Title title,
         CoverImageUrl coverImageUrl
     ) {
         this.id = id;
+        this.author = author;
         this.title = title;
         this.coverImageUrl = coverImageUrl;
     }
 
 
-    public Book create(Title title, CoverImageUrl coverImageUrl){
-        return new Book(BookId.random(), title, coverImageUrl);
-    }
 
     public void changeTitle(Title title) {
         this.title = title;

@@ -1,7 +1,6 @@
 package org.pageflow.boundedcontext.book.port.out;
 
 import org.pageflow.boundedcontext.book.domain.Folder;
-import org.pageflow.boundedcontext.book.domain.NodeAr;
 import org.pageflow.boundedcontext.book.domain.NodeId;
 import org.pageflow.boundedcontext.book.domain.Page;
 import org.pageflow.boundedcontext.book.port.in.CreateFolderCmd;
@@ -13,11 +12,11 @@ import java.util.Optional;
  * @author : sechan
  */
 public interface NodePersistencePort {
-    Optional<NodeAr> loadNode(NodeId id);
     Folder createFolder(CreateFolderCmd cmd);
-
     Page createPage(CreatePageCmd cmd);
-    <N extends NodeAr> N saveNode(N node);
-
+    Optional<Folder> loadFolder(NodeId id);
+    Optional<Page> loadPage(NodeId id);
+    Folder saveFolder(Folder folder);
+    Page savePage(Page page);
     void deleteNode(NodeId id);
 }

@@ -11,5 +11,5 @@ import org.pageflow.boundedcontext.book.domain.NodeId;
 public class ReorderCmd {
     BookId bookId;
     NodeId nodeId;
-    int dest;
+    int destOrder;
 }

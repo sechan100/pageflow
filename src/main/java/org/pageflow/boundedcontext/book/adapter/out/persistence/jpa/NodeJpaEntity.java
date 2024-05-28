@@ -1,10 +1,7 @@
 package org.pageflow.boundedcontext.book.adapter.out.persistence.jpa;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.pageflow.shared.jpa.BaseJpaEntity;
 import org.springframework.lang.Nullable;
 
@@ -23,8 +20,10 @@ import org.springframework.lang.Nullable;
 public abstract class NodeJpaEntity extends BaseJpaEntity {
 
     @Id
+    @Setter(AccessLevel.NONE)
     private Long id;
 
+    @Setter(AccessLevel.NONE)
     @ManyToOne(fetch = FetchType.LAZY, optional = false, cascade = CascadeType.MERGE)
     @JoinColumn(name = "book_id", nullable = false)
     private BookJpaEntity book;
@@ -51,5 +50,6 @@ public abstract class NodeJpaEntity extends BaseJpaEntity {
         this.book = book;
         this.title = title;
         this.parentNode = parentNode;
+        this.ov = 0;
     }
 }

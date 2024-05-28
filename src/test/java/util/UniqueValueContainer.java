@@ -1,5 +1,6 @@
 package util;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -31,13 +32,7 @@ public class UniqueValueContainer<T> {
         return container.stream().findAny().orElseThrow();
     }
 
-    public T getAndRemoveAny() {
-        T any = getAny();
-        container.remove(any);
-        return any;
-    }
-
     public Set<T> getContainer() {
-        return container;
+        return Collections.unmodifiableSet(container);
     }
 }

@@ -8,9 +8,14 @@ import org.springframework.util.StringUtils;
  * @author : sechan
  */
 public final class Title extends SingleValueWrapper<String> {
-    public Title(String value) {
+
+    private Title(String value) {
         super(value);
+    }
+
+    public static Title from(String value) {
         validate(value);
+        return new Title(value);
     }
 
     private static void validate(String value) {

@@ -23,7 +23,6 @@ import java.util.stream.Collectors;
 public class ApiCodeRuntimeValidator implements RuntimeInitializer {
 
     @Override
-    @SuppressWarnings({"MethodWithMoreThanThreeNegations", "OverlyLongMethod"})
     public void initialize() throws Throwable {
         Reflections loadAllApiCodeReflections = new Reflections(
             new ConfigurationBuilder()
@@ -46,12 +45,7 @@ public class ApiCodeRuntimeValidator implements RuntimeInitializer {
 
         // 숫자 범위 검사
         boolean isRangeExceedCodeExist = codeNums.stream().anyMatch(num -> {
-            int numAbs = (num < 0) ? -num : num;
-            if(numAbs < 1000 || numAbs > 9999){
-                return true;
-            } else {
-                return false;
-            }
+            return num < 1000 || num > 9999;
         });
         if(isRangeExceedCodeExist){
             List<Integer> invalidNums = codeNums.stream()
@@ -70,19 +64,6 @@ public class ApiCodeRuntimeValidator implements RuntimeInitializer {
                 }
             }
             throw new InvalidApiCodeSpecificationException("중복된 ApiCode가 존재합니다:" + duplicates);
-        }
-
-        // UnexposableCode substituteForRedacted() 메소드 검사
-        Set<ApiCode> unexposableCodes = apiCodes.stream()
-            .filter(code -> code.getCode() < 0).collect(Collectors.toSet());
-        if(!unexposableCodes.isEmpty()){
-            Set<ApiCode> unexposableCodesWithInvalidOverride = unexposableCodes.stream()
-                .filter(code -> code.substituteForRedacted().getCode() < 0)
-                .collect(Collectors.toSet());
-            if(!unexposableCodesWithInvalidOverride.isEmpty()){
-                throw new InvalidApiCodeSpecificationException(
-                    "UnexposableCode(code < 0)는 반드시 exposableApiCode(code > 0)를 반환하도록 substituteForRedacted() 메소드를 Override해야합니다. invalid or didn't override 'substituteForRedacted() unexposable codes:" + unexposableCodesWithInvalidOverride);
-            }
         }
 
         log.info("ApiCode 정합성 검사를 완료했습니다.");

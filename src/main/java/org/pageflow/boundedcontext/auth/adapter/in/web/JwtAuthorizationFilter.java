@@ -43,7 +43,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         Optional<String> accessTokenOp = resolveTokenIfExist(request);
 
         if(accessTokenOp.isPresent()) {
-            Principal.Session principal = useCase.parseAndGetSession(accessTokenOp.get());
+            Principal.Session principal = useCase.extractPrincipalFromAccessToken(accessTokenOp.get());
             Authentication authentication = new UsernamePasswordAuthenticationToken(
                 principal,
                 null,

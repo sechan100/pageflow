@@ -1,7 +1,7 @@
 package org.pageflow.global.api.code;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 /**
  * <p>LEVEL: 1000</p>
@@ -13,37 +13,32 @@ import lombok.Getter;
  * @author : sechan
  */
 @Getter
-@AllArgsConstructor
+@RequiredArgsConstructor
 public enum ApiCode1 implements ApiCode {
     // 1000: LOGIN
-      LOGIN_REQUIRED(1000, "로그인 필요", "로그인이 필요합니다!")
+      LOGIN_REQUIRED(1000, "로그인 필요")
 
     // 1100: LOGOUT
 
     // 1200: SESSION
-    , SESSION_EXPIRED(1200, "세션(refreshToken) 만료", "세션이 만료되어 다시 로그인이 필요합니다!")
-    , SESSION_ID_COOKIE_NOT_FOUND(1420, "세션ID 쿠키 없음", "로그인이 필요합니다!")
+    , SESSION_EXPIRED(1200, "세션(refreshToken) 만료")
 
 
     // 1410: ACCESS_TOKEN
-    , ACCESS_TOKEN_EXPIRED(1410,"AccessToken 만료", FeedbackTemplate.getINSTANCE().getCanNotFeedback())
-    , INVALID_ACCESS_TOKEN(1411,"accessToken jwt 파싱 실패", FeedbackTemplate.getINSTANCE().getCanNotFeedback())
+    , ACCESS_TOKEN_EXPIRED(1410, "AccessToken 만료")
 
     // 1700: 이메일 인증
-    , EMAIL_VERIFICATION_AUTH_CODE_MISMATCH(1700, "이메일 인증 코드 불일치", "이메일 인증코드가 일치하지 않습니다.")
-    , APPLIED_EMAIL_VERIFICATION_NOT_FOUND(1701, "요청된 이메일 인증 정보가 없음", "이메일 인증 요청정보가 없습니다.")
-    , ALRADY_VERIFIED_EMAIL(1702, "이미 인증된 이메일", "이미 인증된 이메일입니다."),;
-
+    , EMAIL_VERIFICATION_AUTH_CODE_MISMATCH(1700, "이메일 인증 코드 불일치")
+    , APPLIED_EMAIL_VERIFICATION_NOT_FOUND(1701, "요청된 이메일 인증 정보가 없음")
+    , ALRADY_VERIFIED_EMAIL(1702, "이미 인증된 이메일")
+    ;
 
     private final int code;
     private final String message;
-    private final String feedback;
+    private final Class<?> dataType;
 
-    public ApiException fire() {
-        return new ApiException(this, this.getFeedback(), null, null);
+    ApiCode1(int code, String message) {
+        this(code, message, null);
     }
 
-    public ApiException fire(Throwable cause) {
-        return new ApiException(this, this.getFeedback(), null, cause);
-    }
 }

@@ -3,13 +3,13 @@ package org.pageflow.boundedcontext.auth.springsecurity.oauth2.authorizationrequ
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.pageflow.global.api.code.ApiCode2;
+import org.pageflow.global.api.ResDataTypes;
+import org.pageflow.global.api.code.ApiCode4;
+import org.pageflow.global.api.exception.ApiException;
 import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
-
-import java.util.Optional;
 
 /**
  * OAuth2 인증요청(OAuth2AuthorizationRequest)을 저장하고 관리하는 메커니즘을 정의한다.
@@ -48,15 +48,14 @@ public class InMemoryAuthorizationRepository implements AuthorizationRequestRepo
 
 
     private RedisOAuth2AuthorizationRequestWrapper loadCache(HttpServletRequest request) {
-        Optional<RedisOAuth2AuthorizationRequestWrapper> wrapperOp =
-            repository.findById(getStateParameter(request));
-
-        if(wrapperOp.isPresent()) {
-            repository.delete(wrapperOp.get());
-            return wrapperOp.get();
-        } else {
-            throw ApiCode2.INVALID_OAUTH2_STATE.fire();
-        }
+        String state = getStateParameter(request);
+        var wrapper = repository.findById(state)
+                .orElseThrow(() -> new ApiException(
+                    ApiCode4.BAD_CREDENTIALS,
+                    new ResDataTypes.FieldName("oauth2-state")
+                ));
+        repository.delete(wrapper);
+        return wrapper;
     }
 
     private String getStateParameter(HttpServletRequest request) {

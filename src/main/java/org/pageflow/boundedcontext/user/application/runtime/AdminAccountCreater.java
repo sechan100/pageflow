@@ -34,7 +34,7 @@ public class AdminAccountCreater implements RuntimeInitializer {
         }
         AppProps.Admin admin = props.admin;
         SignupCmd cmd = new SignupCmd(
-            Username.of(admin.username),
+            Username.from(admin.username),
             Password.encrypt(admin.password),
             Email.from(admin.email),
             Penname.from(admin.penname),

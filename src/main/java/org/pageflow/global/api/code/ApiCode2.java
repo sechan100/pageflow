@@ -1,7 +1,8 @@
 package org.pageflow.global.api.code;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import org.pageflow.global.api.ResDataTypes;
 
 /**
  * <p>LEVEL: 2000</p>
@@ -13,29 +14,20 @@ import lombok.Getter;
  * @author : sechan
  */
 @Getter
-@AllArgsConstructor
+@RequiredArgsConstructor
 public enum ApiCode2 implements ApiCode {
     // 2000: 성공
-      SUCCESS(2000, "성공", "요청이 성공적으로 처리되었습니다.")
+      SUCCESS(2000, "성공", Object.class)
 
     // 2100: 요청이 정상 처리되었지만, 아직 처리중인 경우
-    , PROCESSING(2100, "요청 처리중; not fail", "정상 요청되어, 처리중입니다.")
+    , PROCESSING(2100, "요청 처리중")
 
-    // 2200: 분기
-    , OAUTH2_SIGNUP_REQUIRED(2200, "OAuth2 회원가입이 필요", "로그인하기 위해서, 회원가입을 먼저 진행해주세요!")
+    // 2200: 선행조건
+    , PRECONDITION_REQUIRED(2200, "작업의 선행조건이 완수되지 않음", ResDataTypes.Precondition.class)
+    , OAUTH2_SIGNUP_REQUIRED(2201, "OAuth2 회원가입이 필요", Object.class)
 
-
-    // 2500: 메타 요청
-    , INVALID_REQUEST(2500, "올바르지 않은 요청", "올바르지 않은 요청입니다.")
-    , PROTECTED_URI_ACCESS(-2501, "internal-only uri 접근 불가", "요청정보가 올바르지 않습니다."){
-          @Override
-          public ApiCode substituteForRedacted() {
-              return INVALID_REQUEST;
-          }
-    }
-
-    // 2560: OAuth2 관련
-    , INVALID_OAUTH2_STATE(2560, "OAuth2 state가 없거나 올바르지 않음", "올바르지 않은 요청입니다.")
+    // 2400: http 스펙
+    , FAIL_TO_PARSE_HTTP_REQUEST(2400, "http 요청을 해석하지 못했습니다")
 
 
 
@@ -44,9 +36,10 @@ public enum ApiCode2 implements ApiCode {
     ;
     private final int code;
     private final String message;
-    private final String feedback;
+    private final Class<?> dataType;
 
-    public ApiException fire() {
-        return new ApiException(this, this.getFeedback(), null, null);
+    ApiCode2(int code, String message) {
+        this(code, message, null);
     }
+
 }

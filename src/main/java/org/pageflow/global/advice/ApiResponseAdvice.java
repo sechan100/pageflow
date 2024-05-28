@@ -28,7 +28,7 @@ public class ApiResponseAdvice implements ResponseBodyAdvice<Object> {
             @NonNull ServerHttpRequest request,
             @NonNull ServerHttpResponse response
     ) {
-        return ApiResponse.withoutFeedback(ApiCode2.SUCCESS, body);
+        return new ApiResponse<>(ApiCode2.SUCCESS, body);
     }
     
 }

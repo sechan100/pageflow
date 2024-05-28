@@ -1,7 +1,7 @@
 package org.pageflow.global.api;
 
 import org.pageflow.global.api.code.ApiCode;
-import org.pageflow.global.api.code.ApiException;
+import org.pageflow.global.api.exception.ApiException;
 
 import java.util.function.Consumer;
 
@@ -23,7 +23,7 @@ public abstract class ApiCodeCatcher {
         }
 
         public CatcherBuilder doCatch(ApiCode apiCode, Consumer<ApiCode> consumer){
-            if(e.getOriginApiCode().equals(apiCode)){
+            if(e.getApiResponse().getCode() == apiCode.getCode()){
                 consumer.accept(apiCode);
             }
             return this;

@@ -1,16 +1,21 @@
 package org.pageflow.global.advice;
 
 import lombok.extern.slf4j.Slf4j;
+import org.pageflow.boundedcontext.common.exception.InputValueException;
 import org.pageflow.global.api.ApiResponse;
+import org.pageflow.global.api.ResDataTypes;
+import org.pageflow.global.api.code.ApiCode2;
 import org.pageflow.global.api.code.ApiCode4;
 import org.pageflow.global.api.code.ApiCode5;
-import org.pageflow.global.api.code.ApiException;
+import org.pageflow.global.api.exception.ApiException;
 import org.springframework.http.converter.HttpMessageConversionException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * @author : sechan
@@ -27,53 +32,45 @@ public class ExceptionRestAdvice {
     }
 
     @ExceptionHandler(Throwable.class)
-    public ApiResponse<Void> handleException(Throwable e) {
+    public ApiResponse<?> handleException(Throwable e) {
         log.debug("Throwable을 advice에서 INTERNAL_SERVER_ERROR로 처리 \n ====================[ EXCEPTION ]====================", e);
-        return ApiResponse.withoutFeedback(ApiCode5.INTERNAL_SERVER_ERROR, null);
+        return new ApiResponse<>(ApiCode5.INTERNAL_SERVER_ERROR, null);
     }
 
     
     // @Valid를 통한 Spring Bean Validation의 필드의 유효성 검사에 실패한 경우
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ApiResponse<Map<String, String[]>> handleMethodArgumentNotValid(MethodArgumentNotValidException e) {
-        
-        Map<String, List<String>> errors = new LinkedHashMap<>();
+    public ApiResponse<ResDataTypes.FieldValidation> handleMethodArgumentNotValid(MethodArgumentNotValidException e) {
+
+        List<ResDataTypes.FieldError> errors = new ArrayList<>();
         e.getBindingResult().getFieldErrors()
                 .forEach(fieldError -> {
                     String fieldName = fieldError.getField();
+                    String rejectedValue = Objects.requireNonNullElse(fieldError.getRejectedValue(), "null").toString();
                     String errorMessage = Objects.requireNonNullElse(fieldError.getDefaultMessage(), "올바르지 않은 값입니다.");
-                    
-                    // 이미 해당 필드가 에러로 등록되어있는 경우
-                    if(errors.containsKey(fieldName)){
-                        errors.get(fieldName).add(errorMessage);
-                    }
-                    // 해당 필드가 처음으로 에러로 등록되는 경우
-                    else {
-                        errors.put(fieldName, new ArrayList<>());
-                        errors.get(fieldName).add(errorMessage);
-                    }
+                    errors.add(new ResDataTypes.FieldError(
+                        fieldName,
+                        rejectedValue,
+                        errorMessage
+                    ));
                 });
-        
-        // 필드별 에러 메세지를 배열로 변환
-        Map<String, String[]> result = new LinkedHashMap<>();
-        errors.forEach((fieldName, errorMessageList) -> {
-            String[] errorMessageArray = errorMessageList.toArray(new String[0]);
-            result.put(fieldName, errorMessageArray);
-        });
-        
-        return ApiResponse.withoutFeedback(ApiCode4.FIELD_VALIDATION_FAIL, result);
+        return new ApiResponse<>(ApiCode4.FIELD_VALIDATION_FAIL, new ResDataTypes.FieldValidation(errors));
     }
 
-    @ExceptionHandler(NoSuchElementException.class)
-    public ApiResponse<Void> handleNoSuchElementException(NoSuchElementException e) {
-        log.warn("NoSuchElementException의 경우 Spring Date 스펙에서 사용하는 Optional에서 발생했을 가능성이 농후하니, Optional에서 발생하는지 먼저 확인할 것");
-        // 어디서 발생한지 모르는 범용적인 예외이니, 상세한 정보를 제공하지 않는다.
-        return ApiResponse.withoutFeedback(ApiCode5.INTERNAL_SERVER_ERROR, null);
+    @ExceptionHandler(InputValueException.class)
+    public ApiResponse<ResDataTypes.FieldValidation> handleInputValueException(InputValueException e) {
+        List<ResDataTypes.FieldError> errors = new ArrayList<>();
+        errors.add(new ResDataTypes.FieldError(
+            e.getFieldName(),
+            e.getValue(),
+            e.getMessage()
+        ));
+        return new ApiResponse<>(ApiCode4.FIELD_VALIDATION_FAIL, new ResDataTypes.FieldValidation(errors));
     }
 
     @ExceptionHandler(HttpMessageConversionException.class)
     public ApiResponse<Void> handleHttpMessageConversionException(HttpMessageConversionException e) {
-        return ApiResponse.withoutFeedback(ApiCode4.FIELD_PARSE_FAIL, null);
+        return new ApiResponse<>(ApiCode2.FAIL_TO_PARSE_HTTP_REQUEST);
     }
  
 }

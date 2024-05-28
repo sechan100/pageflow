@@ -5,7 +5,9 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.pageflow.global.api.code.ApiCode2;
+import lombok.extern.slf4j.Slf4j;
+import org.pageflow.global.api.code.ApiCode5;
+import org.pageflow.global.api.exception.ApiException;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -13,6 +15,7 @@ import java.io.IOException;
 /**
  * @author : sechan
  */
+@Slf4j
 public class InternalOnlyUriPretectFilter extends OncePerRequestFilter {
 
     @Override
@@ -21,7 +24,8 @@ public class InternalOnlyUriPretectFilter extends OncePerRequestFilter {
         boolean isInternalOnly = uri.startsWith(UriPrefix.PRIVATE);
 
         if(isInternalOnly && request.getDispatcherType() != DispatcherType.FORWARD){
-            throw ApiCode2.PROTECTED_URI_ACCESS.fire();
+            log.warn("private url에 대한 외부요청이 발생하였습니다. uri: {}", uri);
+            throw new ApiException(ApiCode5.INTERNAL_SERVER_ERROR);
         } else {
             filterChain.doFilter(request, response);
         }

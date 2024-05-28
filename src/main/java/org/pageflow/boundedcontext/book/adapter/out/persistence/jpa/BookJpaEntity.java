@@ -18,14 +18,19 @@ import org.pageflow.shared.jpa.BaseJpaEntity;
 public class BookJpaEntity extends BaseJpaEntity {
 
     @Id
+    @Setter(AccessLevel.NONE)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "profile_id")
+    @Setter(AccessLevel.NONE)
     private ProfileJpaEntity author;
 
     @Column(nullable = false)
     private String title;
+
+    @Column(nullable = false)
+    private String coverImageUrl;
 
 
 }

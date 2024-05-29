@@ -22,10 +22,7 @@ import java.io.IOException;
 import java.util.Optional;
 
 
-/*
-* @Component 붙이면 그냥 Servlet Filter로도 등록되어버린다.
-* 그럼 SecurityFilterChain에서 1번, 그냥 FilterChain에서 1번해서 총 2번 호출된다
-* */
+
 @Slf4j
 @RequiredArgsConstructor
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
@@ -40,6 +37,10 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain
     ){
+        if(SecurityContextHolder.getContext().getAuthentication() != null) {
+            filterChain.doFilter(request, response);
+            return;
+        }
         Optional<String> accessTokenOp = resolveTokenIfExist(request);
 
         if(accessTokenOp.isPresent()) {

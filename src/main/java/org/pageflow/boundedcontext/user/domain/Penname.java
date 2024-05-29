@@ -9,7 +9,7 @@ import org.springframework.util.StringUtils;
  */
 public class Penname extends SingleValueWrapper<String> {
     private static final int MIN_LENGTH = 1;
-    private static final int MAX_LENGTH = 12;
+    private static final int MAX_LENGTH = 20;
     private static final String REGEX = "^[가-힣a-zA-Z0-9]{" + MIN_LENGTH + "," + MAX_LENGTH + "}$";
     private static final String REGEX_DESCRIPTION = String.format(
         "필명은 %d ~ %d자 사이의 한글, 영문, 숫자로 입력해주세요.", MIN_LENGTH, MAX_LENGTH

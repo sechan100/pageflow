@@ -9,8 +9,8 @@ import org.pageflow.boundedcontext.book.domain.Title;
  * @author : sechan
  */
 public interface BookUseCase {
-    BookDto.Simple createBook(CreateBookCmd cmd);
-    BookDto.Simple changeBookTitle(BookId id, Title title);
-    BookDto.Simple changeBookCoverImage(BookId id, CoverImageUrl url);
+    BookDto.Basic createBook(CreateBookCmd cmd);
+    BookDto.Basic changeBookTitle(BookId id, Title title);
+    BookDto.Basic changeBookCoverImage(BookId id, CoverImageUrl url);
 
 }

@@ -1,6 +1,5 @@
 package org.pageflow.boundedcontext.user.adapter.in.web;
 
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
@@ -17,10 +16,22 @@ abstract class Req {
         @NotBlank
         private String password;
 
-        @Email
+        @jakarta.validation.constraints.Email
         private String email;
 
         @NotBlank
         private String penname;
+    }
+
+    @Data
+    public static class Penname {
+        @NotBlank
+        private String penname;
+    }
+
+    @Data
+    public static class Email {
+        @NotBlank
+        private String email;
     }
 }

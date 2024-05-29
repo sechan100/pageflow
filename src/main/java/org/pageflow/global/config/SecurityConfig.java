@@ -5,6 +5,7 @@ import org.pageflow.boundedcontext.auth.adapter.in.web.AuthWebAdapter;
 import org.pageflow.boundedcontext.auth.adapter.in.web.JwtAuthorizationFilter;
 import org.pageflow.boundedcontext.auth.springsecurity.oauth2.OAuth2Service;
 import org.pageflow.global.filter.ApiExceptionCatchAndDelegatingFilter;
+import org.pageflow.global.filter.DevOnlyJwtSessionFixFilter;
 import org.pageflow.global.filter.InFilterForwardedRequestCeaseFilter;
 import org.pageflow.global.filter.InternalOnlyUriPretectFilter;
 import org.pageflow.global.property.AppProps;
@@ -40,6 +41,7 @@ public class SecurityConfig {
     private final ApiExceptionCatchAndDelegatingFilter apiExceptionCatchAndDelegatingFilter;
     private final InFilterForwardedRequestCeaseFilter inFilterForwardedRequestCeaseFilter;
     private final InternalOnlyUriPretectFilter internalOnlyUriPretectFilter;
+    private final DevOnlyJwtSessionFixFilter devOnlyJwtSessionFixFilter;
     // oauth2
     private final OAuth2Service OAuth2Service;
     private final AuthorizationRequestRepository<OAuth2AuthorizationRequest> authorizationRequestRepository;
@@ -92,6 +94,7 @@ public class SecurityConfig {
              * 3. HeaderWriterFilter
              * 4. (CUSTOM) ApiExceptionCatchAndDelegatingFilter
              * 5. (CUSTOM) InternalOnlyUriPretectFilter
+             * 6. (DEV_ONLY) DevOnlyJwtSessionFixFilter
              * 6. (CUSTOM) JwtAuthorizationFilter
              * 7. OAuth2AuthorizationRequestRedirectFilter
              * 8. OAuth2LoginAuthenticationFilter
@@ -106,7 +109,8 @@ public class SecurityConfig {
              */
             .addFilterAfter(apiExceptionCatchAndDelegatingFilter, HeaderWriterFilter.class)
             .addFilterAfter(internalOnlyUriPretectFilter, ApiExceptionCatchAndDelegatingFilter.class)
-            .addFilterAfter(jwtAuthorizationFilter, ApiExceptionCatchAndDelegatingFilter.class)
+            .addFilterAfter(devOnlyJwtSessionFixFilter, InternalOnlyUriPretectFilter.class)
+            .addFilterAfter(jwtAuthorizationFilter, DevOnlyJwtSessionFixFilter.class)
             .addFilterAfter(inFilterForwardedRequestCeaseFilter, SessionManagementFilter.class)
             .headers(headers -> headers
                 .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)

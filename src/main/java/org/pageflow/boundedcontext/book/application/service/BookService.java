@@ -25,13 +25,13 @@ public class BookService implements BookUseCase {
 
 
     @Override
-    public BookDto.Simple createBook(CreateBookCmd cmd) {
+    public BookDto.Basic createBook(CreateBookCmd cmd) {
         Book book = persistPort.createBook(cmd);
         return toDto(book);
     }
 
     @Override
-    public BookDto.Simple changeBookTitle(BookId id, Title title) {
+    public BookDto.Basic changeBookTitle(BookId id, Title title) {
         Book book = persistPort.loadBook(id).get();
         book.changeTitle(title);
         persistPort.saveBook(book);
@@ -39,15 +39,15 @@ public class BookService implements BookUseCase {
     }
 
     @Override
-    public BookDto.Simple changeBookCoverImage(BookId id, CoverImageUrl url) {
+    public BookDto.Basic changeBookCoverImage(BookId id, CoverImageUrl url) {
         Book book = persistPort.loadBook(id).get();
         book.changeCoverImageUrl(url);
         persistPort.saveBook(book);
         return toDto(book);
     }
 
-    private BookDto.Simple toDto(Book book) {
-        return new BookDto.Simple(
+    private BookDto.Basic toDto(Book book) {
+        return new BookDto.Basic(
             book.getId().getValue(),
             book.getTitle().getValue(),
             book.getCoverImageUrl().getValue()

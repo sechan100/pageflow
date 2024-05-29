@@ -6,4 +6,8 @@ package org.pageflow.global.initialize;
  */
 public interface RuntimeInitializer {
     void initialize() throws Throwable;
+
+    default boolean isActivated() {
+        return true;
+    }
 }

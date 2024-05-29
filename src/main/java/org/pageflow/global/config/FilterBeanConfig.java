@@ -4,11 +4,13 @@ import jakarta.servlet.Filter;
 import org.pageflow.boundedcontext.auth.adapter.in.web.JwtAuthorizationFilter;
 import org.pageflow.boundedcontext.auth.port.in.TokenUseCase;
 import org.pageflow.global.filter.ApiExceptionCatchAndDelegatingFilter;
+import org.pageflow.global.filter.DevOnlyJwtSessionFixFilter;
 import org.pageflow.global.filter.InFilterForwardedRequestCeaseFilter;
 import org.pageflow.global.filter.InternalOnlyUriPretectFilter;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 /**
  * 수동 설정을 트리거하여, Springboot의 자동구성으로 인해 @Component인 Filter가 ServletFilter로 자동등록되는 것을 막는다.
@@ -54,6 +56,17 @@ public class FilterBeanConfig {
     }
     @Bean
     public FilterRegistrationBean<InternalOnlyUriPretectFilter> preventRegisterInternalOnlyUriPretectFilter(InternalOnlyUriPretectFilter filter) {
+        return preventsFilterAutoRegistration(filter);
+    }
+
+    @Bean
+    @Profile("dev")
+    public DevOnlyJwtSessionFixFilter devOnlyJwtSessionFixFilter() {
+        return new DevOnlyJwtSessionFixFilter();
+    }
+    @Bean
+    @Profile("dev")
+    public FilterRegistrationBean<DevOnlyJwtSessionFixFilter> preventRegisterDevOnlyJwtSessionFixFilter(DevOnlyJwtSessionFixFilter filter) {
         return preventsFilterAutoRegistration(filter);
     }
 

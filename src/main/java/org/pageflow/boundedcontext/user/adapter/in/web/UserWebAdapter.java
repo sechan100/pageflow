@@ -16,19 +16,18 @@ import org.pageflow.boundedcontext.user.UserUseCase;
 import org.pageflow.boundedcontext.user.adapter.out.cache.entity.OAuth2PreSignupCache;
 import org.pageflow.boundedcontext.user.adapter.out.cache.repository.OAuth2PresignupRedisRepo;
 import org.pageflow.boundedcontext.user.application.dto.UserDto;
-import org.pageflow.boundedcontext.user.domain.*;
+import org.pageflow.boundedcontext.user.domain.Email;
+import org.pageflow.boundedcontext.user.domain.Penname;
+import org.pageflow.boundedcontext.user.domain.ProfileImageUrl;
 import org.pageflow.boundedcontext.user.shared.ProviderType;
-import org.pageflow.global.api.ApiAccess;
 import org.pageflow.global.api.ApiResponse;
 import org.pageflow.global.api.RequestContext;
 import org.pageflow.global.api.code.ApiCode2;
 import org.pageflow.global.filter.UriPrefix;
 import org.pageflow.global.property.AppProps;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -42,7 +41,6 @@ public class UserWebAdapter {
 
 
 
-    @Secured(ApiAccess.ANONYMOUS)
     @Operation(summary = "회원가입", description = "새로운 사용자의 회원가입을 요청")
     @PostMapping("/signup")
     public Res.Signup signup(@Valid @RequestBody Req.SignupForm form) {
@@ -61,13 +59,13 @@ public class UserWebAdapter {
         }
 
         SignupCmd cmd = new SignupCmd(
-            Username.from(form.getUsername()),
-            Password.encrypt(form.getPassword()),
-            Email.from(form.getEmail()),
-            Penname.from(form.getPenname()),
+            form.getUsername(),
+            form.getPassword(),
+            form.getEmail(),
+            form.getPenname(),
             RoleType.ROLE_USER,
             provider,
-            ProfileImageUrl.from(profileImageUrl)
+            profileImageUrl
         );
 
         UserDto.User result = userUsecase.signup(cmd);
@@ -109,18 +107,18 @@ public class UserWebAdapter {
     }
 
     @PostMapping("/user/profile/email")
-    public Res.SessionUser changeEmail(@RequestBody Map<String, String> form){ // "email"
+    public Res.SessionUser changeEmail(@RequestBody Req.Email form){
         UID uid = requestContext.getUid();
-        Email email = Email.from(form.get("email"));
+        Email email = Email.from(form.getEmail());
 
         UserDto.User result = userUsecase.changeEmail(uid, email);
         return toSessionUser(result);
     }
 
     @PostMapping("/user/profile/penname")
-    public Res.SessionUser changePenname(@RequestBody Map<String, String> form){ // "penname"
+    public Res.SessionUser changePenname(@RequestBody Req.Penname form){ // "penname"
         UID uid = requestContext.getUid();
-        Penname penname = Penname.from(form.get("penname"));
+        Penname penname = Penname.from(form.getPenname());
 
         UserDto.User result = userUsecase.changePenname(uid, penname);
         return toSessionUser(result);

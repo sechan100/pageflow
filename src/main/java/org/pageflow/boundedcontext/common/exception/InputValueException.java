@@ -13,7 +13,7 @@ public class InputValueException extends DomainException {
     private final String value;
 
     private InputValueException(String fieldName, @Nullable String value, String message) {
-        super(message);
+        super(message + " fieldName : %s, value : %s".formatted(fieldName, value));
         this.fieldName = fieldName;
         this.value = value;
     }

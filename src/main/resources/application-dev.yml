@@ -25,7 +25,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     properties:
       hibernate:
         show_sql: true
@@ -93,3 +93,10 @@ custom:
   file:
     web-base-url: '${custom.site.base-url}/resources/image'
     parent: /Users/sechan/local/uploads/image
+
+dev:
+  data:
+    user:
+      active: true
+      count: 10
+      random-seed: 1234

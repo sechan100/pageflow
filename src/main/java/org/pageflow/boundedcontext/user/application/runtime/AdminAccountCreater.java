@@ -7,7 +7,6 @@ import org.pageflow.boundedcontext.user.AdminUseCase;
 import org.pageflow.boundedcontext.user.SignupCmd;
 import org.pageflow.boundedcontext.user.adapter.out.persistence.jpa.AccountJpaRepository;
 import org.pageflow.boundedcontext.user.application.dto.UserDto;
-import org.pageflow.boundedcontext.user.domain.*;
 import org.pageflow.boundedcontext.user.shared.ProviderType;
 import org.pageflow.global.initialize.RuntimeInitializer;
 import org.pageflow.global.property.AppProps;
@@ -34,13 +33,13 @@ public class AdminAccountCreater implements RuntimeInitializer {
         }
         AppProps.Admin admin = props.admin;
         SignupCmd cmd = new SignupCmd(
-            Username.from(admin.username),
-            Password.encrypt(admin.password),
-            Email.from(admin.email),
-            Penname.from(admin.penname),
+            admin.username,
+            admin.password,
+            admin.email,
+            admin.penname,
             RoleType.ROLE_ADMIN,
             ProviderType.NATIVE,
-            ProfileImageUrl.from(props.user.defaultProfileImageUrl)
+            props.user.defaultProfileImageUrl
         );
 
         UserDto.User result = adminUseCase.registerAdmin(cmd);

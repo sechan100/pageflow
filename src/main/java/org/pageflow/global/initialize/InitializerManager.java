@@ -20,7 +20,9 @@ public class InitializerManager {
         return args -> {
             for(RuntimeInitializer initializer : initializers) {
                 try {
-                    initializer.initialize();
+                    if(initializer.isActivated()) {
+                        initializer.initialize();
+                    }
                 } catch (Throwable e) {
                     log.error("Runtime Initializer Error가 발생했습니다.");
                     throw new RuntimeInitializeException(e);

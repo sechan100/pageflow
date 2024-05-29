@@ -5,11 +5,12 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.pageflow.boundedcontext.auth.domain.Account;
 import org.pageflow.boundedcontext.auth.port.out.AccountPersistencePort;
+import org.pageflow.global.api.ApiAccess;
 import org.pageflow.global.api.RequestContext;
 import org.pageflow.global.filter.DevOnlyJwtSessionFixFilter;
+import org.pageflow.shared.annotation.web.Delete;
+import org.pageflow.shared.annotation.web.Post;
 import org.springframework.context.annotation.Profile;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -26,14 +27,14 @@ public class DevOnlySessionFixController {
     private final AccountPersistencePort accountPersistencePort;
     private final DevOnlyJwtSessionFixFilter devOnlyJwtSessionFixFilter;
 
-    @PostMapping("/DEV_ONLY/session/fix")
+    @Post(value = "/DEV_ONLY/session/fix", access = ApiAccess.ANONYMOUS)
     @Operation(summary = "서버수준에서 현재 세션 사용자를 고정")
     public void fixSession(@RequestBody Req.SessionPrincipal req) {
         Account account = accountPersistencePort.loadAccount(req.username).get();
         devOnlyJwtSessionFixFilter.fixSession(account.getUid(), account.getRole());
     }
 
-    @DeleteMapping("/DEV_ONLY/session/fix")
+    @Delete("/DEV_ONLY/session/fix")
     @Operation(summary = "서버수준에서 현재 세션 사용자 고정 해제")
     public void unfixSession() {
         devOnlyJwtSessionFixFilter.clearFixedPrincipal();

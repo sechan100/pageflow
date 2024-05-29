@@ -13,16 +13,14 @@ import org.pageflow.boundedcontext.auth.port.in.LoginCmd;
 import org.pageflow.boundedcontext.auth.port.in.SessionUseCase;
 import org.pageflow.boundedcontext.common.value.UID;
 import org.pageflow.boundedcontext.user.application.dto.UserDto;
-import org.pageflow.global.api.ApiAccess;
 import org.pageflow.global.api.RequestContext;
 import org.pageflow.global.api.ResDataTypes;
 import org.pageflow.global.api.code.ApiCode4;
 import org.pageflow.global.api.exception.ApiException;
 import org.pageflow.global.filter.UriPrefix;
 import org.pageflow.global.property.AppProps;
-import org.springframework.security.access.annotation.Secured;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.pageflow.shared.annotation.web.Get;
+import org.pageflow.shared.annotation.web.Post;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -45,8 +43,8 @@ public class AuthWebAdapter {
 
 
     public static final String SPRING_SECURITY_FORM_LOGIN_URI = "/auth/login";
+    @Post(SPRING_SECURITY_FORM_LOGIN_URI)
     @Operation(summary = "로그인", description = "로그인을 요청하고, accessToken을 발급한다.")
-    @PostMapping(SPRING_SECURITY_FORM_LOGIN_URI)
     private Res.AccessToken SpringSecurityLogin(String username, String password) {
         throw new UnsupportedOperationException("Spring Security에서 제공");
     }
@@ -86,9 +84,8 @@ public class AuthWebAdapter {
         );
     }
 
-    @Secured(ApiAccess.USER)
+    @Post("/auth/session/refresh")
     @Operation(summary = "accessToken 재발급", description = "session id cookie를 받아서 accessToken을 재발급한다.")
-    @PostMapping("/auth/session/refresh")
     public Res.AccessToken refresh(HttpServletRequest request) {
         Optional<Cookie> rtCookieOp = requestContext.getCookie(SESSION_ID_COOKIE_NAME);
         // TODO: 나중에 MissingRequestCookieException으로 한번에 받아서 처리하는 코드로 변경
@@ -108,9 +105,8 @@ public class AuthWebAdapter {
         );
     }
 
-    @Secured(ApiAccess.USER)
+    @Post("/auth/session/logout")
     @Operation(summary = "로그아웃", description = "쿠키로 전달된 sessionId를 받아서, 해당 세션을 무효화")
-    @PostMapping("/auth/session/logout")
     public void logout() {
         requestContext.getCookie(SESSION_ID_COOKIE_NAME)
             .ifPresent(cookie -> {
@@ -119,9 +115,8 @@ public class AuthWebAdapter {
             });
     }
 
-    @Secured(ApiAccess.USER)
+    @Get("/auth/session/info")
     @Operation(summary = "세션정보 가져오기", description = "accessToken에 저장된 UID를 기반으로 사용자의 세션 정보를 조회")
-    @GetMapping("/auth/session/info")
     public Res.SessionInfo getSession(){
         UID uid = requestContext.getUid();
         UserDto.Session sessionUser = loadSessionUserAcl.loadSessionUser(uid);

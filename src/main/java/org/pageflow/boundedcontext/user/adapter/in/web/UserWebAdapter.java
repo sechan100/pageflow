@@ -20,12 +20,18 @@ import org.pageflow.boundedcontext.user.domain.Email;
 import org.pageflow.boundedcontext.user.domain.Penname;
 import org.pageflow.boundedcontext.user.domain.ProfileImageUrl;
 import org.pageflow.boundedcontext.user.shared.ProviderType;
+import org.pageflow.global.api.ApiAccess;
 import org.pageflow.global.api.ApiResponse;
 import org.pageflow.global.api.RequestContext;
 import org.pageflow.global.api.code.ApiCode2;
 import org.pageflow.global.filter.UriPrefix;
 import org.pageflow.global.property.AppProps;
-import org.springframework.web.bind.annotation.*;
+import org.pageflow.shared.annotation.web.Delete;
+import org.pageflow.shared.annotation.web.Get;
+import org.pageflow.shared.annotation.web.Post;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Optional;
@@ -41,8 +47,8 @@ public class UserWebAdapter {
 
 
 
+    @Post(value = "/signup", access = ApiAccess.ANONYMOUS)
     @Operation(summary = "회원가입", description = "새로운 사용자의 회원가입을 요청")
-    @PostMapping("/signup")
     public Res.Signup signup(@Valid @RequestBody Req.SignupForm form) {
         Optional<OAuth2PreSignupCache> loaded = preSignupRepo.findById(form.getUsername());
 
@@ -81,8 +87,8 @@ public class UserWebAdapter {
     /**
      * {@link InAuthingInFilterForwardFactory#getOAuth2PreSignupForward(OAuth2ResourceOwner)}
      */
+    @Get(value = PRE_SIGNUP_PATH, access = ApiAccess.ANONYMOUS)
     @Hidden
-    @GetMapping(PRE_SIGNUP_PATH)
     public ApiResponse<Res.PreSignuped> preSignup() {
         OAuth2ResourceOwner owner = requestContext.getRequestAttr(RESOURCE_OWNER_REQUEST_ATTR_KEY);
         boolean isAlreadyPreSignuped = preSignupRepo.existsById(owner.getUsername());
@@ -106,7 +112,7 @@ public class UserWebAdapter {
         return new ApiResponse(ApiCode2.OAUTH2_SIGNUP_REQUIRED, result);
     }
 
-    @PostMapping("/user/profile/email")
+    @Post("/user/profile/email")
     public Res.SessionUser changeEmail(@RequestBody Req.Email form){
         UID uid = requestContext.getUid();
         Email email = Email.from(form.getEmail());
@@ -115,7 +121,7 @@ public class UserWebAdapter {
         return toSessionUser(result);
     }
 
-    @PostMapping("/user/profile/penname")
+    @Post("/user/profile/penname")
     public Res.SessionUser changePenname(@RequestBody Req.Penname form){ // "penname"
         UID uid = requestContext.getUid();
         Penname penname = Penname.from(form.getPenname());
@@ -128,7 +134,7 @@ public class UserWebAdapter {
      * 프로필 이미지를 서버에 업로드하고, 로그인 중인 사용자의 ProfileImageUrl을 변경한다.
      * @param file 프로필 이미지 파일
      */
-    @PostMapping("/user/profile/profile-image")
+    @Post("/user/profile/profile-image")
     public Res.SessionUser changeProfileImage(@RequestPart MultipartFile file){
         UID uid = requestContext.getUid();
         ProfileImageFile profileImageFile = ProfileImageFile.of(file);
@@ -140,7 +146,7 @@ public class UserWebAdapter {
     /**
      * 로그인 중인 사용자의 ProfileImageUrl을 기본 이미지로 변경한다.
      */
-    @DeleteMapping("/user/profile/profile-image")
+    @Delete("/user/profile/profile-image")
     public Res.SessionUser changeProfileImageToDefault(){
         UID uid = requestContext.getUid();
         ProfileImageUrl profileImageUrl = ProfileImageUrl.from(props.user.defaultProfileImageUrl);

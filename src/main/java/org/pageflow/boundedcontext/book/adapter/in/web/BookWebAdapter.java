@@ -6,7 +6,7 @@ import org.pageflow.boundedcontext.book.application.dto.BookDto;
 import org.pageflow.boundedcontext.book.port.in.BookUseCase;
 import org.pageflow.boundedcontext.book.port.in.CreateBookCmd;
 import org.pageflow.global.api.RequestContext;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.pageflow.shared.annotation.web.Post;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -19,7 +19,7 @@ public class BookWebAdapter {
     private final BookUseCase bookUseCase;
     private final RequestContext rqcx;
 
-    @PostMapping("/books")
+    @Post("/books")
     @Operation(summary = "책 생성")
     public Res.CreatedBook createBook(@RequestBody Req.CreateBook req) {
         CreateBookCmd cmd = new CreateBookCmd(

@@ -1,8 +1,9 @@
-package org.pageflow.boundedcontext.book.domain.toc;
+package org.pageflow.boundedcontext.book;
 
 import org.junit.jupiter.api.Test;
 import org.pageflow.boundedcontext.book.domain.NodeId;
-import util.TocFactory;
+import org.pageflow.boundedcontext.book.domain.toc.*;
+import support.toc.TocFactory;
 
 import java.lang.reflect.Field;
 import java.util.LinkedList;
@@ -15,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author : sechan
  */
-class TocRootDomainTest {
+class DomainTest {
     private static final int SEED = 8452;
 
     private static final int REORDER_CMD_REPEATED = 15;

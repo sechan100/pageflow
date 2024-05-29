@@ -1,7 +1,8 @@
-package util;
+package org.pageflow.tsid;
 
 import org.junit.jupiter.api.Test;
 import org.pageflow.shared.type.TSID;
+import support.tsid.TestOnlyTsidFactory;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

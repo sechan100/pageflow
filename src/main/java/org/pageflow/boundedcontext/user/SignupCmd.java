@@ -1,4 +1,4 @@
-package org.pageflow.boundedcontext.user.port.in;
+package org.pageflow.boundedcontext.user;
 
 import lombok.Value;
 import org.pageflow.boundedcontext.auth.shared.RoleType;

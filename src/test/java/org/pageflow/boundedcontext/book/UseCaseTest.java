@@ -1,4 +1,4 @@
-package org.pageflow.boundedcontext.book.port.in;
+package org.pageflow.boundedcontext.book;
 
 import org.junit.jupiter.api.Test;
 import org.pageflow.boundedcontext.auth.shared.RoleType;
@@ -8,11 +8,15 @@ import org.pageflow.boundedcontext.book.domain.BookId;
 import org.pageflow.boundedcontext.book.domain.CoverImageUrl;
 import org.pageflow.boundedcontext.book.domain.NodeId;
 import org.pageflow.boundedcontext.book.domain.Title;
+import org.pageflow.boundedcontext.book.port.in.BookUseCase;
+import org.pageflow.boundedcontext.book.port.in.CreateBookCmd;
+import org.pageflow.boundedcontext.book.port.in.CreateFolderCmd;
+import org.pageflow.boundedcontext.book.port.in.TocUseCase;
 import org.pageflow.boundedcontext.common.value.UID;
+import org.pageflow.boundedcontext.user.SignupCmd;
+import org.pageflow.boundedcontext.user.UserUseCase;
 import org.pageflow.boundedcontext.user.application.dto.UserDto;
 import org.pageflow.boundedcontext.user.domain.*;
-import org.pageflow.boundedcontext.user.port.in.SignupCmd;
-import org.pageflow.boundedcontext.user.port.in.UserUseCase;
 import org.pageflow.boundedcontext.user.shared.ProviderType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,7 +26,7 @@ import org.springframework.test.annotation.Commit;
  * @author : sechan
  */
 @SpringBootTest
-class TocUseCaseTest {
+class UseCaseTest {
     @Autowired
     private UserUseCase userUseCase;
     @Autowired

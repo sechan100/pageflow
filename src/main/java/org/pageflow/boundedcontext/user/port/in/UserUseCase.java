@@ -1,9 +1,10 @@
-package org.pageflow.boundedcontext.user;
+package org.pageflow.boundedcontext.user.port.in;
 
 import org.pageflow.boundedcontext.common.value.UID;
 import org.pageflow.boundedcontext.user.application.dto.UserDto;
 import org.pageflow.boundedcontext.user.domain.Email;
 import org.pageflow.boundedcontext.user.domain.Penname;
+import org.pageflow.boundedcontext.user.domain.ProfileImageFile;
 import org.pageflow.boundedcontext.user.domain.ProfileImageUrl;
 
 /**

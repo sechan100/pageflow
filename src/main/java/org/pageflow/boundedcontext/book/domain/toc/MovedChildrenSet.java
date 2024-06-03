@@ -7,11 +7,11 @@ import java.util.Set;
 /**
  * @author : sechan
  */
-public class MovedChildSet {
-    private final Set<TocChild> moved;
+public class MovedChildrenSet {
+    private Set<TocChild> moved;
 
 
-    public MovedChildSet() {
+    public MovedChildrenSet() {
         this.moved = new HashSet<>();
     }
 
@@ -19,8 +19,14 @@ public class MovedChildSet {
         moved.add(child);
     }
 
-    public Set<TocChild> getMoved() {
+    public Set<TocChild> toSet() {
         return Collections.unmodifiableSet(moved);
+    }
+
+    public Set<TocChild> flush() {
+        Set<TocChild> replica = Collections.unmodifiableSet(this.moved);
+        this.moved = new HashSet<>();
+        return replica;
     }
 
     public void clear() {

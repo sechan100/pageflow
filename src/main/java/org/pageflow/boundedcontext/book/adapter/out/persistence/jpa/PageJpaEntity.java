@@ -1,9 +1,6 @@
 package org.pageflow.boundedcontext.book.adapter.out.persistence.jpa;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Lob;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -19,6 +16,7 @@ import org.springframework.lang.Nullable;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(callSuper = true)
 @DynamicUpdate
+@DiscriminatorValue("page")
 @Table(name = "page")
 public class PageJpaEntity extends NodeJpaEntity {
 

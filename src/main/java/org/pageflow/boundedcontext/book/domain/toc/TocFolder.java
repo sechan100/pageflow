@@ -27,6 +27,9 @@ public class TocFolder extends AbstractChild implements TocParent, TocChild {
     public TocFolder(@NonNull NodeId id, TocParent parent, int ov, List<TocChild> children) {
         super(id, parent, ov);
         this.children = children == null ? new LinkedList<>() : new LinkedList<>(children);
+        for(TocChild child : this.children){
+            child._setParent(this);
+        }
     }
 
 
@@ -128,9 +131,9 @@ public class TocFolder extends AbstractChild implements TocParent, TocChild {
         addChild(children.size(), child);
     }
 
-    private void addChild(int dest, TocChild target) {
-        children.add(dest, target);
-        setChildParent(target);
+    private void addChild(int dest, TocChild child) {
+        children.add(dest, child);
+        child._setParent(this);
         int prevOv;
         int nextOv;
 
@@ -164,13 +167,9 @@ public class TocFolder extends AbstractChild implements TocParent, TocChild {
             return;
         }
         // rebalance가 필요하지 않은 경우
-        target._setOv(
+        child._setOv(
             (prevOv + nextOv) / 2 // floor
         );
-    }
-
-    protected void setChildParent(TocChild target){
-        target._setParent(this);
     }
 
     private void rebalanceOv(){

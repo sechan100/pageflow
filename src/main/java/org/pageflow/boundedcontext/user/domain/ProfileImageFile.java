@@ -1,4 +1,4 @@
-package org.pageflow.boundedcontext.user;
+package org.pageflow.boundedcontext.user.domain;
 
 import org.pageflow.boundedcontext.common.exception.InputValueException;
 import org.pageflow.shared.type.SingleValueWrapper;

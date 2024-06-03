@@ -1,4 +1,4 @@
-package org.pageflow.boundedcontext.user;
+package org.pageflow.boundedcontext.user.port.in;
 
 import org.pageflow.boundedcontext.user.application.dto.UserDto;
 

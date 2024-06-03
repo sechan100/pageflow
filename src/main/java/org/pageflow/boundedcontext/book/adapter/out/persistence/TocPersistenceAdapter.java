@@ -39,7 +39,7 @@ public class TocPersistenceAdapter implements TocPersistencePort {
 
     @Override
     public TocRoot saveToc(TocRoot root) {
-        Set<TocChild> movedNodes = root.getMovedAndClear();
+        Set<TocChild> movedNodes = root.flushMovedChildren();
         for(TocChild node : movedNodes){
             saveNode(node);
         }

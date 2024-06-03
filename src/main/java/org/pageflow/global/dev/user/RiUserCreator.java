@@ -2,9 +2,9 @@ package org.pageflow.global.dev.user;
 
 import lombok.RequiredArgsConstructor;
 import org.pageflow.boundedcontext.auth.shared.RoleType;
-import org.pageflow.boundedcontext.user.SignupCmd;
-import org.pageflow.boundedcontext.user.UserUseCase;
 import org.pageflow.boundedcontext.user.application.dto.UserDto;
+import org.pageflow.boundedcontext.user.port.in.SignupCmd;
+import org.pageflow.boundedcontext.user.port.in.UserUseCase;
 import org.pageflow.boundedcontext.user.shared.ProviderType;
 import org.pageflow.global.initialize.RuntimeInitializer;
 import org.springframework.beans.factory.annotation.Value;

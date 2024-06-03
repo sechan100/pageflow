@@ -97,6 +97,6 @@ custom:
 dev:
   data:
     user:
-      active: true
+      active: false
       count: 10
       random-seed: 1234

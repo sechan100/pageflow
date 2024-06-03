@@ -1,5 +1,6 @@
 package org.pageflow.boundedcontext.book.adapter.out.persistence.jpa;
 
+import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
@@ -17,6 +18,7 @@ import org.springframework.lang.Nullable;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(callSuper = true)
 @DynamicUpdate
+@DiscriminatorValue("folder")
 @Table(name = "folder")
 public class FolderJpaEntity extends NodeJpaEntity {
 

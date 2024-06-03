@@ -48,11 +48,18 @@ public class NodePersistenceAdapter implements NodePersistencePort {
 
     @Override
     public Page createPage(CreatePageCmd cmd) {
+        FolderJpaEntity parentFolder;
+        if(cmd.getParentNodeId().equals(NodeId.from(0L))){
+            parentFolder = null;
+        } else {
+            parentFolder = folderRepo.getReferenceById(cmd.getParentNodeId().toLong());
+        }
+
         PageJpaEntity entity = new PageJpaEntity(
             TSID.Factory.getTsid().toLong(), // id
             bookRepo.getReferenceById(cmd.getBookId().toLong()), // book
             cmd.getTitle().getValue(), // title
-            folderRepo.getReferenceById(cmd.getParentNodeId().toLong()), // parent
+            parentFolder , // parent
             cmd.getContent() // content
         );
         nodeRepo.persist(entity);

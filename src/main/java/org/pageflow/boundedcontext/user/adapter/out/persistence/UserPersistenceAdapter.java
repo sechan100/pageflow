@@ -6,13 +6,13 @@ import org.pageflow.boundedcontext.auth.domain.Account;
 import org.pageflow.boundedcontext.auth.domain.EncryptedPassword;
 import org.pageflow.boundedcontext.auth.port.out.AccountPersistencePort;
 import org.pageflow.boundedcontext.common.value.UID;
-import org.pageflow.boundedcontext.user.SignupCmd;
 import org.pageflow.boundedcontext.user.adapter.out.persistence.jpa.AccountJpaEntity;
 import org.pageflow.boundedcontext.user.adapter.out.persistence.jpa.AccountJpaRepository;
 import org.pageflow.boundedcontext.user.adapter.out.persistence.jpa.ProfileJpaEntity;
 import org.pageflow.boundedcontext.user.adapter.out.persistence.jpa.ProfileJpaRepository;
 import org.pageflow.boundedcontext.user.application.dto.UserDto;
 import org.pageflow.boundedcontext.user.domain.*;
+import org.pageflow.boundedcontext.user.port.in.SignupCmd;
 import org.pageflow.boundedcontext.user.port.out.UserPersistencePort;
 import org.pageflow.shared.annotation.PersistenceAdapter;
 import org.pageflow.shared.jpa.RequiredDataNotFoundException;
@@ -80,6 +80,12 @@ public class UserPersistenceAdapter implements UserPersistencePort, AccountPersi
     @Override
     public Optional<User> loadUser(UID uid) {
         Optional<AccountJpaEntity> a = accountJpaRepository.findWithProfileById(uid.toLong());
+        return a.map(accountJpaEntity -> toUser(accountJpaEntity, accountJpaEntity.getProfile()));
+    }
+
+    @Override
+    public Optional<User> loadUser(Username username) {
+        Optional<AccountJpaEntity> a = accountJpaRepository.findWithProfileByUsername(username.toString());
         return a.map(accountJpaEntity -> toUser(accountJpaEntity, accountJpaEntity.getProfile()));
     }
 

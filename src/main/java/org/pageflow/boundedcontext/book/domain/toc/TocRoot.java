@@ -13,26 +13,24 @@ import java.util.Set;
  */
 public class TocRoot implements TocParent {
     private final BookId bookId;
-    private final TocParentComponent delegate;
-    private final MovedChildSet moved;
+    private final RootParentableComponent delegate;
+    private final MovedChildrenSet movedChildren;
 
 
     @SuppressWarnings("ThisEscapedInObjectConstruction")
     public TocRoot(BookId bookId, @Nullable List<TocChild> children) {
         this.bookId = bookId;
-        this.delegate = new TocParentComponent(this);
-        this.moved = new MovedChildSet();
+        this.delegate = new RootParentableComponent(this, children);
+        this.movedChildren = new MovedChildrenSet();
     }
 
 
     void registerMoved(TocChild child) {
-        moved.add(child);
+        movedChildren.add(child);
     }
 
-    public Set<TocChild> getMovedAndClear() {
-        Set<TocChild> movedChildren = moved.getMoved();
-        this.moved.clear();
-        return movedChildren;
+    public Set<TocChild> flushMovedChildren() {
+        return movedChildren.flush();
     }
 
 
@@ -146,18 +144,17 @@ public class TocRoot implements TocParent {
     }
 }
 
-class TocParentComponent extends TocFolder {
+class RootParentableComponent extends TocFolder {
     private static final long ROOT_FOLDER_ID = 0L;
-    private final TocRoot rootRef;
+    private final TocRoot root;
 
-    TocParentComponent(TocRoot rootRef) {
-        super(NodeId.from(ROOT_FOLDER_ID));
-        this.rootRef = rootRef;
+    RootParentableComponent(TocRoot root, List<TocChild> children) {
+        super(NodeId.from(ROOT_FOLDER_ID), root, 0, children);
+        this.root = root;
     }
 
-    @Override
-    protected void setChildParent(TocChild child) {
-        child._setParent(rootRef);
+    public TocRoot _getRoot() {
+        return root;
     }
 
 }

@@ -20,6 +20,11 @@ public class CreatePageCmd {
     private final Title title;
     private final String content;
 
+
+    public CreatePageCmd(BookId bookId, NodeId parentNodeId) {
+        this(bookId, parentNodeId, null);
+    }
+
     public CreatePageCmd(
         BookId bookId,
         NodeId parentNodeId,

@@ -3,16 +3,14 @@ package org.pageflow.boundedcontext.book.application.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pageflow.boundedcontext.book.application.dto.TocDto;
-import org.pageflow.boundedcontext.book.domain.AbstractNode;
-import org.pageflow.boundedcontext.book.domain.Folder;
-import org.pageflow.boundedcontext.book.domain.NodeId;
-import org.pageflow.boundedcontext.book.domain.Page;
+import org.pageflow.boundedcontext.book.domain.*;
 import org.pageflow.boundedcontext.book.domain.toc.TocChild;
 import org.pageflow.boundedcontext.book.domain.toc.TocNode;
 import org.pageflow.boundedcontext.book.domain.toc.TocRoot;
 import org.pageflow.boundedcontext.book.port.in.*;
 import org.pageflow.boundedcontext.book.port.out.NodePersistencePort;
 import org.pageflow.boundedcontext.book.port.out.TocPersistencePort;
+import org.pageflow.boundedcontext.book.shared.constants.TocNodeType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,13 +27,13 @@ public class TocService implements TocUseCase {
 
 
     @Override
-    public TocDto.Node createFolder(CreateFolderCmd cmd) {
+    public TocDto.SingleNode createFolder(CreateFolderCmd cmd) {
         Folder f = persistPort.createFolder(cmd);
         return toDto(f);
     }
 
     @Override
-    public TocDto.Node createPage(CreatePageCmd cmd) {
+    public TocDto.SingleNode createPage(CreatePageCmd cmd) {
         Page p = persistPort.createPage(cmd);
         return toDto(p);
     }
@@ -66,12 +64,18 @@ public class TocService implements TocUseCase {
         persistPort.deleteNode(id);
     }
 
+    @Override
+    public TocDto.Toc queryToc(BookId bookId) {
+        return tocPort.queryToc(bookId);
+    }
 
 
-    private <N extends AbstractNode> TocDto.Node toDto(N n) {
-        return new TocDto.Node(
+    private <N extends AbstractNode> TocDto.SingleNode toDto(N n) {
+        TocNodeType type = n instanceof Folder ? TocNodeType.FOLDER : TocNodeType.PAGE;
+        return new TocDto.SingleNode(
             n.getId().getValue(),
-            n.getTitle().getValue()
+            n.getTitle().getValue(),
+            type
         );
     }
 }

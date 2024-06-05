@@ -2,7 +2,6 @@ package org.pageflow.global.api.code;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.pageflow.global.api.ResDataTypes;
 
 /**
  * <p>LEVEL: 2000</p>
@@ -23,7 +22,6 @@ public enum ApiCode2 implements ApiCode {
     , PROCESSING(2100, "요청 처리중")
 
     // 2200: 선행조건
-    , PRECONDITION_REQUIRED(2200, "작업의 선행조건이 완수되지 않음", ResDataTypes.Precondition.class)
     , OAUTH2_SIGNUP_REQUIRED(2201, "OAuth2 회원가입이 필요", Object.class)
 
     // 2400: http 스펙

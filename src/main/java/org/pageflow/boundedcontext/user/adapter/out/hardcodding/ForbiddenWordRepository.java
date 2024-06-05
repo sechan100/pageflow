@@ -38,8 +38,8 @@ public class ForbiddenWordRepository implements CheckForbiddenWordPort {
     @Override
     public void checkPennameContainsForbiddenWord(Penname penname) {
         String pennameValue = penname.getValue();
-        for(String forbiddenWord : PENNAME) {
-            if(pennameValue.contains(forbiddenWord)) {
+        for(String forbiddenWord : PENNAME){
+            if(pennameValue.contains(forbiddenWord)){
                 throw InputValueException.builder()
                     .message("'%s'은(는) 필명에 포함될 수 없습니다. 다른 필명을 사용해주세요.", forbiddenWord)
                     .field("penname", pennameValue)

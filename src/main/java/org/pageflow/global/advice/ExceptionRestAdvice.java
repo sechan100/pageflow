@@ -2,6 +2,7 @@ package org.pageflow.global.advice;
 
 import lombok.extern.slf4j.Slf4j;
 import org.pageflow.boundedcontext.common.exception.InputValueException;
+import org.pageflow.boundedcontext.common.exception.UniqueFieldDuplicatedException;
 import org.pageflow.global.api.ApiResponse;
 import org.pageflow.global.api.ResDataTypes;
 import org.pageflow.global.api.code.ApiCode2;
@@ -63,6 +64,17 @@ public class ExceptionRestAdvice {
         errors.add(new ResDataTypes.FieldError(
             e.getFieldName(),
             e.getValue(),
+            e.getMessage()
+        ));
+        return new ApiResponse<>(ApiCode4.FIELD_VALIDATION_FAIL, new ResDataTypes.FieldValidation(errors));
+    }
+
+    @ExceptionHandler(UniqueFieldDuplicatedException.class)
+    public ApiResponse<ResDataTypes.FieldValidation> handleUniqueFieldDuplicatedException(UniqueFieldDuplicatedException e) {
+        List<ResDataTypes.FieldError> errors = new ArrayList<>();
+        errors.add(new ResDataTypes.FieldError(
+            e.getField(),
+            e.getDuplicatedValue(),
             e.getMessage()
         ));
         return new ApiResponse<>(ApiCode4.FIELD_VALIDATION_FAIL, new ResDataTypes.FieldValidation(errors));

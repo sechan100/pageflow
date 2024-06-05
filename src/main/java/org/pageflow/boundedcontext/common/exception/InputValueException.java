@@ -13,7 +13,7 @@ public class InputValueException extends DomainException {
     private final String value;
 
     private InputValueException(String fieldName, @Nullable String value, String message) {
-        super(message + " fieldName : %s, value : %s".formatted(fieldName, value));
+        super(message);
         this.fieldName = fieldName;
         this.value = value;
     }
@@ -46,8 +46,9 @@ public class InputValueException extends DomainException {
         }
 
         @Override
+        @SuppressWarnings("ConfusingArgumentToVarargsMethod")
         public Builder2 message(String message, String... args) {
-            this.message = message.formatted((Object) args);
+            this.message = String.format(message, args);
             return this;
         }
 

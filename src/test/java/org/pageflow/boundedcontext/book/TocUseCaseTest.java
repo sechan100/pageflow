@@ -3,6 +3,7 @@ package org.pageflow.boundedcontext.book;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.pageflow.boundedcontext.book.application.dto.TocDto;
 import org.pageflow.boundedcontext.book.domain.BookId;
 import org.pageflow.boundedcontext.book.domain.NodeId;
 import org.pageflow.boundedcontext.book.domain.toc.TocChild;
@@ -12,6 +13,7 @@ import org.pageflow.boundedcontext.book.port.in.*;
 import org.pageflow.boundedcontext.book.port.out.TocPersistencePort;
 import org.pageflow.boundedcontext.common.value.UID;
 import org.pageflow.global.dev.user.TestUserCreator;
+import org.pageflow.shared.utility.JsonUtility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
@@ -65,6 +67,24 @@ class TocUseCaseTest {
         assertEquals(f2, folder2.getId(), "f2의 id가 일치하지 않습니다.");
         assertEquals(p1, page1.getId(), "p1의 id가 일치하지 않습니다.");
         assertEquals(p2, page2.getId(), "p2의 id가 일치하지 않습니다.");
+    }
+
+    @Test
+    @Transactional
+    void queryToc(){
+        NodeId f1 = cf(NodeId.ROOT);
+            NodeId f2 = cf(f1);
+                NodeId p1 = cp(f2);
+                NodeId p2 = cp(f2);
+            NodeId f3 = cf(f1);
+                NodeId f4 = cf(f3);
+                    NodeId p4 = cp(f4);
+        NodeId p3 = cp(NodeId.ROOT);
+        NodeId f5 = cf(NodeId.ROOT);
+            NodeId p5 = cp(f5);
+
+        TocDto.Toc toc = tocUseCase.queryToc(_bookId);
+        System.out.println(JsonUtility.toJson(toc));
     }
 
 

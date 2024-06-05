@@ -1,5 +1,6 @@
 package org.pageflow.boundedcontext.book.application.dto;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import org.pageflow.boundedcontext.book.shared.constants.TocNodeType;
@@ -17,6 +18,7 @@ public abstract class TocDto {
         TocNodeType type;
     }
 
+    @Getter
     @RequiredArgsConstructor
     public static abstract class Node {
         private final TSID id;
@@ -24,6 +26,7 @@ public abstract class TocDto {
         private final TocNodeType type;
     }
 
+    @Getter
     public static class Folder extends Node {
         private final List<Node> children;
 

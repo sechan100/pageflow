@@ -2,7 +2,6 @@ package org.pageflow.boundedcontext.auth.springsecurity.common;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.pageflow.global.api.ResDataTypes;
 import org.pageflow.global.api.code.ApiCode3;
 import org.pageflow.global.api.code.ApiCode4;
 import org.pageflow.global.api.exception.ApiException;
@@ -25,7 +24,7 @@ public class LoginFailureHandler implements AuthenticationFailureHandler {
             case "UsernameNotFoundException":
                 throw new ApiException(ApiCode3.DATA_NOT_FOUND);
             case "BadCredentialsException":
-                throw new ApiException(ApiCode4.BAD_CREDENTIALS, new ResDataTypes.FieldName("user-password"));
+                throw new ApiException(ApiCode4.BAD_CREDENTIALS);
             default:
                 throw exception;
         }

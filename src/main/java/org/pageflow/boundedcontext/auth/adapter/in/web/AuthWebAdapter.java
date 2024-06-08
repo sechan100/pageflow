@@ -14,9 +14,9 @@ import org.pageflow.boundedcontext.auth.port.in.SessionUseCase;
 import org.pageflow.boundedcontext.common.value.UID;
 import org.pageflow.boundedcontext.user.application.dto.UserDto;
 import org.pageflow.global.api.RequestContext;
-import org.pageflow.global.api.ResDataTypes;
 import org.pageflow.global.api.code.ApiCode4;
 import org.pageflow.global.api.exception.ApiException;
+import org.pageflow.global.api.types.FieldError;
 import org.pageflow.global.filter.UriPrefix;
 import org.pageflow.global.property.AppProps;
 import org.pageflow.shared.annotation.web.Get;
@@ -92,7 +92,7 @@ public class AuthWebAdapter {
         if(rtCookieOp.isEmpty()){
             throw new ApiException(
                 ApiCode4.REQUIRED_COOKIE_NOT_FOUND,
-                new ResDataTypes.FieldName(SESSION_ID_COOKIE_NAME)
+                new FieldError(SESSION_ID_COOKIE_NAME, null, "세션이 유효하지 않습니다.")
             );
         }
 

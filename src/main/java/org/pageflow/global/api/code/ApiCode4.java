@@ -2,9 +2,7 @@ package org.pageflow.global.api.code;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-
-import static org.pageflow.global.api.ResDataTypes.FieldName;
-import static org.pageflow.global.api.ResDataTypes.FieldValidation;
+import org.pageflow.global.api.types.FieldError;
 
 /**
  * <p>LEVEL: 4000</p>
@@ -26,17 +24,13 @@ import static org.pageflow.global.api.ResDataTypes.FieldValidation;
 public enum ApiCode4 implements ApiCode {
     // 4000: http 스펙
       MISSING_REQUEST_PARAMETER(4000, "필수 요청 파라미터 누락")
-    , REQUIRED_COOKIE_NOT_FOUND(4001, "필수 쿠키 누락", FieldName.class)
+    , REQUIRED_COOKIE_NOT_FOUND(4001, "필수 쿠키 누락", FieldError.class)
 
     // 4100: 기본적인 유효성 에러
-    , FIELD_VALIDATION_FAIL(4100, "필드 유효성 검사 실패", FieldValidation.class)
+    , FIELD_VALIDATION_FAIL(4100, "필드 유효성 검사 실패", FieldError.Errors.class)
 
     // 4200: 범용 도메인 요구사항
-    , BAD_CREDENTIALS(4210, "자격증명 실패", FieldName.class)
-
-    // 4500: 구체 도메인 요구사항
-    , UNIQUE_FIELD_DUPLICATED(4510, "unique 칼럼 중복")
-    , CONTAINS_FORBIDDEN_WORD(4511, "금지어 포함")
+    , BAD_CREDENTIALS(4210, "자격증명 실패")
 
 
     ;

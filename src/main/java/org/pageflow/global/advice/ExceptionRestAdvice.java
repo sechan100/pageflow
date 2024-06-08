@@ -4,18 +4,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.pageflow.boundedcontext.common.exception.InputValueException;
 import org.pageflow.boundedcontext.common.exception.UniqueFieldDuplicatedException;
 import org.pageflow.global.api.ApiResponse;
-import org.pageflow.global.api.ResDataTypes;
 import org.pageflow.global.api.code.ApiCode2;
 import org.pageflow.global.api.code.ApiCode4;
 import org.pageflow.global.api.code.ApiCode5;
 import org.pageflow.global.api.exception.ApiException;
+import org.pageflow.global.api.types.FieldError;
 import org.springframework.http.converter.HttpMessageConversionException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -41,43 +39,43 @@ public class ExceptionRestAdvice {
     
     // @Valid를 통한 Spring Bean Validation의 필드의 유효성 검사에 실패한 경우
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ApiResponse<ResDataTypes.FieldValidation> handleMethodArgumentNotValid(MethodArgumentNotValidException e) {
+    public ApiResponse<FieldError.Errors> handleMethodArgumentNotValid(MethodArgumentNotValidException e) {
 
-        List<ResDataTypes.FieldError> errors = new ArrayList<>();
+        FieldError.Errors errors = new FieldError.Errors();
         e.getBindingResult().getFieldErrors()
                 .forEach(fieldError -> {
                     String fieldName = fieldError.getField();
                     String rejectedValue = Objects.requireNonNullElse(fieldError.getRejectedValue(), "null").toString();
                     String errorMessage = Objects.requireNonNullElse(fieldError.getDefaultMessage(), "올바르지 않은 값입니다.");
-                    errors.add(new ResDataTypes.FieldError(
+                    errors.add(new FieldError(
                         fieldName,
                         rejectedValue,
                         errorMessage
                     ));
                 });
-        return new ApiResponse<>(ApiCode4.FIELD_VALIDATION_FAIL, new ResDataTypes.FieldValidation(errors));
+        return new ApiResponse<>(ApiCode4.FIELD_VALIDATION_FAIL, errors);
     }
 
     @ExceptionHandler(InputValueException.class)
-    public ApiResponse<ResDataTypes.FieldValidation> handleInputValueException(InputValueException e) {
-        List<ResDataTypes.FieldError> errors = new ArrayList<>();
-        errors.add(new ResDataTypes.FieldError(
+    public ApiResponse<FieldError.Errors> handleInputValueException(InputValueException e) {
+        FieldError.Errors errors = new FieldError.Errors();
+        errors.add(new FieldError(
             e.getFieldName(),
             e.getValue(),
             e.getMessage()
         ));
-        return new ApiResponse<>(ApiCode4.FIELD_VALIDATION_FAIL, new ResDataTypes.FieldValidation(errors));
+        return new ApiResponse<>(ApiCode4.FIELD_VALIDATION_FAIL, errors);
     }
 
     @ExceptionHandler(UniqueFieldDuplicatedException.class)
-    public ApiResponse<ResDataTypes.FieldValidation> handleUniqueFieldDuplicatedException(UniqueFieldDuplicatedException e) {
-        List<ResDataTypes.FieldError> errors = new ArrayList<>();
-        errors.add(new ResDataTypes.FieldError(
+    public ApiResponse<FieldError.Errors> handleUniqueFieldDuplicatedException(UniqueFieldDuplicatedException e) {
+        FieldError.Errors errors = new FieldError.Errors();
+        errors.add(new FieldError(
             e.getField(),
             e.getDuplicatedValue(),
             e.getMessage()
         ));
-        return new ApiResponse<>(ApiCode4.FIELD_VALIDATION_FAIL, new ResDataTypes.FieldValidation(errors));
+        return new ApiResponse<>(ApiCode4.FIELD_VALIDATION_FAIL, errors);
     }
 
     @ExceptionHandler(HttpMessageConversionException.class)

@@ -3,7 +3,6 @@ package org.pageflow.boundedcontext.auth.springsecurity.oauth2.authorizationrequ
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.pageflow.global.api.ResDataTypes;
 import org.pageflow.global.api.code.ApiCode4;
 import org.pageflow.global.api.exception.ApiException;
 import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
@@ -50,10 +49,7 @@ public class InMemoryAuthorizationRepository implements AuthorizationRequestRepo
     private RedisOAuth2AuthorizationRequestWrapper loadCache(HttpServletRequest request) {
         String state = getStateParameter(request);
         var wrapper = repository.findById(state)
-                .orElseThrow(() -> new ApiException(
-                    ApiCode4.BAD_CREDENTIALS,
-                    new ResDataTypes.FieldName("oauth2-state")
-                ));
+                .orElseThrow(() -> new ApiException(ApiCode4.BAD_CREDENTIALS));
         repository.delete(wrapper);
         return wrapper;
     }

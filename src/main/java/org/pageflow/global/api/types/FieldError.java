@@ -20,6 +20,7 @@ public class FieldError {
     private final String message;
 
 
+    @Getter
     public static class Errors {
         private final List<FieldError> errors;
 

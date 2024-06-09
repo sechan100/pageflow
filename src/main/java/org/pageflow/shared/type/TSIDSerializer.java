@@ -16,7 +16,7 @@ public class TSIDSerializer extends StdSerializer<TSID> {
     @Override
     public void serialize(TSID value, JsonGenerator gen, SerializerProvider provider) {
         try {
-            gen.writeNumber(value.toLong());
+            gen.writeString(value.toString());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

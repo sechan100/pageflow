@@ -125,13 +125,21 @@ public class UserService implements UserUseCase, AdminUseCase {
 
     private void checkUniqueUsername(Username username){
         if(userPersistePort.isUserExistByEmail(username)){
-            throw new UniqueFieldDuplicatedException("username", username.getValue());
+            throw new UniqueFieldDuplicatedException(
+                "username",
+                username.getValue(),
+                String.format("'%s'은(는) 이미 사용중인 아이디입니다.", username.getValue())
+            );
         }
     }
 
     private void checkUniqueEmail(Email email) {
         if(userPersistePort.isUserExistByEmail(Email.from(email.getValue()))){
-            throw new UniqueFieldDuplicatedException("email", email.getValue());
+            throw new UniqueFieldDuplicatedException(
+                "email",
+                email.getValue(),
+                String.format("'%s'은(는) 이미 사용중인 이메일입니다.", email.getValue())
+            );
         }
     }
 

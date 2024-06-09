@@ -1,14 +1,18 @@
 package org.pageflow.boundedcontext.common.exception;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 /**
  * @author : sechan
  */
 @Getter
-@RequiredArgsConstructor
 public class UniqueFieldDuplicatedException extends DomainException {
     private final String field;
     private final String duplicatedValue;
+
+    public UniqueFieldDuplicatedException(String field, String duplicatedValue, String message) {
+        super(message);
+        this.field = field;
+        this.duplicatedValue = duplicatedValue;
+    }
 }

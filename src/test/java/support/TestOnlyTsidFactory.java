@@ -1,4 +1,4 @@
-package support.tsid;
+package support;
 
 import org.pageflow.shared.type.TSID;
 

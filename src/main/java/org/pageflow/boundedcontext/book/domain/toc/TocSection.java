@@ -7,13 +7,13 @@ import org.springframework.lang.NonNull;
  *
  * @author         : sechan
  */
-public class TocPage extends AbstractChild implements TocChild {
+public class TocSection extends AbstractChild implements TocChild {
 
-    public TocPage(NodeId id){
+    public TocSection(NodeId id){
         this(id, null, 0);
     }
 
-    public TocPage(@NonNull NodeId id, TocParent parent, int ov) {
+    public TocSection(@NonNull NodeId id, TocParent parent, int ov) {
         super(id, parent, ov);
     }
 

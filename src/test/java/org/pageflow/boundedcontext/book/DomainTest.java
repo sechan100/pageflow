@@ -3,7 +3,7 @@ package org.pageflow.boundedcontext.book;
 import org.junit.jupiter.api.Test;
 import org.pageflow.boundedcontext.book.domain.NodeId;
 import org.pageflow.boundedcontext.book.domain.toc.*;
-import support.toc.TocFactory;
+import support.TocCreator;
 
 import java.lang.reflect.Field;
 import java.util.LinkedList;
@@ -24,15 +24,15 @@ class DomainTest {
 
     @Test
     void sameTocCreateTest(){
-        TocRoot root1 = new TocFactory(SEED).create();
-        TocRoot root2 = new TocFactory(SEED).create();
+        TocRoot root1 = new TocCreator(SEED).create();
+        TocRoot root2 = new TocCreator(SEED).create();
         boolean isSameRootTree = root1.isSameTree(root2);
         assertTrue(isSameRootTree, "같은 TocFactory로 생성된 Toc의 root가 다름");
     }
 
     @Test
     void TocReorderTest() {
-        TocFactory factory = new TocFactory(SEED);
+        TocCreator factory = new TocCreator(SEED);
         TocRoot root = factory.create();
         TocParent parent = null;
         // 자식을 3개 이상 가진 parent를 찾음
@@ -73,7 +73,7 @@ class DomainTest {
 
     @Test
     void reblanceTest(){
-        TocFactory factory = new TocFactory(SEED);
+        TocCreator factory = new TocCreator(SEED);
         TocRoot root = factory.create();
         TocParent parent = null;
         // 자식을 3개 이상 가진 folder를 찾음
@@ -116,7 +116,7 @@ class DomainTest {
 
     @Test
     void findNodeTest(){
-        TocFactory factory = new TocFactory(SEED);
+        TocCreator factory = new TocCreator(SEED);
         TocRoot root = factory.create();
         for(NodeId id: factory.getIdSet().getContainer()){
             TocNode node = root.findNode(id); // 어차피 못찾으면 예외발생

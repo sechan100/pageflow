@@ -5,6 +5,7 @@ import io.vavr.Function2;
 import lombok.AccessLevel;
 import lombok.Getter;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -54,7 +55,7 @@ public class NodeProjection {
                     .map(c -> c.project(folderMapper, pageMapper))
                     .toList();
             } else {
-                childrenProjection = null;
+                childrenProjection = new ArrayList<>();
             }
             return folderMapper.apply(this, childrenProjection);
         } else {
@@ -71,18 +72,18 @@ public class NodeProjection {
 
         public <N, F extends N, P extends N> List<N> projectTree(ProjectionStrategy<N, F, P> plan){
             return children.stream()
-                .map(c -> c.project(plan.folderMapper, plan.pageMapper))
+                .map(c -> c.project(plan.folderMapper, plan.sectionMapper))
                 .toList();
         }
     }
 
     public static class ProjectionStrategy<N, F extends N, P extends N> {
         private final Function2<NodeProjection, List<N>, F> folderMapper;
-        private final Function1<NodeProjection, P> pageMapper;
+        private final Function1<NodeProjection, P> sectionMapper;
 
-        public ProjectionStrategy(Function2<NodeProjection, List<N>, F> folderMapper, Function1<NodeProjection, P> pageMapper) {
+        public ProjectionStrategy(Function2<NodeProjection, List<N>, F> folderMapper, Function1<NodeProjection, P> sectionMapper) {
             this.folderMapper = folderMapper;
-            this.pageMapper = pageMapper;
+            this.sectionMapper = sectionMapper;
         }
     }
 }

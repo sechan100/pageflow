@@ -1,8 +1,8 @@
 package org.pageflow.boundedcontext.book.port.out;
 
-import org.pageflow.boundedcontext.book.application.dto.TocDto;
 import org.pageflow.boundedcontext.book.domain.BookId;
 import org.pageflow.boundedcontext.book.domain.toc.TocRoot;
+import org.pageflow.boundedcontext.book.dto.TocDto;
 
 /**
  * @author : sechan

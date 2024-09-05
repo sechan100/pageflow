@@ -8,9 +8,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.pageflow.boundedcontext.auth.application.dto.Principal;
-import org.pageflow.boundedcontext.common.value.UID;
 import org.pageflow.global.api.code.ApiCode1;
 import org.pageflow.global.api.exception.ApiException;
+import org.pageflow.shared.type.TSID;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -122,9 +122,9 @@ public class RequestContext {
      * @return 현재 로그인한 사용자의 UID
      * @apiNote 만약 로그인된 사용자가 아닌 경우 Code1.LOGIN_REQUIRED을 발생함.
      */
-    public UID getUid() {
-        UID uid = principal.getUid();
-        if(uid.equals(UID.from(0L))){ // 익명사용자 UID
+    public TSID getUid() {
+        TSID uid = principal.getUid().getValue();
+        if(uid.equals(TSID.from(0L))){ // 익명사용자 UID
             throw new ApiException(ApiCode1.LOGIN_REQUIRED);
         }
         else return uid;

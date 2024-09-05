@@ -1,16 +1,16 @@
-package org.pageflow.boundedcontext.book.application.service;
+package org.pageflow.boundedcontext.book.application;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.pageflow.boundedcontext.book.application.dto.TocDto;
 import org.pageflow.boundedcontext.book.domain.*;
 import org.pageflow.boundedcontext.book.domain.toc.TocChild;
 import org.pageflow.boundedcontext.book.domain.toc.TocNode;
 import org.pageflow.boundedcontext.book.domain.toc.TocRoot;
+import org.pageflow.boundedcontext.book.dto.TocDto;
 import org.pageflow.boundedcontext.book.port.in.*;
 import org.pageflow.boundedcontext.book.port.out.NodePersistencePort;
 import org.pageflow.boundedcontext.book.port.out.TocPersistencePort;
-import org.pageflow.boundedcontext.book.shared.constants.TocNodeType;
+import org.pageflow.boundedcontext.book.shared.TocNodeType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,14 +27,14 @@ public class TocService implements TocUseCase {
 
 
     @Override
-    public TocDto.SingleNode createFolder(CreateFolderCmd cmd) {
+    public TocDto.Node createFolder(FolderCreateCmd cmd) {
         Folder f = persistPort.createFolder(cmd);
         return toDto(f);
     }
 
     @Override
-    public TocDto.SingleNode createPage(CreatePageCmd cmd) {
-        Page p = persistPort.createPage(cmd);
+    public TocDto.Node createSection(SectionCreateCmd cmd) {
+        Section p = persistPort.createSection(cmd);
         return toDto(p);
     }
 
@@ -70,9 +70,9 @@ public class TocService implements TocUseCase {
     }
 
 
-    private <N extends AbstractNode> TocDto.SingleNode toDto(N n) {
-        TocNodeType type = n instanceof Folder ? TocNodeType.FOLDER : TocNodeType.PAGE;
-        return new TocDto.SingleNode(
+    private <N extends AbstractNode> TocDto.Node toDto(N n) {
+        TocNodeType type = n instanceof Folder ? TocNodeType.FOLDER : TocNodeType.SECTION;
+        return new TocDto.Node(
             n.getId().getValue(),
             n.getTitle().getValue(),
             type

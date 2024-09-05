@@ -5,7 +5,7 @@ import org.pageflow.shared.type.TSID;
 
 // node id
 public final class NodeId extends SingleValueWrapper<TSID> {
-    public static final NodeId ROOT = NodeId.from(0L);
+    public static final NodeId ROOT = NodeId.from(0L); // 최상위 노드
     // CONUIDSTRUCTOR
     public NodeId(TSID id) {
         super(id);

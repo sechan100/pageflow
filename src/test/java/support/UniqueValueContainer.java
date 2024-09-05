@@ -1,4 +1,4 @@
-package support.util;
+package support;
 
 import java.util.Collections;
 import java.util.HashSet;

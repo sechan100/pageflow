@@ -1,4 +1,4 @@
-package org.pageflow.shared.annotation.web;
+package org.pageflow.shared.annotation;
 
 import org.pageflow.global.api.ApiAccess;
 import org.springframework.core.annotation.AliasFor;
@@ -15,19 +15,19 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @RequestMapping(
-    method = {RequestMethod.PUT}
+    method = {RequestMethod.GET}
 )
 @Secured({})
-public @interface Put {
-    
+public @interface Get {
+
     @AliasFor(
         annotation = Secured.class,
         attribute = "value"
     )
     String[] access() default ApiAccess.USER;
-    
-    
-    // @PutMapping alias
+
+
+    // @GetMapping alias
     @AliasFor(
         annotation = RequestMapping.class
     )

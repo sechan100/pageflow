@@ -6,11 +6,11 @@ import lombok.Getter;
  * @author : sechan
  */
 @Getter
-public class Page extends AbstractNode {
+public class Section extends AbstractNode {
     private String content;
 
 
-    public Page(BookId bookId, NodeId id, Title title, String content) {
+    public Section(BookId bookId, NodeId id, Title title, String content) {
         super(bookId, id, title);
         this.content = content;
     }

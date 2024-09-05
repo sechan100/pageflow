@@ -1,18 +1,16 @@
-package support.toc;
+package support;
 
 
 import org.pageflow.boundedcontext.book.domain.BookId;
 import org.pageflow.boundedcontext.book.domain.NodeId;
 import org.pageflow.boundedcontext.book.domain.toc.*;
-import support.tsid.TestOnlyTsidFactory;
-import support.util.UniqueValueContainer;
 
 import java.util.Random;
 
 /**
  * @author : sechan
  */
-public class TocFactory {
+public class TocCreator {
     private static final int DEEP = 5;
     private static final int MIN_CHILDREN = 2;
     private static final int MAX_CHILDREN = 10;
@@ -20,7 +18,7 @@ public class TocFactory {
     private final BookId bookId;
     private final UniqueValueContainer<NodeId> idSet;
 
-    public TocFactory(int seed) {
+    public TocCreator(int seed) {
         this.random = new Random(seed);
         TestOnlyTsidFactory factory = new TestOnlyTsidFactory(seed);
         idSet = new UniqueValueContainer<>(
@@ -57,7 +55,7 @@ public class TocFactory {
 
     private TocParent addPages(TocParent parent, int pageCount) {
         for (int i = 0; i < pageCount; i++) {
-            TocPage page = new TocPage(idSet.gen());
+            TocSection page = new TocSection(idSet.gen());
             parent._addChildLast(page);
         }
         return parent;
@@ -67,7 +65,7 @@ public class TocFactory {
         for (int i = 0; i < nodeCount; i++) {
             AbstractChild child;
             if(random.nextBoolean()){
-                child = new TocPage(idSet.gen());
+                child = new TocSection(idSet.gen());
             } else {
                 child = new TocFolder(idSet.gen());
             }

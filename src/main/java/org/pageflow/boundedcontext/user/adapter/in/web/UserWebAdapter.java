@@ -26,10 +26,10 @@ import org.pageflow.global.api.RequestContext;
 import org.pageflow.global.api.code.ApiCode2;
 import org.pageflow.global.filter.UriPrefix;
 import org.pageflow.global.property.AppProps;
-import org.pageflow.shared.annotation.web.Delete;
-import org.pageflow.shared.annotation.web.Get;
-import org.pageflow.shared.annotation.web.Post;
+import org.pageflow.shared.annotation.Get;
+import org.pageflow.shared.annotation.Post;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -114,7 +114,7 @@ public class UserWebAdapter {
 
     @Post("/user/profile/email")
     public Res.SessionUser changeEmail(@RequestBody Req.Email form){
-        UID uid = requestContext.getUid();
+        UID uid = UID.from(requestContext.getUid());
         Email email = Email.from(form.getEmail());
 
         UserDto.User result = userUsecase.changeEmail(uid, email);
@@ -123,7 +123,7 @@ public class UserWebAdapter {
 
     @Post("/user/profile/penname")
     public Res.SessionUser changePenname(@RequestBody Req.Penname form){ // "penname"
-        UID uid = requestContext.getUid();
+        UID uid = UID.from(requestContext.getUid());
         Penname penname = Penname.from(form.getPenname());
 
         UserDto.User result = userUsecase.changePenname(uid, penname);
@@ -135,31 +135,25 @@ public class UserWebAdapter {
      * @param file 프로필 이미지 파일
      */
     @Post("/user/profile/profile-image")
-    public Res.SessionUser changeProfileImage(@RequestPart MultipartFile file){
-        UID uid = requestContext.getUid();
-        ProfileImageFile profileImageFile = ProfileImageFile.of(file);
-
-        UserDto.User result = userUsecase.changeProfileImage(uid, profileImageFile);
+    public Res.SessionUser changeProfileImage(
+        @RequestPart MultipartFile file,
+        @RequestParam(defaultValue = "false") Boolean toDefault
+    ) {
+        UID uid = UID.from(requestContext.getUid());
+        UserDto.User result;
+        if(toDefault){
+            ProfileImageUrl profileImageUrl = ProfileImageUrl.from(props.user.defaultProfileImageUrl);
+            result = userUsecase.changeProfileImage(uid, profileImageUrl);
+        } else {
+            ProfileImageFile profileImageFile = ProfileImageFile.of(file);
+            result = userUsecase.changeProfileImage(uid, profileImageFile);
+        }
         return toSessionUser(result);
     }
-
-    /**
-     * 로그인 중인 사용자의 ProfileImageUrl을 기본 이미지로 변경한다.
-     */
-    @Delete("/user/profile/profile-image")
-    public Res.SessionUser changeProfileImageToDefault(){
-        UID uid = requestContext.getUid();
-        ProfileImageUrl profileImageUrl = ProfileImageUrl.from(props.user.defaultProfileImageUrl);
-
-        UserDto.User result = userUsecase.changeProfileImage(uid, profileImageUrl);
-        return toSessionUser(result);
-    }
-
-
 
     private Res.SessionUser toSessionUser(UserDto.User user){
         return new Res.SessionUser(
-            user.getUid(),
+            user.getId(),
             user.getUsername(),
             user.getEmail(),
             user.isEmailVerified(),

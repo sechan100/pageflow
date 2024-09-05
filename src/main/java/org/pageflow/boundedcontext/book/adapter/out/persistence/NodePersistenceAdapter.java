@@ -4,8 +4,8 @@ package org.pageflow.boundedcontext.book.adapter.out.persistence;
 import lombok.RequiredArgsConstructor;
 import org.pageflow.boundedcontext.book.adapter.out.persistence.jpa.*;
 import org.pageflow.boundedcontext.book.domain.*;
-import org.pageflow.boundedcontext.book.port.in.CreateFolderCmd;
-import org.pageflow.boundedcontext.book.port.in.CreatePageCmd;
+import org.pageflow.boundedcontext.book.port.in.FolderCreateCmd;
+import org.pageflow.boundedcontext.book.port.in.SectionCreateCmd;
 import org.pageflow.boundedcontext.book.port.out.NodePersistencePort;
 import org.pageflow.shared.type.TSID;
 import org.springframework.stereotype.Component;
@@ -23,12 +23,12 @@ public class NodePersistenceAdapter implements NodePersistencePort {
     private final BookJpaRepository bookRepo;
     private final NodeJpaRepository nodeRepo;
     private final FolderJpaRepository folderRepo;
-    private final PageJpaRepository pageRepo;
+    private final SectionJpaRepository sectionRepo;
 
 
 
     @Override
-    public Folder createFolder(CreateFolderCmd cmd) {
+    public Folder createFolder(FolderCreateCmd cmd) {
         FolderJpaEntity parentFolder;
         if(cmd.getParentNodeId().equals(NodeId.from(0L))){
             parentFolder = null;
@@ -47,7 +47,7 @@ public class NodePersistenceAdapter implements NodePersistencePort {
     }
 
     @Override
-    public Page createPage(CreatePageCmd cmd) {
+    public Section createSection(SectionCreateCmd cmd) {
         FolderJpaEntity parentFolder;
         if(cmd.getParentNodeId().equals(NodeId.from(0L))){
             parentFolder = null;
@@ -55,7 +55,7 @@ public class NodePersistenceAdapter implements NodePersistencePort {
             parentFolder = folderRepo.getReferenceById(cmd.getParentNodeId().toLong());
         }
 
-        PageJpaEntity entity = new PageJpaEntity(
+        SectionJpaEntity entity = new SectionJpaEntity(
             TSID.Factory.getTsid().toLong(), // id
             bookRepo.getReferenceById(cmd.getBookId().toLong()), // book
             cmd.getTitle().getValue(), // title
@@ -73,7 +73,7 @@ public class NodePersistenceAdapter implements NodePersistencePort {
     }
 
     @Override
-    public Optional<Page> loadPage(NodeId id) {
+    public Optional<Section> loadSection(NodeId id) {
         return nodeRepo.findById(id.toLong())
             .map(this::toDomain);
     }
@@ -86,11 +86,11 @@ public class NodePersistenceAdapter implements NodePersistencePort {
     }
 
     @Override
-    public Page savePage(Page page) {
-        PageJpaEntity entity = pageRepo.findById(page.getId().toLong()).get();
-        entity.setTitle(page.getTitle().getValue());
-        entity.setContent(page.getContent());
-        return page;
+    public Section saveSection(Section section) {
+        SectionJpaEntity entity = sectionRepo.findById(section.getId().toLong()).get();
+        entity.setTitle(section.getTitle().getValue());
+        entity.setContent(section.getContent());
+        return section;
     }
 
     @Override
@@ -107,8 +107,8 @@ public class NodePersistenceAdapter implements NodePersistencePort {
                 NodeId.from(f.getId()),
                 Title.from(f.getTitle())
             );
-        } else if(nodeJpaEntity instanceof PageJpaEntity p){
-            return (N) new Page(
+        } else if(nodeJpaEntity instanceof SectionJpaEntity p){
+            return (N) new Section(
                 BookId.from(p.getBook().getId()),
                 NodeId.from(p.getId()),
                 Title.from(p.getTitle()),

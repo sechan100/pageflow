@@ -1,9 +1,9 @@
-package org.pageflow.boundedcontext.book.application.dto;
+package org.pageflow.boundedcontext.book.dto;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
-import org.pageflow.boundedcontext.book.shared.constants.TocNodeType;
+import org.pageflow.boundedcontext.book.shared.TocNodeType;
 import org.pageflow.shared.type.TSID;
 
 import java.util.Collections;
@@ -11,16 +11,9 @@ import java.util.List;
 
 public abstract class TocDto {
 
-    @Value
-    public static class SingleNode {
-        TSID id;
-        String title;
-        TocNodeType type;
-    }
-
     @Getter
     @RequiredArgsConstructor
-    public static abstract class Node {
+    public static class Node {
         private final TSID id;
         private final String title;
         private final TocNodeType type;
@@ -36,15 +29,15 @@ public abstract class TocDto {
         }
     }
 
-    public static class Page extends Node {
-        public Page(TSID id, String title) {
-            super(id, title, TocNodeType.PAGE);
+    public static class Section extends Node {
+        public Section(TSID id, String title) {
+            super(id, title, TocNodeType.SECTION);
         }
     }
 
     @Value
     public static class Toc {
         TSID bookId;
-        List<Node> children;
+        List<Node> root;
     }
 }

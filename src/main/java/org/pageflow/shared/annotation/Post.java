@@ -1,4 +1,4 @@
-package org.pageflow.shared.annotation.web;
+package org.pageflow.shared.annotation;
 
 import org.pageflow.global.api.ApiAccess;
 import org.springframework.core.annotation.AliasFor;
@@ -15,10 +15,10 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @RequestMapping(
-    method = {RequestMethod.GET}
+    method = {RequestMethod.POST}
 )
 @Secured({})
-public @interface Delete {
+public @interface Post {
     
     @AliasFor(
         annotation = Secured.class,
@@ -27,7 +27,7 @@ public @interface Delete {
     String[] access() default ApiAccess.USER;
     
     
-    // @DeleteMapping alias
+    // @PostMapping alias
     @AliasFor(
         annotation = RequestMapping.class
     )

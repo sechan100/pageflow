@@ -16,15 +16,15 @@ import org.springframework.lang.Nullable;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(callSuper = true)
 @DynamicUpdate
-@DiscriminatorValue("page")
-@Table(name = "page")
-public class PageJpaEntity extends NodeJpaEntity {
+@DiscriminatorValue("section")
+@Table(name = "section")
+public class SectionJpaEntity extends NodeJpaEntity {
 
     @Lob
     @Column(nullable = false)
     private String content;
 
-    public PageJpaEntity(
+    public SectionJpaEntity(
         Long id,
         BookJpaEntity book,
         String title,

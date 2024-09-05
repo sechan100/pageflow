@@ -12,7 +12,7 @@ public abstract class UserDto {
     // user domain의 필트와 동일
     @Value
     public static class User {
-        TSID uid;
+        TSID id;
         String username;
         String email;
         boolean isEmailVerified;

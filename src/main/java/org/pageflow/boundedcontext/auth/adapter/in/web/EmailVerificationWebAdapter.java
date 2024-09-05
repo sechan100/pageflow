@@ -32,7 +32,8 @@ public class EmailVerificationWebAdapter {
     @PostMapping("/auth/email/send-verification-email")
     @ResponseBody
     public void sendVerificationEmail() {
-        useCase.sendVerificationEmail(requestContext.getUid());
+        UID uid = UID.from(requestContext.getUid());
+        useCase.sendVerificationEmail(uid);
     }
 
     public static final String EMAIL_VERIFICATION_URI = "/auth/email/verify";

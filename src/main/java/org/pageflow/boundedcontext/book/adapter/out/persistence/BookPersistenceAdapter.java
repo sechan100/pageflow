@@ -4,12 +4,13 @@ import lombok.RequiredArgsConstructor;
 import org.pageflow.boundedcontext.book.adapter.out.persistence.jpa.BookJpaEntity;
 import org.pageflow.boundedcontext.book.adapter.out.persistence.jpa.BookJpaRepository;
 import org.pageflow.boundedcontext.book.domain.*;
-import org.pageflow.boundedcontext.book.port.in.CreateBookCmd;
+import org.pageflow.boundedcontext.book.port.in.BookCreateCmd;
 import org.pageflow.boundedcontext.book.port.out.BookPersistencePort;
 import org.pageflow.boundedcontext.common.value.UID;
 import org.pageflow.boundedcontext.user.adapter.out.persistence.jpa.ProfileJpaEntity;
 import org.pageflow.boundedcontext.user.adapter.out.persistence.jpa.ProfileJpaRepository;
 import org.pageflow.boundedcontext.user.domain.Penname;
+import org.pageflow.shared.type.TSID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,10 +27,11 @@ public class BookPersistenceAdapter implements BookPersistencePort {
     private final ProfileJpaRepository profileRepo;
 
     @Override
-    public Book createBook(CreateBookCmd cmd) {
+    public Book createBook(BookCreateCmd cmd) {
         ProfileJpaEntity profile = profileRepo.getReferenceById(cmd.getAuthorId().toLong());
+        Long bookId = TSID.Factory.getTsid().toLong();
         BookJpaEntity entity = BookJpaEntity.builder()
-            .id(cmd.getAuthorId().toLong())
+            .id(bookId)
             .author(profile)
             .title(cmd.getTitle().getValue())
             .coverImageUrl(cmd.getCoverImageUrl().getValue())
@@ -56,7 +58,6 @@ public class BookPersistenceAdapter implements BookPersistencePort {
         entity.setCoverImageUrl(book.getCoverImageUrl().getValue());
         return book;
     }
-
 
     private Book toDomain(BookJpaEntity entity) {
         ProfileJpaEntity authorEntity = entity.getAuthor();

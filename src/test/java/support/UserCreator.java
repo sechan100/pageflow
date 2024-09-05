@@ -1,4 +1,4 @@
-package org.pageflow.global.dev.user;
+package support;
 
 import org.pageflow.boundedcontext.auth.shared.RoleType;
 import org.pageflow.boundedcontext.common.value.UID;
@@ -15,7 +15,7 @@ import java.util.Random;
  * @author : sechan
  */
 @Component
-public class TestUserCreator {
+public class UserCreator {
     @Autowired
     private UserUseCase userUseCase;
 
@@ -35,6 +35,6 @@ public class TestUserCreator {
             ProviderType.NATIVE,
             "/test"
         ));
-        return UID.from(user.getUid());
+        return UID.from(user.getId());
     }
 }

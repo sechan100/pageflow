@@ -3,20 +3,20 @@ package org.pageflow.boundedcontext.book;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-import org.pageflow.boundedcontext.book.application.dto.TocDto;
 import org.pageflow.boundedcontext.book.domain.BookId;
 import org.pageflow.boundedcontext.book.domain.NodeId;
 import org.pageflow.boundedcontext.book.domain.toc.TocChild;
 import org.pageflow.boundedcontext.book.domain.toc.TocParent;
 import org.pageflow.boundedcontext.book.domain.toc.TocRoot;
+import org.pageflow.boundedcontext.book.dto.TocDto;
 import org.pageflow.boundedcontext.book.port.in.*;
 import org.pageflow.boundedcontext.book.port.out.TocPersistencePort;
 import org.pageflow.boundedcontext.common.value.UID;
-import org.pageflow.global.dev.user.TestUserCreator;
 import org.pageflow.shared.utility.JsonUtility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+import support.UserCreator;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
 class TocUseCaseTest {
     @Autowired
-    private TestUserCreator userCreator;
+    private UserCreator userCreator;
     @Autowired
     private BookUseCase bookUseCase;
     @Autowired
@@ -41,8 +41,8 @@ class TocUseCaseTest {
     @BeforeEach
     void createBook() {
         this._uid = userCreator.create("tuser");
-        CreateBookCmd cmd = new CreateBookCmd(
-            _uid,
+        BookCreateCmd cmd = new BookCreateCmd(
+            _uid.getValue(),
             "테스트용 책",
             "/book/test/cover/image.jpg"
         );
@@ -92,18 +92,18 @@ class TocUseCaseTest {
 
 
     private NodeId cf(NodeId parentNodeId){
-        CreateFolderCmd cmd = new CreateFolderCmd(
-            _bookId,
-            parentNodeId
+        FolderCreateCmd cmd = new FolderCreateCmd(
+            _bookId.getValue(),
+            parentNodeId.getValue()
         );
         return NodeId.from(tocUseCase.createFolder(cmd).getId());
     }
 
     private NodeId cp(NodeId parentNodeId){
-        CreatePageCmd cmd = new CreatePageCmd(
-            _bookId,
-            parentNodeId
+        SectionCreateCmd cmd = new SectionCreateCmd(
+            _bookId.getValue(),
+            parentNodeId.getValue()
         );
-        return NodeId.from(tocUseCase.createPage(cmd).getId());
+        return NodeId.from(tocUseCase.createSection(cmd).getId());
     }
 }

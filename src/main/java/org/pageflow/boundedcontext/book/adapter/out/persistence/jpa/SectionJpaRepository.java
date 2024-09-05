@@ -5,5 +5,5 @@ import org.pageflow.shared.jpa.repository.BaseJpaRepository;
 /**
  * @author : sechan
  */
-public interface PageJpaRepository extends BaseJpaRepository<PageJpaEntity, Long> {
+public interface SectionJpaRepository extends BaseJpaRepository<SectionJpaEntity, Long> {
 }

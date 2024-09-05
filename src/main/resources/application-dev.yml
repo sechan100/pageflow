@@ -25,7 +25,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     properties:
       hibernate:
         show_sql: true
@@ -96,7 +96,9 @@ custom:
 
 dev:
   data:
+    enabled: false
+    random-seed: 1234
     user:
-      active: true
       count: 10
-      random-seed: 1234
+    book:
+      count: 30

@@ -19,8 +19,8 @@ import org.pageflow.global.api.exception.ApiException;
 import org.pageflow.global.api.types.FieldError;
 import org.pageflow.global.filter.UriPrefix;
 import org.pageflow.global.property.AppProps;
-import org.pageflow.shared.annotation.web.Get;
-import org.pageflow.shared.annotation.web.Post;
+import org.pageflow.shared.annotation.Get;
+import org.pageflow.shared.annotation.Post;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -118,7 +118,7 @@ public class AuthWebAdapter {
     @Get("/auth/session/info")
     @Operation(summary = "세션정보 가져오기", description = "accessToken에 저장된 UID를 기반으로 사용자의 세션 정보를 조회")
     public Res.SessionInfo getSession(){
-        UID uid = requestContext.getUid();
+        UID uid = UID.from(requestContext.getUid());
         UserDto.Session sessionUser = loadSessionUserAcl.loadSessionUser(uid);
         return new Res.SessionInfo(
             sessionUser

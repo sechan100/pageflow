@@ -10,7 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
  */
 public class Password extends SingleValueWrapper<String> {
     private static final PasswordEncoder ENCODER = PasswordEncoderConfig.PASSWORD_ENCODER;
-    private static final int MIN_LENGTH = 6;
+    private static final int MIN_LENGTH = 5;
     private static final int MAX_LENGTH = 36;
     private static final String REGEX = "^(?=.*[A-Za-z])(?=.*[0-9])([A-Za-z0-9~!@#$%^&*()+_|=]|-){"+MIN_LENGTH+","+MAX_LENGTH+"}$";
     private static final String REGEX_DESCRIPTION = String.format(

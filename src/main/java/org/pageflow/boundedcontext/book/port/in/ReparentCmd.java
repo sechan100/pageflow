@@ -12,5 +12,5 @@ public class ReparentCmd {
     BookId bookId;
     NodeId nodeId;
     NodeId destfolderId;
-    int destOrder;
+    int destIndex;
 }

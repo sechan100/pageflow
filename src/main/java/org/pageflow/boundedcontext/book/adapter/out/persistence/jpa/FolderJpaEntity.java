@@ -26,8 +26,9 @@ public class FolderJpaEntity extends NodeJpaEntity {
         Long id,
         BookJpaEntity book,
         String title,
-        @Nullable FolderJpaEntity parentNode
+        @Nullable FolderJpaEntity parentNode,
+        int ov
     ) {
-        super(id, book, title, parentNode);
+        super(id, book, title, parentNode, ov);
     }
 }

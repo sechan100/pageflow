@@ -3,7 +3,7 @@ package support;
 
 import org.pageflow.boundedcontext.book.domain.BookId;
 import org.pageflow.boundedcontext.book.domain.NodeId;
-import org.pageflow.boundedcontext.book.domain.toc.*;
+import org.pageflow.boundedcontext.book.domain.toc.TocParent;
 
 import java.util.Random;
 
@@ -63,11 +63,11 @@ public class TocCreator {
 
     private TocParent addFolderOrPage(TocParent parent, int nodeCount) {
         for (int i = 0; i < nodeCount; i++) {
-            AbstractChild child;
+            ChildRole child;
             if(random.nextBoolean()){
                 child = new TocSection(idSet.gen());
             } else {
-                child = new TocFolder(idSet.gen());
+                child = new ParentRole(idSet.gen());
             }
             parent._addChildLast(child);
         }

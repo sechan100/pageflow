@@ -15,7 +15,11 @@ import org.springframework.lang.Nullable;
 @Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn(name = "node_type")
 @Table(
-    name = "node"
+    name = "node",
+    uniqueConstraints = {
+        // 형제 노드끼리의 순서를 결정하기 위해서는 ov값이 형제들 사이에서 모두 unique해야 한다.
+        @UniqueConstraint(name = "node_book_id_title_uk", columnNames = {"parent_id", "ov"})
+    }
 )
 public abstract class NodeJpaEntity extends BaseJpaEntity {
 
@@ -44,12 +48,13 @@ public abstract class NodeJpaEntity extends BaseJpaEntity {
         Long id,
         BookJpaEntity book,
         String title,
-        @Nullable FolderJpaEntity parentNode
+        @Nullable FolderJpaEntity parentNode,
+        int ov
     ) {
         this.id = id;
         this.book = book;
         this.title = title;
         this.parentNode = parentNode;
-        this.ov = 0;
+        this.ov = ov;
     }
 }

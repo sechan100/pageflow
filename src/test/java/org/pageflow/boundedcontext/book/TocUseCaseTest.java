@@ -18,8 +18,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 import support.UserCreator;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 /**
  * @author : sechan
  */
@@ -57,7 +55,7 @@ class TocUseCaseTest {
                 NodeId p1 = cp(f2);
         NodeId p2 = cp(NodeId.ROOT);
 
-        TocRoot root = tocPort.loadTocRoot(_bookId);
+        TocRoot root = tocPort.loadRegistry(_bookId);
         TocChild folder1 = root.getChild(f1);
         TocChild folder2 = ((TocParent) folder1).getChild(f2);
         TocChild page1 = ((TocParent) folder2).getChild(p1);

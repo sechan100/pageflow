@@ -29,9 +29,10 @@ public class SectionJpaEntity extends NodeJpaEntity {
         BookJpaEntity book,
         String title,
         @Nullable FolderJpaEntity parentNode,
-        String content
+        String content,
+        int ov
     ) {
-        super(id, book, title, parentNode);
+        super(id, book, title, parentNode, ov);
         this.content = content;
     }
 

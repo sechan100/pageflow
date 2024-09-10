@@ -1,10 +1,6 @@
 package org.pageflow.boundedcontext.book.port.out;
 
-import org.pageflow.boundedcontext.book.domain.Folder;
-import org.pageflow.boundedcontext.book.domain.NodeId;
-import org.pageflow.boundedcontext.book.domain.Section;
-import org.pageflow.boundedcontext.book.port.in.FolderCreateCmd;
-import org.pageflow.boundedcontext.book.port.in.SectionCreateCmd;
+import org.pageflow.boundedcontext.book.domain.*;
 
 import java.util.Optional;
 
@@ -12,11 +8,12 @@ import java.util.Optional;
  * @author : sechan
  */
 public interface NodePersistencePort {
-    Folder createFolder(FolderCreateCmd cmd);
-    Section createSection(SectionCreateCmd cmd);
+    Folder createFolder(BookId bookId, NodeId parentNodeId, Title title, int ov);
+    Section createSection(BookId bookId, NodeId parentNodeId, Title title, String content, int ov);
     Optional<Folder> loadFolder(NodeId id);
     Optional<Section> loadSection(NodeId id);
     Folder saveFolder(Folder folder);
     Section saveSection(Section section);
     void deleteNode(NodeId id);
+    Optional<Integer> loadMaxOvAmongSiblings(BookId bookId, NodeId parentNodeId);
 }

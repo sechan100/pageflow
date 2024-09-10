@@ -3,9 +3,8 @@ package org.pageflow.boundedcontext.book.application;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pageflow.boundedcontext.book.domain.*;
-import org.pageflow.boundedcontext.book.domain.toc.TocChild;
-import org.pageflow.boundedcontext.book.domain.toc.TocNode;
-import org.pageflow.boundedcontext.book.domain.toc.TocRoot;
+import org.pageflow.boundedcontext.book.domain.toc.NodeRegistry;
+import org.pageflow.boundedcontext.book.domain.toc.TocParent;
 import org.pageflow.boundedcontext.book.dto.TocDto;
 import org.pageflow.boundedcontext.book.port.in.*;
 import org.pageflow.boundedcontext.book.port.out.NodePersistencePort;
@@ -28,34 +27,47 @@ public class TocService implements TocUseCase {
 
     @Override
     public TocDto.Node createFolder(FolderCreateCmd cmd) {
-        Folder f = persistPort.createFolder(cmd);
+        int maxOvAmongSiblings = persistPort.loadMaxOvAmongSiblings(cmd.getBookId(), cmd.getParentNodeId())
+            .orElse(-TocParent.OV_OFFSET);
+        int ov = maxOvAmongSiblings + TocParent.OV_OFFSET;
+        Folder f = persistPort.createFolder(
+            cmd.getBookId(),
+            cmd.getParentNodeId(),
+            cmd.getTitle(),
+            ov
+        );
         return toDto(f);
     }
 
     @Override
     public TocDto.Node createSection(SectionCreateCmd cmd) {
-        Section p = persistPort.createSection(cmd);
-        return toDto(p);
+        int maxOvAmongSiblings = persistPort.loadMaxOvAmongSiblings(cmd.getBookId(), cmd.getParentNodeId())
+            .orElse(-TocParent.OV_OFFSET);
+        int ov = maxOvAmongSiblings + TocParent.OV_OFFSET;
+        Section s = persistPort.createSection(
+            cmd.getBookId(),
+            cmd.getParentNodeId(),
+            cmd.getTitle(),
+            cmd.getContent(),
+            ov
+        );
+        return toDto(s);
     }
 
     @Override
     public void reparent(ReparentCmd cmd) {
-        TocRoot root = tocPort.loadTocRoot(cmd.getBookId());
-        TocNode node = root.findNode(cmd.getNodeId());
-        if(!(node instanceof TocChild target)) throw new IllegalArgumentException("TocChild를 구현하지 않는 노드는 reparent의 대상이 될 수 없습니다.");
-        // reparent
-        target.getParent().reparent(cmd.getDestOrder(), target);
-        tocPort.saveToc(root);
+        NodeRegistry registry = tocPort.loadRegistry(cmd.getBookId());
+        TocParent parent = registry.buildTocParent(cmd.getDestfolderId());
+        parent.reparent(cmd.getDestIndex(), cmd.getNodeId());
+        tocPort.saveNodes(registry);
     }
 
     @Override
     public void reorder(ReorderCmd cmd) {
-        TocRoot root = tocPort.loadTocRoot(cmd.getBookId());
-        TocNode node = root.findNode(cmd.getNodeId());
-        if(!(node instanceof TocChild target)) throw new IllegalArgumentException("TocChild를 구현하지 않는 노드는 reorder의 대상이 될 수 없습니다.");
-        // reorder
-        target.getParent().reorder(cmd.getDestOrder(), target);
-        tocPort.saveToc(root);
+        NodeRegistry registry = tocPort.loadRegistry(cmd.getBookId());
+        TocParent parent = registry.buildTocParentFromChildId(cmd.getNodeId());
+        parent.reorder(cmd.getDestIndex(), cmd.getNodeId());
+        tocPort.saveNodes(registry);
     }
 
 

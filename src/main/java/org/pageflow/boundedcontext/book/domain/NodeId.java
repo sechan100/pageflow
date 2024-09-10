@@ -15,6 +15,6 @@ public final class NodeId extends SingleValueWrapper<TSID> {
     public static NodeId from(Long id){ return new NodeId(TSID.from(id));}
     public static NodeId from(TSID id){return new NodeId(id);}
     public static NodeId random(){return new NodeId(TSID.Factory.getTsid());}
-    // CASTw
+    // CAST
     public Long toLong(){return super.value.toLong();}
 }

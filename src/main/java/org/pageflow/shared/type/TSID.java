@@ -24,7 +24,7 @@
 
 package org.pageflow.shared.type;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.lang.Nullable;
 
 import java.io.Serial;
@@ -70,7 +70,6 @@ import java.util.function.IntSupplier;
  *
  * @see <a href="https://en.wikipedia.org/wiki/Snowflake_ID">Snowflake ID</a>
  */
-@JsonSerialize(using = TSIDSerializer.class)
 @SuppressWarnings({"MagicCharacter", "MagicNumber", "NumericCastThatLosesPrecision", "StandardVariableNames", "DuplicateExpressions"})
 public final class TSID implements Serializable, Comparable<TSID> {
 
@@ -362,6 +361,7 @@ public final class TSID implements Serializable, Comparable<TSID> {
      *
      * @return {@link Instant}
      */
+    @JsonIgnore
     public Instant getInstant(){
         return Instant.ofEpochMilli(getUnixMilliseconds());
     }
@@ -374,6 +374,7 @@ public final class TSID implements Serializable, Comparable<TSID> {
      * @param customEpoch the custom epoch instant
      * @return {@link Instant}
      */
+    @JsonIgnore
     public Instant getInstant(final Instant customEpoch){
         return Instant.ofEpochMilli(getUnixMilliseconds(customEpoch.toEpochMilli()));
     }
@@ -385,6 +386,7 @@ public final class TSID implements Serializable, Comparable<TSID> {
      *
      * @return the number of milliseconds since 1970-01-01
      */
+    @JsonIgnore
     public long getUnixMilliseconds(){
         return this.getTime() + TSID_EPOCH;
     }

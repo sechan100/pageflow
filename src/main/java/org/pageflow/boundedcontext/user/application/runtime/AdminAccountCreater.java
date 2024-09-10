@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class AdminAccountCreater implements RuntimeInitializer {
     private final AdminUseCase adminUseCase;
     private final AccountJpaRepository accountJpaRepo;
+    private final JsonUtility jsonUtility;
     private final AppProps props;
 
     @Override
@@ -44,6 +45,6 @@ public class AdminAccountCreater implements RuntimeInitializer {
 
         UserDto.User result = adminUseCase.registerAdmin(cmd);
 
-        log.info("관리자 계정을 생성했습니다. {}", JsonUtility.toJson(result));
+        log.info("관리자 계정을 생성했습니다. {}", jsonUtility.toJson(result));
     }
 }

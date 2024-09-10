@@ -6,7 +6,7 @@ import lombok.Value;
 import org.pageflow.boundedcontext.book.shared.TocNodeType;
 import org.pageflow.shared.type.TSID;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class TocDto {
@@ -25,8 +25,9 @@ public abstract class TocDto {
 
         public Folder(TSID id, String title, List<Node> children) {
             super(id, title, TocNodeType.FOLDER);
-            this.children = Collections.unmodifiableList(children);
+            this.children = new ArrayList<>(children);
         }
+
     }
 
     public static class Section extends Node {

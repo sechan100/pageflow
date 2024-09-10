@@ -8,6 +8,7 @@ import org.pageflow.shared.type.TSID;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.function.Supplier;
@@ -36,6 +37,7 @@ public class BookCreator {
         this.tocUseCase = tocUseCase;
     }
 
+    @Transactional
     public void create(Set<TSID> userIds){
         Set<TSID> bookIds = createBooks(userIds);
         for(TSID bookId : bookIds){

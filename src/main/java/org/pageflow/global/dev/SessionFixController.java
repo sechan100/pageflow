@@ -1,6 +1,7 @@
 package org.pageflow.global.dev;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.pageflow.boundedcontext.auth.domain.Account;
@@ -45,6 +46,7 @@ public class SessionFixController {
     public static class Req {
         @Data
         public static class SessionPrincipal {
+            @Schema(description = "username", defaultValue = "user1")
             private String username;
         }
     }

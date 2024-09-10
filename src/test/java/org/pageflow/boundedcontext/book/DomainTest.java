@@ -2,7 +2,8 @@ package org.pageflow.boundedcontext.book;
 
 import org.junit.jupiter.api.Test;
 import org.pageflow.boundedcontext.book.domain.NodeId;
-import org.pageflow.boundedcontext.book.domain.toc.*;
+import org.pageflow.boundedcontext.book.domain.toc.TocNode;
+import org.pageflow.boundedcontext.book.domain.toc.TocParent;
 import support.TocCreator;
 
 import java.lang.reflect.Field;
@@ -11,7 +12,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author : sechan
@@ -92,7 +94,7 @@ class DomainTest {
         AtomicInteger ov = new AtomicInteger(0);
         nodes.forEach(n -> {
             try {
-                Field ovField = AbstractChild.class.getDeclaredField("ov");
+                Field ovField = ChildRole.class.getDeclaredField("ov");
                 ovField.setAccessible(true);
                 ovField.set(n, ov.getAndIncrement());
             } catch(NoSuchFieldException | IllegalAccessException e){
@@ -103,7 +105,7 @@ class DomainTest {
         boolean isOvRebalanced = parent.getChildren().stream()
             .map(TocChild::getOv)
             .reduce((prev, next) -> {
-                if(next - prev == TocFolder.OV_OFFSET){
+                if(next - prev == ParentRole.OV_OFFSET){
                     return next;
                 } else {
                     return 0;

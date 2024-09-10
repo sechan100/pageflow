@@ -1,20 +1,25 @@
 package org.pageflow.shared.utility;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import lombok.RequiredArgsConstructor;
 
 /**
+ * 빈으로 제작
  * @author : sechan
  */
-public abstract class JsonUtility {
-    private final static ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
+@RequiredArgsConstructor
+public class JsonUtility {
+    private final ObjectMapper mapper;
 
+    public ObjectMapper getObjectMapper() {
+        return mapper;
+    }
 
-    public static String toJson(Object object) {
+    public String toJson(Object object) {
         try {
             return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(object);
         } catch(Exception e) {
-            throw new RuntimeException(e);
+            throw new IllegalArgumentException(e);
         }
     }
 }

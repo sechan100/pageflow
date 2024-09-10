@@ -7,10 +7,7 @@ import lombok.Value;
 import org.pageflow.boundedcontext.book.domain.BookId;
 import org.pageflow.boundedcontext.book.domain.NodeId;
 import org.pageflow.boundedcontext.book.dto.*;
-import org.pageflow.boundedcontext.book.port.in.BookCreateCmd;
-import org.pageflow.boundedcontext.book.port.in.BookQueries;
-import org.pageflow.boundedcontext.book.port.in.BookUseCase;
-import org.pageflow.boundedcontext.book.port.in.TocUseCase;
+import org.pageflow.boundedcontext.book.port.in.*;
 import org.pageflow.boundedcontext.common.value.UID;
 import org.pageflow.global.api.RequestContext;
 import org.pageflow.shared.annotation.Get;
@@ -30,10 +27,8 @@ import java.util.List;
 public class BookWebAdapter {
     private final BookUseCase bookUseCase;
     private final TocUseCase tocUsecase;
-
     private final BookQueries bookQueries;
     private final RequestContext rqcx;
-
 
     @Post("/user/books")
     @Operation(summary = "책 생성")
@@ -47,11 +42,10 @@ public class BookWebAdapter {
         return result;
     }
     @Data
-    public static class CreateBook {
+    static class CreateBook {
         private String title;
         private String coverImageUrl;
     }
-
 
     @Get("/user/books")
     @Operation(summary = "내 책장 조회")
@@ -63,11 +57,10 @@ public class BookWebAdapter {
         );
     }
     @Value
-    public static class MyBooks {
+    static class MyBooks {
         AuthorDto author;
         List<BookDto.Basic> books;
     }
-
 
     @Get("/user/books/{bookId}")
     @Operation(summary = "책 조회")
@@ -76,12 +69,45 @@ public class BookWebAdapter {
         return book;
     }
 
-
     @Get("/user/books/{bookId}/toc")
     @Operation(summary = "책 목차 조회")
     public TocDto.Toc getToc(@PathVariable TSID bookId) {
         TocDto.Toc toc = tocUsecase.queryToc(BookId.from(bookId));
         return toc;
+    }
+
+    @Post("/user/books/{bookId}/toc/reorder")
+    @Operation(summary = "목차 노드 재정렬")
+    public void reorder(@PathVariable TSID bookId, @RequestBody ReorderReq req) {
+        ReorderCmd cmd = new ReorderCmd(
+            BookId.from(bookId),
+            NodeId.from(req.getNodeId()),
+            req.getDestIndex()
+        );
+        tocUsecase.reorder(cmd);
+    }
+    @Data
+    static class ReorderReq {
+        int destIndex;
+        TSID nodeId;
+    }
+
+    @Post("/user/books/{bookId}/toc/reparent")
+    @Operation(summary = "목차 노드 이동")
+    public void reorder(@PathVariable TSID bookId, @RequestBody ReparentReq req) {
+        ReparentCmd cmd = new ReparentCmd(
+            BookId.from(bookId),
+            NodeId.from(req.getNodeId()),
+            NodeId.from(req.getDestFolderId()),
+            req.getDestIndex()
+        );
+        tocUsecase.reparent(cmd);
+    }
+    @Data
+    static class ReparentReq {
+        int destIndex;
+        TSID nodeId;
+        TSID destFolderId;
     }
 
     @Get("/user/books/{bookId}/folders/{folderId}")

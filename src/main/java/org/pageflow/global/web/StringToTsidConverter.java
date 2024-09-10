@@ -1,4 +1,4 @@
-package org.pageflow.global.mvc;
+package org.pageflow.global.web;
 
 import io.vavr.control.Try;
 import org.pageflow.shared.type.TSID;

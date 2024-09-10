@@ -1,12 +1,7 @@
 package org.pageflow.boundedcontext.book.adapter.out.persistence.jpa;
 
-import io.vavr.Function1;
-import io.vavr.Function2;
-import lombok.AccessLevel;
 import lombok.Getter;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -17,7 +12,7 @@ import java.util.List;
 @Getter
 public class NodeProjection {
     private final Long id;
-    private final Long parentId;
+    private final Long parentId; // nullable
     private final int ov;
     private final String title;
     private final Class<? extends NodeJpaEntity> type;
@@ -31,10 +26,12 @@ public class NodeProjection {
     }
 
     // no projection
-    @Getter(AccessLevel.NONE)
     private List<NodeProjection> children;
 
-    public void addAccordingToOv(NodeProjection node){
+    public void addChildAccordingToOv(NodeProjection node){
+        if(this.type != FolderJpaEntity.class){
+            throw new IllegalStateException("Section 타입에는 자식을 추가할 수 없습니다.");
+        }
         if(children == null){
             this.children = new LinkedList<>();
         }
@@ -47,43 +44,5 @@ public class NodeProjection {
         children.add(node);
     }
 
-    private <N, F extends N, P extends N> N project(Function2<NodeProjection, List<N>, F> folderMapper, Function1<NodeProjection, P> pageMapper){
-        if(type == FolderJpaEntity.class){
-            List<N> childrenProjection;
-            if(children != null){
-                childrenProjection = children.stream()
-                    .map(c -> c.project(folderMapper, pageMapper))
-                    .toList();
-            } else {
-                childrenProjection = new ArrayList<>();
-            }
-            return folderMapper.apply(this, childrenProjection);
-        } else {
-            return pageMapper.apply(this);
-        }
-    }
 
-    public static class Root {
-        private final List<NodeProjection> children;
-
-        public Root(List<NodeProjection> children) {
-            this.children = Collections.unmodifiableList(children);
-        }
-
-        public <N, F extends N, P extends N> List<N> projectTree(ProjectionStrategy<N, F, P> plan){
-            return children.stream()
-                .map(c -> c.project(plan.folderMapper, plan.sectionMapper))
-                .toList();
-        }
-    }
-
-    public static class ProjectionStrategy<N, F extends N, P extends N> {
-        private final Function2<NodeProjection, List<N>, F> folderMapper;
-        private final Function1<NodeProjection, P> sectionMapper;
-
-        public ProjectionStrategy(Function2<NodeProjection, List<N>, F> folderMapper, Function1<NodeProjection, P> sectionMapper) {
-            this.folderMapper = folderMapper;
-            this.sectionMapper = sectionMapper;
-        }
-    }
 }

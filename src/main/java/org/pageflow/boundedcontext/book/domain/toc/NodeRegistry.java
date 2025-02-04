@@ -13,29 +13,55 @@ import java.util.stream.Collectors;
  */
 public class NodeRegistry {
     private final BookId bookId;
-    private final Map<NodeId, TocNode> nodes;
+    private final TocRootNode rootNode;
+    private final Map<NodeId, ChildableTocNode> nodes;
 
-    public NodeRegistry(BookId bookId, Collection<TocNode> nodes){
+    public NodeRegistry(BookId bookId, TocRootNode rootNode, Collection<ChildableTocNode> nodes){
         this.bookId = bookId;
+        this.rootNode = rootNode;
         this.nodes = nodes.stream()
-            .collect(Collectors.toMap(TocNode::getId, node -> node));
+            .collect(Collectors.toMap(ChildableTocNode::getId, node -> node));
     }
 
     public TocNode findNode(NodeId id) {
+        if(id.equals(rootNode.getId())){
+            return rootNode;
+        } else {
+            return nodes.get(id);
+        }
+    }
+
+    public ChildableTocNode findChildableNode(NodeId id){
+        if(id.equals(rootNode.getId())){
+            throw new IllegalArgumentException("루트노드는 ChildableTocNode가 아닙니다.");
+        }
         return nodes.get(id);
     }
 
-    public Collection<TocNode> all(){
+    public boolean contains(NodeId id){
+        if(id.equals(rootNode.getId())){
+            return true;
+        }
+        return nodes.containsKey(id);
+    }
+
+    public Collection<ChildableTocNode> allChildables(){
         return nodes.values();
     }
 
-    public TocParent buildTocParent(NodeId parentId){
-        return new TocParent(parentId, this);
+    public TocParent buildTocParent(NodeId id){
+        if(!contains(id)){
+            throw new IllegalArgumentException("해당 id의 노드가 존재하지 않습니다.");
+        }
+        return new TocParent(id, this);
     }
 
     public TocParent buildTocParentFromChildId(NodeId childId){
-        TocNode child = findNode(childId);
-        return buildTocParent(child.getParentId());
+        if(findNode(childId) instanceof ChildableTocNode child){
+            return buildTocParent(child.getParentId());
+        }
+
+        throw new IllegalArgumentException("루트노드의 부모는 존재하지 않습니다.");
     }
 
     /**
@@ -45,17 +71,23 @@ public class NodeRegistry {
      * @return child가 parent의 후손인지 여부
      */
     public boolean isDescendantOf(NodeId parentId, NodeId childId){
-        TocNode child = findNode(childId);
-        if(child.getParentId().equals(parentId)){
-            return true;
+        TocNode childNode = findNode(childId);
+        if(childNode instanceof ChildableTocNode child){
+            if(child.getParentId().equals(parentId)){
+                return true;
+            } else {
+                return isDescendantOf(parentId, child.getParentId());
+            }
+        // childNode가 TocRootNode인 경우
         } else {
-            return isDescendantOf(parentId, child.getParentId());
+            return false;
         }
+
     }
 
-    public Set<TocNode> getChangedNodes() {
-        return all().stream()
-            .filter(TocNode::isChanged)
+    public Set<ChildableTocNode> getChangedNodes() {
+        return allChildables().stream()
+            .filter(ChildableTocNode::isChanged)
             .collect(Collectors.toSet());
     }
 }

@@ -42,6 +42,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             return;
         }
         Optional<String> accessTokenOp = resolveTokenIfExist(request);
+        String requestURI = request.getRequestURI();
 
         if(accessTokenOp.isPresent()) {
             Principal.Session principal = useCase.extractPrincipalFromAccessToken(accessTokenOp.get());
@@ -50,11 +51,12 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                 null,
                 principal.getRole().toAuthorities()
             );
+
+            // Authentication 객체를 할당하면, 이후 AnonymousAuthenticationFilter에서 인증된 사용자로 처리한다.
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            // DB를 조회하지는 않기 때문에, DB에 사용자가 실제로 있는지 없는지는 모른다.
-            log.debug("JWT AccessToken 인증 완료된 사용자: UID({}), ROLE({})", principal.getUid().toLong(), principal.getRole());
+            log.debug("인증된 사용자 요청: URI({}), UID({}), ROLE({})", requestURI, principal.getUid().toLong(), principal.getRole());
         } else {
-            log.debug("인증되지 않은 사용자입니다: AccessToken 토큰 존재하지 않음");
+            log.debug("익명 사용자 요청: {}", requestURI);
         }
         filterChain.doFilter(request, response);
     }

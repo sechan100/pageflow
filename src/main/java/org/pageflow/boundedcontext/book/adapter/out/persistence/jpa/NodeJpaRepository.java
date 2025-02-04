@@ -21,4 +21,12 @@ public interface NodeJpaRepository extends BaseJpaRepository<NodeJpaEntity, Long
          AND n.parentNode.id = :parentId
      """)
      Optional<Integer> findMaxOvAmongSiblings(@Param("bookId") Long bookId, @Param("parentId") Long parentId);
+
+     @Query("""
+         SELECT n
+         FROM FolderJpaEntity n
+         WHERE n.book.id = :bookId
+         AND n.parentNode IS NULL
+     """)
+     Optional<FolderJpaEntity> findRootNode(@Param("bookId") Long bookId);
 }

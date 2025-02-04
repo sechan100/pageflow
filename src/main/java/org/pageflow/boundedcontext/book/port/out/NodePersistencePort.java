@@ -15,5 +15,4 @@ public interface NodePersistencePort {
     Folder saveFolder(Folder folder);
     Section saveSection(Section section);
     void deleteNode(NodeId id);
-    Optional<Integer> loadMaxOvAmongSiblings(BookId bookId, NodeId parentNodeId);
 }

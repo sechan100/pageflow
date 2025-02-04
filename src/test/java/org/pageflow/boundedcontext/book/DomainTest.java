@@ -2,7 +2,7 @@ package org.pageflow.boundedcontext.book;
 
 import org.junit.jupiter.api.Test;
 import org.pageflow.boundedcontext.book.domain.NodeId;
-import org.pageflow.boundedcontext.book.domain.toc.TocNode;
+import org.pageflow.boundedcontext.book.domain.toc.ChildableTocNode;
 import org.pageflow.boundedcontext.book.domain.toc.TocParent;
 import support.TocCreator;
 
@@ -40,7 +40,7 @@ class DomainTest {
         // 자식을 3개 이상 가진 parent를 찾음
         for(NodeId id : factory.getIdSet().getContainer()){
             if(id.equals(root.getId())) continue;
-            TocNode anyNode = root.findNode(id);
+            ChildableTocNode anyNode = root.findNode(id);
             if(!(anyNode instanceof TocParent p)) continue;
             if(p.getChildren().size() > 2){
                 parent = p;
@@ -82,7 +82,7 @@ class DomainTest {
         // 자식을 3개 이상 가진 parent를 찾음
         for(NodeId id : factory.getIdSet().getContainer()){
             if(id.equals(root.getId())) continue;
-            TocNode anyNode = root.findNode(id);
+            ChildableTocNode anyNode = root.findNode(id);
             if(!(anyNode instanceof TocParent p)) continue;
             if(p.getChildren().size() > 2){
                 parent = p;
@@ -121,7 +121,7 @@ class DomainTest {
         TocCreator factory = new TocCreator(SEED);
         TocRoot root = factory.create();
         for(NodeId id: factory.getIdSet().getContainer()){
-            TocNode node = root.findNode(id); // 어차피 못찾으면 예외발생
+            ChildableTocNode node = root.findNode(id); // 어차피 못찾으면 예외발생
             assertNotNull(node, "findNode 실패");
         }
     }

@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicUpdate;
-import org.springframework.lang.Nullable;
 
 /**
  * @author : sechan
@@ -28,7 +27,7 @@ public class SectionJpaEntity extends NodeJpaEntity {
         Long id,
         BookJpaEntity book,
         String title,
-        @Nullable FolderJpaEntity parentNode,
+        FolderJpaEntity parentNode,
         String content,
         int ov
     ) {

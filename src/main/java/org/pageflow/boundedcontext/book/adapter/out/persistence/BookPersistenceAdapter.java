@@ -3,6 +3,8 @@ package org.pageflow.boundedcontext.book.adapter.out.persistence;
 import lombok.RequiredArgsConstructor;
 import org.pageflow.boundedcontext.book.adapter.out.persistence.jpa.BookJpaEntity;
 import org.pageflow.boundedcontext.book.adapter.out.persistence.jpa.BookJpaRepository;
+import org.pageflow.boundedcontext.book.adapter.out.persistence.jpa.FolderJpaEntity;
+import org.pageflow.boundedcontext.book.adapter.out.persistence.jpa.FolderJpaRepository;
 import org.pageflow.boundedcontext.book.domain.*;
 import org.pageflow.boundedcontext.book.port.in.BookCreateCmd;
 import org.pageflow.boundedcontext.book.port.out.BookPersistencePort;
@@ -24,20 +26,34 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class BookPersistenceAdapter implements BookPersistencePort {
     private final BookJpaRepository bookRepo;
+    private final FolderJpaRepository folderRepo;
     private final ProfileJpaRepository profileRepo;
 
     @Override
     public Book createBook(BookCreateCmd cmd) {
+        // 유저
         ProfileJpaEntity profile = profileRepo.getReferenceById(cmd.getAuthorId().toLong());
+
+        // 책
         Long bookId = TSID.Factory.getTsid().toLong();
-        BookJpaEntity entity = BookJpaEntity.builder()
+        BookJpaEntity book = BookJpaEntity.builder()
             .id(bookId)
             .author(profile)
             .title(cmd.getTitle().getValue())
             .coverImageUrl(cmd.getCoverImageUrl().getValue())
             .build();
-        bookRepo.persist(entity);
-        return toDomain(entity);
+        bookRepo.persist(book);
+
+        // root folder
+        FolderJpaEntity rootFolder = new FolderJpaEntity(
+            TSID.Factory.getTsid().toLong(),
+            book,
+            ":root",
+            null,
+            0
+        );
+        folderRepo.persist(rootFolder);
+        return toDomain(book);
     }
 
     @Override

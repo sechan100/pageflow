@@ -35,9 +35,14 @@ public abstract class NodeJpaEntity extends BaseJpaEntity {
     @Column(name = "title", nullable = false)
     private String title;
 
+    /**
+     * 부모 노드
+     * null인 경우 해당 book의 root node임을 나타낸다.
+     * root 노드는 어떠한 변경에 대해서도 폐쇄적이다.
+     */
     @Nullable
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
-    @JoinColumn(name = "parent_id")
+    @JoinColumn(name = "parent_id", nullable = true)
     private FolderJpaEntity parentNode;
 
     @Column(nullable = false)
@@ -48,7 +53,7 @@ public abstract class NodeJpaEntity extends BaseJpaEntity {
         Long id,
         BookJpaEntity book,
         String title,
-        @Nullable FolderJpaEntity parentNode,
+        FolderJpaEntity parentNode,
         int ov
     ) {
         this.id = id;

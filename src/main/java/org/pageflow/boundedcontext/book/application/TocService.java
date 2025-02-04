@@ -21,16 +21,16 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @RequiredArgsConstructor
 public class TocService implements TocUseCase {
-    private final NodePersistencePort persistPort;
+    private final NodePersistencePort nodePort;
     private final TocPersistencePort tocPort;
 
 
     @Override
     public TocDto.Node createFolder(FolderCreateCmd cmd) {
-        int maxOvAmongSiblings = persistPort.loadMaxOvAmongSiblings(cmd.getBookId(), cmd.getParentNodeId())
+        int maxOvAmongSiblings = tocPort.loadMaxOvAmongSiblings(cmd.getBookId(), cmd.getParentNodeId())
             .orElse(-TocParent.OV_OFFSET);
         int ov = maxOvAmongSiblings + TocParent.OV_OFFSET;
-        Folder f = persistPort.createFolder(
+        Folder f = nodePort.createFolder(
             cmd.getBookId(),
             cmd.getParentNodeId(),
             cmd.getTitle(),
@@ -41,10 +41,10 @@ public class TocService implements TocUseCase {
 
     @Override
     public TocDto.Node createSection(SectionCreateCmd cmd) {
-        int maxOvAmongSiblings = persistPort.loadMaxOvAmongSiblings(cmd.getBookId(), cmd.getParentNodeId())
+        int maxOvAmongSiblings = tocPort.loadMaxOvAmongSiblings(cmd.getBookId(), cmd.getParentNodeId())
             .orElse(-TocParent.OV_OFFSET);
         int ov = maxOvAmongSiblings + TocParent.OV_OFFSET;
-        Section s = persistPort.createSection(
+        Section s = nodePort.createSection(
             cmd.getBookId(),
             cmd.getParentNodeId(),
             cmd.getTitle(),
@@ -73,7 +73,7 @@ public class TocService implements TocUseCase {
 
     @Override
     public void deleteNode(NodeId id) {
-        persistPort.deleteNode(id);
+        nodePort.deleteNode(id);
     }
 
     @Override

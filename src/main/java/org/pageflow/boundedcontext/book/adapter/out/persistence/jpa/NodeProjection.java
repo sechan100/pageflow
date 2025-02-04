@@ -12,7 +12,7 @@ import java.util.List;
 @Getter
 public class NodeProjection {
     private final Long id;
-    private final Long parentId; // nullable
+    private final Long parentId; // root 노드인 경우 null
     private final int ov;
     private final String title;
     private final Class<? extends NodeJpaEntity> type;

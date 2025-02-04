@@ -6,7 +6,6 @@ import org.pageflow.boundedcontext.book.adapter.out.persistence.jpa.*;
 import org.pageflow.boundedcontext.book.domain.*;
 import org.pageflow.boundedcontext.book.port.out.NodePersistencePort;
 import org.pageflow.shared.type.TSID;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,10 +24,9 @@ public class NodePersistenceAdapter implements NodePersistencePort {
     private final SectionJpaRepository sectionRepo;
 
 
-
     @Override
     public Folder createFolder(BookId bookId, NodeId parentNodeId, Title title, int ov) {
-        FolderJpaEntity parentFolder = getParentNodeOrNull(parentNodeId);
+        FolderJpaEntity parentFolder = folderRepo.getReferenceById(parentNodeId.toLong());
 
         FolderJpaEntity entity = new FolderJpaEntity(
             TSID.Factory.getTsid().toLong(), // id
@@ -43,7 +41,7 @@ public class NodePersistenceAdapter implements NodePersistencePort {
 
     @Override
     public Section createSection(BookId bookId, NodeId parentNodeId, Title title, String content, int ov) {
-        FolderJpaEntity parentFolder = getParentNodeOrNull(parentNodeId);
+        FolderJpaEntity parentFolder = folderRepo.getReferenceById(parentNodeId.toLong());
 
         SectionJpaEntity entity = new SectionJpaEntity(
             TSID.Factory.getTsid().toLong(), // id
@@ -87,27 +85,6 @@ public class NodePersistenceAdapter implements NodePersistencePort {
     @Override
     public void deleteNode(NodeId id) {
         nodeRepo.deleteById(id.toLong());
-    }
-
-    /**
-     * parentNode들의 자식중에서 가장 큰 ov 값을 찾는다.
-     */
-    @Override
-    public Optional<Integer> loadMaxOvAmongSiblings(BookId bookId, NodeId parentNodeId) {
-        return nodeRepo.findMaxOvAmongSiblings(bookId.toLong(), parentNodeId.toLong());
-    }
-
-    /**
-     *
-     */
-    @Nullable
-    private FolderJpaEntity getParentNodeOrNull(NodeId parentNodeId) {
-        Long idOrNull = DomainValueConveter.convertNodeId(parentNodeId);
-        if(parentNodeId.equals(NodeId.ROOT)){
-            return null;
-        } else {
-            return folderRepo.getReferenceById(parentNodeId.toLong());
-        }
     }
 
 

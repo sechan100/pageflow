@@ -11,16 +11,16 @@ import java.util.stream.Collectors;
  */
 public class TocParent {
     public static final int OV_OFFSET = 10_000_000; // 자식 노드의 OV 간격
-    private final NodeId parentId;
-    private final List<TocNode> children;
+    private final NodeId id;
+    private final List<ChildableTocNode> children;
     private final NodeRegistry registry;
 
-    TocParent(NodeId parentId, NodeRegistry registry) {
-        this.parentId = parentId;
-        this.registry = registry;
-        this.children = registry.all().stream()
-            .filter(node -> node.getParentId().equals(parentId))
-            .sorted((a, b) -> Integer.compare(a.getOv(), b.getOv()))
+        TocParent(NodeId id, NodeRegistry registry) {
+            this.id = id;
+            this.registry = registry;
+            this.children = registry.allChildables().stream()
+                .filter(node -> node.getParentId().equals(id))
+                .sorted((a, b) -> Integer.compare(a.getOv(), b.getOv()))
             .collect(Collectors.toList());
     }
 
@@ -30,7 +30,7 @@ public class TocParent {
      * @param targetNodeId 재정렬할 노드 id
      */
     public void reorder(int dest, NodeId targetNodeId) {
-        TocNode t = registry.findNode(targetNodeId);
+        ChildableTocNode t = registry.findChildableNode(targetNodeId);
         Assert.isTrue(children.contains(t), "해당 노드는 이 폴더의 자식이 아닙니다.");
         remove(t);
         add(dest, t);
@@ -41,11 +41,11 @@ public class TocParent {
      * @param targetNodeId 부모 folder를 변경할 node
      */
     public void reparent(int dest, NodeId targetNodeId) {
-        TocNode t = registry.findNode(targetNodeId);
+        ChildableTocNode t = registry.findChildableNode(targetNodeId);
         Assert.isTrue(!children.contains(t), "이미 자식인 childNode를 reparent할 수 없습니다.");
         // target이 this의 Ancestor인 경우를 검사
         Assert.isTrue(
-            !registry.isDescendantOf(t.getId(), this.parentId),
+            !registry.isDescendantOf(t.getId(), this.id),
             "이동 대상이 parent의 조상인 경우, 이동이 불가능합니다.(순환구조로 인해서 계층구조 파괴)"
         );
         add(dest, t);
@@ -63,7 +63,7 @@ public class TocParent {
         return children.removeIf(child -> child.getId().equals(id));
     }
 
-    private boolean remove(TocNode child){
+    private boolean remove(ChildableTocNode child){
         return children.remove(child);
     }
 
@@ -71,10 +71,10 @@ public class TocParent {
      * @param child 추가할 노드. 해당 노드는 children에 이미 속한 노드가 아니어야 함
      * @param dest 0 <= dest < children.size() 인 정수
      */
-    private void add(int dest, TocNode child){
+    private void add(int dest, ChildableTocNode child){
         Assert.isTrue(!children.contains(child), "해당 노드는 이미 이 폴더의 자식입니다.");
         children.add(dest, child);
-        child.setParentId(parentId);
+        child.setParentId(id);
         int prevOv;
         int nextOv;
 

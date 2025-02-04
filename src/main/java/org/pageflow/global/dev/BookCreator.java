@@ -1,8 +1,10 @@
 package org.pageflow.global.dev;
 
+import org.pageflow.boundedcontext.book.domain.BookId;
 import org.pageflow.boundedcontext.book.domain.NodeId;
 import org.pageflow.boundedcontext.book.dto.TocDto;
 import org.pageflow.boundedcontext.book.port.in.*;
+import org.pageflow.boundedcontext.book.port.out.TocPersistencePort;
 import org.pageflow.boundedcontext.book.shared.TocNodeType;
 import org.pageflow.shared.type.TSID;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,6 +21,7 @@ import java.util.function.Supplier;
 @Profile("dev")
 @Component
 public class BookCreator {
+    private final TocPersistencePort tocPersistencePort;
     private final BookUseCase bookUseCase;
     private final TocUseCase tocUseCase;
     private final Random random;
@@ -28,11 +31,13 @@ public class BookCreator {
     public BookCreator(
         @Value("${dev.data.random-seed}") int seed,
         @Value("${dev.data.book.count}") int count,
+        TocPersistencePort tocPersistencePort,
         BookUseCase bookUseCase,
         TocUseCase tocUseCase
     ) {
         this.random = new Random(seed);
         this.count = count;
+        this.tocPersistencePort = tocPersistencePort;
         this.bookUseCase = bookUseCase;
         this.tocUseCase = tocUseCase;
     }
@@ -41,7 +46,8 @@ public class BookCreator {
     public void create(Set<TSID> userIds){
         Set<TSID> bookIds = createBooks(userIds);
         for(TSID bookId : bookIds){
-            fillParentRecursively(bookId, NodeId.ROOT.getValue(), 3);
+            NodeId rootId = tocPersistencePort.getRootNodeId(BookId.from(bookId));
+            fillParentRecursively(bookId, rootId.getValue(), 3);
         }
     }
 

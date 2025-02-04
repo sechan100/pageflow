@@ -4,8 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.pageflow.boundedcontext.book.adapter.out.persistence.jpa.*;
 import org.pageflow.boundedcontext.book.domain.BookId;
 import org.pageflow.boundedcontext.book.domain.NodeId;
+import org.pageflow.boundedcontext.book.domain.toc.ChildableTocNode;
 import org.pageflow.boundedcontext.book.domain.toc.NodeRegistry;
-import org.pageflow.boundedcontext.book.domain.toc.TocNode;
+import org.pageflow.boundedcontext.book.domain.toc.TocRootNode;
 import org.pageflow.boundedcontext.book.dto.TocDto;
 import org.pageflow.boundedcontext.book.port.out.TocPersistencePort;
 import org.pageflow.boundedcontext.book.shared.TocNodeType;
@@ -30,35 +31,49 @@ public class TocPersistenceAdapter implements TocPersistencePort {
     @Override
     public TocDto.Toc queryToc(BookId bookId) {
         List<NodeProjection> nodeProjections = nodeRepo.queryNodesByBookId(bookId.toLong());
-        List<TocDto.Node> root = buildTree(nodeProjections);
+        TocDto.Folder root = buildTree(nodeProjections);
         return new TocDto.Toc(bookId.getValue(), root);
     }
 
     @Override
     public NodeRegistry loadRegistry(BookId bookId) {
         List<NodeProjection> nodeProjections = nodeRepo.queryNodesByBookId(bookId.toLong());
-        Collection<TocNode> nodes = nodeProjections
-            .stream()
-            .map(this::mapDomain)
-            .toList();
-        return new NodeRegistry(bookId, nodes);
+
+        TocRootNode root = null;
+        Collection<ChildableTocNode> nodes = new ArrayList<>();
+        for(NodeProjection p : nodeProjections){
+            if(p.getParentId()==null){
+                root = new TocRootNode(NodeId.from(p.getId()), TocNodeType.FOLDER);
+            } else {
+                nodes.add(
+                    new ChildableTocNode(
+                        NodeId.from(p.getId()),
+                        NodeId.from(p.getParentId()),
+                        p.getOv(),
+                        p.getType().equals(FolderJpaEntity.class) ? TocNodeType.FOLDER:TocNodeType.SECTION
+                    )
+                );
+            }
+        }
+        if(root==null) throw new IllegalStateException("루트 노드가 없습니다.");
+        return new NodeRegistry(bookId, root, nodes);
     }
 
     @Override
     public NodeRegistry saveNodes(NodeRegistry registry) {
-        Set<TocNode> domainNodes = registry.getChangedNodes();
+        Set<ChildableTocNode> domainNodes = registry.getChangedNodes();
         Map<Long, NodeJpaEntity> entities = nodeRepo.findAllById(
-            domainNodes
-                .stream()
-                .map(changed -> changed.getId().toLong())
-                .collect(Collectors.toSet())
-        )
+                domainNodes
+                    .stream()
+                    .map(changed -> changed.getId().toLong())
+                    .collect(Collectors.toSet())
+            )
             .stream()
             .collect(Collectors.toMap(
                 NodeJpaEntity::getId,
                 entity -> entity
             ));
-        for(TocNode node : domainNodes){
+        for(ChildableTocNode node : domainNodes){
             NodeJpaEntity entity = entities.get(node.getId().toLong());
 
             // ov 변경
@@ -67,7 +82,7 @@ public class TocPersistenceAdapter implements TocPersistencePort {
             // parent 변경
             Long parentId = node.getParentId().toLong();
             FolderJpaEntity newParentRef;
-            if(parentId == 0L){
+            if(parentId==0L){
                 newParentRef = null;
             } else {
                 newParentRef = folderRepo.getReferenceById(parentId);
@@ -80,29 +95,25 @@ public class TocPersistenceAdapter implements TocPersistencePort {
         return registry;
     }
 
-
-
-    private TocNode mapDomain(NodeProjection p){
-        return new TocNode(
-            NodeId.from(p.getId()),
-            mapsParentId(p.getParentId()),
-            p.getOv(),
-            p.getType().equals(FolderJpaEntity.class) ? TocNodeType.FOLDER : TocNodeType.SECTION
-        );
+    @Override
+    public NodeId getRootNodeId(BookId bookId) {
+        FolderJpaEntity rootNode = nodeRepo.findRootNode(bookId.toLong()).orElseThrow();
+        return NodeId.from(rootNode.getId());
     }
 
     /**
-     * DB 칼럼에 실제로 저장되는 parentId 값을, 도메인에서 의미있는 값으로 변환해주는 메서드.
-     * 실제로 root 레벨에 위치한 노드들의 parentId 값은 null이지만, 도메인 안에서는 TSID.from(0L)에 해당하는 값으로 사용
+     * parentNode들의 자식중에서 가장 큰 ov 값을 찾는다.
      */
-    private NodeId mapsParentId(Long parentIdOrNull){
-        return parentIdOrNull != null ? NodeId.from(parentIdOrNull) : NodeId.ROOT;
+    @Override
+    public Optional<Integer> loadMaxOvAmongSiblings(BookId bookId, NodeId parentNodeId) {
+        return nodeRepo.findMaxOvAmongSiblings(bookId.toLong(), parentNodeId.toLong());
     }
+
 
     /**
      * NodeProjection로 트리를 구성하고 TocDto.Node 기반의 트리로 변환하여 그 root를 반환한다.
      */
-    private List<TocDto.Node> buildTree(List<NodeProjection> projections){
+    private TocDto.Folder buildTree(List<NodeProjection> projections){
         // 트리 구성
         Map<Long, NodeProjection> nodeMap = projections
             .stream()
@@ -110,21 +121,27 @@ public class TocPersistenceAdapter implements TocPersistencePort {
                 NodeProjection::getId,
                 p -> p
             ));
-        List<NodeProjection> projectionRoot = new ArrayList<>();
+        NodeProjection rootProjection = projections.stream()
+            .filter(p -> p.getParentId() == null)
+            .findFirst()
+            .orElseThrow();
         for(NodeProjection p : projections){
             Long parentId = p.getParentId();
-            if(parentId== null){ // root
-                projectionRoot.add(p);
-            } else {
-                NodeProjection parent = nodeMap.get(parentId);
-                parent.addChildAccordingToOv(p);
-            }
+            if(parentId == null) continue; // root
+            NodeProjection parent = nodeMap.get(parentId);
+            parent.addChildAccordingToOv(p);
         }
+
         // NodeProjection 객체를 Dto 객체로 변환
-        List<TocDto.Node> root = projectionRoot.stream()
+        List<TocDto.Node> rootChildren = rootProjection.getChildren().stream()
             .map(this::projectRecursively)
             .toList();
-        return root;
+
+        return new TocDto.Folder(
+            new TSID(rootProjection.getId()),
+            rootProjection.getTitle(),
+            rootChildren
+        );
     }
 
     private TocDto.Node projectRecursively(NodeProjection projection){

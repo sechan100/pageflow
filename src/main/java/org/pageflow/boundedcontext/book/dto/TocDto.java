@@ -39,6 +39,6 @@ public abstract class TocDto {
     @Value
     public static class Toc {
         TSID bookId;
-        List<Node> root;
+        Folder root;
     }
 }

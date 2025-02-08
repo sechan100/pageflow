@@ -50,4 +50,5 @@ src/main/generated
 dump.rdb
 .gitsecret/keys/random_seed
 !*.secret
+.env
 .env.ci

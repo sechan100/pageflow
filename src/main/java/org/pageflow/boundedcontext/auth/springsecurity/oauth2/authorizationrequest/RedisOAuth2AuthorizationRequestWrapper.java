@@ -9,6 +9,7 @@ import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequ
 
 /**
  * {@link OAuth2AuthorizationRequest}가 상속이 안되서 wrapper로 만듦
+ *
  * @author : sechan
  */
 @Data
@@ -17,8 +18,8 @@ import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequ
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @RedisHash("oauth2-authorization-request")
 public class RedisOAuth2AuthorizationRequestWrapper implements JpaEntity {
-    @Id
-    private String state;
-    @Getter
-    private OAuth2AuthorizationRequest request;
+  @Id
+  private String state;
+  @Getter
+  private OAuth2AuthorizationRequest request;
 }

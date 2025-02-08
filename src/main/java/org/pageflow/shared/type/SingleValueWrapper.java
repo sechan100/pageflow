@@ -10,32 +10,32 @@ import java.io.Serializable;
  * @author : sechan
  */
 public abstract class SingleValueWrapper<V> implements Serializable {
-    protected final V value;
+  protected final V value;
 
-    public SingleValueWrapper(V value){
-        this.value = value;
-    }
+  public SingleValueWrapper(V value) {
+    this.value = value;
+  }
 
-    public V getValue(){
-        return value;
-    }
+  public V getValue() {
+    return value;
+  }
 
-    @Override
-    public String toString(){
-        return value.toString();
-    }
+  @Override
+  public String toString() {
+    return value.toString();
+  }
 
-    @Override
-    public boolean equals(Object obj){
-        if(obj == null) return false;
-        if(obj == this) return true;
-        if(obj.getClass() != this.getClass()) return false;
-        SingleValueWrapper<?> other = (SingleValueWrapper<?>) obj;
-        return this.value.equals(other.value);
-    }
+  @Override
+  public boolean equals(Object obj) {
+    if(obj==null) return false;
+    if(obj==this) return true;
+    if(obj.getClass()!=this.getClass()) return false;
+    SingleValueWrapper<?> other = (SingleValueWrapper<?>) obj;
+    return this.value.equals(other.value);
+  }
 
-    @Override
-    public int hashCode(){
-        return value.hashCode();
-    }
+  @Override
+  public int hashCode() {
+    return value.hashCode();
+  }
 }

@@ -13,22 +13,22 @@ import java.util.List;
 @Configuration
 @RequiredArgsConstructor
 public class InitializerManager {
-    private final List<RuntimeInitializer> initializers;
-    
-    @Bean
-    public ApplicationRunner runner() {
-        return args -> {
-            for(RuntimeInitializer initializer : initializers) {
-                try {
-                    if(initializer.isActivated()) {
-                        initializer.initialize();
-                    }
-                } catch (Throwable e) {
-                    log.error("Runtime Initializer Error가 발생했습니다.");
-                    throw new RuntimeInitializeException(e);
-                }
-            }
-        };
-    }
-    
+  private final List<RuntimeInitializer> initializers;
+
+  @Bean
+  public ApplicationRunner runner() {
+    return args -> {
+      for(RuntimeInitializer initializer : initializers){
+        try {
+          if(initializer.isActivated()){
+            initializer.initialize();
+          }
+        } catch(Throwable e){
+          log.error("Runtime Initializer Error가 발생했습니다.");
+          throw new RuntimeInitializeException(e);
+        }
+      }
+    };
+  }
+
 }

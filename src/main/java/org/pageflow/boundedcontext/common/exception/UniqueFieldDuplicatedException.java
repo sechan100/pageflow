@@ -7,12 +7,12 @@ import lombok.Getter;
  */
 @Getter
 public class UniqueFieldDuplicatedException extends DomainException {
-    private final String field;
-    private final String duplicatedValue;
+  private final String field;
+  private final String duplicatedValue;
 
-    public UniqueFieldDuplicatedException(String field, String duplicatedValue, String message) {
-        super(message);
-        this.field = field;
-        this.duplicatedValue = duplicatedValue;
-    }
+  public UniqueFieldDuplicatedException(String field, String duplicatedValue, String message) {
+    super(message);
+    this.field = field;
+    this.duplicatedValue = duplicatedValue;
+  }
 }

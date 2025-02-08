@@ -1,7 +1,7 @@
 package org.pageflow.global.advice;
 
 import org.pageflow.global.api.ApiResponse;
-import org.pageflow.global.api.code.ApiCode2;
+import org.pageflow.global.result.code.ResultCode2;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;
 import org.springframework.http.server.ServerHttpRequest;
@@ -12,23 +12,23 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
 @RestControllerAdvice(basePackages = "org.pageflow")
 public class ApiResponseAdvice implements ResponseBodyAdvice<Object> {
-    
-    @Override
-    public boolean supports(@NonNull MethodParameter returnType, @NonNull Class converterType) {
-        // 공통응답 객체를 반환하지 않는 메소드에 적용
-        return !returnType.getParameterType().equals(ApiResponse.class);
-    }
-    
-    @Override
-    public Object beforeBodyWrite(
-            Object body,
-            @NonNull MethodParameter returnType,
-            @NonNull MediaType selectedContentType,
-            @NonNull Class selectedConverterType,
-            @NonNull ServerHttpRequest request,
-            @NonNull ServerHttpResponse response
-    ) {
-        return new ApiResponse<>(ApiCode2.SUCCESS, body);
-    }
-    
+
+  @Override
+  public boolean supports(@NonNull MethodParameter returnType, @NonNull Class converterType) {
+    // 공통응답 객체를 반환하지 않는 메소드에 적용
+    return !returnType.getParameterType().equals(ApiResponse.class);
+  }
+
+  @Override
+  public Object beforeBodyWrite(
+    Object body,
+    @NonNull MethodParameter returnType,
+    @NonNull MediaType selectedContentType,
+    @NonNull Class selectedConverterType,
+    @NonNull ServerHttpRequest request,
+    @NonNull ServerHttpResponse response
+  ) {
+    return new ApiResponse<>(ResultCode2.SUCCESS, body);
+  }
+
 }

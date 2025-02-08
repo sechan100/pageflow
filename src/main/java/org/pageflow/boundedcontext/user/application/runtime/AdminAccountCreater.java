@@ -21,30 +21,30 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @RequiredArgsConstructor
 public class AdminAccountCreater implements RuntimeInitializer {
-    private final AdminUseCase adminUseCase;
-    private final AccountJpaRepository accountJpaRepo;
-    private final JsonUtility jsonUtility;
-    private final AppProps props;
+  private final AdminUseCase adminUseCase;
+  private final AccountJpaRepository accountJpaRepo;
+  private final JsonUtility jsonUtility;
+  private final AppProps props;
 
-    @Override
-    @Transactional
-    public void initialize() {
-        if(accountJpaRepo.existsByRole(RoleType.ROLE_ADMIN)) {
-            return;
-        }
-        AppProps.Admin admin = props.admin;
-        SignupCmd cmd = new SignupCmd(
-            admin.username,
-            admin.password,
-            admin.email,
-            admin.penname,
-            RoleType.ROLE_ADMIN,
-            ProviderType.NATIVE,
-            props.user.defaultProfileImageUrl
-        );
-
-        UserDto.User result = adminUseCase.registerAdmin(cmd);
-
-        log.info("관리자 계정을 생성했습니다. {}", jsonUtility.toJson(result));
+  @Override
+  @Transactional
+  public void initialize() {
+    if(accountJpaRepo.existsByRole(RoleType.ROLE_ADMIN)){
+      return;
     }
+    AppProps.Admin admin = props.admin;
+    SignupCmd cmd = new SignupCmd(
+      admin.username,
+      admin.password,
+      admin.email,
+      admin.penname,
+      RoleType.ROLE_ADMIN,
+      ProviderType.NATIVE,
+      props.user.defaultProfileImageUrl
+    );
+
+    UserDto.User result = adminUseCase.registerAdmin(cmd);
+
+    log.info("관리자 계정을 생성했습니다. {}", jsonUtility.toJson(result));
+  }
 }

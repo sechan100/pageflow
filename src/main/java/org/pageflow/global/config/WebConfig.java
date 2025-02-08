@@ -15,18 +15,18 @@ import java.util.List;
 @RequiredArgsConstructor
 public class WebConfig implements WebMvcConfigurer {
 
-    private final StringToTsidConverter stringToTsidConverter;
-    private final ObjectMapper objectMapper;
+  private final StringToTsidConverter stringToTsidConverter;
+  private final ObjectMapper objectMapper;
 
-    @Override
-    public void addFormatters(FormatterRegistry registry) {
-        registry.addConverter(stringToTsidConverter);
-    }
+  @Override
+  public void addFormatters(FormatterRegistry registry) {
+    registry.addConverter(stringToTsidConverter);
+  }
 
-    @Override
-    public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-        final MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
-        converter.setObjectMapper(objectMapper);
-        converters.add(1, converter);
-    }
+  @Override
+  public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
+    final MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
+    converter.setObjectMapper(objectMapper);
+    converters.add(1, converter);
+  }
 }

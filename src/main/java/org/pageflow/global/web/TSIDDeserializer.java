@@ -13,14 +13,14 @@ import java.io.IOException;
  */
 public class TSIDDeserializer extends JsonDeserializer<TSID> {
 
-    @Override
-    public TSID deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JacksonException {
-        try {
-            return TSID.from(p.getValueAsString());
-        } catch(Exception e) {
-            throw new IllegalArgumentException(e);
-        }
+  @Override
+  public TSID deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JacksonException {
+    try {
+      return TSID.from(p.getValueAsString());
+    } catch(Exception e){
+      throw new IllegalArgumentException(e);
     }
+  }
 
 
 }

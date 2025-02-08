@@ -10,5 +10,5 @@ import java.util.UUID;
  */
 @RequiredArgsConstructor
 public class EmailVerificationAuthCodeMisMatchException extends DomainException {
-    private final UUID failedAuthCode;
+  private final UUID failedAuthCode;
 }

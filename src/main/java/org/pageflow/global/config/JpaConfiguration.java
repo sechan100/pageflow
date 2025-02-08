@@ -9,8 +9,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
  */
 @Configuration
 @EnableJpaRepositories(
-    value = "org.pageflow",
-    repositoryBaseClass = BaseJpaRepositoryImpl.class
+  value = "org.pageflow",
+  repositoryBaseClass = BaseJpaRepositoryImpl.class
 )
 public class JpaConfiguration {
 }

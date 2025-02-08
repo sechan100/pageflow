@@ -9,34 +9,34 @@ import java.util.Map;
 
 public abstract class AbstractOwner implements OAuth2ResourceOwner {
 
-    private final OAuth2User oAuth2User;
-    private final ClientRegistration clientRegistration;
-    private final Map<String, Object> attributes;
+  private final OAuth2User oAuth2User;
+  private final ClientRegistration clientRegistration;
+  private final Map<String, Object> attributes;
 
-    public AbstractOwner(Map<String, Object> attributes, OAuth2User oAuth2User, ClientRegistration clientRegistration) {
-        this.oAuth2User = oAuth2User;
-        this.clientRegistration = clientRegistration;
-        this.attributes = Collections.unmodifiableMap(attributes);
-    }
+  public AbstractOwner(Map<String, Object> attributes, OAuth2User oAuth2User, ClientRegistration clientRegistration) {
+    this.oAuth2User = oAuth2User;
+    this.clientRegistration = clientRegistration;
+    this.attributes = Collections.unmodifiableMap(attributes);
+  }
 
-    @Override
-    public String getEmail() {
-        return (String) getAttributes().get("email");
-    }
+  @Override
+  public String getEmail() {
+    return (String) getAttributes().get("email");
+  }
 
-    @Override
-    public String getProvider() {
-        return clientRegistration.getRegistrationId();
-    }
+  @Override
+  public String getProvider() {
+    return clientRegistration.getRegistrationId();
+  }
 
-    // format: '${provider}-${identifier}'   ex)GOOGLE-14223456829527890
-    @Override
-    public String getUsername() {
-        return getProviderType() + "-" + getId();
-    }
-    
-    @Override
-    public Map<String, Object> getAttributes() {
-        return attributes;
-    }
+  // format: '${provider}-${identifier}'   ex)GOOGLE-14223456829527890
+  @Override
+  public String getUsername() {
+    return getProviderType() + "-" + getId();
+  }
+
+  @Override
+  public Map<String, Object> getAttributes() {
+    return attributes;
+  }
 }

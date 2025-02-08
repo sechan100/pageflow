@@ -6,16 +6,16 @@ import lombok.Getter;
  * @author : sechan
  */
 public interface FileType {
-    FileOwnerType getOwnerType();
-    String name();
+  FileOwnerType getOwnerType();
 
-    enum USER implements FileType {
-        PROFILE_IMAGE
-        ;
+  String name();
 
-        @Getter
-        private final FileOwnerType ownerType = FileOwnerType.USER;
-    }
+  enum USER implements FileType {
+    PROFILE_IMAGE;
+
+    @Getter
+    private final FileOwnerType ownerType = FileOwnerType.USER;
+  }
 
 }
 

@@ -15,26 +15,26 @@ import java.util.UUID;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @RedisHash(value = "user-email-verification", timeToLive = 60 * 60)
 public class EmailVerificationRequest implements JpaEntity {
-    
-    @Id
-    private Long uid;
-    
-    private String email;
 
-    /**
-     * UUID
-     */
-    private String authorizationCode;
+  @Id
+  private Long uid;
 
-    public EmailVerificationRequest(TSID uid, String email){
-        this.uid = uid.toLong();
-        this.email = email;
-        this.authorizationCode = UUID.randomUUID().toString();
-    }
+  private String email;
 
-    public void changeVerificationTargerEmail(String email){
-        this.email = email;
-    }
+  /**
+   * UUID
+   */
+  private String authorizationCode;
 
-    
+  public EmailVerificationRequest(TSID uid, String email) {
+    this.uid = uid.toLong();
+    this.email = email;
+    this.authorizationCode = UUID.randomUUID().toString();
+  }
+
+  public void changeVerificationTargerEmail(String email) {
+    this.email = email;
+  }
+
+
 }

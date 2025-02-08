@@ -7,7 +7,7 @@ import org.pageflow.boundedcontext.common.exception.DomainException;
  */
 public class AccessTokenExpiredException extends DomainException {
 
-    public AccessTokenExpiredException(Throwable cause) {
-        super(cause);
-    }
+  public AccessTokenExpiredException(Throwable cause) {
+    super(cause);
+  }
 }

@@ -1,15 +1,17 @@
 package org.pageflow.boundedcontext.book.dto;
 
 import lombok.Value;
-import org.pageflow.shared.type.TSID;
+
+import java.util.UUID;
+
 
 /**
  * @author : sechan
  */
 public abstract class FolderDto {
-    @Value
-    public static class Basic {
-        TSID id;
-        String title;
-    }
+  @Value
+  public static class Basic {
+    UUID id;
+    String title;
+  }
 }

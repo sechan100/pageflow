@@ -16,25 +16,25 @@ import java.util.Random;
  */
 @Component
 public class UserCreator {
-    @Autowired
-    private UserUseCase userUseCase;
+  @Autowired
+  private UserUseCase userUseCase;
 
-    private final Random random = new Random(1);
+  private final Random random = new Random(1);
 
-    public UID create() {
-        return create(null);
-    }
+  public UID create() {
+    return create(null);
+  }
 
-    public UID create(String username) {
-        UserDto.User user = userUseCase.signup(new SignupCmd(
-            username != null ? username : "tuser" + random.nextInt(),
-            "tuser" + random.nextInt(),
-            "testemail" + random.nextInt() + "@pageflow.org",
-            "테스트사용자" + random.nextInt(),
-            RoleType.ROLE_USER,
-            ProviderType.NATIVE,
-            "/test"
-        ));
-        return UID.from(user.getId());
-    }
+  public UID create(String username) {
+    UserDto.User user = userUseCase.signup(new SignupCmd(
+      username!=null ? username:"tuser" + random.nextInt(),
+      "tuser" + random.nextInt(),
+      "testemail" + random.nextInt() + "@pageflow.org",
+      "테스트사용자" + random.nextInt(),
+      RoleType.ROLE_USER,
+      ProviderType.NATIVE,
+      "/test"
+    ));
+    return UID.from(user.getId());
+  }
 }

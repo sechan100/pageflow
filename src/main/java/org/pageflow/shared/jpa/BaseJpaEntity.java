@@ -22,10 +22,10 @@ import java.time.LocalDateTime;
 @EntityListeners(AuditingEntityListener.class)
 public abstract class BaseJpaEntity implements JpaEntity {
 
-    @CreatedDate
-    private LocalDateTime createdDatetime;
+  @CreatedDate
+  private LocalDateTime createdDatetime;
 
-    @LastModifiedDate
-    private LocalDateTime updatedDatetime;
+  @LastModifiedDate
+  private LocalDateTime updatedDatetime;
 
 }

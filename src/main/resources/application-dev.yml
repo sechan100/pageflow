@@ -78,7 +78,7 @@ custom:
     client-url: '${custom.site.protocol}://localhost:3000'
     client-proxy-prefix: '/PROXY'
   auth:
-    # defined in application-secret.yml
+  # defined in application-secret.yml
   user:
     default-profile-image-url: '${custom.site.base-url}/img/default-profile-image.png'
   email:

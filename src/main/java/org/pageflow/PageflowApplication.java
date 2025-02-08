@@ -12,8 +12,8 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @ConfigurationPropertiesScan // @ConfigurationProperties 클래스를 빈으로 등록
 public class PageflowApplication {
 
-    public static void main(String[] args) {
-        SpringApplication.run(PageflowApplication.class, args);
-    }
+  public static void main(String[] args) {
+    SpringApplication.run(PageflowApplication.class, args);
+  }
 
 }

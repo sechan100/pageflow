@@ -11,10 +11,14 @@ import org.pageflow.boundedcontext.user.domain.ProfileImageUrl;
  * @author : sechan
  */
 public interface UserUseCase {
-    UserDto.User signup(SignupCmd cmd);
-    UserDto.User changeEmail(UID uid, Email email);
-    UserDto.User changePenname(UID uid, Penname penname);
-    UserDto.User changeProfileImage(UID uid, ProfileImageFile file);
-    UserDto.User changeProfileImage(UID uid, ProfileImageUrl url);
-    // 프로필 사진 삭제 기능 추기
+  UserDto.User signup(SignupCmd cmd);
+
+  UserDto.User changeEmail(UID uid, Email email);
+
+  UserDto.User changePenname(UID uid, Penname penname);
+
+  UserDto.User changeProfileImage(UID uid, ProfileImageFile file);
+
+  UserDto.User changeProfileImage(UID uid, ProfileImageUrl url);
+  // 프로필 사진 삭제 기능 추기
 }

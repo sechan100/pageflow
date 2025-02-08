@@ -1,11 +1,9 @@
 package org.pageflow.global.api;
 
 import lombok.Getter;
-import org.pageflow.global.api.code.ApiCode;
-import org.pageflow.global.api.exception.ApiResponseDataTypeMisMatchException;
+import org.pageflow.global.result.Result;
+import org.pageflow.global.result.code.ResultCode;
 import org.springframework.lang.Nullable;
-
-import java.util.Objects;
 
 /**
  * @author : sechan
@@ -13,31 +11,23 @@ import java.util.Objects;
 @Getter
 public class ApiResponse<T> {
 
-    private final String title;
-    private final int code;
-    private final String message;
-    @Nullable
-    private final T data;
+  private final String title;
+  private final int code;
+  private final String message;
+  @Nullable
+  private final T data;
 
 
-    public ApiResponse(ApiCode apiCode, @Nullable T data){
-        Class<?> expectedDataType = Objects.requireNonNullElse(apiCode.getDataType(), NullDataType.class);
-        Class<?> actualDataType = Objects.requireNonNullElse(data, new NullDataType()).getClass();
-        if(!expectedDataType.isAssignableFrom(actualDataType)){
-            throw new ApiResponseDataTypeMisMatchException(expectedDataType, actualDataType);
-        }
-        this.title = apiCode.getTitle();
-        this.code = apiCode.getCode();
-        this.message = apiCode.getMessage();
-        this.data = data;
-    }
+  private ApiResponse(Result<T> result) {
+    ResultCode code = result.getCode();
+    this.title = code.getTitle();
+    this.code = code.getCode();
+    this.message = code.getMessage();
+    this.data = result.getData();
+  }
 
-    public ApiResponse(ApiCode apiCode){
-        this(apiCode, null);
-    }
+  public static <T> ApiResponse<T> of(Result<T> result) {
+    return new ApiResponse<>(result);
+  }
 
-}
-
-// ApiResponse의 dataType이 null인 경우를 표현하기 위한 타입 객체
-class NullDataType {
 }

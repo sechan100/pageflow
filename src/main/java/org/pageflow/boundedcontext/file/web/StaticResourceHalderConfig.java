@@ -10,12 +10,12 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @RequiredArgsConstructor
 public class StaticResourceHalderConfig implements WebMvcConfigurer {
 
-    private final AppProps props;
+  private final AppProps props;
 
-    @Override
-    public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry
-            .addResourceHandler(props.file.webBaseUrl + "/**")
-            .addResourceLocations("file:" + props.file.parent + "/");
-    }
+  @Override
+  public void addResourceHandlers(ResourceHandlerRegistry registry) {
+    registry
+      .addResourceHandler(props.file.webBaseUrl + "/**")
+      .addResourceLocations("file:" + props.file.parent + "/");
+  }
 }

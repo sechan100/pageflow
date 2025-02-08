@@ -9,15 +9,15 @@ import org.springframework.util.Assert;
 @Component
 public class PropsAware {
 
-    private static AppProps props;
+  private static AppProps props;
 
-    public PropsAware(AppProps props){
-        PropsAware.props = props;
-    }
+  public PropsAware(AppProps props) {
+    PropsAware.props = props;
+  }
 
-    @SuppressWarnings("StaticVariableUsedBeforeInitialization")
-    public static AppProps use(){
-        Assert.notNull(props, "AppProps가 초기화되지 않았습니다.");
-        return props;
-    }
+  @SuppressWarnings("StaticVariableUsedBeforeInitialization")
+  public static AppProps use() {
+    Assert.notNull(props, "AppProps가 초기화되지 않았습니다.");
+    return props;
+  }
 }

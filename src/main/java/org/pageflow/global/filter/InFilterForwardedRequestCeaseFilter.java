@@ -24,44 +24,44 @@ import java.util.Optional;
 @Slf4j
 public class InFilterForwardedRequestCeaseFilter extends OncePerRequestFilter implements InFilterForwardManager {
 
-    private static final String IN_FILTER_FORWARDED_REQUEST_ATTR = "InFilterForwardedRequestCeaseFilter.inFilterForwarded";
+  private static final String IN_FILTER_FORWARDED_REQUEST_ATTR = "InFilterForwardedRequestCeaseFilter.inFilterForwarded";
 
-    @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        Optional<ForwardedRequestAttr> op = getForwardedRequestAttr(request);
-        if(op.isPresent()){
-            log.debug("이미 {}에 의해서 InFilterForward로 commit된 요청입니다. filterChain 연쇄를 끊어, 요청을 중단합니다.", op.get().getSource());
-        } else {
-            filterChain.doFilter(request, response);
-        }
+  @Override
+  protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    Optional<ForwardedRequestAttr> op = getForwardedRequestAttr(request);
+    if(op.isPresent()){
+      log.debug("이미 {}에 의해서 InFilterForward로 commit된 요청입니다. filterChain 연쇄를 끊어, 요청을 중단합니다.", op.get().getSource());
+    } else {
+      filterChain.doFilter(request, response);
     }
+  }
 
-    @Override
-    public void inFilterForward(Object source, Forward forward) {
-        Optional<ForwardedRequestAttr> op = getForwardedRequestAttr(forward.getRequest());
-        // 이미 inFilterForward한 경우
-        if(op.isPresent()) {
-            throw new IllegalStateException(
-                "이미 InFilterForward에 의해서 commit된 요청입니다." +
-                "inFilterForward source: " + op.get().getSource() + ", uri: '" + forward + "'"
-            );
-        } else {
-            forward.send();
-        }
+  @Override
+  public void inFilterForward(Object source, Forward forward) {
+    Optional<ForwardedRequestAttr> op = getForwardedRequestAttr(forward.getRequest());
+    // 이미 inFilterForward한 경우
+    if(op.isPresent()){
+      throw new IllegalStateException(
+        "이미 InFilterForward에 의해서 commit된 요청입니다." +
+          "inFilterForward source: " + op.get().getSource() + ", uri: '" + forward + "'"
+      );
+    } else {
+      forward.send();
     }
+  }
 
-    @Override
-    public boolean isCommitedResponseByInFilterForward(HttpServletRequest request) {
-        return getForwardedRequestAttr(request).isPresent();
-    }
+  @Override
+  public boolean isCommitedResponseByInFilterForward(HttpServletRequest request) {
+    return getForwardedRequestAttr(request).isPresent();
+  }
 
-    private Optional<ForwardedRequestAttr> getForwardedRequestAttr(HttpServletRequest request) {
-        return Optional.ofNullable((ForwardedRequestAttr) request.getAttribute(IN_FILTER_FORWARDED_REQUEST_ATTR));
-    }
+  private Optional<ForwardedRequestAttr> getForwardedRequestAttr(HttpServletRequest request) {
+    return Optional.ofNullable((ForwardedRequestAttr) request.getAttribute(IN_FILTER_FORWARDED_REQUEST_ATTR));
+  }
 
-    @Value
-    static class ForwardedRequestAttr {
-        private final Object source;
-        private final Forward forward;
-    }
+  @Value
+  static class ForwardedRequestAttr {
+    private final Object source;
+    private final Forward forward;
+  }
 }

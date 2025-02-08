@@ -12,28 +12,27 @@ import org.pageflow.boundedcontext.common.value.UID;
 @Getter
 @AllArgsConstructor
 public class User {
-    private final UID uid;
-    private final Username username;
-    private final RoleType role;
-    private Email email;
-    private boolean isEmailVerified;
-    private Penname penname;
-    private ProfileImageUrl profileImageUrl;
+  private final UID uid;
+  private final Username username;
+  private final RoleType role;
+  private Email email;
+  private boolean isEmailVerified;
+  private Penname penname;
+  private ProfileImageUrl profileImageUrl;
 
 
+  public void changeEmail(Email email) {
+    this.email = email;
+    this.isEmailVerified = false;
+  }
 
-    public void changeEmail(Email email) {
-        this.email = email;
-        this.isEmailVerified = false;
-    }
+  public void changePenname(Penname penname) {
+    this.penname = penname;
+  }
 
-    public void changePenname(Penname penname) {
-        this.penname = penname;
-    }
-
-    public void changeProfileImageUrl(ProfileImageUrl profileImageUrl) {
-        this.profileImageUrl = profileImageUrl;
-    }
+  public void changeProfileImageUrl(ProfileImageUrl profileImageUrl) {
+    this.profileImageUrl = profileImageUrl;
+  }
 
 
 }

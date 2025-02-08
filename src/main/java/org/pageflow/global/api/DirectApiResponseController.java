@@ -15,10 +15,11 @@ import org.springframework.web.bind.annotation.RestController;
 @AllArgsConstructor
 public class DirectApiResponseController {
 
-    public static final String SEND_GR_ANY_WHERE_ENDPOINT = UriPrefix.PRIVATE + "/send-response/apiResponse";
-    @RequestMapping(SEND_GR_ANY_WHERE_ENDPOINT)
-    @Hidden
-    public ApiResponse<?> response(HttpServletRequest request){
-        return(ApiResponse<?>) request.getAttribute(ApiExceptionCatchAndDelegatingFilter.API_RESPONSE_REQUEST_ATTR);
-    }
+  public static final String SEND_GR_ANY_WHERE_ENDPOINT = UriPrefix.PRIVATE + "/send-response/apiResponse";
+
+  @RequestMapping(SEND_GR_ANY_WHERE_ENDPOINT)
+  @Hidden
+  public ApiResponse<?> response(HttpServletRequest request) {
+    return (ApiResponse<?>) request.getAttribute(ApiExceptionCatchAndDelegatingFilter.API_RESPONSE_REQUEST_ATTR);
+  }
 }

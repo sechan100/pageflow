@@ -8,30 +8,30 @@ import lombok.Data;
  */
 abstract class Req {
 
-    @Data
-    public static class SignupForm {
-        @NotBlank
-        private String username;
+  @Data
+  public static class SignupForm {
+    @NotBlank
+    private String username;
 
-        @NotBlank
-        private String password;
+    @NotBlank
+    private String password;
 
-        @jakarta.validation.constraints.Email
-        private String email;
+    @jakarta.validation.constraints.Email
+    private String email;
 
-        @NotBlank
-        private String penname;
-    }
+    @NotBlank
+    private String penname;
+  }
 
-    @Data
-    public static class Penname {
-        @NotBlank
-        private String penname;
-    }
+  @Data
+  public static class Penname {
+    @NotBlank
+    private String penname;
+  }
 
-    @Data
-    public static class Email {
-        @NotBlank
-        private String email;
-    }
+  @Data
+  public static class Email {
+    @NotBlank
+    private String email;
+  }
 }

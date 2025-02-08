@@ -58,12 +58,6 @@ dependencies {
 //	implementation 'io.hypersistence:hypersistence-tsid:2.1.1' // 프로젝트 내부로 통합
 //	implementation 'io.hypersistence:hypersistence-utils-hibernate-63:3.7.4' // 프로젝트 내부로 통합
 
-
-	// Mapstruct
-	implementation 'org.projectlombok:lombok-mapstruct-binding:0.2.0' // lombok과 연동
-	implementation 'org.mapstruct:mapstruct:1.5.5.Final'
-	annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
-	testAnnotationProcessor "org.mapstruct:mapstruct-processor:1.5.5.Final"
 }
 
 tasks.named('test') {

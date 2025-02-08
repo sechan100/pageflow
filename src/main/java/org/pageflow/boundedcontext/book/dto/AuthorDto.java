@@ -1,14 +1,15 @@
 package org.pageflow.boundedcontext.book.dto;
 
 import lombok.Value;
-import org.pageflow.shared.type.TSID;
+
+import java.util.UUID;
 
 /**
  * @author : sechan
  */
 @Value
 public class AuthorDto {
-    TSID id;
-    String penname;
-    String profileImageUrl;
+    UUID id;
+  String penname;
+  String profileImageUrl;
 }

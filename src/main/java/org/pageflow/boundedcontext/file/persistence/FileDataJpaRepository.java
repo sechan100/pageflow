@@ -7,33 +7,34 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.UUID;
 
-public interface FileDataJpaRepository extends BaseJpaRepository<FileData, String> {
+public interface FileDataJpaRepository extends BaseJpaRepository<FileData, UUID> {
 
-    @Query("""
+  @Query("""
         select f from FileData f
         where f.ownerId = :#{#identity.ownerId.toLong()}
         and f.ownerType = :#{#identity.ownerType}
         and f.fileType = :#{#identity.fileType}
     """)
-    List<FileData> findAll(@Param("identity") FileIdentity identity);
+  List<FileData> findAll(@Param("identity") FileIdentity identity);
 
-    @Query("""
+  @Query("""
         delete from FileData f
         where f.ownerId = :#{#identity.ownerId.toLong()}
         and f.ownerType = :#{#identity.ownerType}
         and f.fileType = :#{#identity.fileType}
     """)
-    void deleteAll(@Param("identity") FileIdentity identity);
+  void deleteAll(@Param("identity") FileIdentity identity);
 
 
-    @Query("""
+  @Query("""
         delete from FileData f
         where f.ownerId = :#{#ownerId.toLong()}
         and f.ownerType = :ownerType
     """)
-    void deleteAll(
-        @Param("ownerId") Long ownerId,
-        @Param("ownerType") FileOwnerType ownerType);
+  void deleteAll(
+    @Param("ownerId") UUID ownerId,
+    @Param("ownerType") FileOwnerType ownerType);
 }
 

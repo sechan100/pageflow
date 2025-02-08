@@ -15,51 +15,51 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @RequestMapping(
-    method = {RequestMethod.GET}
+  method = {RequestMethod.GET}
 )
 @Secured({})
 public @interface Get {
 
-    @AliasFor(
-        annotation = Secured.class,
-        attribute = "value"
-    )
-    String[] access() default ApiAccess.USER;
+  @AliasFor(
+    annotation = Secured.class,
+    attribute = "value"
+  )
+  String[] access() default ApiAccess.USER;
 
 
-    // @GetMapping alias
-    @AliasFor(
-        annotation = RequestMapping.class
-    )
-    String name() default "";
+  // @GetMapping alias
+  @AliasFor(
+    annotation = RequestMapping.class
+  )
+  String name() default "";
 
-    @AliasFor(
-        annotation = RequestMapping.class
-    )
-    String[] value() default {};
+  @AliasFor(
+    annotation = RequestMapping.class
+  )
+  String[] value() default {};
 
-    @AliasFor(
-        annotation = RequestMapping.class
-    )
-    String[] path() default {};
+  @AliasFor(
+    annotation = RequestMapping.class
+  )
+  String[] path() default {};
 
-    @AliasFor(
-        annotation = RequestMapping.class
-    )
-    String[] params() default {};
+  @AliasFor(
+    annotation = RequestMapping.class
+  )
+  String[] params() default {};
 
-    @AliasFor(
-        annotation = RequestMapping.class
-    )
-    String[] headers() default {};
+  @AliasFor(
+    annotation = RequestMapping.class
+  )
+  String[] headers() default {};
 
-    @AliasFor(
-        annotation = RequestMapping.class
-    )
-    String[] consumes() default {};
+  @AliasFor(
+    annotation = RequestMapping.class
+  )
+  String[] consumes() default {};
 
-    @AliasFor(
-        annotation = RequestMapping.class
-    )
-    String[] produces() default {};
+  @AliasFor(
+    annotation = RequestMapping.class
+  )
+  String[] produces() default {};
 }

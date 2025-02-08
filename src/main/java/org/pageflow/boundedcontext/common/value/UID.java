@@ -1,23 +1,25 @@
 package org.pageflow.boundedcontext.common.value;
 
 import org.pageflow.shared.type.SingleValueWrapper;
-import org.pageflow.shared.type.TSID;
+
+import java.util.UUID;
 
 /**
  * @author : sechan
  */
-public final class UID extends SingleValueWrapper<TSID> {
+public final class UID extends SingleValueWrapper<UUID> {
 
-    // CONUIDSTRUCTOR
-    public UID(TSID id) {
-        super(id);
-    }
-    // FACTORY METHODS
-    public static UID from(String id){return new UID(TSID.from(id));}
-    public static UID from(Long id){ return new UID(TSID.from(id));}
-    public static UID from(TSID id){return new UID(id);}
-    public static UID random(){return new UID(TSID.Factory.getTsid());}
+  public static final UID ANONYMOUS_UID = UID.from("00000000-0000-0000-0000-000000000000");
 
-    // CAST
-    public Long toLong(){return super.value.toLong();}
+  public UID(UUID id) {
+    super(id);
+  }
+
+  public static UID from(String id) {
+    return new UID(UUID.fromString(id));
+  }
+
+  public static UID random() {
+    return new UID(UUID.randomUUID());
+  }
 }

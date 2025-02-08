@@ -9,20 +9,20 @@ import java.util.Optional;
 
 public interface AccountJpaRepository extends BaseJpaRepository<AccountJpaEntity, Long> {
 
-    boolean existsByUsername(String username);
+  boolean existsByUsername(String username);
 
-    boolean existsByEmail(String email);
+  boolean existsByEmail(String email);
 
-    boolean existsByRole(RoleType roleType);
+  boolean existsByRole(RoleType roleType);
 
-    Optional<AccountJpaEntity> findByUsername(String username);
+  Optional<AccountJpaEntity> findByUsername(String username);
 
-    Optional<AccountJpaEntity> findByRole(RoleType role);
+  Optional<AccountJpaEntity> findByRole(RoleType role);
 
-    @EntityGraph(attributePaths = {"profile"})
-    Optional<AccountJpaEntity> findWithProfileByUsername(String username);
+  @EntityGraph(attributePaths = {"profile"})
+  Optional<AccountJpaEntity> findWithProfileByUsername(String username);
 
-    @EntityGraph(attributePaths = {"profile"})
-    Optional<AccountJpaEntity> findWithProfileById(Long id);
+  @EntityGraph(attributePaths = {"profile"})
+  Optional<AccountJpaEntity> findWithProfileById(Long id);
 
 }

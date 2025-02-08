@@ -21,7 +21,7 @@ spring:
     username: root
     password: dlqhfka
     driver-class-name: com.mysql.cj.jdbc.Driver
-#    url: jdbc:mysql://host.docker.internal:3307/pageflow?useSSL=false&autoReconnect=true
+    #    url: jdbc:mysql://host.docker.internal:3307/pageflow?useSSL=false&autoReconnect=true
     url: jdbc:mysql://db:3306/pageflow?autoReconnect=true
 
   jpa:
@@ -83,6 +83,6 @@ custom:
   files:
     img:
       base-url: /files/img
-#      directory: C:/Users/SBS/local/uploads/img
-#      directory: C:/Users/gsw05/local/uploads/img
+      #      directory: C:/Users/SBS/local/uploads/img
+      #      directory: C:/Users/gsw05/local/uploads/img
       directory: /Users/sechan/local/uploads/img

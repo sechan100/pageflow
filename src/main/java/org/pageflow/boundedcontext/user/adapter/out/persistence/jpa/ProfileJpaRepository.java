@@ -10,9 +10,9 @@ import java.util.Optional;
  */
 public interface ProfileJpaRepository extends BaseJpaRepository<ProfileJpaEntity, Long> {
 
-    boolean existsByPenname(String penname);
+  boolean existsByPenname(String penname);
 
-    @EntityGraph(attributePaths = {"account"})
-    Optional<ProfileJpaEntity> findWithAccountById(Long id);
+  @EntityGraph(attributePaths = {"account"})
+  Optional<ProfileJpaEntity> findWithAccountById(Long id);
 
 }

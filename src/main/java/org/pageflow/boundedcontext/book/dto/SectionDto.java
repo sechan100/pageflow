@@ -1,22 +1,24 @@
 package org.pageflow.boundedcontext.book.dto;
 
 import lombok.Value;
-import org.pageflow.shared.type.TSID;
+
+import java.util.UUID;
+
 
 /**
  * @author : sechan
  */
 public abstract class SectionDto {
-    @Value
-    public static class WithContent {
-        TSID id;
-        String title;
-        String content;
-    }
+  @Value
+  public static class WithContent {
+    UUID id;
+    String title;
+    String content;
+  }
 
-    @Value
-    public static class MetaData {
-        TSID id;
-        String title;
-    }
+  @Value
+  public static class MetaData {
+    UUID id;
+    String title;
+  }
 }

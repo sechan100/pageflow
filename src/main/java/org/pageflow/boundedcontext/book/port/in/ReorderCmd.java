@@ -9,7 +9,7 @@ import org.pageflow.boundedcontext.book.domain.NodeId;
  */
 @Value
 public class ReorderCmd {
-    BookId bookId;
-    NodeId nodeId;
-    int destIndex;
+  BookId bookId;
+  NodeId nodeId;
+  int destIndex;
 }

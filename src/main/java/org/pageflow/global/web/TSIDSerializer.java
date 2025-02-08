@@ -10,14 +10,14 @@ import org.pageflow.shared.type.TSID;
  */
 public class TSIDSerializer extends JsonSerializer<TSID> {
 
-    @Override
-    public void serialize(TSID value, JsonGenerator gen, SerializerProvider provider) {
-        try {
-            gen.writeString(value.toString());
-        } catch(Exception e) {
-            throw new IllegalArgumentException(e);
-        }
+  @Override
+  public void serialize(TSID value, JsonGenerator gen, SerializerProvider provider) {
+    try {
+      gen.writeString(value.toString());
+    } catch(Exception e){
+      throw new IllegalArgumentException(e);
     }
+  }
 
 
 }

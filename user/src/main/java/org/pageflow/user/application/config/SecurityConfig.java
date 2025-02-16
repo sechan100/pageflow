@@ -4,7 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.pageflow.common.property.ApplicationProperties;
 import org.pageflow.user.adapter.in.auth.form.LoginUri;
 import org.pageflow.user.adapter.in.auth.oauth2.OAuth2Service;
-import org.pageflow.user.adapter.in.filter.*;
+import org.pageflow.user.adapter.in.filter.DevOnlyJwtSessionFixFilter;
+import org.pageflow.user.adapter.in.filter.ExceptionCatchFilter;
+import org.pageflow.user.adapter.in.filter.JwtAuthorizationFilter;
+import org.pageflow.user.adapter.in.filter.PrivateUriPretectFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -22,7 +25,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.header.HeaderWriterFilter;
-import org.springframework.security.web.session.SessionManagementFilter;
 
 @EnableWebSecurity
 @Configuration
@@ -35,7 +37,6 @@ public class SecurityConfig {
   // filter
   private final JwtAuthorizationFilter jwtAuthorizationFilter;
   private final ExceptionCatchFilter exceptionCatchFilter;
-  private final InFilterForwardedRequestCeaseFilter inFilterForwardedRequestCeaseFilter;
   private final PrivateUriPretectFilter privateUriPretectFilter;
   private final DevOnlyJwtSessionFixFilter devOnlyJwtSessionFixFilter;
   // oauth2
@@ -98,8 +99,7 @@ public class SecurityConfig {
        * 10. RequestCacheAwareFilter
        * 11. SecurityContextHolderAwareRequestFilter
        * 12. AnonymousAuthenticationFilter
-       * 15. SessionManagementFilter
-       * 13. (CUSTOM) InFilterForwardedRequestCeaseFilter
+       * 13. SessionManagementFilter
        * 14. ExceptionTranslationFilter
        * 15. AuthorizationFilter
        */
@@ -107,7 +107,6 @@ public class SecurityConfig {
       .addFilterAfter(privateUriPretectFilter, ExceptionCatchFilter.class)
       .addFilterAfter(devOnlyJwtSessionFixFilter, PrivateUriPretectFilter.class)
       .addFilterAfter(jwtAuthorizationFilter, DevOnlyJwtSessionFixFilter.class)
-      .addFilterAfter(inFilterForwardedRequestCeaseFilter, SessionManagementFilter.class)
       .headers(headers -> headers
         .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
       )

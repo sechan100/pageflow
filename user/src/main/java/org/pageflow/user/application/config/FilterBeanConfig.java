@@ -2,7 +2,10 @@ package org.pageflow.user.application.config;
 
 import jakarta.servlet.Filter;
 import org.pageflow.user.adapter.in.auth.form.AuthenticationTokenPrivder;
-import org.pageflow.user.adapter.in.filter.*;
+import org.pageflow.user.adapter.in.filter.DevOnlyJwtSessionFixFilter;
+import org.pageflow.user.adapter.in.filter.ExceptionCatchFilter;
+import org.pageflow.user.adapter.in.filter.JwtAuthorizationFilter;
+import org.pageflow.user.adapter.in.filter.PrivateUriPretectFilter;
 import org.pageflow.user.port.in.SessionUseCase;
 import org.pageflow.user.port.in.TokenUseCase;
 import org.pageflow.user.port.out.LoadAccountPort;
@@ -50,17 +53,6 @@ FilterBeanConfig {
   }
   @Bean
   public FilterRegistrationBean<ExceptionCatchFilter> preventRegisterExceptionCatchFilter(ExceptionCatchFilter filter) {
-    return preventsFilterAutoRegistration(filter);
-  }
-
-  /******* InFilterForwardedRequestCeaseFilter ********
-   *****************************************************/
-  @Bean
-  public InFilterForwardedRequestCeaseFilter inFilterForwardedRequestCeaseFilter() {
-    return new InFilterForwardedRequestCeaseFilter();
-  }
-  @Bean
-  public FilterRegistrationBean<InFilterForwardedRequestCeaseFilter> registrationBeanInFilterForwardedRequestCeaseFilter(InFilterForwardedRequestCeaseFilter filter) {
     return preventsFilterAutoRegistration(filter);
   }
 

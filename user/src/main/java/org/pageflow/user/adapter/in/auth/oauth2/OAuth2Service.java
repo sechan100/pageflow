@@ -10,7 +10,6 @@ import org.pageflow.user.adapter.in.auth.oauth2.owner.GoogleOwner;
 import org.pageflow.user.adapter.in.auth.oauth2.owner.NaverOwner;
 import org.pageflow.user.adapter.in.auth.oauth2.owner.OAuth2ResourceOwner;
 import org.pageflow.user.adapter.in.auth.oauth2.presignup.OAuth2PreSignupForward;
-import org.pageflow.user.adapter.in.filter.shared.InFilterForwarder;
 import org.pageflow.user.domain.entity.Account;
 import org.pageflow.user.dto.AccountDto;
 import org.pageflow.user.port.out.LoadAccountPort;
@@ -30,7 +29,6 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class OAuth2Service implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 
-  private final InFilterForwarder inFilterForwarder;
   private final LoadAccountPort loadAccountPort;
 
 

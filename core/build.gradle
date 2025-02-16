@@ -1,0 +1,23 @@
+plugins {
+  id 'java'
+}
+jar { enabled = false; }
+
+bootJar {
+  archiveBaseName = 'pageflow'
+  archiveVersion = '0.0.1'
+}
+
+dependencies {
+  implementation project(':email')
+  implementation project(':common')
+  implementation project(':user')
+  implementation project(':file')
+//  runtimeOnly project(':book')
+}
+
+
+test {
+  useJUnitPlatform()
+
+}

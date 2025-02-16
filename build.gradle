@@ -1,98 +1,107 @@
 plugins {
-	id 'java'
-	id 'org.springframework.boot' version '3.1.4'
-	id 'io.spring.dependency-management' version '1.1.3'
-}
-
-group = 'org.pageflow'
-version = '0.1'
-
-java {
-	sourceCompatibility = '17'
-}
-
-compileJava {
-	options.compilerArgs << '-parameters'
+  id 'java'
+  id 'org.springframework.boot' version '3.1.4'
+  id 'io.spring.dependency-management' version '1.1.3'
+  id "com.vanniktech.dependency.graph.generator" version "0.8.0"
 }
 
 repositories {
-	mavenCentral()
+  mavenCentral()
 }
 
-dependencies {
-	// spring
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-	implementation 'org.springframework.boot:spring-boot-starter-validation'
-	implementation 'org.springframework.boot:spring-boot-starter-mail'
-	implementation 'org.springframework.boot:spring-boot-starter-security'
-	testImplementation 'org.springframework.security:spring-security-test'
-	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
-	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-	implementation 'org.springframework.boot:spring-boot-starter-aop'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	implementation 'org.springframework.boot:spring-boot-starter'
-	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+subprojects {
+  group = 'org.pageflow'
+  version = '0.1'
+  sourceCompatibility = "17"
+  compileJava {
+    options.compilerArgs << '-parameters'
+  }
 
+  springBoot {
+    mainClass.set("org.pageflow.core.PageflowApplication")
+  }
 
-	// mysql
-	runtimeOnly 'com.mysql:mysql-connector-j'
+  apply plugin: 'java'
+  apply plugin: 'java-library'
+  apply plugin: 'org.springframework.boot'
+  apply plugin: 'io.spring.dependency-management'
 
-	// lombok
-	compileOnly 'org.projectlombok:lombok'
-	annotationProcessor 'org.projectlombok:lombok'
+  configurations {
+    compileOnly {
+      extendsFrom annotationProcessor
+    }
+  }
 
-	// OpenAPI(Swagger)
-	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
+  repositories {
+    mavenCentral()
+  }
 
-	// JWT
-	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
-	implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
-	implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+  dependencies {
+    // spring
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+//		testImplementation 'org.springframework.security:spring-security-test'
+//		implementation 'org.springframework.boot:spring-boot-starter-aop'
 
-	// Utils
-	implementation 'com.google.guava:guava:33.0.0-jre'
-	implementation 'io.vavr:vavr:0.10.4'
-	implementation 'org.reflections:reflections:0.10.2'
-//	implementation 'io.hypersistence:hypersistence-tsid:2.1.1' // 프로젝트 내부로 통합
-//	implementation 'io.hypersistence:hypersistence-utils-hibernate-63:3.7.4' // 프로젝트 내부로 통합
+//		implementation 'org.springframework.boot:spring-boot-starter'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
-}
+    // mysql
+    runtimeOnly 'com.mysql:mysql-connector-j'
 
-tasks.named('test') {
-	useJUnitPlatform()
+    // lombok
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    // OpenAPI(Swagger)
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
+
+    // ArchUnit
+//		implementation 'com.tngtech.archunit:archunit-junit5:0.21.0'
+
+    // Utils
+    implementation 'com.google.guava:guava:33.0.0-jre'
+    implementation 'io.vavr:vavr:0.10.4'
+    implementation 'org.reflections:reflections:0.10.2'
+
+    // test
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+    testImplementation 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
+  }
 }
 
 // flush redis cache
 tasks.register('flushRedis', Exec) {
-	commandLine 'redis-cli', 'flushall'
+  commandLine 'redis-cli', 'flushall'
 }
 
 // 윈도우 용: redis 서버 프로세스 재시작
 tasks.register('restartRedisServerOnWindow', Exec) {
-	println 'Stopping Redis Server...'
-	commandLine 'cmd', '/c', 'taskkill', '/F', '/IM', 'redis-server.exe'
-	println 'Redis Server stopped.'
-	println 'Starting Redis Server...'
+  println 'Stopping Redis Server...'
+  commandLine 'cmd', '/c', 'taskkill', '/F', '/IM', 'redis-server.exe'
+  println 'Redis Server stopped.'
+  println 'Starting Redis Server...'
 //	commandLine 'cmd', '/c', 'start', '/B', 'C:\\Users\\gsw05\\OneDrive\\tools\\Redis-7.0.14-Windows-x64-with-Service\\redis-server.exe'
-	println '##### Started Redis Server #####'
+  println '##### Started Redis Server #####'
 //	commandLine 'cmd', '/c', 'start', '/B', 'C:\\Users\\SBS\\Redis-x64-3.0.504\\redis-server.exe'
-	commandLine 'cmd', '/c', 'start', '/B', 'C:\\Users\\user\\Redis-x64-3.0.504\\redis-server.exe'
-	println('레디스가 실행중입니다.')
+  commandLine 'cmd', '/c', 'start', '/B', 'C:\\Users\\user\\Redis-x64-3.0.504\\redis-server.exe'
+  println('레디스가 실행중입니다.')
 }
 
 
-
-
 tasks.register('encrypt-secrets', Exec) {
-	// 먼저 application-secret.yml과 application-prod.yml, 그리고 .env.ci 파일을 git secret에 스테이징한다.
-	commandLine "git", "secret", "add", ".env.ci"
-	workingDir("src/main/resources")
-	commandLine "git", "secret", "add", "application-secret.yml"
-	commandLine "git", "secret", "add", "application-prod.yml"
-	// git secret으로 암호화한다.
-	commandLine "git", "secret", "hide"
+  // 먼저 application-secret.yml과 application-prod.yml, 그리고 .env.ci 파일을 git secret에 스테이징한다.
+  commandLine "git", "secret", "add", ".env.ci"
+  workingDir("src/main/resources")
+  commandLine "git", "secret", "add", "application-secret.yml"
+  commandLine "git", "secret", "add", "application-prod.yml"
+  // git secret으로 암호화한다.
+  commandLine "git", "secret", "hide"
 }
 
 

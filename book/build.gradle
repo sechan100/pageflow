@@ -1,0 +1,13 @@
+plugins {
+  id 'java'
+}
+bootJar { enabled = false; }
+jar { enabled = true; }
+
+dependencies {
+  implementation project(':common')
+}
+
+test {
+  useJUnitPlatform()
+}

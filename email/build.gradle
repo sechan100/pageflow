@@ -1,0 +1,14 @@
+plugins {
+  id 'java'
+}
+bootJar { enabled = false; }
+jar { enabled = true; }
+
+dependencies {
+  implementation 'org.springframework.boot:spring-boot-starter-mail'
+  implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+}
+
+test {
+  useJUnitPlatform()
+}

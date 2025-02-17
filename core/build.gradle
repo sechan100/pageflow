@@ -14,6 +14,9 @@ dependencies {
   implementation project(':user')
   implementation project(':file')
 //  runtimeOnly project(':book')
+
+  // Test DB
+  testImplementation 'com.h2database:h2'
 }
 
 

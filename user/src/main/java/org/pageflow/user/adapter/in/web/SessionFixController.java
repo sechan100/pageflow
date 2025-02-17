@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pageflow.common.api.ApiAccess;
 import org.pageflow.common.api.RequestContext;
-import org.pageflow.common.shared.annotation.Post;
+import org.pageflow.common.shared.annotation.SecuredPost;
 import org.springframework.context.annotation.Profile;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -32,7 +32,7 @@ public class SessionFixController {
   private final RequestContext rqctx;
   private final JwtSessionFixer sessionFixer;
 
-  @Post(value = "/DEV_ONLY/session/fix", access = ApiAccess.ANONYMOUS)
+  @SecuredPost(value = "/DEV_ONLY/session/fix", access = ApiAccess.ANONYMOUS)
   @Operation(summary = "서버수준에서 현재 세션 사용자를 고정 또는 해제")
   public void fixSession(
     @RequestBody Username req,

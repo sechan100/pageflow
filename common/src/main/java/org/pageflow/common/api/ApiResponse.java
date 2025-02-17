@@ -1,5 +1,7 @@
 package org.pageflow.common.api;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import org.pageflow.common.result.Result;
 import org.pageflow.common.result.code.ResultCode;
@@ -20,11 +22,22 @@ public class ApiResponse<T> {
   private final T data;
 
 
+  @JsonCreator
+  public ApiResponse(
+    @JsonProperty("code") String code,
+    @JsonProperty("message") String message,
+    @JsonProperty("data") T data
+  ) {
+    this.code = code;
+    this.message = message;
+    this.data = data;
+  }
+
   private ApiResponse(Result<T> result) {
     ResultCode code = result.getCode();
     this.code = code.getCode();
     this.message = code.getMessage();
-    this.data = result.getData();
+    this.data = result.dangerouslyGetData();
   }
 
   public static <T> ApiResponse<T> of(Result<T> result) {

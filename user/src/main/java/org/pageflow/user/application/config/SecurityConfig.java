@@ -25,6 +25,9 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.header.HeaderWriterFilter;
+import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
+import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
+
 
 @EnableWebSecurity
 @Configuration
@@ -50,11 +53,12 @@ public class SecurityConfig {
   private final AuthenticationEntryPoint authEntryPoint;
 
   @Bean
-  SecurityFilterChain pageflowApiChain(HttpSecurity http) throws Exception {
+  SecurityFilterChain pageflowApiChain(HttpSecurity http, HandlerMappingIntrospector introspector) throws Exception {
+    MvcRequestMatcher.Builder mvcMatcherBuilder = new MvcRequestMatcher.Builder(introspector);
     http
       .authorizeHttpRequests(auth -> auth
-        .requestMatchers("/user/**").hasRole("USER")
-        .requestMatchers("/admin/**").hasRole("ADMIN")
+        .requestMatchers(mvcMatcherBuilder.pattern("/user/**")).hasRole("USER")
+        .requestMatchers(mvcMatcherBuilder.pattern("/admin/**")).hasRole("ADMIN")
         .anyRequest().permitAll()
       )
       .oauth2Login(oauth2 -> oauth2
@@ -120,19 +124,20 @@ public class SecurityConfig {
   }
 
   @Bean
-  public WebSecurityCustomizer webSecurityCustomizer() {
-    return web -> web.ignoring().requestMatchers(
-      "/h2-console/**",
-      "/favicon.ico",
-      "/error/**",
-      "/css/**",
-      "/js/**",
-      "/img/**",
-      "/files/img/**",
-      "/swagger-ui/**",
-      "/swagger-resources/**",
-      "/v3/api-docs/**"
-    );
+  public WebSecurityCustomizer webSecurityCustomizer(HandlerMappingIntrospector introspector) {
+    MvcRequestMatcher.Builder mvcMatcherBuilder = new MvcRequestMatcher.Builder(introspector);
+    return web -> web.ignoring()
+      .requestMatchers(mvcMatcherBuilder.pattern("/h2-console/**"))
+      .requestMatchers(mvcMatcherBuilder.pattern("/favicon.ico"))
+      .requestMatchers(mvcMatcherBuilder.pattern("/error/**"))
+      .requestMatchers(mvcMatcherBuilder.pattern("/css/**"))
+      .requestMatchers(mvcMatcherBuilder.pattern("/js/**"))
+      .requestMatchers(mvcMatcherBuilder.pattern("/img/**"))
+      .requestMatchers(mvcMatcherBuilder.pattern("/files/img/**"))
+      .requestMatchers(mvcMatcherBuilder.pattern("/swagger-ui/**"))
+      .requestMatchers(mvcMatcherBuilder.pattern("/swagger-resources/**"))
+      .requestMatchers(mvcMatcherBuilder.pattern("/v3/api-docs/**"))
+    ;
   }
 
 }

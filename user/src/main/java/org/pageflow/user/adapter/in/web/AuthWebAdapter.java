@@ -12,7 +12,7 @@ import org.pageflow.common.result.ProcessResultException;
 import org.pageflow.common.result.Result;
 import org.pageflow.common.result.code.CommonCode;
 import org.pageflow.common.shared.annotation.Get;
-import org.pageflow.common.shared.annotation.Post;
+import org.pageflow.common.shared.annotation.SecuredPost;
 import org.pageflow.common.user.UID;
 import org.pageflow.common.validation.FieldReason;
 import org.pageflow.common.validation.InvalidField;
@@ -44,8 +44,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Tag(name = "auth", description = "인증관련")
 public class AuthWebAdapter {
-  private static final String SESSION_ID_COOKIE_PATH = "/auth/session";
-  private static final String SESSION_ID_COOKIE_NAME = "PAGEFLOW_SESSION_IDENTIFIER";
+  public static final String SESSION_ID_COOKIE_PATH = "/auth/session";
+  public static final String SESSION_ID_COOKIE_NAME = "PAGEFLOW_SESSION_IDENTIFIER";
 
   private final ApplicationProperties props;
   private final RequestContext requestContext;
@@ -56,7 +56,7 @@ public class AuthWebAdapter {
   /**
    * 실제로 호출되지는 않는다. SpringSecurity Form로그인으로 처리된다.
    */
-  @Post(LoginUri.SPRING_SECURITY_FORM_LOGIN_URI)
+  @SecuredPost(LoginUri.SPRING_SECURITY_FORM_LOGIN_URI)
   @Operation(summary = "로그인", description = "로그인을 요청하고, accessToken을 발급한다.")
   private AccessTokenRes SpringSecurityLogin(String username, String password) {
     throw new UnsupportedOperationException("Spring Security에서 제공");
@@ -101,7 +101,7 @@ public class AuthWebAdapter {
     );
   }
 
-  @Post("/auth/session/refresh")
+  @SecuredPost("/auth/session/refresh")
   @Operation(summary = "accessToken 재발급", description = "session id cookie를 받아서 accessToken을 재발급한다.")
   public AccessTokenRes refresh(HttpServletRequest request) {
     UUID sessionId = this.getSessionIdFromCookie();
@@ -113,7 +113,7 @@ public class AuthWebAdapter {
     );
   }
 
-  @Post("/auth/session/logout")
+  @SecuredPost("/auth/session/logout")
   @Operation(summary = "로그아웃", description = "쿠키로 전달된 sessionId를 받아서, 해당 세션을 무효화")
   public void logout() {
     UUID sessionId = this.getSessionIdFromCookie();

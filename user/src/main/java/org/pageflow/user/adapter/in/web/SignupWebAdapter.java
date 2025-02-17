@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.pageflow.common.api.ApiAccess;
 import org.pageflow.common.api.RequestContext;
 import org.pageflow.common.result.Result;
-import org.pageflow.common.shared.annotation.Post;
+import org.pageflow.common.shared.annotation.SecuredPost;
 import org.pageflow.common.user.ProviderType;
 import org.pageflow.common.user.RoleType;
 import org.pageflow.user.adapter.in.auth.oauth2.owner.OAuth2ResourceOwner;
@@ -39,7 +39,7 @@ public class SignupWebAdapter {
   private final SignupUseCase signupUseCase;
 
 
-  @Post(value = "/signup", access = ApiAccess.ANONYMOUS)
+  @SecuredPost(value = "/signup", access = ApiAccess.ANONYMOUS)
   @Operation(summary = "회원가입", description = "새로운 사용자의 회원가입을 요청")
   public UserRes signup(@RequestBody SignupForm form) {
     Optional<PreSignupDto> preSignupOptional = preSignupService.loadAndRemove(form.getUsername());
@@ -81,7 +81,7 @@ public class SignupWebAdapter {
    * OAuth2 Provider에게 받아온 데이터를 임시로 저장하고 반환한다.
    * 사용자는 이 데이터를 기반으로 다시한번 회원가입을 요청해야한다.
    */
-  @Post(value = OAuth2PreSignupForward.OAUTH2_PRE_SIGNUP_PATH, access = ApiAccess.ANONYMOUS)
+  @SecuredPost(value = OAuth2PreSignupForward.OAUTH2_PRE_SIGNUP_PATH, access = ApiAccess.ANONYMOUS)
   @Hidden
   @Operation(summary = "OAuth2 회원가입 전처리", description = "OAuth2를 통해 받아온 사용자 정보를 회원가입을 위해 서버에 임시 저장")
   public Result<PreSignupedUser> oAuth2PreSignup() {

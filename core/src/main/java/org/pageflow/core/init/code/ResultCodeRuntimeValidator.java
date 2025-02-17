@@ -30,7 +30,7 @@ public class ResultCodeRuntimeValidator implements RuntimeInitializer {
 
     List<ResultCode> resultCodes = new ArrayList<>();
 
-    // Load With Reflections!
+    // ResultCode의 구현체가 Enum인지 검사
     for(Class<? extends ResultCode> clazz : allApiCodeClasses){
       if(!clazz.isEnum()) {
         throw new InvalidResultCodeSpecificationException("ResultCode의 구현은 반드시 Enum 타입이어야 합니다: " + clazz);
@@ -42,9 +42,20 @@ public class ResultCodeRuntimeValidator implements RuntimeInitializer {
 
     Set<String> uniqueNames = new HashSet<>();
     for(ResultCode resultCode : resultCodes){
+
+      // 중복되는 이름의 ResultCode가 있는지 검사
       if(!uniqueNames.add(resultCode.name())) {
         throw new InvalidResultCodeSpecificationException("중복된 ResultCode가 존재합니다: " + resultCode.name());
       }
+
+      // Generic Type Parameter를 사용하는 클래스를 DataType으로 사용했는지 검사
+      Class<?> dataType = resultCode.getDataType();
+      if(dataType != null && dataType.getTypeParameters().length > 0){
+        throw new InvalidResultCodeSpecificationException(String.format(
+          "ResultCode의 DataType은 Generic Type Parameter를 포함하는 클래스를 사용할 수 없습니다. CODE: '%s', DataType: '%s'", resultCode.name(), dataType.getName()
+        ));
+      }
+
     }
     log.info("===== ResultCode 정합성 검사를 완료했습니다. =====");
   }

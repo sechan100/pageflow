@@ -4,8 +4,6 @@ import lombok.Getter;
 import org.pageflow.common.validation.FieldValidationResult;
 import org.pageflow.common.validation.InvalidField;
 
-import java.util.Collection;
-
 /**
  * @author : sechan
  */
@@ -42,20 +40,15 @@ public enum CommonCode implements ResultCode {
   ;
   private final String message;
   private final Class<?> dataType;
-  private final Class<? extends Collection> collectionType;
 
   CommonCode(String message) {
-    this(message, null, null);
+    this(message, null);
   }
 
   CommonCode(String message, Class<?> dataType) {
-    this(message, dataType, null);
-  }
-
-  CommonCode(String message, Class<?> dataType, Class<? extends Collection> collectionType) {
     this.message = message;
     this.dataType = dataType;
-    this.collectionType = collectionType;
   }
+
 
 }

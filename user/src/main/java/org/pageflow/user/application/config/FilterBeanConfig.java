@@ -70,7 +70,7 @@ FilterBeanConfig {
   /************** DevOnlyJwtSessionFixFilter ***************
    *****************************************************/
   @Bean
-  @Profile("dev")
+  @Profile({"dev", "test"})
   public DevOnlyJwtSessionFixFilter devOnlyJwtSessionFixFilter(
     AuthenticationTokenPrivder authenticationTokenPrivder,
     SessionUseCase sessionUseCase,
@@ -85,7 +85,7 @@ FilterBeanConfig {
     );
   }
   @Bean
-  @Profile("dev")
+  @Profile({"dev", "test"})
   public FilterRegistrationBean<DevOnlyJwtSessionFixFilter> preventRegisterDevOnlyJwtSessionFixFilter(DevOnlyJwtSessionFixFilter filter) {
     return preventsFilterAutoRegistration(filter);
   }

@@ -4,8 +4,6 @@ import lombok.Getter;
 import org.pageflow.common.result.code.ResultCode;
 import org.pageflow.user.adapter.in.res.PreSignupedUser;
 
-import java.util.Collection;
-
 /**
  * @author : sechan
  */
@@ -31,19 +29,13 @@ public enum UserCode implements ResultCode {
   ;
   private final String message;
   private final Class<?> dataType;
-  private final Class<? extends Collection> collectionType;
 
   UserCode(String message) {
-    this(message, null, null);
+    this(message, null);
   }
 
   UserCode(String message, Class<?> dataType) {
-    this(message, dataType, null);
-  }
-
-  UserCode(String message, Class<?> dataType, Class<? extends Collection> collectionType) {
     this.message = message;
     this.dataType = dataType;
-    this.collectionType = collectionType;
   }
 }

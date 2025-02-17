@@ -8,7 +8,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.pageflow.common.result.ProcessResultException;
+import org.pageflow.common.result.Result;
 import org.pageflow.user.adapter.in.auth.form.AuthenticationTokenPrivder;
+import org.pageflow.user.application.UserCode;
 import org.pageflow.user.domain.token.AccessToken;
 import org.pageflow.user.port.in.TokenUseCase;
 import org.springframework.http.HttpHeaders;
@@ -45,12 +48,18 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     Optional<String> accessTokenOpt = resolveToken(request);
     String requestUri = request.getRequestURI();
 
-    // 요청에 토큰이 포함된 경우
+    // 요청에 토큰이 포함된 경우 파싱 후 처리
     if(accessTokenOpt.isPresent()){
-      AccessToken token = useCase.parseAccessToken(accessTokenOpt.get());
-      Authentication authentication = authenticationTokenPrivder.create(token, request);
+      Result<AccessToken> tokenParseResult = useCase.parseAccessToken(accessTokenOpt.get());
+
+      // 만료된 토큰인 경우 처리 중단
+      if(tokenParseResult.is(UserCode.ACCESS_TOKEN_EXPIRED)){
+        throw new ProcessResultException(tokenParseResult);
+      }
+      AccessToken accessToken = tokenParseResult.getSuccessData();
+      Authentication authentication = authenticationTokenPrivder.create(accessToken, request);
       SecurityContextHolder.getContext().setAuthentication(authentication);
-      log.debug("사용자 JWT로 인증됨: UID({}), role({}), session({})", token.getUid(), token.getRole(), token.getSessionId());
+      log.debug("사용자 JWT로 인증됨: UID({}), role({}), session({})", accessToken.getUid(), accessToken.getRole(), accessToken.getSessionId());
     } else {
       log.debug("사용자가 인증되지 않았습니다(accessToken 없음)");
     }

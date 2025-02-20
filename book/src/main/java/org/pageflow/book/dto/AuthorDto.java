@@ -9,7 +9,7 @@ import java.util.UUID;
  */
 @Value
 public class AuthorDto {
-    UUID id;
+  UUID id;
   String penname;
   String profileImageUrl;
 }

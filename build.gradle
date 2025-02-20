@@ -59,13 +59,13 @@ subprojects {
     // OpenAPI(Swagger)
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
 
-    // ArchUnit
-//		implementation 'com.tngtech.archunit:archunit-junit5:0.21.0'
-
     // Utils
     implementation 'com.google.guava:guava:33.0.0-jre'
     implementation 'io.vavr:vavr:0.10.4'
     implementation 'org.reflections:reflections:0.10.2'
+
+    // ArchUnit
+    testImplementation 'com.tngtech.archunit:archunit-junit5:1.4.0'
 
     // test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'

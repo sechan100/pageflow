@@ -1,13 +1,14 @@
 plugins {
-  id 'java'
+    id 'java'
 }
 bootJar { enabled = false; }
 jar { enabled = true; }
 
 dependencies {
-  implementation project(':common')
+    implementation project(':common')
+    implementation project(':user')
 }
 
 test {
-  useJUnitPlatform()
+    useJUnitPlatform()
 }

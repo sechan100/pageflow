@@ -3,7 +3,7 @@ package org.pageflow.user.domain.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
-import org.pageflow.common.shared.jpa.BaseJpaEntity;
+import org.pageflow.common.jpa.BaseJpaEntity;
 import org.pageflow.common.user.ProviderType;
 import org.pageflow.common.user.RoleType;
 import org.pageflow.common.user.UID;

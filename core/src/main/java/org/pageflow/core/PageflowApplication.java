@@ -1,6 +1,6 @@
 package org.pageflow.core;
 
-import org.pageflow.common.shared.jpa.repository.BaseJpaRepositoryImpl;
+import org.pageflow.common.jpa.repository.BaseJpaRepositoryImpl;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;

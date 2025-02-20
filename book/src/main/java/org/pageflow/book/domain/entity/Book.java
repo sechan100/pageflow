@@ -2,8 +2,8 @@ package org.pageflow.book.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.pageflow.boundedcontext.user.adapter.out.persistence.jpa.ProfileJpaEntity;
-import org.pageflow.shared.jpa.BaseJpaEntity;
+import org.pageflow.common.jpa.BaseJpaEntity;
+import org.pageflow.user.domain.entity.Profile;
 
 import java.util.UUID;
 
@@ -11,8 +11,8 @@ import java.util.UUID;
 /**
  * @author : sechan
  */
-@Entity
 @Getter
+@Entity
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(of = "id", callSuper = false)
@@ -21,13 +21,11 @@ public class Book extends BaseJpaEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)
-  @Setter(AccessLevel.NONE)
   private UUID id;
 
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "profile_id")
-  @Setter(AccessLevel.NONE)
-  private ProfileJpaEntity author;
+  @JoinColumn(name = "author_id")
+  private Profile author;
 
   @Column(nullable = false)
   private String title;
@@ -39,7 +37,7 @@ public class Book extends BaseJpaEntity {
 
   public Book(
     UUID id,
-    ProfileJpaEntity author,
+    Profile author,
     String title,
     String coverImageUrl
   ) {

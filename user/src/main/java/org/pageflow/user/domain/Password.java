@@ -1,7 +1,7 @@
 package org.pageflow.user.domain;
 
 
-import org.pageflow.common.shared.type.SingleValueWrapper;
+import org.pageflow.common.utility.SingleValueWrapper;
 import org.pageflow.common.validation.FieldValidationException;
 import org.pageflow.common.validation.FieldValidationResult;
 import org.pageflow.common.validation.FieldValidator;

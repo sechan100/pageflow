@@ -2,8 +2,8 @@ package org.pageflow.user.adapter.in.auth;
 
 import lombok.Getter;
 import org.pageflow.common.api.RequestContextUserPrincipal;
-import org.pageflow.common.shared.utility.Forward;
 import org.pageflow.common.user.RoleType;
+import org.pageflow.common.utility.Forward;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 

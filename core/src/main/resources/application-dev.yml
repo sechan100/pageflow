@@ -119,7 +119,7 @@ pageflow:
     email: pagefloworg@gmail.com
   file:
     web-base-url: '${pageflow.site.base-url}/resources/image'
-    parent: /Users/sechan/local/uploads/image
+    parent: /Users/sechan/container/pageflow/image
   dev:
     data:
       # enable, disable, according-to-ddl 중 택 1

@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pageflow.common.api.ApiAccess;
 import org.pageflow.common.api.RequestContext;
-import org.pageflow.common.shared.annotation.SecuredPost;
+import org.pageflow.common.utility.SecuredPost;
 import org.springframework.context.annotation.Profile;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;

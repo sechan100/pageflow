@@ -1,6 +1,6 @@
 package org.pageflow.file.persistence;
 
-import org.pageflow.common.shared.jpa.repository.BaseJpaRepository;
+import org.pageflow.common.jpa.repository.BaseJpaRepository;
 import org.pageflow.file.model.FileIdentity;
 import org.pageflow.file.shared.FileOwnerType;
 import org.springframework.data.jpa.repository.Query;

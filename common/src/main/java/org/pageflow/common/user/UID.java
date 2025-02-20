@@ -1,6 +1,6 @@
 package org.pageflow.common.user;
 
-import org.pageflow.common.shared.type.SingleValueWrapper;
+import org.pageflow.common.utility.SingleValueWrapper;
 
 import java.util.UUID;
 

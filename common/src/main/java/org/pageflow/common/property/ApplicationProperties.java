@@ -3,7 +3,7 @@ package org.pageflow.common.property;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.pageflow.common.shared.utility.UriUtility;
+import org.pageflow.common.utility.UriUtility;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 

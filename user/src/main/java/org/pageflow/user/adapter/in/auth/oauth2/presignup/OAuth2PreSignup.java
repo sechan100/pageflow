@@ -3,7 +3,7 @@ package org.pageflow.user.adapter.in.auth.oauth2.presignup;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import lombok.*;
-import org.pageflow.common.shared.jpa.TemporaryEntity;
+import org.pageflow.common.jpa.TemporaryEntity;
 import org.pageflow.common.user.ProviderType;
 
 /**

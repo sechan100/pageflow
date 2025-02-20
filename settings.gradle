@@ -1,9 +1,9 @@
 rootProject.name = 'pageflow'
 
-include 'user'
-//include 'book'
+include 'common'
 include 'core'
+include 'user'
+include 'book'
 include 'email'
 include 'file'
-include 'common'
 

@@ -1,9 +1,10 @@
 package org.pageflow.book.domain;
 
-import org.pageflow.boundedcontext.common.exception.FieldValidationException;
-import org.pageflow.global.validation.FieldValidationResult;
-import org.pageflow.global.validation.FieldValidator;
-import org.pageflow.shared.type.SingleValueWrapper;
+
+import org.pageflow.common.utility.SingleValueWrapper;
+import org.pageflow.common.validation.FieldValidationException;
+import org.pageflow.common.validation.FieldValidationResult;
+import org.pageflow.common.validation.FieldValidator;
 
 /**
  * @author : sechan

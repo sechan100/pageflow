@@ -3,7 +3,7 @@ package org.pageflow.user.adapter.in.auth;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.pageflow.common.shared.utility.Forward;
+import org.pageflow.common.utility.Forward;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;

@@ -2,7 +2,7 @@ package org.pageflow.file.persistence;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.pageflow.common.shared.jpa.BaseJpaEntity;
+import org.pageflow.common.jpa.BaseJpaEntity;
 import org.pageflow.file.model.FilePath;
 import org.pageflow.file.shared.FileOwnerType;
 

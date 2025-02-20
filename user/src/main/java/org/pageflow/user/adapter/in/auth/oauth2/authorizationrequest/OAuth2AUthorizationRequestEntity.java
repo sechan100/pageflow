@@ -7,7 +7,7 @@ import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.pageflow.common.shared.jpa.TemporaryEntity;
+import org.pageflow.common.jpa.TemporaryEntity;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 
 /**

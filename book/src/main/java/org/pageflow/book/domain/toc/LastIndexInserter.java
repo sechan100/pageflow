@@ -2,7 +2,7 @@ package org.pageflow.book.domain.toc;
 
 import org.pageflow.book.domain.entity.Folder;
 import org.pageflow.book.domain.entity.TocNode;
-import org.pageflow.book.persistence.NodeRepository;
+import org.pageflow.book.port.out.persistence.NodeRepository;
 
 import java.util.List;
 import java.util.Optional;

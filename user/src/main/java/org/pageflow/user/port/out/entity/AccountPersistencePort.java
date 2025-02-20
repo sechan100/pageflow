@@ -1,7 +1,7 @@
 package org.pageflow.user.port.out.entity;
 
 
-import org.pageflow.common.shared.jpa.repository.BaseJpaRepository;
+import org.pageflow.common.jpa.repository.BaseJpaRepository;
 import org.pageflow.common.user.RoleType;
 import org.pageflow.user.domain.entity.Account;
 import org.springframework.data.jpa.repository.EntityGraph;

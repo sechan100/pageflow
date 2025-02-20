@@ -3,7 +3,7 @@ package org.pageflow.user.domain.entity;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import lombok.*;
-import org.pageflow.common.shared.jpa.TemporaryEntity;
+import org.pageflow.common.jpa.TemporaryEntity;
 
 import java.util.UUID;
 

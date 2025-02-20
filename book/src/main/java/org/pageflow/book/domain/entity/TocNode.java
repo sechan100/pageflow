@@ -6,7 +6,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import org.pageflow.shared.jpa.BaseJpaEntity;
+import org.pageflow.common.jpa.BaseJpaEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
@@ -35,7 +35,7 @@ public abstract class TocNode extends BaseJpaEntity {
   @GeneratedValue(strategy = GenerationType.UUID)
   private UUID id;
 
-  @ManyToOne(fetch = FetchType.LAZY, optional = false, cascade = CascadeType.MERGE)
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
   @JoinColumn(name = "book_id", nullable = false)
   private Book book;
 

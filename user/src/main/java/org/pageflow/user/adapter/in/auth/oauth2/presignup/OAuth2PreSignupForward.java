@@ -2,7 +2,7 @@ package org.pageflow.user.adapter.in.auth.oauth2.presignup;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.pageflow.common.api.UriPrefix;
-import org.pageflow.common.shared.utility.Forward;
+import org.pageflow.common.utility.Forward;
 import org.pageflow.user.adapter.in.auth.oauth2.owner.OAuth2ResourceOwner;
 
 /**

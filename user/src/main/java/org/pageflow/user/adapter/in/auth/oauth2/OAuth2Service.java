@@ -2,7 +2,7 @@ package org.pageflow.user.adapter.in.auth.oauth2;
 
 
 import lombok.RequiredArgsConstructor;
-import org.pageflow.common.shared.utility.Forward;
+import org.pageflow.common.utility.Forward;
 import org.pageflow.user.adapter.in.auth.ForwardRequireAuthenticationPrincipal;
 import org.pageflow.user.adapter.in.auth.LoginTokenEndpointForward;
 import org.pageflow.user.adapter.in.auth.oauth2.owner.GithubOwner;

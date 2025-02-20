@@ -2,7 +2,7 @@ package org.pageflow.user.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.pageflow.common.shared.jpa.JpaEntity;
+import org.pageflow.common.jpa.JpaEntity;
 import org.pageflow.common.user.RoleType;
 
 import java.util.UUID;

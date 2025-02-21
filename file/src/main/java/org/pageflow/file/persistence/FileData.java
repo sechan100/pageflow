@@ -38,7 +38,7 @@ public class FileData extends BaseJpaEntity {
   private Long size;
 
   @Column(name = "owner_id")
-  private UUID ownerId;
+  private String ownerId;
 
   @Enumerated(EnumType.STRING)
   @Column(name = "owner_type")

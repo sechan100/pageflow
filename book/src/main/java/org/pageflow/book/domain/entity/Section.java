@@ -5,7 +5,6 @@ import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.DynamicUpdate;
 
 import java.util.UUID;
@@ -14,8 +13,6 @@ import java.util.UUID;
  * @author : sechan
  */
 @Entity
-@Getter
-@SuperBuilder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(callSuper = true)
 @DynamicUpdate
@@ -24,6 +21,7 @@ import java.util.UUID;
 public class Section extends TocNode {
 
   @Lob
+  @Getter
   @Column(nullable = false)
   private String content;
 

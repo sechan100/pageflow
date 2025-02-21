@@ -1,8 +1,9 @@
 package org.pageflow.book.domain.toc;
 
+import org.hibernate.Hibernate;
 import org.pageflow.book.domain.entity.Folder;
 import org.pageflow.book.domain.entity.TocNode;
-import org.pageflow.book.port.out.persistence.NodeRepository;
+import org.pageflow.book.port.out.jpa.NodePersistencePort;
 
 import java.util.List;
 import java.util.Optional;
@@ -30,8 +31,8 @@ public class LastIndexInserter {
    * @param parentFolderId 부모가 될 folder의 아이디
    * @param repo
    */
-  public LastIndexInserter(UUID bookId, UUID parentFolderId, NodeRepository repo) {
-    TocNode nodeProxy = repo.getReferenceById(parentFolderId);
+  public LastIndexInserter(UUID bookId, UUID parentFolderId, NodePersistencePort repo) {
+    TocNode nodeProxy = (TocNode) Hibernate.unproxy(repo.getReferenceById(parentFolderId));
     if(nodeProxy instanceof Folder folder){
       this.folderProxy = folder;
     } else {
@@ -50,6 +51,8 @@ public class LastIndexInserter {
    */
   public int insertLast(TocNode node) {
     Optional<Integer> lastIndexOptional = this.maxOvSupplier.get();
+    node.changeParentNode(this.folderProxy);
+
     // folder에 자식이 없음
     if(lastIndexOptional.isEmpty()){
       node.setOv(OV_START);
@@ -63,8 +66,6 @@ public class LastIndexInserter {
       List<TocNode> nodes = this.siblingsSupplier.get();
       lastIndex = rebalancer.rebalance(nodes);
     }
-
-    node.changeParentNode(this.folderProxy);
 
     int newOv = lastIndex + OV_GAP;
     node.setOv(newOv);

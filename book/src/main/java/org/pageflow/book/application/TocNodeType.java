@@ -1,4 +1,4 @@
-package org.pageflow.book.shared;
+package org.pageflow.book.application;
 
 /**
  * @author : sechan

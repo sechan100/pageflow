@@ -14,7 +14,7 @@ public class NodeTitle extends SingleValueWrapper<String> {
   private static final int MIN_LENGTH = 1;
   private static final int MAX_LENGTH = 100;
 
-  public NodeTitle(String value) {
+  private NodeTitle(String value) {
     super(value);
   }
 

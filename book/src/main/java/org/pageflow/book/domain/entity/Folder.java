@@ -7,7 +7,6 @@ import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.DynamicUpdate;
 
 import java.util.UUID;
@@ -17,7 +16,6 @@ import java.util.UUID;
  */
 @Entity
 @Getter
-@SuperBuilder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(callSuper = true)
 @DynamicUpdate
@@ -33,6 +31,16 @@ public class Folder extends TocNode {
     Integer ov
   ) {
     super(id, book, title, parentNode, ov);
+  }
+
+  public static Folder createRootFolder(Book book) {
+    return new Folder(
+      UUID.randomUUID(),
+      book,
+      ":root",
+      null,
+      0
+    );
   }
 
 }

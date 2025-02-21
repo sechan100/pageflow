@@ -14,6 +14,7 @@ public class ApplicationProperties {
   Site site;
   Auth auth;
   User user;
+  Book book;
   Email email;
   Admin admin;
   File file;
@@ -40,6 +41,12 @@ public class ApplicationProperties {
   @FieldDefaults(makeFinal = true, level = AccessLevel.PUBLIC)
   public static class User {
     String defaultProfileImageUrl;
+  }
+
+  @AllArgsConstructor
+  @FieldDefaults(makeFinal = true, level = AccessLevel.PUBLIC)
+  public static class Book {
+    String defaultCoverImageUrl;
   }
 
   @AllArgsConstructor

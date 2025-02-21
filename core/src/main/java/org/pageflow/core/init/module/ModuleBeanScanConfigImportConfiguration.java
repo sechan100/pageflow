@@ -1,6 +1,7 @@
 package org.pageflow.core.init.module;
 
 import lombok.extern.slf4j.Slf4j;
+import org.pageflow.book.BookModule;
 import org.pageflow.common.CommonModule;
 import org.pageflow.email.EmailModule;
 import org.pageflow.file.FileModule;
@@ -18,6 +19,7 @@ import org.springframework.context.annotation.Import;
   EmailModule.class,
   FileModule.class,
   UserModule.class,
+  BookModule.class
 })
 @Configuration
 @Slf4j

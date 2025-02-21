@@ -13,7 +13,7 @@ dependencies {
   implementation project(':common')
   implementation project(':user')
   implementation project(':file')
-//  runtimeOnly project(':book')
+  implementation project(':book')
 
   // Test DB
   testImplementation 'com.h2database:h2'

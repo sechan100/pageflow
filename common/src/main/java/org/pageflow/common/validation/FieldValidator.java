@@ -10,7 +10,7 @@ import java.util.function.Function;
 /**
  * @author : sechan
  */
-public class FieldValidator<T> {
+public class FieldValidator<T>  {
   private final String fieldName;
   private final T value;
   private final List<Function<T, InvalidField>> validators;

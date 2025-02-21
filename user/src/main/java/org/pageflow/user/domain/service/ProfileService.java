@@ -7,6 +7,7 @@ import org.pageflow.common.user.UID;
 import org.pageflow.common.validation.FieldReason;
 import org.pageflow.common.validation.FieldValidationException;
 import org.pageflow.common.validation.FieldValidator;
+import org.pageflow.common.validation.ImageUrlValidator;
 import org.pageflow.file.model.FilePath;
 import org.pageflow.file.model.FileUploadCmd;
 import org.pageflow.file.service.FileService;
@@ -33,6 +34,7 @@ public class ProfileService implements ProfileUseCase {
   private final PennameValidator pennameValidator;
   private final ProfilePersistencePort profilePersistencePort;
   private final FileService fileService;
+  private final ImageUrlValidator imageUrlValidator;
 
 
   @Override
@@ -41,21 +43,19 @@ public class ProfileService implements ProfileUseCase {
       .rule(v -> !v.isEmpty(), FieldReason.EMPTY, "첨부된 파일이 없습니다.")
       .rule(v -> v.getOriginalFilename() != null, FieldReason.INVALID_VALUE, "파일 이름이 없습니다.");
     var validation = validator.validate();
-    if(!validation.isValid()){
-      throw new FieldValidationException(validation);
-    }
+    validation.throwIfInvalid();
 
     Profile profile = profilePersistencePort.findById(uid.getValue()).orElseThrow();
     String oldUrl = profile.getProfileImageUrl();
 
     // 내부에 저장된 이미지인 경우, 기존 이미지를 삭제
-    if(this.isInternalImage(oldUrl)){
+    if(imageUrlValidator.isInternalUrl(oldUrl)){
       fileService.delete(oldUrl);
     }
 
     // 새 이미지 업로드
     FileUploadCmd cmd = new FileUploadCmd(
-      uid.getValue(),
+      uid.getValue().toString(),
       FileType.USER.PROFILE_IMAGE,
       file
     );
@@ -71,7 +71,7 @@ public class ProfileService implements ProfileUseCase {
     String oldUrl = user.getProfileImageUrl();
 
     // 내부에 저장된 이미지인 경우, 기존 이미지를 삭제
-    if(this.isInternalImage(oldUrl)){
+    if(imageUrlValidator.isInternalUrl(oldUrl)){
       fileService.delete(oldUrl);
     }
 
@@ -95,13 +95,4 @@ public class ProfileService implements ProfileUseCase {
   private Profile load(UID uid) {
     return profilePersistencePort.findById(uid.getValue()).orElseThrow();
   }
-
-  private boolean isExternalImage(String url) {
-    return !isInternalImage(url);
-  }
-
-  private boolean isInternalImage(String url) {
-    return url.startsWith(WEB_BASE_URL);
-  }
-
 }

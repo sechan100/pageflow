@@ -18,7 +18,7 @@ import java.lang.annotation.*;
   method = {RequestMethod.POST}
 )
 @Secured({})
-public @interface SecuredPost {
+public @interface Post {
 
   @AliasFor(
     annotation = Secured.class,

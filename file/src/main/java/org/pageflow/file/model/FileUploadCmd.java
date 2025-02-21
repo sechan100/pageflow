@@ -1,11 +1,10 @@
 package org.pageflow.file.model;
 
-import com.google.common.base.Preconditions;
 import lombok.Value;
+import org.pageflow.common.validation.FieldReason;
+import org.pageflow.common.validation.FieldValidator;
 import org.pageflow.file.shared.FileType;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.UUID;
 
 /**
  * @author : sechan
@@ -16,19 +15,15 @@ public class FileUploadCmd {
   MultipartFile file;
 
   public FileUploadCmd(
-    UUID ownerId,
+    String ownerId,
     FileType fileType,
     MultipartFile file
   ) {
-    assert file!=null;
-    Preconditions.checkState(
-      !file.isEmpty(),
-      "업로드할 파일이 비어있습니다."
-    );
-    Preconditions.checkNotNull(
-      file.getOriginalFilename(),
-      "파일 이름이 없습니다."
-    );
+    FieldValidator<MultipartFile> validator = new FieldValidator<>("file", file)
+      .rule(f -> !f.isEmpty(), FieldReason.EMPTY, "파일이 없습니다.")
+      .rule(f -> f.getOriginalFilename() != null, FieldReason.INVALID_FORMAT, "파일 이름이 없습니다.");
+    validator.validate().throwIfInvalid();
+
     this.fileIdentity = new FileIdentity(ownerId, fileType.getOwnerType(), fileType);
     this.file = file;
   }

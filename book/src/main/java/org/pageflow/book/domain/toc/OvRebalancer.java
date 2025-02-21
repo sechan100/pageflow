@@ -47,18 +47,21 @@ public class OvRebalancer {
     @Nullable Integer prevOvOrNull,
     @Nullable Integer nextOvOrNull
   ) {
-    // 0번에 들어가는 경우
-    if(prevOvOrNull == null){
-      assert nextOvOrNull != null;
+    // list가 비어있는 경우
+    if(prevOvOrNull == null && nextOvOrNull == null){
+      return false;
+
+    // list 맨 처음에 들어가는 경우
+    } else if(prevOvOrNull == null){
       if(Integer.MIN_VALUE + OV_GAP > nextOvOrNull){
         return true;
       }
-      // list 마지막에 들어가는 경우
+    // list 마지막에 들어가는 경우
     } else if(nextOvOrNull == null){
       if(Integer.MAX_VALUE - OV_GAP < prevOvOrNull){
         return true;
       }
-      // 중간에 들어가는 경우
+    // 중간에 들어가는 경우
     } else {
       if(nextOvOrNull - prevOvOrNull < MIN_OV_GAP){
         return true;

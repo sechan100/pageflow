@@ -13,6 +13,14 @@ public class FieldValidationResult {
     this.invalidFields = new ArrayList<>();
   }
 
+  public static FieldValidationResult of(InvalidField... invalidField) {
+    FieldValidationResult result = new FieldValidationResult();
+    for(InvalidField field : invalidField) {
+      result.addInvalidField(field);
+    }
+    return result;
+  }
+
   public static FieldValidationResult combine(FieldValidationResult... results) {
     FieldValidationResult combinedResult = new FieldValidationResult();
     for(FieldValidationResult result : results) {
@@ -23,6 +31,12 @@ public class FieldValidationResult {
 
   public void addInvalidField(InvalidField invalidField) {
     invalidFields.add(invalidField);
+  }
+
+  public void throwIfInvalid() {
+    if(!this.isValid()){
+      throw new FieldValidationException(this);
+    }
   }
 
   public List<InvalidField> getInvalidFields() {

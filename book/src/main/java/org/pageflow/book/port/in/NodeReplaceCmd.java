@@ -1,4 +1,4 @@
-package org.pageflow.book.domain.toc;
+package org.pageflow.book.port.in;
 
 import lombok.Value;
 

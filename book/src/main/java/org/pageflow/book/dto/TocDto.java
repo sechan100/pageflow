@@ -3,7 +3,7 @@ package org.pageflow.book.dto;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
-import org.pageflow.book.shared.TocNodeType;
+import org.pageflow.book.application.TocNodeType;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,15 +1,24 @@
 package org.pageflow.book.dto;
 
 import lombok.Value;
+import org.pageflow.book.domain.Author;
+import org.pageflow.common.user.UID;
 
-import java.util.UUID;
 
 /**
  * @author : sechan
  */
 @Value
 public class AuthorDto {
-  UUID id;
+  UID id;
   String penname;
   String profileImageUrl;
+
+  public static AuthorDto from(Author author) {
+    return new AuthorDto(
+      author.getUid(),
+      author.getPenname(),
+      author.getProfileImageUrl()
+    );
+  }
 }

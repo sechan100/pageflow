@@ -13,7 +13,7 @@ import org.pageflow.common.result.Result;
 import org.pageflow.common.result.code.CommonCode;
 import org.pageflow.common.user.UID;
 import org.pageflow.common.utility.Get;
-import org.pageflow.common.utility.SecuredPost;
+import org.pageflow.common.utility.Post;
 import org.pageflow.common.validation.FieldReason;
 import org.pageflow.common.validation.InvalidField;
 import org.pageflow.user.adapter.in.auth.LoginTokenEndpointForward;
@@ -56,7 +56,7 @@ public class AuthWebAdapter {
   /**
    * 실제로 호출되지는 않는다. SpringSecurity Form로그인으로 처리된다.
    */
-  @SecuredPost(LoginUri.SPRING_SECURITY_FORM_LOGIN_URI)
+  @Post(LoginUri.SPRING_SECURITY_FORM_LOGIN_URI)
   @Operation(summary = "로그인", description = "로그인을 요청하고, accessToken을 발급한다.")
   private AccessTokenRes SpringSecurityLogin(String username, String password) {
     throw new UnsupportedOperationException("Spring Security에서 제공");
@@ -101,7 +101,7 @@ public class AuthWebAdapter {
     );
   }
 
-  @SecuredPost("/auth/session/refresh")
+  @Post("/auth/session/refresh")
   @Operation(summary = "accessToken 재발급", description = "session id cookie를 받아서 accessToken을 재발급한다.")
   public AccessTokenRes refresh(HttpServletRequest request) {
     UUID sessionId = this.getSessionIdFromCookie();
@@ -113,7 +113,7 @@ public class AuthWebAdapter {
     );
   }
 
-  @SecuredPost("/auth/session/logout")
+  @Post("/auth/session/logout")
   @Operation(summary = "로그아웃", description = "쿠키로 전달된 sessionId를 받아서, 해당 세션을 무효화")
   public void logout() {
     UUID sessionId = this.getSessionIdFromCookie();

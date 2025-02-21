@@ -5,19 +5,14 @@ import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 import org.pageflow.common.jpa.BaseJpaEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 import java.util.UUID;
 
-/**
- * @author : sechan
- */
-@Getter
+
 @Entity
-@SuperBuilder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(of = "id", callSuper = false)
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -32,13 +27,15 @@ import java.util.UUID;
 public abstract class TocNode extends BaseJpaEntity {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.UUID)
+  @Getter
   private UUID id;
 
+  @Getter
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   @JoinColumn(name = "book_id", nullable = false)
   private Book book;
 
+  @Getter
   @Column(name = "title", nullable = false)
   private String title;
 
@@ -49,10 +46,12 @@ public abstract class TocNode extends BaseJpaEntity {
    * 생명주기는 소속된 Book과 일치한다.
    */
   @Nullable
+  @Getter
   @ManyToOne(fetch = FetchType.LAZY, optional = true)
   @JoinColumn(name = "parent_id", nullable = true)
   private Folder parentNode;
 
+  @Getter
   @Column(nullable = false)
   private Integer ov;
 

@@ -17,5 +17,12 @@ public interface FileType {
     private final FileOwnerType ownerType = FileOwnerType.USER;
   }
 
+  enum BOOK implements FileType {
+    COVER_IMAGE;
+
+    @Getter
+    private final FileOwnerType ownerType = FileOwnerType.BOOK;
+  }
+
 }
 

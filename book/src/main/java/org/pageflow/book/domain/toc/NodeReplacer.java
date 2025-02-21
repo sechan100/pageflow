@@ -2,6 +2,9 @@ package org.pageflow.book.domain.toc;
 
 import org.pageflow.book.domain.entity.Folder;
 import org.pageflow.book.domain.entity.TocNode;
+import org.pageflow.common.validation.FieldReason;
+import org.pageflow.common.validation.FieldValidationException;
+import org.pageflow.common.validation.InvalidField;
 import org.springframework.lang.Nullable;
 
 import java.util.ArrayList;
@@ -46,7 +49,12 @@ public class NodeReplacer {
    */
   public void reparent(int destIndex, TocNode target) {
     if(destIndex < 0 || destIndex > nodes.size()){
-      throw new IllegalArgumentException("invalid node destIndex " + destIndex);
+      throw new FieldValidationException(InvalidField.builder()
+        .field("destIndex")
+        .reason(FieldReason.OUT_OF_RANGE)
+        .value(destIndex)
+        .build()
+      );
     }
     if(this.isNodeChildOfThis(target)){
       throw new IllegalArgumentException("node must not be in nodes for reparent operation");
@@ -55,7 +63,7 @@ public class NodeReplacer {
     // NODE를 list에 삽입
     nodes.add(destIndex, target);
     Integer prevOvOrNull = destIndex != 0 ? nodes.get(destIndex - 1).getOv() : null;
-    Integer nextOvOrNull = destIndex != nodes.size() ? nodes.get(destIndex + 1).getOv() : null;
+    Integer nextOvOrNull = destIndex != nodes.size() - 1 ? nodes.get(destIndex + 1).getOv() : null;
 
     OvRebalancer rebalancer = new OvRebalancer();
     if(rebalancer.isRequireRebalance(prevOvOrNull, nextOvOrNull)){
@@ -86,11 +94,19 @@ public class NodeReplacer {
     @Nullable Integer prevOvOrNull,
     @Nullable Integer nextOvOrNull
   ) {
-    if(prevOvOrNull == null){
-      assert nextOvOrNull != null;
+    // 기존 child가 없는 경우
+    if(prevOvOrNull==null && nextOvOrNull==null){
+      return 0;
+
+    // 맨 처음에 삽입되는 경우
+    } else if(prevOvOrNull == null){
       return nextOvOrNull - OV_GAP;
+
+    // 맨 마지막에 삽입되는 경우
     } else if(nextOvOrNull == null){
       return prevOvOrNull + OV_GAP;
+
+    // 중간에 삽입되는 경우
     } else {
       long resolved = ((long) prevOvOrNull + nextOvOrNull) / 2;
       return (int) resolved;

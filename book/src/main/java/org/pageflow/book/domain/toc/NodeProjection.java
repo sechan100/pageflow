@@ -4,7 +4,7 @@ import lombok.Getter;
 import org.pageflow.book.domain.entity.Folder;
 import org.pageflow.book.domain.entity.TocNode;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -34,15 +34,12 @@ public class NodeProjection {
    */
 
   // projection 하지 않는 필드
-  private List<NodeProjection> children;
+  private List<NodeProjection> children = new ArrayList<>();
 
   // ov 순서대로 자식 추가
   public void addChildAccordingToOv(NodeProjection node) {
-    if(this.type!=Folder.class){
+    if(this.type != Folder.class){
       throw new IllegalStateException("Section 타입에는 자식을 추가할 수 없습니다.");
-    }
-    if(children==null){
-      this.children = new LinkedList<>();
     }
     for(int i = 0; i < children.size(); i++){
       if(children.get(i).ov > node.ov){

@@ -1,4 +1,4 @@
-package org.pageflow.book.port.out.persistence;
+package org.pageflow.book.port.out.jpa;
 
 import org.pageflow.book.domain.entity.Folder;
 import org.pageflow.book.domain.entity.TocNode;
@@ -14,13 +14,13 @@ import java.util.UUID;
 /**
  * @author : sechan
  */
-public interface NodeRepository extends BaseJpaRepository<TocNode, UUID> {
-  @Query("SELECT new org.pageflow.boundedcontext.book.adapter.out.persistence.jpa.NodeProjection(n.id, n.parentNode.id, n.ov, n.title, TYPE(n)) FROM NodeJpaEntity n WHERE n.book.id = :bookId")
+public interface NodePersistencePort extends BaseJpaRepository<TocNode, UUID> {
+  @Query("SELECT new org.pageflow.book.domain.toc.NodeProjection(n.id, n.parentNode.id, n.ov, n.title, TYPE(n)) FROM TocNode n WHERE n.book.id = :bookId")
   List<NodeProjection> queryNodesByBookId(@Param("bookId") UUID bookId);
 
   @Query("""
       SELECT MAX(n.ov)
-      FROM NodeJpaEntity n
+      FROM TocNode n
       WHERE n.book.id = :bookId
       AND n.parentNode.id = :parentId
     """)
@@ -28,7 +28,7 @@ public interface NodeRepository extends BaseJpaRepository<TocNode, UUID> {
 
   @Query("""
       SELECT n
-      FROM FolderJpaEntity n
+      FROM Folder n
       WHERE n.book.id = :bookId
       AND n.parentNode IS NULL
     """)
@@ -36,10 +36,10 @@ public interface NodeRepository extends BaseJpaRepository<TocNode, UUID> {
 
   @Query("""
     SELECT siblings
-    FROM NodeJpaEntity siblings
+    FROM TocNode siblings
     WHERE siblings.parentNode.id = (
         SELECT node.parentNode.id
-        FROM NodeJpaEntity node
+        FROM TocNode node
         WHERE node.id = :nodeId
     )
   """)

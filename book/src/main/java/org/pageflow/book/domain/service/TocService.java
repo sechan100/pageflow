@@ -1,15 +1,22 @@
-package org.pageflow.book.service;
+package org.pageflow.book.domain.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.pageflow.book.domain.entity.Book;
 import org.pageflow.book.domain.entity.Folder;
+import org.pageflow.book.domain.entity.Section;
 import org.pageflow.book.domain.entity.TocNode;
+import org.pageflow.book.domain.toc.LastIndexInserter;
 import org.pageflow.book.domain.toc.NodeProjection;
-import org.pageflow.book.domain.toc.NodeReplaceCmd;
 import org.pageflow.book.domain.toc.NodeReplacer;
+import org.pageflow.book.dto.FolderDto;
+import org.pageflow.book.dto.SectionDtoWithContent;
 import org.pageflow.book.dto.TocDto;
-import org.pageflow.book.port.out.persistence.FolderRepository;
-import org.pageflow.book.port.out.persistence.NodeRepository;
+import org.pageflow.book.port.in.*;
+import org.pageflow.book.port.out.jpa.BookPersistencePort;
+import org.pageflow.book.port.out.jpa.FolderPersistencePort;
+import org.pageflow.book.port.out.jpa.NodePersistencePort;
+import org.pageflow.book.port.out.jpa.SectionPersistencePort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -24,19 +31,21 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class TocService {
-  private final NodeRepository nodeRepo;
-  private final FolderRepository folderRepo;
+public class TocService implements TocUseCase, NodeCrudUseCase {
+  private final BookPersistencePort bookPersistencePort;
+  private final FolderPersistencePort folderPersistencePort;
+  private final SectionPersistencePort sectionPersistencePort;
+  private final NodePersistencePort nodePersistencePort;
 
 
-
+  @Override
   public void replaceNode(NodeReplaceCmd cmd) {
-    TocNode node = nodeRepo.findById(cmd.getNodeId()).orElseThrow();
+    TocNode node = nodePersistencePort.findById(cmd.getNodeId()).orElseThrow();
     Assert.notNull(node.getParentNode(), "Root Folder는 이동할 수 없습니다.");
 
     UUID destFolderId = cmd.getDestfolderId();
-    Folder folderProxy = folderRepo.getReferenceById(destFolderId);
-    List<TocNode> siblings = nodeRepo.findChildrenByParentNode_IdOrderByOv(destFolderId);
+    Folder folderProxy = folderPersistencePort.getReferenceById(destFolderId);
+    List<TocNode> siblings = nodePersistencePort.findChildrenByParentNode_IdOrderByOv(destFolderId);
     NodeReplacer replacer = new NodeReplacer(folderProxy, siblings);
     // Reorder
     if(node.getParentNode().getId().equals(destFolderId)){
@@ -47,10 +56,57 @@ public class TocService {
     }
   }
 
+  @Override
   public TocDto.Toc loadToc(UUID bookId) {
-    List<NodeProjection> nodeProjections = nodeRepo.queryNodesByBookId(bookId);
+    List<NodeProjection> nodeProjections = nodePersistencePort.queryNodesByBookId(bookId);
     TocDto.Folder root = buildTree(bookId, nodeProjections);
     return new TocDto.Toc(bookId, root);
+  }
+
+  @Override
+  public FolderDto createFolder(CreateFolderCmd cmd) {
+    UUID bookId = cmd.getBookId();
+    UUID parentId = cmd.getParentNodeId();
+    UUID folderId = UUID.randomUUID();
+
+    // Folder 생성
+    Book bookProxy = bookPersistencePort.getReferenceById(cmd.getBookId());
+    Folder folder = folderPersistencePort.persist(new Folder(
+      folderId,
+      bookProxy,
+      cmd.getTitle().getValue(),
+      null,
+      0
+    ));
+
+    LastIndexInserter inserter = new LastIndexInserter(bookId, parentId, nodePersistencePort);
+    inserter.insertLast(folder);
+
+    return FolderDto.from(folder);
+  }
+
+  @Override
+  public SectionDtoWithContent createSection(CreateSectionCmd cmd) {
+    UUID bookId = cmd.getBookId();
+    UUID parentId = cmd.getParentNodeId();
+    UUID sectionId = UUID.randomUUID();
+
+    // Section 생성
+    Book bookProxy = bookPersistencePort.getReferenceById(cmd.getBookId());
+    Folder parentFolder = folderPersistencePort.findById(parentId).orElseThrow();
+    Section section = sectionPersistencePort.persist(new Section(
+      sectionId,
+      bookProxy,
+      cmd.getTitle().getValue(),
+      parentFolder,
+      cmd.getContent(),
+      0
+    ));
+
+    LastIndexInserter inserter = new LastIndexInserter(bookId, parentId, nodePersistencePort);
+    inserter.insertLast(section);
+
+    return SectionDtoWithContent.from(section);
   }
 
 
@@ -78,7 +134,7 @@ public class TocService {
     }
 
     // NodeProjection -> Dto로 변환
-    if(rootProjection==null) throw new IllegalStateException("Root Folder가 없습니다.");
+    if(rootProjection == null) throw new IllegalStateException("Root Folder가 없습니다.");
     List<TocDto.Node> rootChildren = rootProjection.getChildren().stream()
       .map(this::projectRecursively)
       .toList();
@@ -114,6 +170,6 @@ public class TocService {
   }
 
   private Optional<Integer> loadMaxOvAmongSiblings(UUID bookId, UUID parentNodeId) {
-    return nodeRepo.findMaxOvAmongSiblings(bookId, parentNodeId);
+    return nodePersistencePort.findMaxOvAmongSiblings(bookId, parentNodeId);
   }
 }

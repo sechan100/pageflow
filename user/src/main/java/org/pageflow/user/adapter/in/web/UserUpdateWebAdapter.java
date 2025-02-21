@@ -6,7 +6,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.pageflow.common.api.RequestContext;
 import org.pageflow.common.user.UID;
-import org.pageflow.common.utility.SecuredPost;
+import org.pageflow.common.utility.Post;
 import org.pageflow.user.adapter.in.req.EmailReq;
 import org.pageflow.user.adapter.in.req.PennameReq;
 import org.pageflow.user.adapter.in.res.AccountRes;
@@ -35,7 +35,7 @@ public class UserUpdateWebAdapter {
   private final ProfileUseCase profileUseCase;
 
 
-  @SecuredPost("/user/profile/email")
+  @Post("/user/profile/email")
   public AccountRes changeEmail(@RequestBody EmailReq req) {
     UID uid = requestContext.getUid();
     AccountDto result = accountUsecase.changeEmail(uid, req.getEmail());
@@ -43,7 +43,7 @@ public class UserUpdateWebAdapter {
   }
 
 
-  @SecuredPost("/user/profile/penname")
+  @Post("/user/profile/penname")
   public ProfileRes changePenname(@RequestBody PennameReq req) {
     UID uid = requestContext.getUid();
     ProfileDto result = profileUseCase.changePenname(uid, req.getPenname());
@@ -51,7 +51,7 @@ public class UserUpdateWebAdapter {
   }
 
 
-  @SecuredPost("/user/profile/profile-image")
+  @Post("/user/profile/profile-image")
   @Operation(summary = "프로필 이미지 변경", description = "프로필 이미지를 변경합니다.")
   public ProfileRes changeProfileImage(
     @RequestPart(required = false)

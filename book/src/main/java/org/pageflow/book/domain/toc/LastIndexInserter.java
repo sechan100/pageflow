@@ -4,6 +4,9 @@ import org.hibernate.Hibernate;
 import org.pageflow.book.domain.entity.Folder;
 import org.pageflow.book.domain.entity.TocNode;
 import org.pageflow.book.port.out.jpa.NodePersistencePort;
+import org.pageflow.common.validation.FieldReason;
+import org.pageflow.common.validation.FieldValidationException;
+import org.pageflow.common.validation.InvalidField;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,18 +31,24 @@ public class LastIndexInserter {
 
   /**
    * @param bookId
-   * @param parentFolderId 부모가 될 folder의 아이디
+   * @param destFolderId 부모가 될 folder의 아이디
    * @param repo
    */
-  public LastIndexInserter(UUID bookId, UUID parentFolderId, NodePersistencePort repo) {
-    TocNode nodeProxy = (TocNode) Hibernate.unproxy(repo.getReferenceById(parentFolderId));
+  public LastIndexInserter(UUID bookId, UUID destFolderId, NodePersistencePort repo) {
+    TocNode nodeProxy = (TocNode) Hibernate.unproxy(repo.getReferenceById(destFolderId));
     if(nodeProxy instanceof Folder folder){
       this.folderProxy = folder;
     } else {
-      throw new IllegalArgumentException("folderId에 해당하는 노드가 Folder 타입이 아닙니다.");
+      throw new FieldValidationException(InvalidField.builder()
+        .field("destFolderId")
+        .reason(FieldReason.INVALID_VALUE)
+        .message("destFilderid가 folder 타입이 아닙니다.")
+        .value(destFolderId)
+        .build()
+      );
     }
-    this.maxOvSupplier = () -> repo.findMaxOvAmongSiblings(bookId, parentFolderId);
-    this.siblingsSupplier = () -> repo.findChildrenByParentNode_IdOrderByOv(parentFolderId);
+    this.maxOvSupplier = () -> repo.findMaxOvAmongSiblings(bookId, destFolderId);
+    this.siblingsSupplier = () -> repo.findChildrenByParentNode_IdOrderByOv(destFolderId);
   }
 
   /**

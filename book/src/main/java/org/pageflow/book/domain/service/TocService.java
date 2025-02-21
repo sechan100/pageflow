@@ -43,7 +43,7 @@ public class TocService implements TocUseCase, NodeCrudUseCase {
     TocNode node = nodePersistencePort.findById(cmd.getNodeId()).orElseThrow();
     Assert.notNull(node.getParentNode(), "Root Folder는 이동할 수 없습니다.");
 
-    UUID destFolderId = cmd.getDestfolderId();
+    UUID destFolderId = cmd.getDestFolderId();
     Folder folderProxy = folderPersistencePort.getReferenceById(destFolderId);
     List<TocNode> siblings = nodePersistencePort.findChildrenByParentNode_IdOrderByOv(destFolderId);
     NodeReplacer replacer = new NodeReplacer(folderProxy, siblings);

@@ -11,6 +11,6 @@ import java.util.UUID;
 public class NodeReplaceCmd {
   UUID bookId;
   UUID nodeId;
-  UUID destfolderId;
+  UUID destFolderId;
   int destIndex;
 }

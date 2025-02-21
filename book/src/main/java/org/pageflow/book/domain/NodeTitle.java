@@ -18,7 +18,7 @@ public class NodeTitle extends SingleValueWrapper<String> {
     super(value);
   }
 
-  public static NodeTitle validOf(String value) {
+  public static NodeTitle of(String value) {
     FieldValidationResult result = validate(value);
     if(result.isValid()) {
       return new NodeTitle(value);

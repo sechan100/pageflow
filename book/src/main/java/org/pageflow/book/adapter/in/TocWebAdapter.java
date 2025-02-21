@@ -27,7 +27,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class TocWebAdapter {
   private final TocUseCase tocUsecase;
-  private final NodeCrudUseCase nodeCrudUseCase;
+  private final NodeCmdUseCase nodeCmdUseCase;
 
 
   @Get("/user/books/{bookId}/toc")
@@ -52,25 +52,24 @@ public class TocWebAdapter {
   @Post("/user/books/{bookId}/toc/create-folder")
   @Operation(summary = "폴더 생성")
   public FolderDto createFolder(@PathVariable UUID bookId, @RequestBody CreateFolderReq req) {
-    NodeTitle title = NodeTitle.validOf(req.getTitle());
-    CreateFolderCmd cmd = new CreateFolderCmd(
+    FolderCreateCmd cmd = FolderCreateCmd.withTitle(
       bookId,
       req.getParentNodeId(),
-      title
+      req.getTitle()
     );
-    FolderDto folderDto = nodeCrudUseCase.createFolder(cmd);
+    FolderDto folderDto = nodeCmdUseCase.createFolder(cmd);
     return folderDto;
   }
 
   @Post("/user/books/{bookId}/toc/create-section")
   @Operation(summary = "섹션 생성")
   public SectionDtoWithContent createSection(@PathVariable UUID bookId, @RequestBody CreateSectionReq req) {
-    CreateSectionCmd cmd = new CreateSectionCmd(
+    SectionCreateCmd cmd = new SectionCreateCmd(
       bookId,
       req.getParentNodeId(),
-      NodeTitle.validOf(req.getTitle())
+      NodeTitle.of(req.getTitle())
     );
-    SectionDtoWithContent sectionDto = nodeCrudUseCase.createSection(cmd);
+    SectionDtoWithContent sectionDto = nodeCmdUseCase.createSection(cmd);
     return sectionDto;
   }
 }

@@ -43,4 +43,7 @@ public class Folder extends TocNode {
     );
   }
 
+  public void changeTitle(String title) {
+    this.title = title;
+  }
 }

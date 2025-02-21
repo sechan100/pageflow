@@ -34,7 +34,7 @@ public class BookWebAdapter {
   @Operation(summary = "책 생성")
   public BookRes createBook(@RequestBody CreateBookReq req) {
     UID uid = rqcx.getUid();
-    BookTitle title = BookTitle.validOf(req.getTitle());
+    BookTitle title = BookTitle.of(req.getTitle());
     BookDto result = bookUseCase.createBook(uid, title, null);
     return BookRes.from(result);
   }

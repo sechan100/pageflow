@@ -37,4 +37,12 @@ public class Section extends TocNode {
     this.content = content;
   }
 
+  public void updateContent(String content) {
+    this.content = content;
+  }
+
+  public void changeTitle(String title) {
+    this.title = title;
+  }
+
 }

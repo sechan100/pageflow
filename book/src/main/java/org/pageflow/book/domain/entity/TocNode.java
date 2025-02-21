@@ -37,7 +37,7 @@ public abstract class TocNode extends BaseJpaEntity {
 
   @Getter
   @Column(name = "title", nullable = false)
-  private String title;
+  protected String title;
 
   /**
    * 부모 노드

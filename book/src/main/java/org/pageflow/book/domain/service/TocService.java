@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class TocService implements TocUseCase, NodeCrudUseCase {
+public class TocService implements TocUseCase, NodeCmdUseCase {
   private final BookPersistencePort bookPersistencePort;
   private final FolderPersistencePort folderPersistencePort;
   private final SectionPersistencePort sectionPersistencePort;
@@ -64,7 +64,7 @@ public class TocService implements TocUseCase, NodeCrudUseCase {
   }
 
   @Override
-  public FolderDto createFolder(CreateFolderCmd cmd) {
+  public FolderDto createFolder(FolderCreateCmd cmd) {
     UUID bookId = cmd.getBookId();
     UUID parentId = cmd.getParentNodeId();
     UUID folderId = UUID.randomUUID();
@@ -86,7 +86,23 @@ public class TocService implements TocUseCase, NodeCrudUseCase {
   }
 
   @Override
-  public SectionDtoWithContent createSection(CreateSectionCmd cmd) {
+  public FolderDto updateFolder(FolderUpdateCmd cmd) {
+    Folder folder = folderPersistencePort.findById(cmd.getId()).get();
+    folder.changeTitle(cmd.getTitle().getValue());
+    return FolderDto.from(folder);
+  }
+
+  @Override
+  public void deleteFolder(UUID folderId) {
+    this.deleteNode(folderId);
+  }
+
+  public void deleteNode(UUID nodeId) {
+    nodePersistencePort.deleteById(nodeId);
+  }
+
+  @Override
+  public SectionDtoWithContent createSection(SectionCreateCmd cmd) {
     UUID bookId = cmd.getBookId();
     UUID parentId = cmd.getParentNodeId();
     UUID sectionId = UUID.randomUUID();
@@ -109,6 +125,18 @@ public class TocService implements TocUseCase, NodeCrudUseCase {
     return SectionDtoWithContent.from(section);
   }
 
+  @Override
+  public SectionDtoWithContent updateSection(SectionUpdateCmd cmd) {
+    Section section = sectionPersistencePort.findById(cmd.getId()).get();
+    section.changeTitle(cmd.getTitle().getValue());
+    section.updateContent(cmd.getContent());
+    return SectionDtoWithContent.from(section);
+  }
+
+  @Override
+  public void deleteSection(UUID sectionId) {
+    this.deleteNode(sectionId);
+  }
 
 
   /**

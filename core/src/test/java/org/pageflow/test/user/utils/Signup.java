@@ -1,9 +1,9 @@
-package user;
+package org.pageflow.test.user.utils;
 
-import api.API;
-import api.APIFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.pageflow.test.api.API;
+import org.pageflow.test.api.ApiFactory;
 import org.pageflow.user.adapter.in.res.UserRes;
 import org.springframework.stereotype.Component;
 
@@ -15,7 +15,7 @@ import java.util.UUID;
 @Component
 @RequiredArgsConstructor
 public class Signup {
-  private final APIFactory apiFactory;
+  private final ApiFactory apiFactory;
   private final ObjectMapper objectMapper;
 
   public UserRes signup() {

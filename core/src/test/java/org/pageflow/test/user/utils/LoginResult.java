@@ -1,4 +1,4 @@
-package user.auth;
+package org.pageflow.test.user.utils;
 
 import lombok.Value;
 

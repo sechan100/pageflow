@@ -1,4 +1,4 @@
-package architecture;
+package org.pageflow.test.architecture;
 
 import com.tngtech.archunit.core.domain.JavaClass;
 import com.tngtech.archunit.lang.ArchCondition;
@@ -18,7 +18,7 @@ import static com.tngtech.archunit.core.domain.JavaClass.Predicates.resideInAnyP
  */
 public class ModuleCheckCondition<ANNOTATION extends Annotation> extends ArchCondition<ArchModule<AnnotationDescriptor<ANNOTATION>>> {
   public ModuleCheckCondition() {
-    super("Module Rule");
+    super("'exposedPackages, exposedClassAnnotation로 허용된 클래스만 외부 모듈에서 import 할 수 있습니다.");
   }
 
   @Override

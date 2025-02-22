@@ -1,4 +1,4 @@
-package architecture;
+package org.pageflow.test.architecture;
 
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
@@ -25,11 +25,6 @@ public class ModuleArchitectureTest {
     ArchRule rule = modules()
       .definedByAnnotation(ArchModule.class)
       .should(new ModuleCheckCondition<>());
-//        .should().onlyDependOnEachOtherThroughClassesThat().areAnnotatedWith(ArchModule.class)
-//      .should().respectTheirAllowedDependenciesDeclaredIn("allowedDependencies",
-//        consideringOnlyDependenciesInAnyPackage("org.pageflow.."))
-//      .andShould().onlyDependOnEachOtherThroughPackagesDeclaredIn("exposedPackages");
-
     rule.check(importedClasses);
   }
 

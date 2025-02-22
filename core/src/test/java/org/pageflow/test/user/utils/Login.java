@@ -1,9 +1,9 @@
-package user.auth;
+package org.pageflow.test.user.utils;
 
-import api.API;
-import api.APIFactory;
 import lombok.RequiredArgsConstructor;
 import org.pageflow.common.api.ApiResponse;
+import org.pageflow.test.api.API;
+import org.pageflow.test.api.ApiFactory;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -19,7 +19,7 @@ import java.util.Map;
 @Component
 @RequiredArgsConstructor
 public class Login {
-  private final APIFactory apiFactory;
+  private final ApiFactory apiFactory;
 
   public LoginResult login(String username) {
     API api = apiFactory.createAPI();

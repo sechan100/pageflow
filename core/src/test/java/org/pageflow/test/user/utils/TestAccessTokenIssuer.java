@@ -1,4 +1,4 @@
-package user.auth;
+package org.pageflow.test.user.utils;
 
 import lombok.RequiredArgsConstructor;
 import org.pageflow.common.property.ApplicationProperties;
@@ -16,7 +16,7 @@ import java.lang.reflect.Field;
  */
 @Component
 @RequiredArgsConstructor
-public class TestAccessTokenIssuer {
+public class  TestAccessTokenIssuer {
   private final SessionUseCase sessionUseCase;
   private final LoadAccountPort loadAccountPort;
   private final ApplicationProperties applicationProperties;

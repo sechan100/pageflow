@@ -1,17 +1,18 @@
-package api;
+package org.pageflow.test.api;
 
 import lombok.RequiredArgsConstructor;
+import org.pageflow.test.user.utils.LoginResult;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.stereotype.Component;
-import user.auth.LoginResult;
 
 /**
  * @author : sechan
  */
 @Component
 @RequiredArgsConstructor
-public class APIFactory {
+public class ApiFactory {
   private final TestRestTemplate restTemplate;
+
 
   public API createAPI() {
     return new API(restTemplate);

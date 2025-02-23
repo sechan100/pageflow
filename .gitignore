@@ -51,4 +51,6 @@ dump.rdb
 .gitsecret/keys/random_seed
 !*.secret
 .env
+.env.test
 .env.ci
+.env.test

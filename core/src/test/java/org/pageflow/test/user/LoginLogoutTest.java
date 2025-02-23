@@ -3,30 +3,24 @@ package org.pageflow.test.user;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.pageflow.common.result.code.CommonCode;
-import org.pageflow.core.PageflowApplication;
-import org.pageflow.test.TestModuleConfig;
-import org.pageflow.test.api.API;
-import org.pageflow.test.api.ApiFactory;
-import org.pageflow.test.api.ResTestWrapper;
-import org.pageflow.test.user.utils.Login;
-import org.pageflow.test.user.utils.LoginResult;
-import org.pageflow.test.user.utils.Signup;
-import org.pageflow.test.user.utils.TestAccessTokenIssuer;
+import org.pageflow.test.shared.API;
+import org.pageflow.test.shared.ApiFactory;
+import org.pageflow.test.shared.PageflowIntegrationTest;
+import org.pageflow.test.shared.ResTestWrapper;
+import org.pageflow.test.user.shared.Login;
+import org.pageflow.test.user.shared.LoginResult;
+import org.pageflow.test.user.shared.Signup;
+import org.pageflow.test.user.shared.TestAccessTokenIssuer;
 import org.pageflow.user.adapter.in.res.UserRes;
 import org.pageflow.user.application.UserCode;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Map;
 
 /**
  * @author : sechan
  */
-@SpringBootTest(classes = PageflowApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Import(TestModuleConfig.class)
-@ActiveProfiles("test")
+@PageflowIntegrationTest
 public class LoginLogoutTest {
   @Autowired
   private Login login;

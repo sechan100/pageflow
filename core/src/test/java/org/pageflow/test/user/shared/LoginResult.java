@@ -1,4 +1,4 @@
-package org.pageflow.test.user.utils;
+package org.pageflow.test.user.shared;
 
 import lombok.Value;
 

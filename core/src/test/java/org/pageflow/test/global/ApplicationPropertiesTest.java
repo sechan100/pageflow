@@ -3,10 +3,8 @@ package org.pageflow.test.global;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.pageflow.common.property.ApplicationProperties;
-import org.pageflow.core.PageflowApplication;
+import org.pageflow.test.shared.PageflowIntegrationTest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -16,8 +14,7 @@ import java.util.List;
  * properties가 생성될 때, 잘못된 속성값이 있는지 검증한다.
  * @author : sechan
  */
-@SpringBootTest(classes = PageflowApplication.class)
-@ActiveProfiles("test")
+@PageflowIntegrationTest
 public class ApplicationPropertiesTest {
   @Autowired
   private ApplicationProperties properties;

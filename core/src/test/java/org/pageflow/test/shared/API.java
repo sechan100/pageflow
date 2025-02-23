@@ -1,4 +1,4 @@
-package org.pageflow.test.api;
+package org.pageflow.test.shared;
 
 import lombok.Getter;
 import org.pageflow.common.api.ApiResponse;

@@ -3,23 +3,17 @@ package org.pageflow.test.user;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.pageflow.common.result.code.CommonCode;
-import org.pageflow.core.PageflowApplication;
-import org.pageflow.test.TestModuleConfig;
-import org.pageflow.test.api.API;
-import org.pageflow.test.api.ResTestWrapper;
+import org.pageflow.test.shared.API;
+import org.pageflow.test.shared.PageflowIntegrationTest;
+import org.pageflow.test.shared.ResTestWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.Rollback;
-import org.springframework.test.context.ActiveProfiles;
 
 /**
  * @author : sechan
  */
-@SpringBootTest(classes = PageflowApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Import(TestModuleConfig.class)
-@ActiveProfiles("test")
+@PageflowIntegrationTest
 public class SignupUseCaseTest {
   @Autowired
   private TestRestTemplate restTemplate;

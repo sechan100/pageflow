@@ -1,4 +1,4 @@
-package org.pageflow.test;
+package org.pageflow.test.shared;
 
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 

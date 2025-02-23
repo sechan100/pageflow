@@ -82,7 +82,7 @@ subprojects {
 
   // .env 파일을 IDE 실행으로는 잘 못 읽어와서 수동으로 등록하는 설정을 작성
   tasks.withType(Test).configureEach {
-    def envFile = file('../.env')
+    def envFile = file('../.env.test')
     if (envFile.exists()) {
       envFile.eachLine { line ->
         if (!line.startsWith("#") && line.contains("=")) {

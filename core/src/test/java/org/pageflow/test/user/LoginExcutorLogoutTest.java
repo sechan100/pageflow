@@ -7,9 +7,9 @@ import org.pageflow.test.shared.API;
 import org.pageflow.test.shared.ApiFactory;
 import org.pageflow.test.shared.PageflowIntegrationTest;
 import org.pageflow.test.shared.ResTestWrapper;
-import org.pageflow.test.user.shared.Login;
+import org.pageflow.test.user.shared.LoginExcutor;
 import org.pageflow.test.user.shared.LoginResult;
-import org.pageflow.test.user.shared.Signup;
+import org.pageflow.test.user.shared.SignupExcetuor;
 import org.pageflow.test.user.shared.TestAccessTokenIssuer;
 import org.pageflow.user.adapter.in.res.UserRes;
 import org.pageflow.user.application.UserCode;
@@ -21,11 +21,11 @@ import java.util.Map;
  * @author : sechan
  */
 @PageflowIntegrationTest
-public class LoginLogoutTest {
+public class LoginExcutorLogoutTest {
   @Autowired
-  private Login login;
+  private LoginExcutor loginExcutor;
   @Autowired
-  private Signup signup;
+  private SignupExcetuor signupExcetuor;
   @Autowired
   private ApiFactory apiFactory;
   @Autowired
@@ -40,9 +40,9 @@ public class LoginLogoutTest {
     api.get("/auth/session/info").is(CommonCode.LOGIN_REQUIRED);
 
     // 로그인
-    UserRes user = signup.signup();
+    UserRes user = signupExcetuor.signup();
     String username = user.getUsername();
-    var loginResult = login.login(username);
+    var loginResult = loginExcutor.login(username);
 
     // 로그인 후 session 조회
     API authenticatedApi = apiFactory.createAuthenticated(loginResult);
@@ -61,9 +61,9 @@ public class LoginLogoutTest {
   void accessTokenExpiredAndRefresh() {
     API anonymousApi = apiFactory.createAPI();
     // 로그인
-    UserRes user = signup.signup();
+    UserRes user = signupExcetuor.signup();
     String username = user.getUsername();
-    var loginRes = login.login(username);
+    var loginRes = loginExcutor.login(username);
 
     // 만료된 토큰 발행
     String expiredAccessToken = testAccessTokenIssuer.issueImmediatelyExpireToken(username);

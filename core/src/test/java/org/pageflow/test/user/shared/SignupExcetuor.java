@@ -14,7 +14,7 @@ import java.util.UUID;
  */
 @Component
 @RequiredArgsConstructor
-public class Signup {
+public class SignupExcetuor {
   private final ApiFactory apiFactory;
   private final ObjectMapper objectMapper;
 

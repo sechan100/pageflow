@@ -14,7 +14,7 @@ import org.springframework.test.annotation.Rollback;
  * @author : sechan
  */
 @PageflowIntegrationTest
-public class SignupUseCaseTest {
+public class SignupExcetuorUseCaseTest {
   @Autowired
   private TestRestTemplate restTemplate;
 

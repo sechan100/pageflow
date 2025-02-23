@@ -97,6 +97,8 @@ pageflow:
     refresh-token-expire-days: ${REFRESH_TOKEN_EXPIRE_DAYS}
   user:
     default-profile-image-url: '${pageflow.site.base-url}/image/default-profile-image.png'
+  book:
+    default-cover-image-url: '${pageflow.site.base-url}/image/default-cover-image.png'
   email:
     from:
       no-reply: noreply@pageflow.org

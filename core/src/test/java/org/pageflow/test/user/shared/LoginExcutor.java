@@ -18,7 +18,7 @@ import java.util.Map;
  */
 @Component
 @RequiredArgsConstructor
-public class Login {
+public class LoginExcutor {
   private final ApiFactory apiFactory;
 
   public LoginResult login(String username) {

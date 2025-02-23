@@ -96,6 +96,12 @@ public class BookService implements BookUseCase {
     return BookDto.from(book);
   }
 
+  @Override
+  public void deleteBook(UUID bookId) {
+    Book book = bookPersistencePort.findById(bookId).get();
+    bookPersistencePort.delete(book);
+  }
+
 
   private String uploadCoverImage(UUID bookId, MultipartFile coverImage) {
     // 새 이미지 업로드

@@ -22,4 +22,6 @@ public interface BookUseCase {
 
   BookDto changeBookCoverImage(UUID bookId, MultipartFile file);
 
+  void deleteBook(UUID bookId);
+
 }

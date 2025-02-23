@@ -9,11 +9,11 @@ import java.util.UUID;
  * @author : sechan
  */
 public interface NodeCmdUseCase {
-  FolderDto createFolder(FolderCreateCmd cmd);
-  FolderDto updateFolder(FolderUpdateCmd cmd);
+  FolderDto createFolder(CreateFolderCmd cmd);
+  FolderDto updateFolder(UpdateFolderCmd cmd);
   void deleteFolder(UUID folderId);
 
-  SectionDtoWithContent createSection(SectionCreateCmd cmd);
-  SectionDtoWithContent updateSection(SectionUpdateCmd cmd);
+  SectionDtoWithContent createSection(CreateSectionCmd cmd);
+  SectionDtoWithContent updateSection(UpdateSectionCmd cmd);
   void deleteSection(UUID sectionId);
 }

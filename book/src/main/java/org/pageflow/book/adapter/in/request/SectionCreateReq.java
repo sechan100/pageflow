@@ -9,7 +9,7 @@ import java.util.UUID;
  * @author : sechan
  */
 @Data
-public class CreateSectionReq {
+public class SectionCreateReq {
   @NotBlank
   private UUID parentNodeId;
 

@@ -2,14 +2,15 @@ package org.pageflow.book.adapter.in;
 
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
-import org.pageflow.book.adapter.in.request.CreateFolderReq;
-import org.pageflow.book.adapter.in.request.CreateSectionReq;
 import org.pageflow.book.adapter.in.request.NodeReplaceReq;
+import org.pageflow.book.adapter.in.request.SectionCreateReq;
 import org.pageflow.book.domain.NodeTitle;
-import org.pageflow.book.dto.FolderDto;
 import org.pageflow.book.dto.SectionDtoWithContent;
 import org.pageflow.book.dto.TocDto;
-import org.pageflow.book.port.in.*;
+import org.pageflow.book.port.in.CreateSectionCmd;
+import org.pageflow.book.port.in.NodeCmdUseCase;
+import org.pageflow.book.port.in.ReplaceNodeCmd;
+import org.pageflow.book.port.in.TocUseCase;
 import org.pageflow.common.utility.Get;
 import org.pageflow.common.utility.Post;
 import org.springframework.validation.annotation.Validated;
@@ -40,7 +41,7 @@ public class TocWebAdapter {
   @Post("/user/books/{bookId}/toc/replace-node")
   @Operation(summary = "목차 노드 재배치")
   public void reorder(@PathVariable UUID bookId, @RequestBody NodeReplaceReq req) {
-    NodeReplaceCmd cmd = new NodeReplaceCmd(
+    ReplaceNodeCmd cmd = new ReplaceNodeCmd(
       bookId,
       req.getTargetNodeId(),
       req.getDestFolderId(),
@@ -49,22 +50,12 @@ public class TocWebAdapter {
     tocUsecase.replaceNode(cmd);
   }
 
-  @Post("/user/books/{bookId}/toc/create-folder")
-  @Operation(summary = "폴더 생성")
-  public FolderDto createFolder(@PathVariable UUID bookId, @RequestBody CreateFolderReq req) {
-    FolderCreateCmd cmd = FolderCreateCmd.withTitle(
-      bookId,
-      req.getParentNodeId(),
-      req.getTitle()
-    );
-    FolderDto folderDto = nodeCmdUseCase.createFolder(cmd);
-    return folderDto;
-  }
+
 
   @Post("/user/books/{bookId}/toc/create-section")
   @Operation(summary = "섹션 생성")
-  public SectionDtoWithContent createSection(@PathVariable UUID bookId, @RequestBody CreateSectionReq req) {
-    SectionCreateCmd cmd = new SectionCreateCmd(
+  public SectionDtoWithContent createSection(@PathVariable UUID bookId, @RequestBody SectionCreateReq req) {
+    CreateSectionCmd cmd = new CreateSectionCmd(
       bookId,
       req.getParentNodeId(),
       NodeTitle.of(req.getTitle())
@@ -72,4 +63,6 @@ public class TocWebAdapter {
     SectionDtoWithContent sectionDto = nodeCmdUseCase.createSection(cmd);
     return sectionDto;
   }
+
+
 }

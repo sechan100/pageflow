@@ -39,7 +39,7 @@ public class TocService implements TocUseCase, NodeCmdUseCase {
 
 
   @Override
-  public void replaceNode(NodeReplaceCmd cmd) {
+  public void replaceNode(ReplaceNodeCmd cmd) {
     TocNode node = nodePersistencePort.findById(cmd.getNodeId()).orElseThrow();
     Assert.notNull(node.getParentNode(), "Root Folder는 이동할 수 없습니다.");
 
@@ -64,7 +64,7 @@ public class TocService implements TocUseCase, NodeCmdUseCase {
   }
 
   @Override
-  public FolderDto createFolder(FolderCreateCmd cmd) {
+  public FolderDto createFolder(CreateFolderCmd cmd) {
     UUID bookId = cmd.getBookId();
     UUID parentId = cmd.getParentNodeId();
     UUID folderId = UUID.randomUUID();
@@ -86,7 +86,7 @@ public class TocService implements TocUseCase, NodeCmdUseCase {
   }
 
   @Override
-  public FolderDto updateFolder(FolderUpdateCmd cmd) {
+  public FolderDto updateFolder(UpdateFolderCmd cmd) {
     Folder folder = folderPersistencePort.findById(cmd.getId()).get();
     folder.changeTitle(cmd.getTitle().getValue());
     return FolderDto.from(folder);
@@ -102,7 +102,7 @@ public class TocService implements TocUseCase, NodeCmdUseCase {
   }
 
   @Override
-  public SectionDtoWithContent createSection(SectionCreateCmd cmd) {
+  public SectionDtoWithContent createSection(CreateSectionCmd cmd) {
     UUID bookId = cmd.getBookId();
     UUID parentId = cmd.getParentNodeId();
     UUID sectionId = UUID.randomUUID();
@@ -126,7 +126,7 @@ public class TocService implements TocUseCase, NodeCmdUseCase {
   }
 
   @Override
-  public SectionDtoWithContent updateSection(SectionUpdateCmd cmd) {
+  public SectionDtoWithContent updateSection(UpdateSectionCmd cmd) {
     Section section = sectionPersistencePort.findById(cmd.getId()).get();
     section.changeTitle(cmd.getTitle().getValue());
     section.updateContent(cmd.getContent());

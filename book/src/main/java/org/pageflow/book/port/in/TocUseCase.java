@@ -8,6 +8,6 @@ import java.util.UUID;
  * @author : sechan
  */
 public interface TocUseCase {
-  void replaceNode(NodeReplaceCmd cmd);
+  void replaceNode(ReplaceNodeCmd cmd);
   TocDto.Toc loadToc(UUID bookId);
 }

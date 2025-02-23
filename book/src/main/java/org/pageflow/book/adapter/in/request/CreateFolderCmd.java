@@ -9,7 +9,7 @@ import java.util.UUID;
  * @author : sechan
  */
 @Data
-public class CreateFolderReq {
+public class CreateFolderCmd {
   @NotBlank
   private UUID parentNodeId;
 

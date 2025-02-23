@@ -12,19 +12,19 @@ import java.util.UUID;
  */
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public class FolderCreateCmd {
+public class CreateFolderCmd {
   private final UUID bookId;
   private final UUID parentNodeId;
   private final NodeTitle title;
 
-  public static FolderCreateCmd withTitle(UUID bookId, UUID parentNodeId, String _title) {
+  public static CreateFolderCmd withTitle(UUID bookId, UUID parentNodeId, String _title) {
     NodeTitle title = NodeTitle.of(_title);
-    return new FolderCreateCmd(bookId, parentNodeId, title);
+    return new CreateFolderCmd(bookId, parentNodeId, title);
   }
 
-  public static FolderCreateCmd withoutTitle(UUID bookId, UUID parentNodeId) {
+  public static CreateFolderCmd withoutTitle(UUID bookId, UUID parentNodeId) {
     NodeTitle title = NodeTitle.of("새 폴더");
-    return new FolderCreateCmd(bookId, parentNodeId, title);
+    return new CreateFolderCmd(bookId, parentNodeId, title);
   }
 
 }

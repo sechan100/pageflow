@@ -12,13 +12,13 @@ import java.util.UUID;
  */
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public class FolderUpdateCmd {
+public class UpdateFolderCmd {
   private final UUID id;
   private final NodeTitle title;
 
 
-  public static FolderUpdateCmd of(UUID id, String title) {
-    return new FolderUpdateCmd(
+  public static UpdateFolderCmd of(UUID id, String title) {
+    return new UpdateFolderCmd(
       id,
       NodeTitle.of(title)
     );

@@ -12,17 +12,17 @@ import java.util.UUID;
  */
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public class SectionUpdateCmd {
+public class UpdateSectionCmd {
   private final UUID id;
   private final NodeTitle title;
   private final String content;
 
-  public static SectionUpdateCmd of(
+  public static UpdateSectionCmd of(
     UUID id,
     String title,
     String content
   ) {
-    return new SectionUpdateCmd(
+    return new UpdateSectionCmd(
       id,
       NodeTitle.of(title),
       content

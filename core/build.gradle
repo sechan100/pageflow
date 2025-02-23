@@ -1,9 +1,7 @@
-plugins {
-  id 'java'
-}
-jar { enabled = false; }
 
+jar { enabled = false; }
 bootJar {
+  enabled = true
   archiveBaseName = 'pageflow'
   archiveVersion = '0.0.1'
 }
@@ -18,21 +16,4 @@ dependencies {
   // Test DB
   testImplementation 'com.h2database:h2'
   testImplementation 'io.github.cdimascio:dotenv-java:3.0.0'
-}
-
-
-test {
-  useJUnitPlatform()
-}
-
-tasks.withType(Test).configureEach {
-  def envFile = file('../.env')
-  if (envFile.exists()) {
-    envFile.eachLine { line ->
-      if (!line.startsWith("#") && line.contains("=")) {
-        def (key, value) = line.split("=", 2)
-        environment key.trim(), value.trim()
-      }
-    }
-  }
 }

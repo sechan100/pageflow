@@ -2,7 +2,6 @@ plugins {
   id 'java'
   id 'org.springframework.boot' version '3.1.4'
   id 'io.spring.dependency-management' version '1.1.3'
-  id "com.vanniktech.dependency.graph.generator" version "0.8.0"
 }
 
 repositories {
@@ -73,7 +72,29 @@ subprojects {
     testImplementation 'org.projectlombok:lombok'
     testAnnotationProcessor 'org.projectlombok:lombok'
   }
+
+  test {
+    useJUnitPlatform()
+  }
+
+  bootJar { enabled = false; }
+  jar { enabled = true; }
+
+  // .env 파일을 IDE 실행으로는 잘 못 읽어와서 수동으로 등록하는 설정을 작성
+  tasks.withType(Test).configureEach {
+    def envFile = file('../.env')
+    if (envFile.exists()) {
+      envFile.eachLine { line ->
+        if (!line.startsWith("#") && line.contains("=")) {
+          def (key, value) = line.split("=", 2)
+          environment key.trim(), value.trim()
+        }
+      }
+    }
+  }
 }
+
+
 
 // flush redis cache
 tasks.register('flushRedis', Exec) {

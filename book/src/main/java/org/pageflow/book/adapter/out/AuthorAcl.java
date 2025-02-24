@@ -16,7 +16,7 @@ import java.util.Optional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ProfileToAuthorAcl implements LoadAuthorPort {
+public class AuthorAcl implements LoadAuthorPort {
   private final ProfilePersistencePort profilePort;
 
   @Override

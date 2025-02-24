@@ -75,15 +75,15 @@ public class NodeReplacer {
     target.changeParentNode(folderProxy);
   }
 
+  /**
+   * TocNode가 가지고있는 parentNode는 신경쓰지 않는다.
+   * this 클래스가 가진 List를 기준으로 parentNode를 동기화시킨다.
+   * @param node
+   * @return
+   */
   private boolean isNodeChildOfThis(TocNode node){
     boolean isInList = nodes.contains(node);
-    assert node.getParentNode()!=null;
-    boolean isParentNodeIdSame = node.getParentNode().equals(folderProxy);
-
-    if(isInList != isParentNodeIdSame){
-      throw new IllegalArgumentException("Impossible state: node is in list, but parent node id is not same as folderId. Or vice versa.");
-    }
-
+    assert node.getParentNode() != null;
     return isInList;
   }
 

@@ -21,7 +21,7 @@ import java.util.UUID;
   name = "node",
   uniqueConstraints = {
     // 형제 노드끼리의 순서를 결정하기 위해서는 ov값이 형제들 사이에서 모두 unique해야 한다.
-    @UniqueConstraint(name = "node_book_id_title_uk", columnNames = {"parent_id", "ov"})
+    @UniqueConstraint(name = "siblings_ov_unique", columnNames = {"parent_id", "ov"})
   }
 )
 public abstract class TocNode extends BaseJpaEntity {

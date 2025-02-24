@@ -6,10 +6,8 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.pageflow.book.adapter.in.request.CreateFolderReq;
 import org.pageflow.book.dto.FolderDto;
-import org.pageflow.book.port.in.BookQueries;
-import org.pageflow.book.port.in.CreateFolderCmd;
-import org.pageflow.book.port.in.NodeCmdUseCase;
-import org.pageflow.book.port.in.UpdateFolderCmd;
+import org.pageflow.book.port.in.*;
+import org.pageflow.common.api.RequestContext;
 import org.pageflow.common.utility.Get;
 import org.pageflow.common.utility.Post;
 import org.springframework.validation.annotation.Validated;
@@ -28,8 +26,9 @@ import java.util.UUID;
 @RequestMapping("/user/books/{bookId}/toc/folders")
 @RequiredArgsConstructor
 public class FolderWebAdapter {
-  private final NodeCmdUseCase nodeCmdUseCase;
-  private final BookQueries bookQueries;
+  private final NodeCrudUseCase nodeCrudUseCase;
+  private final BookResourcePermitter permitter;
+  private final RequestContext rqcx;
 
 
   @Post("")
@@ -40,14 +39,16 @@ public class FolderWebAdapter {
       req.getParentNodeId(),
       req.getTitle()
     );
-    FolderDto folderDto = nodeCmdUseCase.createFolder(cmd);
+    BookPermission permission = permitter.getAuthorPermission(bookId, rqcx.getUid());
+    FolderDto folderDto = nodeCrudUseCase.createFolder(permission, cmd);
     return folderDto;
   }
 
   @Get("/{folderId}")
   @Operation(summary = "폴더 조회")
   public FolderDto getFolder(@PathVariable UUID bookId, @PathVariable UUID folderId) {
-    FolderDto folder = bookQueries.queryFolder(folderId);
+    BookPermission permission = permitter.getAuthorPermission(bookId, rqcx.getUid());
+    FolderDto folder = nodeCrudUseCase.queryFolder(permission, folderId);
     return folder;
   }
 
@@ -58,14 +59,16 @@ public class FolderWebAdapter {
       folderId,
       req.getTitle()
     );
-    FolderDto folderDto = nodeCmdUseCase.updateFolder(cmd);
+    BookPermission permission = permitter.getAuthorPermission(bookId, rqcx.getUid());
+    FolderDto folderDto = nodeCrudUseCase.updateFolder(permission, cmd);
     return folderDto;
   }
 
   @Post("/{folderId}/delete")
   @Operation(summary = "폴더 삭제")
   public void deleteFolder(@PathVariable UUID bookId, @PathVariable UUID folderId) {
-    nodeCmdUseCase.deleteFolder(folderId);
+    BookPermission permission = permitter.getAuthorPermission(bookId, rqcx.getUid());
+    nodeCrudUseCase.deleteFolder(permission, folderId);
   }
 
 

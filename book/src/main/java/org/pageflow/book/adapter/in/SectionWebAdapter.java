@@ -7,10 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.pageflow.book.adapter.in.request.SectionCreateReq;
 import org.pageflow.book.dto.SectionDto;
 import org.pageflow.book.dto.SectionDtoWithContent;
-import org.pageflow.book.port.in.BookQueries;
-import org.pageflow.book.port.in.CreateSectionCmd;
-import org.pageflow.book.port.in.NodeCmdUseCase;
-import org.pageflow.book.port.in.UpdateSectionCmd;
+import org.pageflow.book.port.in.*;
+import org.pageflow.common.api.RequestContext;
 import org.pageflow.common.utility.Get;
 import org.pageflow.common.utility.Post;
 import org.springframework.validation.annotation.Validated;
@@ -29,8 +27,9 @@ import java.util.UUID;
 @RequestMapping("/user/books/{bookId}/toc/sections")
 @RequiredArgsConstructor
 public class SectionWebAdapter {
-  private final NodeCmdUseCase nodeCmdUseCase;
-  private final BookQueries bookQueries;
+  private final NodeCrudUseCase nodeCrudUseCase;
+  private final BookResourcePermitter permitter;
+  private final RequestContext rqcx;
 
   @Post("")
   @Operation(summary = "섹션 생성")
@@ -40,21 +39,24 @@ public class SectionWebAdapter {
       req.getParentNodeId(),
       req.getTitle()
     );
-    SectionDtoWithContent sectionDto = nodeCmdUseCase.createSection(cmd);
+    BookPermission permission = permitter.getAuthorPermission(bookId, rqcx.getUid());
+    SectionDtoWithContent sectionDto = nodeCrudUseCase.createSection(permission, cmd);
     return sectionDto;
   }
 
   @Get("/{sectionId}")
   @Operation(summary = "섹션 조회")
   public SectionDto getSection(@PathVariable UUID bookId, @PathVariable UUID sectionId) {
-    SectionDto section = bookQueries.querySection(sectionId);
+    BookPermission permission = permitter.getAuthorPermission(bookId, rqcx.getUid());
+    SectionDto section = nodeCrudUseCase.querySection(permission, sectionId);
     return section;
   }
 
   @Get("/{sectionId}/content")
   @Operation(summary = "섹션을 내용과 함께 조회")
   public SectionDtoWithContent getSectionWithContent(@PathVariable UUID bookId, @PathVariable UUID sectionId) {
-    SectionDtoWithContent section = bookQueries.querySectionWithContent(sectionId);
+    BookPermission permission = permitter.getAuthorPermission(bookId, rqcx.getUid());
+    SectionDtoWithContent section = nodeCrudUseCase.querySectionWithContent(permission, sectionId);
     return section;
   }
 
@@ -62,18 +64,20 @@ public class SectionWebAdapter {
   @Operation(summary = "섹션 업데이트")
   public SectionDtoWithContent updateSection(@PathVariable UUID bookId, @PathVariable UUID sectionId, @RequestBody SectionUpdateReq req) {
     UpdateSectionCmd cmd = UpdateSectionCmd.of(
-      bookId,
+      sectionId,
       req.getTitle(),
       req.getContent()
     );
-    SectionDtoWithContent section = nodeCmdUseCase.updateSection(cmd);
+    BookPermission permission = permitter.getAuthorPermission(bookId, rqcx.getUid());
+    SectionDtoWithContent section = nodeCrudUseCase.updateSection(permission, cmd);
     return section;
   }
 
   @Post("/{sectionId}/delete")
   @Operation(summary = "섹션 삭제")
   public void deleteSection(@PathVariable UUID bookId, @PathVariable UUID sectionId) {
-    nodeCmdUseCase.deleteSection(sectionId);
+    BookPermission permission = permitter.getAuthorPermission(bookId, rqcx.getUid());
+    nodeCrudUseCase.deleteSection(permission, sectionId);
   }
 
 

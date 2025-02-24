@@ -28,4 +28,5 @@ public class Author {
   public Profile getProfileJpaEntity() {
     return profile;
   }
+
 }

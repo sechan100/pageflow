@@ -42,10 +42,7 @@ subprojects {
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-//		testImplementation 'org.springframework.security:spring-security-test'
-//		implementation 'org.springframework.boot:spring-boot-starter-aop'
-
-//		implementation 'org.springframework.boot:spring-boot-starter'
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
     // mysql
@@ -93,7 +90,6 @@ subprojects {
     }
   }
 }
-
 
 
 // flush redis cache

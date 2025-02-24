@@ -22,7 +22,8 @@ public class Section extends TocNode {
 
   @Lob
   @Getter
-  @Column(nullable = false)
+  // MEDIUMTEXT: 16MB, 한글기준 약 4,000,000자
+  @Column(nullable = false, columnDefinition = "MEDIUMTEXT")
   private String content;
 
   public Section(

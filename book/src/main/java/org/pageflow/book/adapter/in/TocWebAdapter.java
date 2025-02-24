@@ -26,7 +26,7 @@ import java.util.UUID;
 public class TocWebAdapter {
   private final TocUseCase tocUsecase;
   private final NodeCrudUseCase nodeCrudUseCase;
-  private final BookResourcePermitter permitter;
+  private final BookAccessPermitter permitter;
   private final RequestContext rqcx;
 
 

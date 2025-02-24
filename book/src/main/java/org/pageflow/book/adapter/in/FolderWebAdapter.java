@@ -27,7 +27,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class FolderWebAdapter {
   private final NodeCrudUseCase nodeCrudUseCase;
-  private final BookResourcePermitter permitter;
+  private final BookAccessPermitter permitter;
   private final RequestContext rqcx;
 
 

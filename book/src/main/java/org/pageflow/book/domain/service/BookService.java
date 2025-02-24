@@ -65,12 +65,12 @@ public class BookService implements BookUseCase {
       :
     applicationProperties.book.defaultCoverImageUrl;
 
-    Book book = Book.builder()
-      .id(bookId)
-      .author(author)
-      .title(title.getValue())
-      .coverImageUrl(coverImageUrl)
-      .build();
+    Book book = Book.create(
+      bookId,
+      author,
+      title,
+      coverImageUrl
+    );
     bookPersistencePort.persist(book);
 
     // root folder

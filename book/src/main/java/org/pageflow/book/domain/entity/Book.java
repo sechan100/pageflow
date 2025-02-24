@@ -3,6 +3,7 @@ package org.pageflow.book.domain.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.pageflow.book.domain.Author;
+import org.pageflow.book.domain.BookStatus;
 import org.pageflow.book.domain.BookTitle;
 import org.pageflow.common.jpa.BaseJpaEntity;
 import org.pageflow.user.domain.entity.Profile;
@@ -14,6 +15,7 @@ import java.util.UUID;
  * @author : sechan
  */
 @Entity
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(of = "id", callSuper = false)
 @Table(name = "book")
@@ -35,20 +37,35 @@ public class Book extends BaseJpaEntity {
   @Column(nullable = false)
   private String coverImageUrl;
 
+  @Getter
+  @Column(nullable = false)
+  @Enumerated(EnumType.STRING)
+  private BookStatus status;
+
+  /**
+   * publish되거나 revise될 때마다 1씩 증가한다.
+   */
+  @Getter
+  @Column(nullable = false)
+  private Integer edition;
 
 
-  @Builder
-  public Book(
+  public static Book create(
     UUID id,
     Author author,
-    String title,
+    BookTitle title,
     String coverImageUrl
   ) {
-    this.id = id;
-    this.author = author.getProfileJpaEntity();
-    this.title = title;
-    this.coverImageUrl = coverImageUrl;
+    return new Book(
+      id,
+      author.getProfileJpaEntity(),
+      title.getValue(),
+      coverImageUrl,
+      BookStatus.DRAFT,
+      0
+    );
   }
+
 
 
   public Author getAuthor() {

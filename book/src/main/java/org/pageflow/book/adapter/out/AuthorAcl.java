@@ -2,9 +2,11 @@ package org.pageflow.book.adapter.out;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.Hibernate;
 import org.pageflow.book.domain.Author;
 import org.pageflow.book.port.out.LoadAuthorPort;
 import org.pageflow.common.user.UID;
+import org.pageflow.user.domain.entity.Profile;
 import org.pageflow.user.port.out.entity.ProfilePersistencePort;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +28,7 @@ public class AuthorAcl implements LoadAuthorPort {
 
   @Override
   public Author loadAuthorReference(UID authorId) {
-    return new Author(profilePort.getReferenceById(authorId.getValue()));
+    Profile profileProxy = profilePort.getReferenceById(authorId.getValue());
+    return new Author(Hibernate.unproxy(profileProxy, Profile.class));
   }
 }

@@ -12,8 +12,8 @@ import org.pageflow.book.domain.Author;
 import org.pageflow.book.domain.BookPermissionPolicy;
 import org.pageflow.book.domain.BookPermissionRequired;
 import org.pageflow.book.domain.entity.Book;
+import org.pageflow.book.port.in.BookAccessPermitter;
 import org.pageflow.book.port.in.BookPermission;
-import org.pageflow.book.port.in.BookResourcePermitter;
 import org.pageflow.book.port.out.jpa.BookPersistencePort;
 import org.pageflow.common.result.ProcessResultException;
 import org.pageflow.common.result.Result;
@@ -29,7 +29,7 @@ import java.util.UUID;
 @Aspect
 @Component
 @RequiredArgsConstructor
-public class PermissionEvaluateAop implements BookResourcePermitter {
+public class PermissionEvaluateAop implements BookAccessPermitter {
   private final BookPersistencePort bookPersistencePort;
   private final AuthorAcl authorAcl;
 

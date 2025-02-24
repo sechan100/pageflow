@@ -8,8 +8,8 @@ import org.pageflow.book.domain.BookTitle;
 import org.pageflow.book.dto.BookDto;
 import org.pageflow.book.dto.BookDtoWithAuthor;
 import org.pageflow.book.dto.MyBooks;
+import org.pageflow.book.port.in.BookAccessPermitter;
 import org.pageflow.book.port.in.BookPermission;
-import org.pageflow.book.port.in.BookResourcePermitter;
 import org.pageflow.book.port.in.BookUseCase;
 import org.pageflow.common.api.RequestContext;
 import org.pageflow.common.user.UID;
@@ -32,7 +32,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BookWebAdapter {
   private final BookUseCase bookUseCase;
-  private final BookResourcePermitter permitter;
+  private final BookAccessPermitter permitter;
   private final RequestContext rqcx;
 
   @Post("")

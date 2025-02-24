@@ -7,6 +7,6 @@ import java.util.UUID;
 /**
  * @author : sechan
  */
-public interface BookResourcePermitter {
+public interface BookAccessPermitter {
   BookPermission getAuthorPermission(UUID bookId, UID uid);
 }

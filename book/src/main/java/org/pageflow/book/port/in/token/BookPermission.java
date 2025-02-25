@@ -1,9 +1,9 @@
-package org.pageflow.book.port.in;
+package org.pageflow.book.port.in.token;
 
-import lombok.Value;
+import lombok.Getter;
 import org.pageflow.book.domain.Author;
-import org.pageflow.book.domain.BookPermissionPolicy;
 import org.pageflow.book.domain.entity.Book;
+import org.pageflow.book.domain.enums.BookPermissionPolicy;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -14,10 +14,12 @@ import java.util.UUID;
  * Book에 접근하여 데이터를 쓰거나 읽을 수 있는 권한을 나타내는 토큰
  * @author : sechan
  */
-@Value
 public class BookPermission {
-  UUID bookId;
-  List<BookPermissionPolicy> permittedPolicies;
+  @Getter
+  private final UUID bookId;
+
+  @Getter
+  private final List<BookPermissionPolicy> permittedPolicies;
 
   private BookPermission(UUID bookId, BookPermissionPolicy... permittedPolicies) {
     this.bookId = bookId;

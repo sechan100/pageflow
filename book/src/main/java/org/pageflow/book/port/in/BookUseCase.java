@@ -4,6 +4,7 @@ import org.pageflow.book.domain.BookTitle;
 import org.pageflow.book.dto.BookDto;
 import org.pageflow.book.dto.BookDtoWithAuthor;
 import org.pageflow.book.dto.MyBooks;
+import org.pageflow.book.port.in.token.BookContext;
 import org.pageflow.common.user.UID;
 import org.springframework.lang.Nullable;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,13 +19,12 @@ public interface BookUseCase {
     @Nullable MultipartFile coverImage
   );
 
-  BookDtoWithAuthor queryBook(BookPermission permission);
+  BookDtoWithAuthor queryBook(BookContext context);
   MyBooks queryMyBooks(UID uid);
 
-  BookDto changeBookTitle(BookPermission permission, BookTitle title);
+  BookDto changeBookTitle(BookContext context, BookTitle title);
 
-  BookDto changeBookCoverImage(BookPermission permission, MultipartFile file);
+  BookDto changeBookCoverImage(BookContext context, MultipartFile file);
 
-  void deleteBook(BookPermission permission);
-
+  void deleteBook(BookContext context);
 }

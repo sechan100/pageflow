@@ -1,4 +1,4 @@
-package org.pageflow.book.domain;
+package org.pageflow.book.domain.enums;
 
 /**
  * @author : sechan

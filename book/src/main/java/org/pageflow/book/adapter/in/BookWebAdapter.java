@@ -8,9 +8,9 @@ import org.pageflow.book.domain.BookTitle;
 import org.pageflow.book.dto.BookDto;
 import org.pageflow.book.dto.BookDtoWithAuthor;
 import org.pageflow.book.dto.MyBooks;
-import org.pageflow.book.port.in.BookAccessPermitter;
-import org.pageflow.book.port.in.BookPermission;
+import org.pageflow.book.port.in.BookContextProvider;
 import org.pageflow.book.port.in.BookUseCase;
+import org.pageflow.book.port.in.token.BookContext;
 import org.pageflow.common.api.RequestContext;
 import org.pageflow.common.user.UID;
 import org.pageflow.common.utility.Get;
@@ -32,7 +32,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BookWebAdapter {
   private final BookUseCase bookUseCase;
-  private final BookAccessPermitter permitter;
+  private final BookContextProvider permitter;
   private final RequestContext rqcx;
 
   @Post("")
@@ -47,8 +47,8 @@ public class BookWebAdapter {
   @Get("/{bookId}")
   @Operation(summary = "책 조회")
   public BookDtoWithAuthor getBook(@PathVariable UUID bookId) {
-    BookPermission permission = permitter.getAuthorPermission(bookId, rqcx.getUid());
-    BookDtoWithAuthor bookWithAuthor = bookUseCase.queryBook(permission);
+    BookContext context = permitter.getAuthorContext(bookId, rqcx.getUid());
+    BookDtoWithAuthor bookWithAuthor = bookUseCase.queryBook(context);
     return bookWithAuthor;
   }
 
@@ -62,8 +62,8 @@ public class BookWebAdapter {
   @Post("/{bookId}/delete")
   @Operation(summary = "책 삭제")
   public void deleteBook(@PathVariable UUID bookId) {
-    BookPermission permission = permitter.getAuthorPermission(bookId, rqcx.getUid());
-    bookUseCase.deleteBook(permission);
+    BookContext context = permitter.getAuthorContext(bookId, rqcx.getUid());
+    bookUseCase.deleteBook(context);
   }
 
 }

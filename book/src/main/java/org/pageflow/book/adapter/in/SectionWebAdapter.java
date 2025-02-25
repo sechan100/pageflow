@@ -7,7 +7,11 @@ import lombok.RequiredArgsConstructor;
 import org.pageflow.book.adapter.in.request.SectionCreateReq;
 import org.pageflow.book.dto.SectionDto;
 import org.pageflow.book.dto.SectionDtoWithContent;
-import org.pageflow.book.port.in.*;
+import org.pageflow.book.port.in.BookContextProvider;
+import org.pageflow.book.port.in.NodeCrudUseCase;
+import org.pageflow.book.port.in.cmd.CreateSectionCmd;
+import org.pageflow.book.port.in.cmd.UpdateSectionCmd;
+import org.pageflow.book.port.in.token.BookContext;
 import org.pageflow.common.api.RequestContext;
 import org.pageflow.common.utility.Get;
 import org.pageflow.common.utility.Post;
@@ -28,7 +32,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class SectionWebAdapter {
   private final NodeCrudUseCase nodeCrudUseCase;
-  private final BookAccessPermitter permitter;
+  private final BookContextProvider permitter;
   private final RequestContext rqcx;
 
   @Post("")
@@ -39,24 +43,24 @@ public class SectionWebAdapter {
       req.getParentNodeId(),
       req.getTitle()
     );
-    BookPermission permission = permitter.getAuthorPermission(bookId, rqcx.getUid());
-    SectionDtoWithContent sectionDto = nodeCrudUseCase.createSection(permission, cmd);
+    BookContext context = permitter.getAuthorContext(bookId, rqcx.getUid());
+    SectionDtoWithContent sectionDto = nodeCrudUseCase.createSection(context, cmd);
     return sectionDto;
   }
 
   @Get("/{sectionId}")
   @Operation(summary = "섹션 조회")
   public SectionDto getSection(@PathVariable UUID bookId, @PathVariable UUID sectionId) {
-    BookPermission permission = permitter.getAuthorPermission(bookId, rqcx.getUid());
-    SectionDto section = nodeCrudUseCase.querySection(permission, sectionId);
+    BookContext context = permitter.getAuthorContext(bookId, rqcx.getUid());
+    SectionDto section = nodeCrudUseCase.querySection(context, sectionId);
     return section;
   }
 
   @Get("/{sectionId}/content")
   @Operation(summary = "섹션을 내용과 함께 조회")
   public SectionDtoWithContent getSectionWithContent(@PathVariable UUID bookId, @PathVariable UUID sectionId) {
-    BookPermission permission = permitter.getAuthorPermission(bookId, rqcx.getUid());
-    SectionDtoWithContent section = nodeCrudUseCase.querySectionWithContent(permission, sectionId);
+    BookContext context = permitter.getAuthorContext(bookId, rqcx.getUid());
+    SectionDtoWithContent section = nodeCrudUseCase.querySectionWithContent(context, sectionId);
     return section;
   }
 
@@ -68,16 +72,16 @@ public class SectionWebAdapter {
       req.getTitle(),
       req.getContent()
     );
-    BookPermission permission = permitter.getAuthorPermission(bookId, rqcx.getUid());
-    SectionDtoWithContent section = nodeCrudUseCase.updateSection(permission, cmd);
+    BookContext context = permitter.getAuthorContext(bookId, rqcx.getUid());
+    SectionDtoWithContent section = nodeCrudUseCase.updateSection(context, cmd);
     return section;
   }
 
   @Post("/{sectionId}/delete")
   @Operation(summary = "섹션 삭제")
   public void deleteSection(@PathVariable UUID bookId, @PathVariable UUID sectionId) {
-    BookPermission permission = permitter.getAuthorPermission(bookId, rqcx.getUid());
-    nodeCrudUseCase.deleteSection(permission, sectionId);
+    BookContext context = permitter.getAuthorContext(bookId, rqcx.getUid());
+    nodeCrudUseCase.deleteSection(context, sectionId);
   }
 
 

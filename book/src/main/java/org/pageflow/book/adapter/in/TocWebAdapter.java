@@ -4,7 +4,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.pageflow.book.adapter.in.request.NodeReplaceReq;
 import org.pageflow.book.dto.TocDto;
-import org.pageflow.book.port.in.*;
+import org.pageflow.book.port.in.BookContextProvider;
+import org.pageflow.book.port.in.NodeCrudUseCase;
+import org.pageflow.book.port.in.TocUseCase;
+import org.pageflow.book.port.in.cmd.ReplaceNodeCmd;
+import org.pageflow.book.port.in.token.BookContext;
 import org.pageflow.common.api.RequestContext;
 import org.pageflow.common.utility.Get;
 import org.pageflow.common.utility.Post;
@@ -26,15 +30,15 @@ import java.util.UUID;
 public class TocWebAdapter {
   private final TocUseCase tocUsecase;
   private final NodeCrudUseCase nodeCrudUseCase;
-  private final BookAccessPermitter permitter;
+  private final BookContextProvider permitter;
   private final RequestContext rqcx;
 
 
   @Get("")
   @Operation(summary = "책 목차 조회")
   public TocDto.Toc getToc(@PathVariable UUID bookId) {
-    BookPermission permission = permitter.getAuthorPermission(bookId, rqcx.getUid());
-    TocDto.Toc toc = tocUsecase.loadToc(permission);
+    BookContext context = permitter.getAuthorContext(bookId, rqcx.getUid());
+    TocDto.Toc toc = tocUsecase.loadToc(context);
     return toc;
   }
 
@@ -47,8 +51,8 @@ public class TocWebAdapter {
       req.getDestFolderId(),
       req.getDestIndex()
     );
-    BookPermission permission = permitter.getAuthorPermission(bookId, rqcx.getUid());
-    tocUsecase.replaceNode(permission, cmd);
+    BookContext context = permitter.getAuthorContext(bookId, rqcx.getUid());
+    tocUsecase.replaceNode(context, cmd);
   }
 
 }

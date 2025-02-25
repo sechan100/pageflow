@@ -3,17 +3,19 @@ package org.pageflow.book.domain.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pageflow.book.domain.Author;
-import org.pageflow.book.domain.BookPermissionPolicy;
-import org.pageflow.book.domain.BookPermissionRequired;
 import org.pageflow.book.domain.BookTitle;
+import org.pageflow.book.domain.aop.BookPermissionRequired;
+import org.pageflow.book.domain.aop.CheckBookStatus;
 import org.pageflow.book.domain.entity.Book;
 import org.pageflow.book.domain.entity.Folder;
+import org.pageflow.book.domain.enums.BookPermissionPolicy;
+import org.pageflow.book.domain.enums.BookStatus;
 import org.pageflow.book.dto.AuthorDto;
 import org.pageflow.book.dto.BookDto;
 import org.pageflow.book.dto.BookDtoWithAuthor;
 import org.pageflow.book.dto.MyBooks;
-import org.pageflow.book.port.in.BookPermission;
 import org.pageflow.book.port.in.BookUseCase;
+import org.pageflow.book.port.in.token.BookContext;
 import org.pageflow.book.port.out.LoadAuthorPort;
 import org.pageflow.book.port.out.jpa.BookPersistencePort;
 import org.pageflow.book.port.out.jpa.FolderPersistencePort;
@@ -83,8 +85,9 @@ public class BookService implements BookUseCase {
 
   @Override
   @BookPermissionRequired(BookPermissionPolicy.READ)
-  public BookDtoWithAuthor queryBook(BookPermission permission) {
-    UUID bookId = permission.getBookId();
+  @CheckBookStatus(BookStatus.PUBLISHED)
+  public BookDtoWithAuthor queryBook(BookContext context) {
+    UUID bookId = context.getBookId();
     Book book = bookPersistencePort.findBookWithAuthorById(bookId).get();
     return BookDtoWithAuthor.from(book);
   }
@@ -103,8 +106,8 @@ public class BookService implements BookUseCase {
 
   @Override
   @BookPermissionRequired
-  public BookDto changeBookTitle(BookPermission permission, BookTitle title) {
-    UUID bookId = permission.getBookId();
+  public BookDto changeBookTitle(BookContext context, BookTitle title) {
+    UUID bookId = context.getBookId();
     Book book = bookPersistencePort.findById(bookId).get();
     book.changeTitle(title);
     return BookDto.from(book);
@@ -112,8 +115,8 @@ public class BookService implements BookUseCase {
 
   @Override
   @BookPermissionRequired
-  public BookDto changeBookCoverImage(BookPermission permission, MultipartFile coverImage) {
-    UUID bookId = permission.getBookId();
+  public BookDto changeBookCoverImage(BookContext context, MultipartFile coverImage) {
+    UUID bookId = context.getBookId();
     Book book = bookPersistencePort.findById(bookId).get();
 
     // 내부에 저장된 이미지인 경우, 기존 이미지를 삭제
@@ -129,8 +132,8 @@ public class BookService implements BookUseCase {
 
   @Override
   @BookPermissionRequired
-  public void deleteBook(BookPermission permission) {
-    UUID bookId = permission.getBookId();
+  public void deleteBook(BookContext context) {
+    UUID bookId = context.getBookId();
     Book book = bookPersistencePort.findById(bookId).get();
     bookPersistencePort.delete(book);
   }

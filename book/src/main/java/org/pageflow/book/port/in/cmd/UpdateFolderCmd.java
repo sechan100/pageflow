@@ -1,4 +1,4 @@
-package org.pageflow.book.port.in;
+package org.pageflow.book.port.in.cmd;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -12,20 +12,15 @@ import java.util.UUID;
  */
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public class UpdateSectionCmd {
+public class UpdateFolderCmd {
   private final UUID id;
   private final NodeTitle title;
-  private final String content;
 
-  public static UpdateSectionCmd of(
-    UUID id,
-    String title,
-    String content
-  ) {
-    return new UpdateSectionCmd(
+
+  public static UpdateFolderCmd of(UUID id, String title) {
+    return new UpdateFolderCmd(
       id,
-      NodeTitle.of(title),
-      content
+      NodeTitle.of(title)
     );
   }
 }

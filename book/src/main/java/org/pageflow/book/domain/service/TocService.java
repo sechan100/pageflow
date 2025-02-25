@@ -3,7 +3,7 @@ package org.pageflow.book.domain.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pageflow.book.application.BookCode;
-import org.pageflow.book.domain.BookPermissionRequired;
+import org.pageflow.book.domain.aop.BookPermissionRequired;
 import org.pageflow.book.domain.entity.Book;
 import org.pageflow.book.domain.entity.Folder;
 import org.pageflow.book.domain.entity.Section;
@@ -15,7 +15,10 @@ import org.pageflow.book.dto.FolderDto;
 import org.pageflow.book.dto.SectionDto;
 import org.pageflow.book.dto.SectionDtoWithContent;
 import org.pageflow.book.dto.TocDto;
-import org.pageflow.book.port.in.*;
+import org.pageflow.book.port.in.NodeCrudUseCase;
+import org.pageflow.book.port.in.TocUseCase;
+import org.pageflow.book.port.in.cmd.*;
+import org.pageflow.book.port.in.token.BookContext;
 import org.pageflow.book.port.out.jpa.BookPersistencePort;
 import org.pageflow.book.port.out.jpa.FolderPersistencePort;
 import org.pageflow.book.port.out.jpa.NodePersistencePort;
@@ -45,7 +48,7 @@ public class TocService implements TocUseCase, NodeCrudUseCase {
 
   @Override
   @BookPermissionRequired
-  public void replaceNode(BookPermission permission, ReplaceNodeCmd cmd) {
+  public void replaceNode(BookContext context, ReplaceNodeCmd cmd) {
     TocNode node = nodePersistencePort.findById(cmd.getNodeId()).orElseThrow();
     if(node.getParentNode() == null){
       throw new ProcessResultException(Result.of(
@@ -68,8 +71,8 @@ public class TocService implements TocUseCase, NodeCrudUseCase {
 
   @Override
   @BookPermissionRequired
-  public TocDto.Toc loadToc(BookPermission permission) {
-    UUID bookId = permission.getBookId();
+  public TocDto.Toc loadToc(BookContext context) {
+    UUID bookId = context.getBookId();
     List<NodeProjection> nodeProjections = nodePersistencePort.queryNodesByBookId(bookId);
     TocDto.Folder root = buildTree(bookId, nodeProjections);
     return new TocDto.Toc(bookId, root);
@@ -77,7 +80,7 @@ public class TocService implements TocUseCase, NodeCrudUseCase {
 
   @Override
   @BookPermissionRequired
-  public FolderDto createFolder(BookPermission permission, CreateFolderCmd cmd) {
+  public FolderDto createFolder(BookContext context, CreateFolderCmd cmd) {
     UUID bookId = cmd.getBookId();
     UUID parentId = cmd.getParentNodeId();
     UUID folderId = UUID.randomUUID();
@@ -101,14 +104,14 @@ public class TocService implements TocUseCase, NodeCrudUseCase {
 
   @Override
   @BookPermissionRequired
-  public FolderDto queryFolder(BookPermission permission, UUID folderId) {
+  public FolderDto queryFolder(BookContext context, UUID folderId) {
     TocNode node = nodePersistencePort.findById(folderId).get();
     return FolderDto.from(node);
   }
 
   @Override
   @BookPermissionRequired
-  public FolderDto updateFolder(BookPermission permission, UpdateFolderCmd cmd) {
+  public FolderDto updateFolder(BookContext context, UpdateFolderCmd cmd) {
     Folder folder = folderPersistencePort.findById(cmd.getId()).get();
     folder.changeTitle(cmd.getTitle().getValue());
     return FolderDto.from(folder);
@@ -116,7 +119,7 @@ public class TocService implements TocUseCase, NodeCrudUseCase {
 
   @Override
   @BookPermissionRequired
-  public void deleteFolder(BookPermission permission, UUID folderId) {
+  public void deleteFolder(BookContext context, UUID folderId) {
     this.deleteNode(folderId);
   }
 
@@ -126,7 +129,7 @@ public class TocService implements TocUseCase, NodeCrudUseCase {
 
   @Override
   @BookPermissionRequired
-  public SectionDtoWithContent createSection(BookPermission permission, CreateSectionCmd cmd) {
+  public SectionDtoWithContent createSection(BookContext context, CreateSectionCmd cmd) {
     UUID bookId = cmd.getBookId();
     UUID parentId = cmd.getParentNodeId();
     UUID sectionId = UUID.randomUUID();
@@ -152,21 +155,21 @@ public class TocService implements TocUseCase, NodeCrudUseCase {
 
   @Override
   @BookPermissionRequired
-  public SectionDto querySection(BookPermission permission, UUID sectionId) {
+  public SectionDto querySection(BookContext context, UUID sectionId) {
     TocNode node = nodePersistencePort.findById(sectionId).get();
     return SectionDto.from(node);
   }
 
   @Override
   @BookPermissionRequired
-  public SectionDtoWithContent querySectionWithContent(BookPermission permission, UUID sectionId) {
+  public SectionDtoWithContent querySectionWithContent(BookContext context, UUID sectionId) {
     Section section = sectionPersistencePort.findById(sectionId).get();
     return SectionDtoWithContent.from(section);
   }
 
   @Override
   @BookPermissionRequired
-  public SectionDtoWithContent updateSection(BookPermission permission, UpdateSectionCmd cmd) {
+  public SectionDtoWithContent updateSection(BookContext context, UpdateSectionCmd cmd) {
     Section section = sectionPersistencePort.findById(cmd.getId()).get();
     section.changeTitle(cmd.getTitle().getValue());
     section.updateContent(cmd.getContent());
@@ -175,7 +178,7 @@ public class TocService implements TocUseCase, NodeCrudUseCase {
 
   @Override
   @BookPermissionRequired
-  public void deleteSection(BookPermission permission, UUID sectionId) {
+  public void deleteSection(BookContext context, UUID sectionId) {
     this.deleteNode(sectionId);
   }
 

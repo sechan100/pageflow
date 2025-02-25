@@ -3,8 +3,8 @@ package org.pageflow.book.domain.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.pageflow.book.domain.Author;
-import org.pageflow.book.domain.BookStatus;
 import org.pageflow.book.domain.BookTitle;
+import org.pageflow.book.domain.enums.BookStatus;
 import org.pageflow.common.jpa.BaseJpaEntity;
 import org.pageflow.user.domain.entity.Profile;
 

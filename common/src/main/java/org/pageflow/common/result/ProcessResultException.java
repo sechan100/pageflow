@@ -24,7 +24,7 @@ public class ProcessResultException extends RuntimeException {
   }
 
   public ProcessResultException(Result result, Throwable cause) {
-    super(result.getCode().getMessage(), cause);
+    super(result.getCode().getDescription(), cause);
     this.result = result;
   }
 }

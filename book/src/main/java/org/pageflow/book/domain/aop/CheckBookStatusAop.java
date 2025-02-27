@@ -7,7 +7,7 @@ import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.pageflow.book.application.BookCode;
-import org.pageflow.book.application.BookStatusRequirement;
+import org.pageflow.book.application.BookStatusData;
 import org.pageflow.book.domain.entity.Book;
 import org.pageflow.book.domain.enums.BookStatus;
 import org.pageflow.book.port.out.jpa.BookPersistencePort;
@@ -44,7 +44,8 @@ public class CheckBookStatusAop {
 
     if(!requiredStatuses.contains(book.getStatus())){
       throw new ProcessResultException(Result.of(
-        BookCode.INVALID_BOOK_STATUS, BookStatusRequirement.of(book.getStatus(), requiredStatuses)
+        BookCode.INVALID_BOOK_STATUS,
+        BookStatusData.of(book.getStatus(), "현재 상태에서는 처리할 수 없습니다.")
       ));
     }
   }

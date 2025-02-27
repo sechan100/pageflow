@@ -35,7 +35,7 @@ public class Account extends BaseJpaEntity {
   private String email;
 
   @Column(nullable = false)
-  private boolean emailVerified;
+  private Boolean emailVerified;
 
   /**
    * NATIVE, GOOGLE, KAKAO, NAVER, GITHUB

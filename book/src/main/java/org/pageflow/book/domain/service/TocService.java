@@ -23,7 +23,7 @@ import org.pageflow.book.port.out.jpa.BookPersistencePort;
 import org.pageflow.book.port.out.jpa.FolderPersistencePort;
 import org.pageflow.book.port.out.jpa.NodePersistencePort;
 import org.pageflow.book.port.out.jpa.SectionPersistencePort;
-import org.pageflow.common.result.AdditionalMessage;
+import org.pageflow.common.result.MessageData;
 import org.pageflow.common.result.ProcessResultException;
 import org.pageflow.common.result.Result;
 import org.springframework.stereotype.Service;
@@ -52,7 +52,7 @@ public class TocService implements TocUseCase, NodeCrudUseCase {
     TocNode node = nodePersistencePort.findById(cmd.getNodeId()).orElseThrow();
     if(node.getParentNode() == null){
       throw new ProcessResultException(Result.of(
-        BookCode.TOC_HIERARCHY_VIOLATION, AdditionalMessage.of("root folder node는 이동할 수 없습니다.")
+        BookCode.TOC_HIERARCHY_VIOLATION, MessageData.of("root folder node는 이동할 수 없습니다.")
       ));
     }
 

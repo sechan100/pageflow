@@ -36,7 +36,7 @@ public class ApiResponse<T> {
   private ApiResponse(Result<T> result) {
     ResultCode code = result.getCode();
     this.code = code.getCode();
-    this.message = code.getMessage();
+    this.message = code.getDescription();
     this.data = result.dangerouslyGetData();
   }
 

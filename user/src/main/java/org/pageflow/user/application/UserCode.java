@@ -27,15 +27,15 @@ public enum UserCode implements ResultCode {
    ********* 새로운 ResultCode를 만들 때, 해당 주석을 포함하여 아래부분을 붙여넣으면 된다. ********
    ********************************************************************************/
   ;
-  private final String message;
+  private final String description;
   private final Class<?> dataType;
 
-  UserCode(String message) {
-    this(message, null);
+  UserCode(String description) {
+    this(description, null);
   }
 
-  UserCode(String message, Class<?> dataType) {
-    this.message = message;
+  UserCode(String description, Class<?> dataType) {
+    this.description = description;
     this.dataType = dataType;
   }
 }

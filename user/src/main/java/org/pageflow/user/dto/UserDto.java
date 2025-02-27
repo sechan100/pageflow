@@ -26,7 +26,7 @@ public class UserDto implements IdentifiableUser {
       account.getUid(),
       account.getUsername(),
       account.getEmail(),
-      account.isEmailVerified(),
+      account.getEmailVerified(),
       account.getRole(),
       profile.getPenname(),
       profile.getProfileImageUrl()

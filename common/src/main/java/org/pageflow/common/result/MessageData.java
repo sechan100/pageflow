@@ -7,10 +7,10 @@ import lombok.Data;
  * @author : sechan
  */
 @Data
-public class AdditionalMessage {
-  private final String additionalMessage;
+public class MessageData {
+  private final String message;
 
-  public static AdditionalMessage of(String message) {
-    return new AdditionalMessage(message);
+  public static MessageData of(String message) {
+    return new MessageData(message);
   }
 }

@@ -11,10 +11,8 @@ package org.pageflow.book.domain.enums;
  * @author : sechan
  */
 public enum BookStatus {
-    DRAFT            // 초안작성(비공개, 수정가능)
-  , PUBLISHED        // 출판(공개, 수정불가능)
-  , REVISING         // 개정중(공개, 수정가능)
-  , PRIVATE_REVISING // 비공개 개정중(비공개, 수정가능)
-  , HIDDEN           // 출판 숨김(비공개, 수정불가능)
+    DRAFT            // 초안작성(수정가능)
+  , PUBLISHED        // 출판(수정불가능)
+  , REVISING         // 개정중(수정가능)
   ;
 }

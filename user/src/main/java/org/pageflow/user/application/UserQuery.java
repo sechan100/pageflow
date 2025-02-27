@@ -28,7 +28,7 @@ public class UserQuery implements LoadSessionUserPort {
       .uid(account.getUid())
       .username(account.getUsername())
       .email(account.getEmail())
-      .isEmailVerified(account.isEmailVerified())
+      .isEmailVerified(account.getEmailVerified())
       .role(account.getRole())
       .penname(profile.getPenname())
       .profileImageUrl(profile.getProfileImageUrl())

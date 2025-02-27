@@ -38,15 +38,15 @@ public enum CommonCode implements ResultCode {
    ********* 새로운 ResultCode를 만들 때, 해당 주석을 포함하여 아래부분을 붙여넣으면 된다. ********
    ********************************************************************************/
   ;
-  private final String message;
+  private final String description;
   private final Class<?> dataType;
 
-  CommonCode(String message) {
-    this(message, null);
+  CommonCode(String description) {
+    this(description, null);
   }
 
-  CommonCode(String message, Class<?> dataType) {
-    this.message = message;
+  CommonCode(String description, Class<?> dataType) {
+    this.description = description;
     this.dataType = dataType;
   }
 

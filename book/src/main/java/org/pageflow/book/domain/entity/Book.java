@@ -13,6 +13,8 @@ import org.pageflow.common.result.ProcessResultException;
 import org.pageflow.common.result.Result;
 import org.pageflow.user.domain.entity.Profile;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 
@@ -34,6 +36,15 @@ public class Book extends BaseJpaEntity {
   @JoinColumn(name = "author_id")
   private Profile author;
 
+  @OneToMany(
+    mappedBy = "book",
+    fetch = FetchType.LAZY,
+    cascade = CascadeType.ALL,
+    orphanRemoval = true
+  )
+  @Getter
+  private List<Review> reviews;
+
   @Getter
   @Column(nullable = false)
   private String title;
@@ -48,7 +59,7 @@ public class Book extends BaseJpaEntity {
   private BookStatus status;
 
   /**
-   * publish되거나 revise될 때마다 1씩 증가한다.
+   * publish될 때마다 1씩 증가한다.
    */
   @Getter
   @Column(nullable = false)
@@ -77,6 +88,7 @@ public class Book extends BaseJpaEntity {
     return new Book(
       id,
       author.getProfileJpaEntity(),
+      new ArrayList<>(),
       title.getValue(),
       coverImageUrl,
       BookStatus.DRAFT,

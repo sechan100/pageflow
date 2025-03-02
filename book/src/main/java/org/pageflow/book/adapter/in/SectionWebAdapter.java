@@ -12,6 +12,7 @@ import org.pageflow.book.dto.SectionDtoWithContent;
 import org.pageflow.book.port.in.TocNodeUseCase;
 import org.pageflow.book.port.in.cmd.CreateSectionCmd;
 import org.pageflow.book.port.in.cmd.UpdateSectionCmd;
+import org.pageflow.common.utility.Delete;
 import org.pageflow.common.utility.Get;
 import org.pageflow.common.utility.Post;
 import org.springframework.validation.annotation.Validated;
@@ -87,7 +88,7 @@ public class SectionWebAdapter {
     return section;
   }
 
-  @Post("/{sectionId}/delete")
+  @Delete("/{sectionId}")
   @Operation(summary = "섹션 삭제")
   @SetBookPermission
   public void deleteSection(

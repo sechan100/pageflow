@@ -11,6 +11,7 @@ import org.pageflow.book.dto.FolderDto;
 import org.pageflow.book.port.in.TocNodeUseCase;
 import org.pageflow.book.port.in.cmd.CreateFolderCmd;
 import org.pageflow.book.port.in.cmd.UpdateFolderCmd;
+import org.pageflow.common.utility.Delete;
 import org.pageflow.common.utility.Get;
 import org.pageflow.common.utility.Post;
 import org.springframework.validation.annotation.Validated;
@@ -76,7 +77,7 @@ public class FolderWebAdapter {
   }
 
 
-  @Post("/{folderId}/delete")
+  @Delete("/{folderId}")
   @Operation(summary = "폴더 삭제")
   @SetBookPermission
   public void deleteFolder(

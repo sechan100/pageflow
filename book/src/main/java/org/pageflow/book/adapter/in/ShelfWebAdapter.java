@@ -9,6 +9,7 @@ import org.pageflow.book.dto.BookDto;
 import org.pageflow.book.port.in.BookShelfUseCase;
 import org.pageflow.common.api.RequestContext;
 import org.pageflow.common.user.UID;
+import org.pageflow.common.utility.Delete;
 import org.pageflow.common.utility.Post;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,7 +30,7 @@ public class ShelfWebAdapter {
   private final RequestContext rqcxt;
 
 
-  @Post("/add")
+  @Post("")
   @Operation(summary = "책을 책장에 추가")
   @SetBookPermission
   public BookRes addBookToShelf(
@@ -40,7 +41,7 @@ public class ShelfWebAdapter {
     return BookRes.from(result);
   }
 
-  @Post("/remove")
+  @Delete("")
   @Operation(summary = "책을 책장에서 제거")
   @SetBookPermission
   public void removeBookFromShelf(

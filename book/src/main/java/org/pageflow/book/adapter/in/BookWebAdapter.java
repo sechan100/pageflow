@@ -13,6 +13,7 @@ import org.pageflow.book.dto.MyBooks;
 import org.pageflow.book.port.in.BookUseCase;
 import org.pageflow.common.api.RequestContext;
 import org.pageflow.common.user.UID;
+import org.pageflow.common.utility.Delete;
 import org.pageflow.common.utility.Get;
 import org.pageflow.common.utility.Post;
 import org.springframework.validation.annotation.Validated;
@@ -59,7 +60,7 @@ public class BookWebAdapter {
     return myBooks;
   }
 
-  @Post("/{bookId}/delete")
+  @Delete("/{bookId}")
   @Operation(summary = "책 삭제")
   @SetBookPermission
   public void deleteBook(@PathVariable @BookId UUID bookId) {

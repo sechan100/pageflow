@@ -3,6 +3,7 @@ package org.pageflow.book.domain.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.pageflow.book.domain.Author;
+import org.pageflow.common.jpa.BaseJpaEntity;
 import org.pageflow.user.domain.entity.Profile;
 
 import java.util.UUID;
@@ -15,7 +16,7 @@ import java.util.UUID;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(of = "id", callSuper = false)
 @Table(name = "review")
-public class Review {
+public class Review extends BaseJpaEntity {
 
   @Id
   @Getter

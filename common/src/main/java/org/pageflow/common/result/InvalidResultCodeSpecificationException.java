@@ -1,4 +1,4 @@
-package org.pageflow.core.init.code;
+package org.pageflow.common.result;
 
 /**
  * @author : sechan

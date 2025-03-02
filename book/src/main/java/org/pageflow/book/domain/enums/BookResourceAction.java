@@ -1,9 +1,11 @@
 package org.pageflow.book.domain.enums;
 
+import org.pageflow.common.permission.ResourceAction;
+
 /**
  * @author : sechan
  */
-public enum BookPermissionPolicy {
+public enum BookResourceAction implements ResourceAction {
   /**
    * 읽기, 책 조회 등
    */
@@ -20,6 +22,4 @@ public enum BookPermissionPolicy {
    */
   , UPDATE_META_INFO
 
-  // 전체
-  , FULL
 }

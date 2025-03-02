@@ -2,8 +2,8 @@ package org.pageflow.book.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.pageflow.common.jpa.BaseJpaEntity;
 import org.pageflow.user.domain.entity.Profile;
-import org.springframework.data.annotation.Id;
 
 /**
  * @author : sechan
@@ -13,7 +13,7 @@ import org.springframework.data.annotation.Id;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(of = "id", callSuper = false)
 @Table(name = "shelf_item")
-public class ShelfItem {
+public class ShelfItem extends BaseJpaEntity {
 
   @Id
   @Getter

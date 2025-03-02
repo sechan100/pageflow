@@ -1,4 +1,4 @@
-package org.pageflow.core.init.code;
+package org.pageflow.common.result;
 
 import lombok.extern.slf4j.Slf4j;
 import org.pageflow.common.initialize.RuntimeInitializer;
@@ -17,6 +17,7 @@ import java.util.*;
  */
 @Component
 @Slf4j
+// TODO: ApplicationListener<ContextRefreshedEvent> 구현으로 변경
 public class ResultCodeRuntimeValidator implements RuntimeInitializer {
 
   @Override

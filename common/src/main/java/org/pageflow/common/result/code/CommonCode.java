@@ -33,6 +33,9 @@ public enum CommonCode implements ResultCode {
    */
   , FIELD_VALIDATION_FAIL("필드 유효성 검사 실패", FieldValidationResult.class)
 
+  /** 데이터 접근 */
+  , RESOURCE_PERMISSION_DENIED("리소스 접근 권한 없음")
+
 
   /********************************************************************************
    ********* 새로운 ResultCode를 만들 때, 해당 주석을 포함하여 아래부분을 붙여넣으면 된다. ********

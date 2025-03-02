@@ -11,7 +11,9 @@ import org.pageflow.book.dto.MyBooks;
 import org.pageflow.book.port.in.BookContextProvider;
 import org.pageflow.book.port.in.BookUseCase;
 import org.pageflow.book.port.in.token.BookContext;
+import org.pageflow.book.port.in.token.BookPermission;
 import org.pageflow.common.api.RequestContext;
+import org.pageflow.common.permission.ResourcePermissionAware;
 import org.pageflow.common.user.UID;
 import org.pageflow.common.utility.Get;
 import org.pageflow.common.utility.Post;
@@ -34,6 +36,7 @@ public class BookWebAdapter {
   private final BookUseCase bookUseCase;
   private final BookContextProvider permitter;
   private final RequestContext rqcx;
+  private final ResourcePermissionAware resourcePermissionAware;
 
   @Post("")
   @Operation(summary = "책 생성")
@@ -48,6 +51,10 @@ public class BookWebAdapter {
   @Operation(summary = "책 조회")
   public BookDtoWithAuthor getBook(@PathVariable UUID bookId) {
     BookContext context = permitter.getAuthorContext(bookId, rqcx.getUid());
+    /////////
+    BookPermission permission = context.getPermission();
+    resourcePermissionAware.addResourcePermission(permission);
+    /////////
     BookDtoWithAuthor bookWithAuthor = bookUseCase.queryBook(context);
     return bookWithAuthor;
   }

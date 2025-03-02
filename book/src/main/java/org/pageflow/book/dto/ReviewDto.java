@@ -19,7 +19,7 @@ public class ReviewDto {
   public static ReviewDto from(Review review) {
     return new ReviewDto(
       review.getId(),
-      AuthorDto.from(review.getAuthor()),
+      AuthorDto.from(review.getWriter()),
       review.getContent(),
       review.getScore()
     );

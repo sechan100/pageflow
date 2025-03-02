@@ -26,7 +26,7 @@ public class DefaultBookAccessPermitter implements BookAccessPermitter {
 
 
   @Override
-  public BookPermission grantIfOwner(UUID bookId, UID uid) {
+  public BookPermission grant(UUID bookId, UID uid) {
     Book book = bookPersistencePort.findById(bookId).get();
     Author author = authorAcl.loadAuthorProxy(uid);
 

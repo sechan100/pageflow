@@ -6,7 +6,7 @@ import org.pageflow.book.adapter.in.aop.SetBookPermission;
 import org.pageflow.book.adapter.in.request.NodeReplaceReq;
 import org.pageflow.book.application.BookId;
 import org.pageflow.book.dto.TocDto;
-import org.pageflow.book.port.in.NodeCrudUseCase;
+import org.pageflow.book.port.in.TocNodeUseCase;
 import org.pageflow.book.port.in.TocUseCase;
 import org.pageflow.book.port.in.cmd.ReplaceNodeCmd;
 import org.pageflow.common.utility.Get;
@@ -28,7 +28,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class TocWebAdapter {
   private final TocUseCase tocUsecase;
-  private final NodeCrudUseCase nodeCrudUseCase;
+  private final TocNodeUseCase tocNodeUseCase;
 
 
   @Get("")
@@ -52,7 +52,7 @@ public class TocWebAdapter {
       req.getDestFolderId(),
       req.getDestIndex()
     );
-    tocUsecase.replaceNode(bookId, cmd);
+    tocNodeUseCase.replaceNode(bookId, cmd);
   }
 
 }

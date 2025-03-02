@@ -46,7 +46,7 @@ public class BookAccessWebAdapterPermittionSettingAop {
   public void setBookPermission(JoinPoint joinPoint) {
     UUID bookId = extractBookId(joinPoint);
     UID uid = rqcxt.getUid();
-    BookPermission permission = bookAccessPermitter.grantIfOwner(bookId, uid);
+    BookPermission permission = bookAccessPermitter.grant(bookId, uid);
     resourcePermissionAware.addResourcePermission(permission);
   }
 

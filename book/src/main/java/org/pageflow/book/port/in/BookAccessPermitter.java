@@ -16,5 +16,5 @@ public interface BookAccessPermitter {
    * @param uid
    * @return
    */
-  BookPermission grantIfOwner(UUID bookId, UID uid);
+  BookPermission grant(UUID bookId, UID uid);
 }

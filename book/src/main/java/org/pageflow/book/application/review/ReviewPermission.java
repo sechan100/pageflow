@@ -25,6 +25,10 @@ public class ReviewPermission implements ResourcePermission<UUID> {
     return new ReviewPermission(reviewId, ReviewAction.values());
   }
 
+  public static ReviewPermission reader(UUID reviewId) {
+    return new ReviewPermission(reviewId, ReviewAction.READ);
+  }
+
 
   @Override
   public UUID getResourceId(){

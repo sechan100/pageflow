@@ -9,7 +9,7 @@ import org.pageflow.book.adapter.in.request.SectionCreateReq;
 import org.pageflow.book.application.BookId;
 import org.pageflow.book.dto.SectionDto;
 import org.pageflow.book.dto.SectionDtoWithContent;
-import org.pageflow.book.port.in.NodeCrudUseCase;
+import org.pageflow.book.port.in.TocNodeUseCase;
 import org.pageflow.book.port.in.cmd.CreateSectionCmd;
 import org.pageflow.book.port.in.cmd.UpdateSectionCmd;
 import org.pageflow.common.utility.Get;
@@ -30,7 +30,7 @@ import java.util.UUID;
 @RequestMapping("/user/books/{bookId}/toc/sections")
 @RequiredArgsConstructor
 public class SectionWebAdapter {
-  private final NodeCrudUseCase nodeCrudUseCase;
+  private final TocNodeUseCase tocNodeUseCase;
 
   @Post("")
   @Operation(summary = "섹션 생성")
@@ -44,7 +44,7 @@ public class SectionWebAdapter {
       req.getParentNodeId(),
       req.getTitle()
     );
-    SectionDtoWithContent sectionDto = nodeCrudUseCase.createSection(bookId, cmd);
+    SectionDtoWithContent sectionDto = tocNodeUseCase.createSection(bookId, cmd);
     return sectionDto;
   }
 
@@ -55,7 +55,7 @@ public class SectionWebAdapter {
     @PathVariable @BookId UUID bookId,
     @PathVariable UUID sectionId
   ){
-    SectionDto section = nodeCrudUseCase.querySection(bookId, sectionId);
+    SectionDto section = tocNodeUseCase.querySection(bookId, sectionId);
     return section;
   }
 
@@ -66,7 +66,7 @@ public class SectionWebAdapter {
     @PathVariable @BookId UUID bookId,
     @PathVariable UUID sectionId
   ){
-    SectionDtoWithContent section = nodeCrudUseCase.querySectionWithContent(bookId, sectionId);
+    SectionDtoWithContent section = tocNodeUseCase.querySectionWithContent(bookId, sectionId);
     return section;
   }
 
@@ -83,7 +83,7 @@ public class SectionWebAdapter {
       req.getTitle(),
       req.getContent()
     );
-    SectionDtoWithContent section = nodeCrudUseCase.updateSection(bookId, cmd);
+    SectionDtoWithContent section = tocNodeUseCase.updateSection(bookId, cmd);
     return section;
   }
 
@@ -94,7 +94,7 @@ public class SectionWebAdapter {
     @PathVariable @BookId UUID bookId,
     @PathVariable UUID sectionId
   ){
-    nodeCrudUseCase.deleteSection(bookId, sectionId);
+    tocNodeUseCase.deleteSection(bookId, sectionId);
   }
 
 

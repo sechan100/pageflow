@@ -16,7 +16,7 @@ import org.pageflow.book.dto.FolderDto;
 import org.pageflow.book.dto.SectionDto;
 import org.pageflow.book.dto.SectionDtoWithContent;
 import org.pageflow.book.dto.TocDto;
-import org.pageflow.book.port.in.NodeCrudUseCase;
+import org.pageflow.book.port.in.TocNodeUseCase;
 import org.pageflow.book.port.in.TocUseCase;
 import org.pageflow.book.port.in.cmd.*;
 import org.pageflow.book.port.out.jpa.BookPersistencePort;
@@ -40,7 +40,7 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class TocService implements TocUseCase, NodeCrudUseCase {
+public class TocService implements TocUseCase, TocNodeUseCase {
   private final BookPersistencePort bookPersistencePort;
   private final FolderPersistencePort folderPersistencePort;
   private final SectionPersistencePort sectionPersistencePort;

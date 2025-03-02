@@ -8,7 +8,7 @@ import org.pageflow.book.adapter.in.aop.SetBookPermission;
 import org.pageflow.book.adapter.in.request.CreateFolderReq;
 import org.pageflow.book.application.BookId;
 import org.pageflow.book.dto.FolderDto;
-import org.pageflow.book.port.in.NodeCrudUseCase;
+import org.pageflow.book.port.in.TocNodeUseCase;
 import org.pageflow.book.port.in.cmd.CreateFolderCmd;
 import org.pageflow.book.port.in.cmd.UpdateFolderCmd;
 import org.pageflow.common.utility.Get;
@@ -29,7 +29,7 @@ import java.util.UUID;
 @RequestMapping("/user/books/{bookId}/toc/folders")
 @RequiredArgsConstructor
 public class FolderWebAdapter {
-  private final NodeCrudUseCase nodeCrudUseCase;
+  private final TocNodeUseCase tocNodeUseCase;
 
 
   @Post("")
@@ -44,7 +44,7 @@ public class FolderWebAdapter {
       req.getParentNodeId(),
       req.getTitle()
     );
-    FolderDto folderDto = nodeCrudUseCase.createFolder(bookId, cmd);
+    FolderDto folderDto = tocNodeUseCase.createFolder(bookId, cmd);
     return folderDto;
   }
 
@@ -55,7 +55,7 @@ public class FolderWebAdapter {
     @PathVariable @BookId UUID bookId,
     @PathVariable UUID folderId
   ){
-    FolderDto folder = nodeCrudUseCase.queryFolder(bookId, folderId);
+    FolderDto folder = tocNodeUseCase.queryFolder(bookId, folderId);
     return folder;
   }
 
@@ -71,7 +71,7 @@ public class FolderWebAdapter {
       folderId,
       req.getTitle()
     );
-    FolderDto folderDto = nodeCrudUseCase.updateFolder(bookId, cmd);
+    FolderDto folderDto = tocNodeUseCase.updateFolder(bookId, cmd);
     return folderDto;
   }
 
@@ -83,7 +83,7 @@ public class FolderWebAdapter {
     @PathVariable @BookId UUID bookId,
     @PathVariable UUID folderId
   ){
-    nodeCrudUseCase.deleteFolder(bookId, folderId);
+    tocNodeUseCase.deleteFolder(bookId, folderId);
   }
 
 

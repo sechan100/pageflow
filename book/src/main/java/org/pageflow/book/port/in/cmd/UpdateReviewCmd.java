@@ -1,21 +1,19 @@
 package org.pageflow.book.port.in.cmd;
 
-import lombok.Getter;
+import lombok.Value;
 
 import java.util.UUID;
 
 /**
  * @author : sechan
  */
-@Getter
+@Value
 public class UpdateReviewCmd {
-  private final UUID reviewId;
-  private final String content;
-  private final int score;
+  UUID reviewId;
+  String content;
+  int score;
 
-  public UpdateReviewCmd(UUID reviewId, String content, int score) {
-    this.reviewId = reviewId;
-    this.content = content;
-    this.score = score;
+  public static UpdateReviewCmd of(UUID reviewId, String content, int score) {
+    return new UpdateReviewCmd(reviewId, content, score);
   }
 }

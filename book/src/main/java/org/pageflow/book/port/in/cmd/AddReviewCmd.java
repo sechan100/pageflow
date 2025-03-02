@@ -1,6 +1,6 @@
 package org.pageflow.book.port.in.cmd;
 
-import lombok.Getter;
+import lombok.Value;
 import org.pageflow.common.user.UID;
 
 import java.util.UUID;
@@ -8,17 +8,14 @@ import java.util.UUID;
 /**
  * @author : sechan
  */
-@Getter
+@Value
 public class AddReviewCmd {
-  private final UID uid;
-  private final UUID bookId;
-  private final String content;
-  private final int score;
+  UID uid;
+  UUID bookId;
+  String content;
+  int score;
 
-  public AddReviewCmd(UID uid, UUID bookId, String content, int score) {
-    this.uid = uid;
-    this.bookId = bookId;
-    this.content = content;
-    this.score = score;
+  public static AddReviewCmd of(UID uid, UUID bookId, String content, int score) {
+    return new AddReviewCmd(uid, bookId, content, score);
   }
 }

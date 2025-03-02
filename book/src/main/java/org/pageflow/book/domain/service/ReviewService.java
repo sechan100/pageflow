@@ -11,9 +11,9 @@ import org.pageflow.book.domain.Author;
 import org.pageflow.book.domain.entity.Book;
 import org.pageflow.book.domain.entity.Review;
 import org.pageflow.book.dto.ReviewDto;
-import org.pageflow.book.port.in.ReviewUseCase;
 import org.pageflow.book.port.in.cmd.AddReviewCmd;
 import org.pageflow.book.port.in.cmd.UpdateReviewCmd;
+import org.pageflow.book.port.in.review.ReviewUseCase;
 import org.pageflow.book.port.out.LoadAuthorPort;
 import org.pageflow.book.port.out.jpa.BookPersistencePort;
 import org.pageflow.book.port.out.jpa.ReviewPersistencePort;
@@ -38,7 +38,8 @@ public class ReviewService implements ReviewUseCase {
 
   @Override
   @ResourceAccessPermissionRequired(permissionType = BookPermission.class)
-  public ReviewDto addReview(@BookId("#cmd.bookId") AddReviewCmd cmd) {
+  public ReviewDto createReview(@BookId("#cmd.bookId") AddReviewCmd cmd) {
+    // TODO: 이미 리뷰를 작성한 경우 처리
     Author authorProxy = loadAuthorPort.loadAuthorProxy(cmd.getUid());
     Book bookProxy = _loadBookProxy(cmd.getBookId());
     Review review = Review.create(
@@ -63,7 +64,7 @@ public class ReviewService implements ReviewUseCase {
 
   @Override
   @ResourceAccessPermissionRequired(permissionType = ReviewPermission.class)
-  public void removeReview(@ReviewId UUID reviewId) {
+  public void deleteReview(@ReviewId UUID reviewId) {
     reviewPersistencePort.deleteById(reviewId);
   }
 

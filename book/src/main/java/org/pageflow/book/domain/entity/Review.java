@@ -23,8 +23,8 @@ public class Review extends BaseJpaEntity {
   private UUID id;
 
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "author_id")
-  private Profile author;
+  @JoinColumn(name = "writer_id")
+  private Profile writer;
 
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   @JoinColumn(name = "book_id")
@@ -45,14 +45,14 @@ public class Review extends BaseJpaEntity {
 
 
   public static Review create(
-    Author author,
+    Author writer,
     Book book,
     String content,
     int score
   ) {
     return new Review(
       UUID.randomUUID(),
-      author.getProfileJpaEntity(),
+      writer.getProfileJpaEntity(),
       book,
       content,
       _validateScore(score)
@@ -60,8 +60,8 @@ public class Review extends BaseJpaEntity {
   }
 
 
-  public Author getAuthor() {
-    return new Author(author);
+  public Author getWriter() {
+    return new Author(writer);
   }
 
   public void changeContent(String content) {

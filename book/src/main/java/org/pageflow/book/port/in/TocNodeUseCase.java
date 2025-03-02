@@ -3,17 +3,16 @@ package org.pageflow.book.port.in;
 import org.pageflow.book.dto.FolderDto;
 import org.pageflow.book.dto.SectionDto;
 import org.pageflow.book.dto.SectionDtoWithContent;
-import org.pageflow.book.port.in.cmd.CreateFolderCmd;
-import org.pageflow.book.port.in.cmd.CreateSectionCmd;
-import org.pageflow.book.port.in.cmd.UpdateFolderCmd;
-import org.pageflow.book.port.in.cmd.UpdateSectionCmd;
+import org.pageflow.book.port.in.cmd.*;
 
 import java.util.UUID;
 
 /**
  * @author : sechan
  */
-public interface NodeCrudUseCase {
+public interface TocNodeUseCase {
+  void replaceNode(UUID bookId, ReplaceNodeCmd cmd);
+
   FolderDto createFolder(UUID bookId, CreateFolderCmd cmd);
   FolderDto queryFolder(UUID bookId, UUID folderId);
   FolderDto updateFolder(UUID bookId, UpdateFolderCmd cmd);

@@ -2,12 +2,13 @@ package org.pageflow.book.port.in;
 
 import org.pageflow.book.dto.TocDto;
 import org.pageflow.book.port.in.cmd.ReplaceNodeCmd;
-import org.pageflow.book.port.in.token.BookContext;
+
+import java.util.UUID;
 
 /**
  * @author : sechan
  */
 public interface TocUseCase {
-  void replaceNode(BookContext context, ReplaceNodeCmd cmd);
-  TocDto.Toc loadToc(BookContext context);
+  void replaceNode(UUID bookId, ReplaceNodeCmd cmd);
+  TocDto.Toc loadToc(UUID bookId);
 }

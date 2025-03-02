@@ -30,14 +30,14 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 @Tag(name = "user-update", description = "다양한 사용자 필드 변경")
 public class UserUpdateWebAdapter {
-  private final RequestContext requestContext;
+  private final RequestContext rqrxt;
   private final AccountUseCase accountUsecase;
   private final ProfileUseCase profileUseCase;
 
 
   @Post("/user/profile/email")
   public AccountRes changeEmail(@RequestBody EmailReq req) {
-    UID uid = requestContext.getUid();
+    UID uid = rqrxt.getUid();
     AccountDto result = accountUsecase.changeEmail(uid, req.getEmail());
     return AccountRes.from(result);
   }
@@ -45,7 +45,7 @@ public class UserUpdateWebAdapter {
 
   @Post("/user/profile/penname")
   public ProfileRes changePenname(@RequestBody PennameReq req) {
-    UID uid = requestContext.getUid();
+    UID uid = rqrxt.getUid();
     ProfileDto result = profileUseCase.changePenname(uid, req.getPenname());
     return ProfileRes.from(result);
   }
@@ -61,7 +61,7 @@ public class UserUpdateWebAdapter {
     @RequestParam(defaultValue = "false")
     Boolean delete
   ) {
-    UID uid = requestContext.getUid();
+    UID uid = rqrxt.getUid();
     ProfileDto result = null;
     if(delete){
       result = profileUseCase.deleteProfileImage(uid);

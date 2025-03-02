@@ -4,10 +4,11 @@ import org.pageflow.book.domain.BookTitle;
 import org.pageflow.book.dto.BookDto;
 import org.pageflow.book.dto.BookDtoWithAuthor;
 import org.pageflow.book.dto.MyBooks;
-import org.pageflow.book.port.in.token.BookContext;
 import org.pageflow.common.user.UID;
 import org.springframework.lang.Nullable;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.UUID;
 
 /**
  * @author : sechan
@@ -19,12 +20,12 @@ public interface BookUseCase {
     @Nullable MultipartFile coverImage
   );
 
-  BookDtoWithAuthor queryBook(BookContext context);
+  BookDtoWithAuthor queryBook(UUID bookId);
   MyBooks queryMyBooks(UID uid);
 
-  BookDto changeBookTitle(BookContext context, BookTitle title);
+  BookDto changeBookTitle(UUID bookId, BookTitle title);
 
-  BookDto changeBookCoverImage(BookContext context, MultipartFile file);
+  BookDto changeBookCoverImage(UUID bookId, MultipartFile file);
 
-  void deleteBook(BookContext context);
+  void deleteBook(UUID bookId);
 }

@@ -2,14 +2,13 @@ package org.pageflow.book.adapter.in;
 
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import org.pageflow.book.adapter.in.aop.SetBookPermission;
 import org.pageflow.book.adapter.in.request.NodeReplaceReq;
+import org.pageflow.book.application.BookId;
 import org.pageflow.book.dto.TocDto;
-import org.pageflow.book.port.in.BookContextProvider;
 import org.pageflow.book.port.in.NodeCrudUseCase;
 import org.pageflow.book.port.in.TocUseCase;
 import org.pageflow.book.port.in.cmd.ReplaceNodeCmd;
-import org.pageflow.book.port.in.token.BookContext;
-import org.pageflow.common.api.RequestContext;
 import org.pageflow.common.utility.Get;
 import org.pageflow.common.utility.Post;
 import org.springframework.validation.annotation.Validated;
@@ -30,29 +29,30 @@ import java.util.UUID;
 public class TocWebAdapter {
   private final TocUseCase tocUsecase;
   private final NodeCrudUseCase nodeCrudUseCase;
-  private final BookContextProvider permitter;
-  private final RequestContext rqcx;
 
 
   @Get("")
   @Operation(summary = "책 목차 조회")
-  public TocDto.Toc getToc(@PathVariable UUID bookId) {
-    BookContext context = permitter.getAuthorContext(bookId, rqcx.getUid());
-    TocDto.Toc toc = tocUsecase.loadToc(context);
+  @SetBookPermission
+  public TocDto.Toc getToc(@PathVariable @BookId UUID bookId) {
+    TocDto.Toc toc = tocUsecase.loadToc(bookId);
     return toc;
   }
 
   @Post("/replace-node")
   @Operation(summary = "목차 노드 재배치")
-  public void reorder(@PathVariable UUID bookId, @RequestBody NodeReplaceReq req) {
+  @SetBookPermission
+  public void reorder(
+    @PathVariable @BookId UUID bookId,
+    @RequestBody NodeReplaceReq req
+  ){
     ReplaceNodeCmd cmd = new ReplaceNodeCmd(
       bookId,
       req.getTargetNodeId(),
       req.getDestFolderId(),
       req.getDestIndex()
     );
-    BookContext context = permitter.getAuthorContext(bookId, rqcx.getUid());
-    tocUsecase.replaceNode(context, cmd);
+    tocUsecase.replaceNode(bookId, cmd);
   }
 
 }

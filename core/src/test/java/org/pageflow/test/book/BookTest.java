@@ -4,7 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.pageflow.book.domain.BookTitle;
 import org.pageflow.book.dto.BookDto;
-import org.pageflow.book.port.in.BookContextProvider;
+import org.pageflow.book.port.in.BookAccessPermitter;
 import org.pageflow.book.port.in.BookUseCase;
 import org.pageflow.book.port.in.token.BookContext;
 import org.pageflow.test.book.shared.BookCreator;
@@ -27,7 +27,7 @@ public class BookTest {
   @Autowired
   private BookUseCase bookUseCase;
   @Autowired
-  private BookContextProvider bookContextProvider;
+  private BookAccessPermitter bookAccessPermitter;
   @Autowired
   private LoginExcutor loginExcutor;
   @Autowired
@@ -50,7 +50,7 @@ public class BookTest {
     BookDto book = bookCreator.createBook(user.getUid(), "테스트 책");
     UUID bookId = book.getId();
 
-    BookContext context = bookContextProvider.getAuthorContext(bookId, user.getUid());
+    BookContext context = bookAccessPermitter.permitFor(bookId, user.getUid());
     // 제목 변경
     BookDto titleChangedBook = bookUseCase.changeBookTitle(context, BookTitle.of("테스트 책 2"));
     assert "테스트 책 2".equals(titleChangedBook.getTitle());

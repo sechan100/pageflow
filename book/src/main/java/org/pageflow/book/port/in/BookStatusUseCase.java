@@ -1,7 +1,8 @@
 package org.pageflow.book.port.in;
 
 import org.pageflow.book.dto.BookDto;
-import org.pageflow.book.port.in.token.BookContext;
+
+import java.util.UUID;
 
 /**
  * @author : sechan
@@ -17,7 +18,7 @@ public interface BookStatusUseCase {
    * @param ctx
    * @return
    */
-  BookDto publish(BookContext ctx);
+  BookDto publish(UUID bookId);
 
   /**
    * 책을 개정상태로 변경한다.
@@ -26,7 +27,7 @@ public interface BookStatusUseCase {
    * @param ctx
    * @return
    */
-  BookDto revise(BookContext ctx);
+  BookDto revise(UUID bookId);
 
   /**
    * 개정을 취소하고 출판상태로 변경한다.
@@ -34,7 +35,7 @@ public interface BookStatusUseCase {
    * @param ctx
    * @return
    */
-  BookDto cancelRevise(BookContext ctx);
+  BookDto cancelRevise(UUID bookId);
 
   /**
    * 개정을 병합하여 출판상태로 변경한다.
@@ -46,5 +47,5 @@ public interface BookStatusUseCase {
    * @param ctx
    * @return
    */
-  BookDto mergeRevision(BookContext ctx);
+  BookDto mergeRevision(UUID bookId);
 }

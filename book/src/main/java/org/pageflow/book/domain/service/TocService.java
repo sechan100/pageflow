@@ -3,6 +3,7 @@ package org.pageflow.book.domain.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pageflow.book.application.BookCode;
+import org.pageflow.book.application.BookId;
 import org.pageflow.book.domain.entity.Book;
 import org.pageflow.book.domain.entity.Folder;
 import org.pageflow.book.domain.entity.Section;
@@ -17,11 +18,12 @@ import org.pageflow.book.dto.TocDto;
 import org.pageflow.book.port.in.NodeCrudUseCase;
 import org.pageflow.book.port.in.TocUseCase;
 import org.pageflow.book.port.in.cmd.*;
-import org.pageflow.book.port.in.token.BookContext;
+import org.pageflow.book.port.in.token.BookPermission;
 import org.pageflow.book.port.out.jpa.BookPersistencePort;
 import org.pageflow.book.port.out.jpa.FolderPersistencePort;
 import org.pageflow.book.port.out.jpa.NodePersistencePort;
 import org.pageflow.book.port.out.jpa.SectionPersistencePort;
+import org.pageflow.common.permission.ResourceAccessPermissionRequired;
 import org.pageflow.common.result.MessageData;
 import org.pageflow.common.result.ProcessResultException;
 import org.pageflow.common.result.Result;
@@ -46,7 +48,8 @@ public class TocService implements TocUseCase, NodeCrudUseCase {
 
 
   @Override
-  public void replaceNode(BookContext context, ReplaceNodeCmd cmd) {
+  @ResourceAccessPermissionRequired(actions = { "EDIT" }, permissionType = BookPermission.class)
+  public void replaceNode(@BookId UUID bookId, ReplaceNodeCmd cmd) {
     TocNode node = nodePersistencePort.findById(cmd.getNodeId()).orElseThrow();
     if(node.getParentNode() == null){
       throw new ProcessResultException(Result.of(
@@ -68,16 +71,16 @@ public class TocService implements TocUseCase, NodeCrudUseCase {
   }
 
   @Override
-  public TocDto.Toc loadToc(BookContext context) {
-    UUID bookId = context.getBookId();
+  @ResourceAccessPermissionRequired(actions = { "READ" }, permissionType = BookPermission.class)
+  public TocDto.Toc loadToc(@BookId UUID bookId) {
     List<NodeProjection> nodeProjections = nodePersistencePort.queryNodesByBookId(bookId);
     TocDto.Folder root = buildTree(bookId, nodeProjections);
     return new TocDto.Toc(bookId, root);
   }
 
   @Override
-  public FolderDto createFolder(BookContext context, CreateFolderCmd cmd) {
-    UUID bookId = cmd.getBookId();
+  @ResourceAccessPermissionRequired(actions = { "EDIT" }, permissionType = BookPermission.class)
+  public FolderDto createFolder(@BookId UUID bookId, CreateFolderCmd cmd) {
     UUID parentId = cmd.getParentNodeId();
     UUID folderId = UUID.randomUUID();
 
@@ -99,20 +102,23 @@ public class TocService implements TocUseCase, NodeCrudUseCase {
   }
 
   @Override
-  public FolderDto queryFolder(BookContext context, UUID folderId) {
+  @ResourceAccessPermissionRequired(actions = { "READ" }, permissionType = BookPermission.class)
+  public FolderDto queryFolder(@BookId UUID bookId, UUID folderId) {
     TocNode node = nodePersistencePort.findById(folderId).get();
     return FolderDto.from(node);
   }
 
   @Override
-  public FolderDto updateFolder(BookContext context, UpdateFolderCmd cmd) {
+  @ResourceAccessPermissionRequired(actions = { "EDIT" }, permissionType = BookPermission.class)
+  public FolderDto updateFolder(@BookId UUID bookId, UpdateFolderCmd cmd) {
     Folder folder = folderPersistencePort.findById(cmd.getId()).get();
     folder.changeTitle(cmd.getTitle().getValue());
     return FolderDto.from(folder);
   }
 
   @Override
-  public void deleteFolder(BookContext context, UUID folderId) {
+  @ResourceAccessPermissionRequired(actions = { "EDIT" }, permissionType = BookPermission.class)
+  public void deleteFolder(@BookId UUID bookId, UUID folderId) {
     this.deleteNode(folderId);
   }
 
@@ -121,8 +127,8 @@ public class TocService implements TocUseCase, NodeCrudUseCase {
   }
 
   @Override
-  public SectionDtoWithContent createSection(BookContext context, CreateSectionCmd cmd) {
-    UUID bookId = cmd.getBookId();
+  @ResourceAccessPermissionRequired(actions = { "EDIT" }, permissionType = BookPermission.class)
+  public SectionDtoWithContent createSection(@BookId UUID bookId, CreateSectionCmd cmd) {
     UUID parentId = cmd.getParentNodeId();
     UUID sectionId = UUID.randomUUID();
 
@@ -146,19 +152,22 @@ public class TocService implements TocUseCase, NodeCrudUseCase {
   }
 
   @Override
-  public SectionDto querySection(BookContext context, UUID sectionId) {
+  @ResourceAccessPermissionRequired(actions = { "READ" }, permissionType = BookPermission.class)
+  public SectionDto querySection(@BookId UUID bookId, UUID sectionId) {
     TocNode node = nodePersistencePort.findById(sectionId).get();
     return SectionDto.from(node);
   }
 
   @Override
-  public SectionDtoWithContent querySectionWithContent(BookContext context, UUID sectionId) {
+  @ResourceAccessPermissionRequired(actions = { "READ" }, permissionType = BookPermission.class)
+  public SectionDtoWithContent querySectionWithContent(@BookId UUID bookId, UUID sectionId) {
     Section section = sectionPersistencePort.findById(sectionId).get();
     return SectionDtoWithContent.from(section);
   }
 
   @Override
-  public SectionDtoWithContent updateSection(BookContext context, UpdateSectionCmd cmd) {
+  @ResourceAccessPermissionRequired(actions = { "EDIT" }, permissionType = BookPermission.class)
+  public SectionDtoWithContent updateSection(@BookId UUID bookId, UpdateSectionCmd cmd) {
     Section section = sectionPersistencePort.findById(cmd.getId()).get();
     section.changeTitle(cmd.getTitle().getValue());
     section.updateContent(cmd.getContent());
@@ -166,7 +175,8 @@ public class TocService implements TocUseCase, NodeCrudUseCase {
   }
 
   @Override
-  public void deleteSection(BookContext context, UUID sectionId) {
+  @ResourceAccessPermissionRequired(actions = { "EDIT" }, permissionType = BookPermission.class)
+  public void deleteSection(@BookId UUID bookId, UUID sectionId) {
     this.deleteNode(sectionId);
   }
 
@@ -229,7 +239,7 @@ public class TocService implements TocUseCase, NodeCrudUseCase {
     }
   }
 
-  private Optional<Integer> loadMaxOvAmongSiblings(UUID bookId, UUID parentNodeId) {
+  private Optional<Integer> loadMaxOvAmongSiblings(@BookId UUID bookId, UUID parentNodeId) {
     return nodePersistencePort.findMaxOvAmongSiblings(bookId, parentNodeId);
   }
 }

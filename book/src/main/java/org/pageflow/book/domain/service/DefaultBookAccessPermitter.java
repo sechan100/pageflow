@@ -5,8 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.pageflow.book.adapter.out.AuthorAcl;
 import org.pageflow.book.domain.Author;
 import org.pageflow.book.domain.entity.Book;
-import org.pageflow.book.port.in.BookContextProvider;
-import org.pageflow.book.port.in.token.BookContext;
+import org.pageflow.book.domain.enums.BookStatus;
+import org.pageflow.book.port.in.BookAccessPermitter;
 import org.pageflow.book.port.in.token.BookPermission;
 import org.pageflow.book.port.out.jpa.BookPersistencePort;
 import org.pageflow.common.user.UID;
@@ -20,16 +20,28 @@ import java.util.UUID;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class BookContextProviderImpl implements BookContextProvider {
+public class DefaultBookAccessPermitter implements BookAccessPermitter {
   private final BookPersistencePort bookPersistencePort;
   private final AuthorAcl authorAcl;
 
+
   @Override
-  public BookContext getAuthorContext(UUID bookId, UID uid) {
+  public BookPermission grantIfOwner(UUID bookId, UID uid) {
     Book book = bookPersistencePort.findById(bookId).get();
     Author author = authorAcl.loadAuthorReference(uid);
-    BookPermission permission = BookPermission.authorPermission(book, author);
 
-    return BookContext.of(bookId, permission);
+    boolean isAuthor = book.getAuthor().getUid().equals(author.getUid());
+    if(isAuthor){
+      return BookPermission.author(bookId);
+    } else {
+      // 작가가 아니라면 책의 상태에 따라 권한을 부여한다.
+      boolean isDraft = book.getStatus() == BookStatus.PUBLISHED;
+      if(!isDraft){
+        return BookPermission.reader(bookId);
+      } else {
+        return BookPermission.denied(bookId);
+      }
+
+    }
   }
 }

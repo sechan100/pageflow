@@ -1,4 +1,4 @@
-package org.pageflow.book.domain.aop;
+package org.pageflow.book.application;
 
 import org.pageflow.book.port.in.token.BookPermission;
 import org.pageflow.common.permission.ResourceId;

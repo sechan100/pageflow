@@ -1,7 +1,5 @@
 package org.pageflow.book.port.in.token;
 
-import org.pageflow.book.domain.Author;
-import org.pageflow.book.domain.entity.Book;
 import org.pageflow.book.domain.enums.BookResourceAction;
 import org.pageflow.common.permission.ResourceAction;
 import org.pageflow.common.permission.ResourcePermission;
@@ -29,15 +27,15 @@ public class BookPermission implements ResourcePermission<UUID> {
    * @param author
    * @return
    */
-  public static BookPermission authorPermission(Book book, Author author) {
-    if(book.getAuthor().getUid().equals(author.getUid())){
-      return new BookPermission(book.getId(), BookResourceAction.values());
-    } else {
-      return deniedPermission(book.getId());
-    }
+  public static BookPermission author(UUID bookId) {
+    return new BookPermission(bookId, BookResourceAction.values());
   }
 
-  public static BookPermission deniedPermission(UUID bookId) {
+  public static BookPermission reader(UUID bookId) {
+    return new BookPermission(bookId, BookResourceAction.READ);
+  }
+
+  public static BookPermission denied(UUID bookId) {
     return new BookPermission(bookId);
   }
 

@@ -2,18 +2,16 @@ package org.pageflow.book.adapter.in;
 
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import org.pageflow.book.adapter.in.aop.SetBookPermission;
 import org.pageflow.book.adapter.in.request.CreateBookReq;
 import org.pageflow.book.adapter.in.response.BookRes;
+import org.pageflow.book.application.BookId;
 import org.pageflow.book.domain.BookTitle;
 import org.pageflow.book.dto.BookDto;
 import org.pageflow.book.dto.BookDtoWithAuthor;
 import org.pageflow.book.dto.MyBooks;
-import org.pageflow.book.port.in.BookContextProvider;
 import org.pageflow.book.port.in.BookUseCase;
-import org.pageflow.book.port.in.token.BookContext;
-import org.pageflow.book.port.in.token.BookPermission;
 import org.pageflow.common.api.RequestContext;
-import org.pageflow.common.permission.ResourcePermissionAware;
 import org.pageflow.common.user.UID;
 import org.pageflow.common.utility.Get;
 import org.pageflow.common.utility.Post;
@@ -34,14 +32,13 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BookWebAdapter {
   private final BookUseCase bookUseCase;
-  private final BookContextProvider permitter;
-  private final RequestContext rqcx;
-  private final ResourcePermissionAware resourcePermissionAware;
+  private final RequestContext rqcxt;
+
 
   @Post("")
   @Operation(summary = "책 생성")
   public BookRes createBook(@RequestBody CreateBookReq req) {
-    UID uid = rqcx.getUid();
+    UID uid = rqcxt.getUid();
     BookTitle title = BookTitle.of(req.getTitle());
     BookDto result = bookUseCase.createBook(uid, title, null);
     return BookRes.from(result);
@@ -49,28 +46,24 @@ public class BookWebAdapter {
 
   @Get("/{bookId}")
   @Operation(summary = "책 조회")
-  public BookDtoWithAuthor getBook(@PathVariable UUID bookId) {
-    BookContext context = permitter.getAuthorContext(bookId, rqcx.getUid());
-    /////////
-    BookPermission permission = context.getPermission();
-    resourcePermissionAware.addResourcePermission(permission);
-    /////////
-    BookDtoWithAuthor bookWithAuthor = bookUseCase.queryBook(context);
+  @SetBookPermission
+  public BookDtoWithAuthor getBook(@PathVariable @BookId UUID bookId) {
+    BookDtoWithAuthor bookWithAuthor = bookUseCase.queryBook(bookId);
     return bookWithAuthor;
   }
 
   @Get("")
   @Operation(summary = "내 책장 조회")
   public MyBooks getMyBooks() {
-    MyBooks myBooks = bookUseCase.queryMyBooks(rqcx.getUid());
+    MyBooks myBooks = bookUseCase.queryMyBooks(rqcxt.getUid());
     return myBooks;
   }
 
   @Post("/{bookId}/delete")
   @Operation(summary = "책 삭제")
-  public void deleteBook(@PathVariable UUID bookId) {
-    BookContext context = permitter.getAuthorContext(bookId, rqcx.getUid());
-    bookUseCase.deleteBook(context);
+  @SetBookPermission
+  public void deleteBook(@PathVariable @BookId UUID bookId) {
+    bookUseCase.deleteBook(bookId);
   }
 
 }

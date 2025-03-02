@@ -7,9 +7,6 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.pageflow.common.result.ProcessResultException;
-import org.pageflow.common.result.Result;
-import org.pageflow.common.result.code.CommonCode;
 import org.pageflow.common.user.UID;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -24,7 +21,8 @@ import java.util.Optional;
 
 
 /**
- *
+ * 반드시 SpringSecurity의 FilterChain을 통과한 후에 사용해야한다.
+ * @author sechan
  */
 @Component
 @RequestScope
@@ -58,24 +56,22 @@ public class RequestContext {
         tip: AuthenticationProvider가 정상적으로 작동하지 않았거나, 임의로 필드가 변경되었을 수 있습니다."""
     );
 
-    // 익명 사용자인 경우의 principal 객체 생성
+    // case 1) 익명 사용자인 경우의 principal 객체 생성
     if(authentication instanceof AnonymousAuthenticationToken){
       this.principal = new AnonymouseRequestContextUserPrincipal();
-    // 인증된 사용자의 principal 객체 생성
+    // case 2) 인증된 사용자의 principal 객체 생성
     } else {
       Object principal = authentication.getPrincipal();
 
+      // case 2-1) 인증된 사용자의 principal이 RequestContextUserPrincipal 타입인 경우
       if(principal instanceof RequestContextUserPrincipal rcuPrincipal){
         if(rcuPrincipal.getUid().equals(UID.ANONYMOUS_UID)){
-          throw new IllegalStateException(
-            "AnonymousAuthenticationToken 타입의 인증객체의 principal이 인증된 사용자가 아닙니다."
-          );
+          throw new IllegalStateException("인증된 사용자의 principal이 익명 사용자의 아이디를 가지고있습니다.");
         }
         this.principal = rcuPrincipal;
+
+      // case 2-2) 인증된 사용자의 principal이 RequestContextUserPrincipal 타입이 아닌 경우(ForwardRequireAuthenticationPrincipal등)
       } else {
-        /**
-         * 로그인, OAuth2에 성공하여 인증된 Authentication가 할당되었지만, principal이 ForwardRequireAuthenticationPrincipal과 같은 타입인 경우 발생한다.
-         */
         this.principal = new AnonymouseRequestContextUserPrincipal();
         log.debug("인증된 Authentication 객체에 익명 사용자 principal을 할당했습니다. '{}'은 인증된 사용자의 principal이 아닙니다.", principal.getClass().getName());
       }
@@ -129,16 +125,11 @@ public class RequestContext {
   }
 
   /**
-   * @return 현재 로그인한 사용자의 UID
-   * @apiNote 현재 요청의 user가 익명 사용자인 경우 {@link CommonCode}의 LOGIN_REQUIRED로 예외가 발생한다.
+   * @return 현재 로그인한 사용자의 UID. 익명 사용자의 경우 익명 UID를 반환한다.
    */
   public UID getUid() {
     UID uid = principal.getUid();
-    if(!uid.equals(UID.ANONYMOUS_UID)){
-      return uid;
-    } else{
-      throw new ProcessResultException(Result.of(CommonCode.LOGIN_REQUIRED));
-    }
+    return uid;
   }
 
   public HttpServletRequest getRequest() {

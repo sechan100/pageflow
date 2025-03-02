@@ -48,7 +48,7 @@ public class AuthWebAdapter {
   public static final String SESSION_ID_COOKIE_NAME = "PAGEFLOW_SESSION_IDENTIFIER";
 
   private final ApplicationProperties props;
-  private final RequestContext requestContext;
+  private final RequestContext rqrxt;
   private final SessionUseCase sessionUseCase;
   private final LoadSessionUserPort loadSessionUserPort;
 
@@ -70,7 +70,7 @@ public class AuthWebAdapter {
   @Hidden
   @RequestMapping(LoginTokenEndpointForward.LOGIN_TOKEN_URI)
   public AccessTokenRes login() {
-    AccountDto account = LoginTokenEndpointForward.getForwardedAccount(requestContext.getRequest());
+    AccountDto account = LoginTokenEndpointForward.getForwardedAccount(rqrxt.getRequest());
     // LOGIN
     IssueSessionCmd cmd = new IssueSessionCmd(account.getUid());
     AuthTokens authTokens = sessionUseCase.issueSession(cmd);
@@ -93,7 +93,7 @@ public class AuthWebAdapter {
     sessionIdCookie.setMaxAge(refreshTokenEpochSecExp);
 
     // 할당
-    requestContext.setCookie(sessionIdCookie);
+    rqrxt.setCookie(sessionIdCookie);
 
     return new AccessTokenRes(
       at.getCompact(),
@@ -118,13 +118,13 @@ public class AuthWebAdapter {
   public void logout() {
     UUID sessionId = this.getSessionIdFromCookie();
     sessionUseCase.logout(sessionId);
-    requestContext.removeCookie(SESSION_ID_COOKIE_NAME);
+    rqrxt.removeCookie(SESSION_ID_COOKIE_NAME);
   }
 
   @Get("/auth/session/info")
   @Operation(summary = "세션정보 가져오기", description = "accessToken에 저장된 UID를 기반으로 사용자의 세션 정보를 조회")
   public SessionInfoRes getSession() {
-    UID uid = requestContext.getUid();
+    UID uid = rqrxt.getUid();
     SessionUserDto dto = loadSessionUserPort.load(uid);
     var user = SessionInfoRes.SessionUser.from(dto);
     return new SessionInfoRes(user);
@@ -132,7 +132,7 @@ public class AuthWebAdapter {
 
 
   private UUID getSessionIdFromCookie() {
-    Optional<Cookie> cookieOpt = requestContext.getCookie(SESSION_ID_COOKIE_NAME);
+    Optional<Cookie> cookieOpt = rqrxt.getCookie(SESSION_ID_COOKIE_NAME);
     if(cookieOpt.isEmpty()){
       Result<InvalidField> cookieInvalidResult = Result.of(CommonCode.INVALID_COOKIE,
         InvalidField.builder()

@@ -12,5 +12,5 @@ import java.util.UUID;
 public interface ReviewUseCase {
   ReviewDto addReview(AddReviewCmd cmd);
   ReviewDto updateReview(UpdateReviewCmd cmd);
-  ReviewDto removeReview(UUID reviewId);
+  void removeReview(UUID reviewId);
 }

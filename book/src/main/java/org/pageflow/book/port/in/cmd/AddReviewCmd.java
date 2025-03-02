@@ -1,5 +1,6 @@
 package org.pageflow.book.port.in.cmd;
 
+import lombok.Getter;
 import org.pageflow.common.user.UID;
 
 import java.util.UUID;
@@ -7,6 +8,7 @@ import java.util.UUID;
 /**
  * @author : sechan
  */
+@Getter
 public class AddReviewCmd {
   private final UID uid;
   private final UUID bookId;

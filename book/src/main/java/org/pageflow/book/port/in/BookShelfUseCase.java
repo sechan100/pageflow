@@ -25,7 +25,7 @@ public interface BookShelfUseCase {
    * @param shlefOwnerId
    * @return
    */
-  BookDto removeBookFromShelf(UUID bookId, UID shlefOwnerId);
+  void removeBookFromShelf(UUID bookId, UID shlefOwnerId);
 
   /**
    * 책장에 있는 책들을 조회한다.

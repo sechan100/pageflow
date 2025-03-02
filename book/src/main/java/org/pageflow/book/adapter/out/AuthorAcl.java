@@ -27,7 +27,7 @@ public class AuthorAcl implements LoadAuthorPort {
   }
 
   @Override
-  public Author loadAuthorReference(UID authorId) {
+  public Author loadAuthorProxy(UID authorId) {
     Profile profileProxy = profilePort.getReferenceById(authorId.getValue());
     return new Author(Hibernate.unproxy(profileProxy, Profile.class));
   }

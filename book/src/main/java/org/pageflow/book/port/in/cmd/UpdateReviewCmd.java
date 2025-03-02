@@ -1,10 +1,13 @@
 package org.pageflow.book.port.in.cmd;
 
+import lombok.Getter;
+
 import java.util.UUID;
 
 /**
  * @author : sechan
  */
+@Getter
 public class UpdateReviewCmd {
   private final UUID reviewId;
   private final String content;

@@ -3,11 +3,11 @@ package org.pageflow.book.domain.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pageflow.book.adapter.out.AuthorAcl;
+import org.pageflow.book.application.BookPermission;
 import org.pageflow.book.domain.Author;
 import org.pageflow.book.domain.entity.Book;
 import org.pageflow.book.domain.enums.BookStatus;
 import org.pageflow.book.port.in.BookAccessPermitter;
-import org.pageflow.book.port.in.token.BookPermission;
 import org.pageflow.book.port.out.jpa.BookPersistencePort;
 import org.pageflow.common.user.UID;
 import org.springframework.stereotype.Service;
@@ -28,7 +28,7 @@ public class DefaultBookAccessPermitter implements BookAccessPermitter {
   @Override
   public BookPermission grantIfOwner(UUID bookId, UID uid) {
     Book book = bookPersistencePort.findById(bookId).get();
-    Author author = authorAcl.loadAuthorReference(uid);
+    Author author = authorAcl.loadAuthorProxy(uid);
 
     boolean isAuthor = book.getAuthor().getUid().equals(author.getUid());
     if(isAuthor){

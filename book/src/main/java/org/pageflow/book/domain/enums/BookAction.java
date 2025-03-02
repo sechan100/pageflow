@@ -6,7 +6,7 @@ import org.pageflow.common.permission.ResourceAction;
  * enum 이름 함부로 바꾸면 안됨. 어노테이션에서 문자열로 넣어서 타입 안정성이 보장되지 않음
  * @author : sechan
  */
-public enum BookResourceAction implements ResourceAction {
+public enum BookAction implements ResourceAction {
   /**
    * 읽기, 책 조회 등
    */

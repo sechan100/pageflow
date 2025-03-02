@@ -1,6 +1,6 @@
-package org.pageflow.book.port.in.token;
+package org.pageflow.book.application;
 
-import org.pageflow.book.domain.enums.BookResourceAction;
+import org.pageflow.book.domain.enums.BookAction;
 import org.pageflow.common.permission.ResourceAction;
 import org.pageflow.common.permission.ResourcePermission;
 
@@ -14,11 +14,11 @@ import java.util.UUID;
  */
 public class BookPermission implements ResourcePermission<UUID> {
   private final UUID bookId;
-  private final Set<BookResourceAction> permittedPolicies;
+  private final Set<BookAction> permittedActions;
 
-  private BookPermission(UUID bookId, BookResourceAction... permittedPolicies) {
+  private BookPermission(UUID bookId, BookAction... permittedActions) {
     this.bookId = bookId;
-    this.permittedPolicies = Set.of(permittedPolicies);
+    this.permittedActions = Set.of(permittedActions);
   }
 
   /**
@@ -28,11 +28,11 @@ public class BookPermission implements ResourcePermission<UUID> {
    * @return
    */
   public static BookPermission author(UUID bookId) {
-    return new BookPermission(bookId, BookResourceAction.values());
+    return new BookPermission(bookId, BookAction.values());
   }
 
   public static BookPermission reader(UUID bookId) {
-    return new BookPermission(bookId, BookResourceAction.READ);
+    return new BookPermission(bookId, BookAction.READ);
   }
 
   public static BookPermission denied(UUID bookId) {
@@ -46,11 +46,11 @@ public class BookPermission implements ResourcePermission<UUID> {
 
   @Override
   public Set<? extends ResourceAction> getPermittedActions() {
-    return permittedPolicies;
+    return permittedActions;
   }
 
   @Override
   public boolean isFullActionPermitted() {
-    return permittedPolicies.containsAll(Arrays.asList(BookResourceAction.values()));
+    return permittedActions.containsAll(Arrays.asList(BookAction.values()));
   }
 }

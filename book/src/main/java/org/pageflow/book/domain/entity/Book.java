@@ -73,6 +73,7 @@ public class Book extends BaseJpaEntity {
 
   /**
    * DRAFT 상태로 생성하고, PRIVATE하게 설정함
+   *
    * @param id
    * @param author
    * @param title
@@ -98,7 +99,6 @@ public class Book extends BaseJpaEntity {
   }
 
 
-
   public Author getAuthor() {
     return new Author(author);
   }
@@ -107,18 +107,19 @@ public class Book extends BaseJpaEntity {
     this.title = title.getValue();
   }
 
-  public void changeCoverImageUrl(String url){
+  public void changeCoverImageUrl(String url) {
     this.coverImageUrl = url;
   }
 
   /**
    * 책의 visibility를 변경한다.
    * {@link BookStatus#DRAFT}인 경우 변경 할 수 없고, PRIVATE로 강제된다.
+   *
    * @param visibility
    */
-  public void changeVisibility(BookVisibility visibility){
-    if(this.status == BookStatus.DRAFT){
-      throw this.getInvalidBookStatusException("DRAFT 상태의 책은 공개범위를 변경할 수 없습니다.");
+  public void changeVisibility(BookVisibility visibility) {
+    if(this.status == BookStatus.DRAFT) {
+      throw _getInvalidBookStatusException("DRAFT 상태의 책은 공개범위를 변경할 수 없습니다.");
     }
 
     this.visibility = visibility;
@@ -127,10 +128,11 @@ public class Book extends BaseJpaEntity {
   /**
    * 책을 출판하고 edition을 1 증가시킨다.
    */
-  public void publish(){
-    if(this.status == BookStatus.PUBLISHED){
-      throw this.getInvalidBookStatusException("이미 발행된 책입니다.");
+  public void publish() {
+    if(this.status == BookStatus.PUBLISHED) {
+      throw _getInvalidBookStatusException("이미 발행된 책입니다.");
     }
+
     this.status = BookStatus.PUBLISHED;
     this.edition++;
   }
@@ -138,21 +140,23 @@ public class Book extends BaseJpaEntity {
   /**
    * 책을 개정상태로 변경한다.
    */
-  public void revise(){
-    if(this.status != BookStatus.PUBLISHED){
-      throw this.getInvalidBookStatusException("출판된 책만 개정을 시작할 수 있습니다.");
+  public void revise() {
+    if(this.status == BookStatus.PUBLISHED) {
+      this.status = BookStatus.REVISING;
+    } else {
+      throw _getInvalidBookStatusException("출판된 책만 개정을 시작할 수 있습니다.");
     }
-    this.status = BookStatus.REVISING;
   }
 
   /**
    * 개정을 취소하고 출판상태로 변경한다.
    */
-  public void cancelRevise(){
-    if(this.status != BookStatus.REVISING){
-      throw this.getInvalidBookStatusException("개정 중인 책만 개정을 취소할 수 있습니다.");
+  public void cancelRevise() {
+    if(this.status == BookStatus.REVISING) {
+      this.status = BookStatus.PUBLISHED;
+    } else {
+      throw this._getInvalidBookStatusException("개정 중인 책만 개정을 취소할 수 있습니다.");
     }
-    this.status = BookStatus.PUBLISHED;
   }
 
   /**
@@ -160,13 +164,14 @@ public class Book extends BaseJpaEntity {
    * edition을 올리지 않는다.
    */
   public void mergeRevision() {
-    if(this.status != BookStatus.REVISING){
-      throw this.getInvalidBookStatusException("개정을 병합하려면 개정 중인 책이어야 합니다.");
+    if(this.status == BookStatus.REVISING) {
+      this.status = BookStatus.PUBLISHED;
+    } else {
+      throw this._getInvalidBookStatusException("개정을 병합하려면 개정 중인 책이어야 합니다.");
     }
-    this.status = BookStatus.PUBLISHED;
   }
 
-  private ProcessResultException getInvalidBookStatusException(String message) {
+  private ProcessResultException _getInvalidBookStatusException(String message) {
     return new ProcessResultException(Result.of(
       BookCode.INVALID_BOOK_STATUS,
       BookStatusData.of(this.status, message)

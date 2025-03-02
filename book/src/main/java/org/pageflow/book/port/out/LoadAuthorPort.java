@@ -16,5 +16,5 @@ public interface LoadAuthorPort {
    * @param authorId
    * @return
    */
-  Author loadAuthorReference(UID authorId);
+  Author loadAuthorProxy(UID authorId);
 }

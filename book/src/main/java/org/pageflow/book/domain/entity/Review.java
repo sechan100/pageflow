@@ -44,7 +44,43 @@ public class Review extends BaseJpaEntity {
   private int score;
 
 
+  public static Review create(
+    Author author,
+    Book book,
+    String content,
+    int score
+  ) {
+    return new Review(
+      UUID.randomUUID(),
+      author.getProfileJpaEntity(),
+      book,
+      content,
+      _validateScore(score)
+    );
+  }
+
+
   public Author getAuthor() {
     return new Author(author);
+  }
+
+  public void changeContent(String content) {
+    this.content = content;
+  }
+
+  public void changeScore(int score) {
+    this.score = _validateScore(score);
+  }
+
+  /**
+   * score가 1 ~ 5사이의 정수인지 확인한다.
+   *
+   * @param score
+   */
+  private static int _validateScore(int score) {
+    if(score < 1 || score > 5) {
+      throw new IllegalArgumentException("score는 1 ~ 5 사이의 정수입니다. score:" + score);
+    }
+    return score;
   }
 }

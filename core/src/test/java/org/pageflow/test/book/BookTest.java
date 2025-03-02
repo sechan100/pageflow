@@ -6,7 +6,6 @@ import org.pageflow.book.domain.BookTitle;
 import org.pageflow.book.dto.BookDto;
 import org.pageflow.book.port.in.BookAccessPermitter;
 import org.pageflow.book.port.in.BookUseCase;
-import org.pageflow.book.port.in.token.BookContext;
 import org.pageflow.test.book.shared.BookCreator;
 import org.pageflow.test.shared.PageflowIntegrationTest;
 import org.pageflow.test.user.shared.LoginExcutor;

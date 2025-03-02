@@ -3,6 +3,7 @@ package org.pageflow.book.domain.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pageflow.book.application.BookId;
+import org.pageflow.book.application.BookPermission;
 import org.pageflow.book.domain.Author;
 import org.pageflow.book.domain.BookTitle;
 import org.pageflow.book.domain.entity.Book;
@@ -12,7 +13,6 @@ import org.pageflow.book.dto.BookDto;
 import org.pageflow.book.dto.BookDtoWithAuthor;
 import org.pageflow.book.dto.MyBooks;
 import org.pageflow.book.port.in.BookUseCase;
-import org.pageflow.book.port.in.token.BookPermission;
 import org.pageflow.book.port.out.LoadAuthorPort;
 import org.pageflow.book.port.out.jpa.BookPersistencePort;
 import org.pageflow.book.port.out.jpa.FolderPersistencePort;
@@ -55,7 +55,7 @@ public class BookService implements BookUseCase {
     @Nullable MultipartFile coverImage
   ) {
     // author
-    Author author = loadAuthorPort.loadAuthorReference(authorId);
+    Author author = loadAuthorPort.loadAuthorProxy(authorId);
 
     // book
     UUID bookId = UUID.randomUUID();

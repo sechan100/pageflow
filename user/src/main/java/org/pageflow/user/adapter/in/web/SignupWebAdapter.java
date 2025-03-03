@@ -5,12 +5,10 @@ import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.pageflow.common.api.ApiAccess;
 import org.pageflow.common.api.RequestContext;
 import org.pageflow.common.result.Result;
 import org.pageflow.common.user.ProviderType;
 import org.pageflow.common.user.RoleType;
-import org.pageflow.common.utility.Post;
 import org.pageflow.user.adapter.in.auth.oauth2.owner.OAuth2ResourceOwner;
 import org.pageflow.user.adapter.in.auth.oauth2.presignup.OAuth2PreSignupForward;
 import org.pageflow.user.adapter.in.auth.oauth2.presignup.OAuth2PreSignupService;
@@ -23,6 +21,7 @@ import org.pageflow.user.dto.UserDto;
 import org.pageflow.user.port.in.SignupCmd;
 import org.pageflow.user.port.in.SignupUseCase;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -39,7 +38,7 @@ public class SignupWebAdapter {
   private final SignupUseCase signupUseCase;
 
 
-  @Post(value = "/signup", access = ApiAccess.ANONYMOUS)
+  @PostMapping("/signup")
   @Operation(summary = "회원가입", description = "새로운 사용자의 회원가입을 요청")
   public UserRes signup(@RequestBody SignupForm form) {
     Optional<PreSignupDto> preSignupOptional = preSignupService.loadAndRemove(form.getUsername());
@@ -81,7 +80,7 @@ public class SignupWebAdapter {
    * OAuth2 Provider에게 받아온 데이터를 임시로 저장하고 반환한다.
    * 사용자는 이 데이터를 기반으로 다시한번 회원가입을 요청해야한다.
    */
-  @Post(value = OAuth2PreSignupForward.OAUTH2_PRE_SIGNUP_PATH, access = ApiAccess.ANONYMOUS)
+  @PostMapping(OAuth2PreSignupForward.OAUTH2_PRE_SIGNUP_PATH)
   @Hidden
   @Operation(summary = "OAuth2 회원가입 전처리", description = "OAuth2를 통해 받아온 사용자 정보를 회원가입을 위해 서버에 임시 저장")
   public Result<PreSignupedUser> oAuth2PreSignup() {

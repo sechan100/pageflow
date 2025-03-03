@@ -1,11 +1,11 @@
-package org.pageflow.test.user;
+package org.pageflow.test.e2e.user;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.pageflow.common.result.code.CommonCode;
-import org.pageflow.test.shared.API;
-import org.pageflow.test.shared.PageflowIntegrationTest;
-import org.pageflow.test.shared.ResTestWrapper;
+import org.pageflow.test.e2e.shared.API;
+import org.pageflow.test.e2e.shared.PageflowIntegrationTest;
+import org.pageflow.test.e2e.shared.ResTestWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.test.annotation.Rollback;

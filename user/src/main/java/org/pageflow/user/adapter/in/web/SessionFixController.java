@@ -7,11 +7,10 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.pageflow.common.api.ApiAccess;
 import org.pageflow.common.api.RequestContext;
-import org.pageflow.common.utility.Post;
 import org.springframework.context.annotation.Profile;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,7 +31,7 @@ public class SessionFixController {
   private final RequestContext rqctx;
   private final JwtSessionFixer sessionFixer;
 
-  @Post(value = "/DEV_ONLY/session/fix", access = ApiAccess.ANONYMOUS)
+  @PostMapping(value = "/DEV_ONLY/session/fix")
   @Operation(summary = "서버수준에서 현재 세션 사용자를 고정 또는 해제")
   public void fixSession(
     @RequestBody Username req,

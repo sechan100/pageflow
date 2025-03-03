@@ -9,13 +9,8 @@ import org.pageflow.book.dto.TocDto;
 import org.pageflow.book.port.in.TocNodeUseCase;
 import org.pageflow.book.port.in.TocUseCase;
 import org.pageflow.book.port.in.cmd.ReplaceNodeCmd;
-import org.pageflow.common.utility.Get;
-import org.pageflow.common.utility.Post;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
@@ -31,7 +26,7 @@ public class TocWebAdapter {
   private final TocNodeUseCase tocNodeUseCase;
 
 
-  @Get("")
+  @GetMapping("")
   @Operation(summary = "책 목차 조회")
   @SetBookPermission
   public TocDto.Toc getToc(@PathVariable @BookId UUID bookId) {
@@ -39,7 +34,7 @@ public class TocWebAdapter {
     return toc;
   }
 
-  @Post("/replace-node")
+  @PostMapping("/replace-node")
   @Operation(summary = "목차 노드 재배치")
   @SetBookPermission
   public void reorder(

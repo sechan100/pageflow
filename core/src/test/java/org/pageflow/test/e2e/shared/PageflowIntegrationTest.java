@@ -1,4 +1,4 @@
-package org.pageflow.test.shared;
+package org.pageflow.test.e2e.shared;
 
 import org.pageflow.core.PageflowApplication;
 import org.springframework.boot.test.context.SpringBootTest;

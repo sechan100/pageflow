@@ -10,8 +10,9 @@ import org.pageflow.user.adapter.in.filter.JwtAuthorizationFilter;
 import org.pageflow.user.adapter.in.filter.PrivateUriPretectFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.access.expression.SecurityExpressionHandler;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
@@ -21,7 +22,9 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.FilterInvocation;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.header.HeaderWriterFilter;
@@ -31,7 +34,7 @@ import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 
 @EnableWebSecurity
 @Configuration
-@EnableMethodSecurity
+//@EnableMethodSecurity(securedEnabled = true)
 @RequiredArgsConstructor
 public class SecurityConfig {
 
@@ -42,6 +45,8 @@ public class SecurityConfig {
   private final ExceptionCatchFilter exceptionCatchFilter;
   private final PrivateUriPretectFilter privateUriPretectFilter;
   private final DevOnlyJwtSessionFixFilter devOnlyJwtSessionFixFilter;
+  // role hierarchy
+  private final RoleHierarchy roleHierarchy;
   // oauth2
   private final OAuth2Service OAuth2Service;
   private final AuthorizationRequestRepository<OAuth2AuthorizationRequest> authorizationRequestRepository;
@@ -114,6 +119,7 @@ public class SecurityConfig {
       .headers(headers -> headers
         .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
       )
+      // TODO: 정책 검토하기(csrf, cors)
       .csrf(AbstractHttpConfigurer::disable)
       .cors(AbstractHttpConfigurer::disable)
       .exceptionHandling(exception -> exception
@@ -138,6 +144,13 @@ public class SecurityConfig {
       .requestMatchers(mvcMatcherBuilder.pattern("/swagger-resources/**"))
       .requestMatchers(mvcMatcherBuilder.pattern("/v3/api-docs/**"))
     ;
+  }
+
+
+  private SecurityExpressionHandler<FilterInvocation> _webExpressionHandler() {
+    DefaultWebSecurityExpressionHandler defaultWebSecurityExpressionHandler = new DefaultWebSecurityExpressionHandler();
+    defaultWebSecurityExpressionHandler.setRoleHierarchy(roleHierarchy);
+    return defaultWebSecurityExpressionHandler;
   }
 
 }

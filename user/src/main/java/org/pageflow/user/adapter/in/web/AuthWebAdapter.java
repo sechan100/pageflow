@@ -11,8 +11,6 @@ import org.pageflow.common.result.ProcessResultException;
 import org.pageflow.common.result.Result;
 import org.pageflow.common.result.code.CommonCode;
 import org.pageflow.common.user.UID;
-import org.pageflow.common.utility.Get;
-import org.pageflow.common.utility.Post;
 import org.pageflow.common.validation.FieldReason;
 import org.pageflow.common.validation.InvalidField;
 import org.pageflow.user.adapter.in.auth.LoginTokenEndpointForward;
@@ -28,6 +26,8 @@ import org.pageflow.user.port.in.IssueSessionCmd;
 import org.pageflow.user.port.in.SessionUseCase;
 import org.pageflow.user.port.out.LoadSessionUserPort;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -36,6 +36,7 @@ import java.util.UUID;
 
 
 /**
+ * @see org.pageflow.user.application.config.SecurityConfig
  * @author : sechan
  */
 @Validated
@@ -56,7 +57,7 @@ public class AuthWebAdapter {
    * 실제로 호출되지는 않는다. SpringSecurity Form 로그인으로 처리된다.
    * 문서화를 위한 endpoint
    */
-  @Post(LoginUri.SPRING_SECURITY_FORM_LOGIN_URI)
+  @PostMapping(LoginUri.SPRING_SECURITY_FORM_LOGIN_URI)
   @Operation(summary = "로그인", description = "로그인을 요청하고, accessToken을 발급한다.")
   private AccessTokenRes SpringSecurityLogin(String username, String password) {
     throw new UnsupportedOperationException("Spring Security에서 제공");
@@ -101,7 +102,7 @@ public class AuthWebAdapter {
     );
   }
 
-  @Post("/auth/session/refresh")
+  @PostMapping("/auth/refresh")
   @Operation(summary = "accessToken 재발급", description = "session id cookie를 받아서 accessToken을 재발급한다.")
   public AccessTokenRes refresh() {
     UUID sessionId = _getSessionIdFromCookie();
@@ -113,7 +114,7 @@ public class AuthWebAdapter {
     );
   }
 
-  @Post("/auth/session/logout")
+  @PostMapping("/auth/logout")
   @Operation(summary = "로그아웃", description = "쿠키로 전달된 sessionId를 받아서, 해당 세션을 무효화")
   public void logout() {
     UUID sessionId = this._getSessionIdFromCookie();
@@ -121,7 +122,7 @@ public class AuthWebAdapter {
     rqrxt.removeCookie(SESSION_ID_COOKIE_NAME);
   }
 
-  @Get("/auth/session/info")
+  @GetMapping("/user/session")
   @Operation(summary = "세션정보 가져오기", description = "accessToken에 저장된 UID를 기반으로 사용자의 세션 정보를 조회")
   public SessionInfoRes getSession() {
     UID uid = rqrxt.getUid();

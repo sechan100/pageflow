@@ -1,9 +1,9 @@
-package org.pageflow.test.user.shared;
+package org.pageflow.test.e2e.user.shared;
 
 import lombok.RequiredArgsConstructor;
 import org.pageflow.common.api.ApiResponse;
-import org.pageflow.test.shared.API;
-import org.pageflow.test.shared.ApiFactory;
+import org.pageflow.test.e2e.shared.API;
+import org.pageflow.test.e2e.shared.ApiFactory;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;

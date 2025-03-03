@@ -1,7 +1,7 @@
-package org.pageflow.test.shared;
+package org.pageflow.test.e2e.shared;
 
 import lombok.RequiredArgsConstructor;
-import org.pageflow.test.user.shared.LoginResult;
+import org.pageflow.test.e2e.user.shared.LoginResult;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.stereotype.Component;
 

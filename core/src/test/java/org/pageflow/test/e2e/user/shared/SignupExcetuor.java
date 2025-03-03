@@ -1,9 +1,9 @@
-package org.pageflow.test.user.shared;
+package org.pageflow.test.e2e.user.shared;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.pageflow.test.shared.API;
-import org.pageflow.test.shared.ApiFactory;
+import org.pageflow.test.e2e.shared.API;
+import org.pageflow.test.e2e.shared.ApiFactory;
 import org.pageflow.user.adapter.in.res.UserRes;
 import org.springframework.stereotype.Component;
 

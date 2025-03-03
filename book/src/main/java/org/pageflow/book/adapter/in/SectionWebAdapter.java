@@ -12,14 +12,8 @@ import org.pageflow.book.dto.SectionDtoWithContent;
 import org.pageflow.book.port.in.TocNodeUseCase;
 import org.pageflow.book.port.in.cmd.CreateSectionCmd;
 import org.pageflow.book.port.in.cmd.UpdateSectionCmd;
-import org.pageflow.common.utility.Delete;
-import org.pageflow.common.utility.Get;
-import org.pageflow.common.utility.Post;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
@@ -33,7 +27,7 @@ import java.util.UUID;
 public class SectionWebAdapter {
   private final TocNodeUseCase tocNodeUseCase;
 
-  @Post("")
+  @PostMapping("")
   @Operation(summary = "섹션 생성")
   @SetBookPermission
   public SectionDtoWithContent createSection(
@@ -49,7 +43,7 @@ public class SectionWebAdapter {
     return sectionDto;
   }
 
-  @Get("/{sectionId}")
+  @GetMapping("/{sectionId}")
   @Operation(summary = "섹션 조회")
   @SetBookPermission
   public SectionDto getSection(
@@ -60,7 +54,7 @@ public class SectionWebAdapter {
     return section;
   }
 
-  @Get("/{sectionId}/content")
+  @GetMapping("/{sectionId}/content")
   @Operation(summary = "섹션을 내용과 함께 조회")
   @SetBookPermission
   public SectionDtoWithContent getSectionWithContent(
@@ -71,7 +65,7 @@ public class SectionWebAdapter {
     return section;
   }
 
-  @Post("/{sectionId}")
+  @PostMapping("/{sectionId}")
   @Operation(summary = "섹션 업데이트")
   @SetBookPermission
   public SectionDtoWithContent updateSection(
@@ -88,7 +82,7 @@ public class SectionWebAdapter {
     return section;
   }
 
-  @Delete("/{sectionId}")
+  @DeleteMapping("/{sectionId}")
   @Operation(summary = "섹션 삭제")
   @SetBookPermission
   public void deleteSection(

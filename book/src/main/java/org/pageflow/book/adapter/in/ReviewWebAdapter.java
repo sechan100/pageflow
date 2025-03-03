@@ -15,13 +15,8 @@ import org.pageflow.book.port.in.review.ReviewUseCase;
 import org.pageflow.common.api.RequestContext;
 import org.pageflow.common.permission.ResourcePermissionAware;
 import org.pageflow.common.user.UID;
-import org.pageflow.common.utility.Delete;
-import org.pageflow.common.utility.Post;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
@@ -39,7 +34,7 @@ public class ReviewWebAdapter {
   private final ResourcePermissionAware permissionAware;
 
 
-  @Post("")
+  @PostMapping("")
   @Operation(summary = "책에 리뷰를 작성")
   @SetBookPermission
   public ReviewDto createReview(
@@ -57,7 +52,7 @@ public class ReviewWebAdapter {
   }
 
 
-  @Post("/{reviewId}")
+  @PostMapping("/{reviewId}")
   @Operation(summary = "리뷰 수정")
   public ReviewDto updateReview(
     @PathVariable UUID bookId,
@@ -77,7 +72,7 @@ public class ReviewWebAdapter {
 
 
 
-  @Delete("/{reviewId}")
+  @DeleteMapping("/{reviewId}")
   @Operation(summary = "리뷰 삭제")
   public void deleteReview(
     @PathVariable UUID bookId,

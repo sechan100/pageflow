@@ -1,4 +1,4 @@
-package org.pageflow.test.book.shared;
+package org.pageflow.test.e2e.book.shared;
 
 import lombok.RequiredArgsConstructor;
 import org.pageflow.book.domain.BookTitle;

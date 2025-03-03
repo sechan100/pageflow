@@ -1,4 +1,4 @@
-package org.pageflow.test.shared;
+package org.pageflow.test.e2e.shared;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

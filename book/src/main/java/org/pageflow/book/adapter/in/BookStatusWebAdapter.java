@@ -9,9 +9,9 @@ import org.pageflow.book.dto.BookDto;
 import org.pageflow.book.port.in.BookStatusUseCase;
 import org.pageflow.common.api.RequestContext;
 import org.pageflow.common.user.UID;
-import org.pageflow.common.utility.Post;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -28,7 +28,7 @@ public class BookStatusWebAdapter {
   private final RequestContext rqcxt;
 
 
-  @Post("/user/books/{bookId}/status")
+  @PostMapping("/user/books/{bookId}/status")
   @Operation(summary = "책 상태 변경")
   @SetBookPermission
   public BookRes changeBookStatus(

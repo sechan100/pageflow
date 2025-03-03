@@ -21,10 +21,10 @@ public class UserQuery implements LoadSessionUserPort {
 
   @Override
   public SessionUserDto load(UID uid) {
-    Account account = accountPersistencePort.findWithProfileById(uid.getValue()).orElseThrow();
+    Account account = accountPersistencePort.findWithProfileById(uid.getValue()).get();
     Profile profile = account.getProfile();
 
-    return SessionUserDto.builder()
+    SessionUserDto dto = SessionUserDto.builder()
       .uid(account.getUid())
       .username(account.getUsername())
       .email(account.getEmail())
@@ -33,5 +33,7 @@ public class UserQuery implements LoadSessionUserPort {
       .penname(profile.getPenname())
       .profileImageUrl(profile.getProfileImageUrl())
       .build();
+
+    return dto;
   }
 }

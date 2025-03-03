@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.pageflow.common.api.RequestContext;
 import org.pageflow.common.property.ApplicationProperties;
@@ -54,7 +53,8 @@ public class AuthWebAdapter {
 
 
   /**
-   * 실제로 호출되지는 않는다. SpringSecurity Form로그인으로 처리된다.
+   * 실제로 호출되지는 않는다. SpringSecurity Form 로그인으로 처리된다.
+   * 문서화를 위한 endpoint
    */
   @Post(LoginUri.SPRING_SECURITY_FORM_LOGIN_URI)
   @Operation(summary = "로그인", description = "로그인을 요청하고, accessToken을 발급한다.")
@@ -103,8 +103,8 @@ public class AuthWebAdapter {
 
   @Post("/auth/session/refresh")
   @Operation(summary = "accessToken 재발급", description = "session id cookie를 받아서 accessToken을 재발급한다.")
-  public AccessTokenRes refresh(HttpServletRequest request) {
-    UUID sessionId = this.getSessionIdFromCookie();
+  public AccessTokenRes refresh() {
+    UUID sessionId = _getSessionIdFromCookie();
     AccessTokenDto at = sessionUseCase.refresh(sessionId);
 
     return new AccessTokenRes(
@@ -116,7 +116,7 @@ public class AuthWebAdapter {
   @Post("/auth/session/logout")
   @Operation(summary = "로그아웃", description = "쿠키로 전달된 sessionId를 받아서, 해당 세션을 무효화")
   public void logout() {
-    UUID sessionId = this.getSessionIdFromCookie();
+    UUID sessionId = this._getSessionIdFromCookie();
     sessionUseCase.logout(sessionId);
     rqrxt.removeCookie(SESSION_ID_COOKIE_NAME);
   }
@@ -131,7 +131,7 @@ public class AuthWebAdapter {
   }
 
 
-  private UUID getSessionIdFromCookie() {
+  private UUID _getSessionIdFromCookie() {
     Optional<Cookie> cookieOpt = rqrxt.getCookie(SESSION_ID_COOKIE_NAME);
     if(cookieOpt.isEmpty()){
       Result<InvalidField> cookieInvalidResult = Result.of(CommonCode.INVALID_COOKIE,

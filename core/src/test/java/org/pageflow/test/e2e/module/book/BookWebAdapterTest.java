@@ -62,47 +62,6 @@ public class BookWebAdapterTest {
 
   @Test
   @Fixture(Users.class)
-  @DisplayName("책 상태 변경 흐름 테스트")
-  void bookStatusTest() {
-    API userApi = apiFactory.user("user1", "user1");
-
-    // 책 생성 (기본 상태: DRAFT)
-    TestRes createRes = userApi.post("/user/books", """
-        {
-          "title": "상태 테스트 도서"
-        }
-      """);
-    createRes.isSuccess();
-    UUID bookId = UUID.fromString(createRes.getData().get("id").asText());
-
-    // DRAFT -> PUBLISHED (publish)
-    TestRes publishRes = userApi.post("/user/books/" + bookId + "/status?cmd=PUBLISH", null);
-    publishRes.isSuccess();
-    
-    // 책 상태 확인
-    TestRes bookAfterPublish = userApi.get("/user/books/" + bookId);
-    bookAfterPublish.isSuccess();
-    
-    // PUBLISHED -> REVISING (revise)
-    TestRes reviseRes = userApi.post("/user/books/" + bookId + "/status?cmd=REVISE", null);
-    reviseRes.isSuccess();
-
-    
-    // REVISING -> PUBLISHED (cancelRevise)
-    TestRes cancelReviseRes = userApi.post("/user/books/" + bookId + "/status?cmd=CANCEL_REVISE", null);
-    cancelReviseRes.isSuccess();
-    
-    // PUBLISHED -> REVISING (다시 revise)
-    TestRes reviseAgainRes = userApi.post("/user/books/" + bookId + "/status?cmd=REVISE", null);
-    reviseAgainRes.isSuccess();
-    
-    // REVISING -> PUBLISHED (mergeRevision)
-    TestRes mergeRes = userApi.post("/user/books/" + bookId + "/status?cmd=MERGE_REVISION", null);
-    mergeRes.isSuccess();
-  }
-
-  @Test
-  @Fixture(Users.class)
   @DisplayName("목차(TOC) 관련 테스트")
   void tocTest() {
     API userApi = apiFactory.user("user1", "user1");

@@ -1,7 +1,6 @@
 package org.pageflow.book.application;
 
 import lombok.Getter;
-import org.pageflow.book.domain.enums.BookAction;
 import org.pageflow.common.result.MessageData;
 import org.pageflow.common.result.code.ResultCode;
 
@@ -11,7 +10,6 @@ import org.pageflow.common.result.code.ResultCode;
 @Getter
 public enum BookCode implements ResultCode {
     EXTERNAL_COVER_IMAGE_URL("외부 커버 이미지 url은 사용할 수 없습니다.")
-  , BOOK_ACCESS_DENIED("책에 대한 접근 권한이 없습니다.", BookAction.class)
   , TOC_HIERARCHY_VIOLATION("책 목차의 계층구조를 위반하는 요청입니다.", MessageData.class)
   , INVALID_BOOK_STATUS("책이 요청을 처리하기 위해 요구되는 상태가 아닙니다.", BookStatusData.class)
 

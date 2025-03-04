@@ -43,7 +43,10 @@ public class Book extends BaseJpaEntity {
     orphanRemoval = true
   )
   @Getter
-  private List<Review> reviews;
+  private final List<Review> reviews = new ArrayList<>(5);
+
+  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "book")
+  private final List<TocNode> nodes = new ArrayList<>(30);
 
   @Getter
   @Column(nullable = false)
@@ -89,7 +92,6 @@ public class Book extends BaseJpaEntity {
     return new Book(
       id,
       author.getProfileJpaEntity(),
-      new ArrayList<>(),
       title.getValue(),
       coverImageUrl,
       BookStatus.DRAFT,

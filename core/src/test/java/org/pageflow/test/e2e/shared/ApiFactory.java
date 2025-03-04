@@ -37,7 +37,6 @@ public class ApiFactory {
   }
 
 
-
   private LoginResult _login(String username, String password){
     API guestApi = this.guest();
 

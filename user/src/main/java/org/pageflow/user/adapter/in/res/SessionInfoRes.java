@@ -1,6 +1,8 @@
 package org.pageflow.user.adapter.in.res;
 
-import lombok.Value;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.pageflow.common.user.RoleType;
 import org.pageflow.common.user.UID;
 import org.pageflow.user.dto.IdentifiableUser;
@@ -9,19 +11,23 @@ import org.pageflow.user.dto.SessionUserDto;
 /**
  * @author : sechan
  */
-@Value
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class SessionInfoRes {
-  SessionUser user;
+  private SessionUser user;
 
-  @Value
+  @Data
+  @NoArgsConstructor
+  @AllArgsConstructor
   public static class SessionUser implements IdentifiableUser {
-    UID uid;
-    String username;
-    String email;
-    boolean isEmailVerified;
-    RoleType role;
-    String penname;
-    String profileImageUrl;
+    private UID uid;
+    private String username;
+    private String email;
+    private boolean isEmailVerified;
+    private RoleType role;
+    private String penname;
+    private String profileImageUrl;
 
     public static SessionUser from(SessionUserDto dto){
       return new SessionUser(

@@ -35,7 +35,7 @@ public class BookShelfService implements BookShelfUseCase {
 
 
   @Override
-  @ResourceAccessPermissionRequired(permissionType = BookPermission.class)
+  @ResourceAccessPermissionRequired(actions = { "READ" }, permissionType = BookPermission.class)
   public BookDto addBookToShelf(@BookId UUID bookId, UID shlefOwnerId) {
     Book book = bookPersistencePort.findById(bookId).get();
     Author shelfOwner = loadAuthorPort.loadAuthorProxy(shlefOwnerId);
@@ -45,7 +45,7 @@ public class BookShelfService implements BookShelfUseCase {
   }
 
   @Override
-  @ResourceAccessPermissionRequired(permissionType = BookPermission.class)
+  @ResourceAccessPermissionRequired(actions = { "READ" }, permissionType = BookPermission.class)
   public void removeBookFromShelf(@BookId UUID bookId, UID shlefOwnerId) {
     shelfItemPersistencePort.deleteByBookIdAndShelfOwnerId(bookId, shlefOwnerId.getValue());
   }

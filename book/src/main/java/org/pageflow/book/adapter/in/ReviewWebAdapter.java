@@ -24,13 +24,13 @@ import java.util.UUID;
  * @author : sechan
  */
 @Validated
-@RequestMapping("/user/books/{bookId}/review")
+@RequestMapping("/user/books/{bookId}/reviews")
 @RestController
 @RequiredArgsConstructor
 public class ReviewWebAdapter {
   private final ReviewUseCase reviewUseCase;
   private final RequestContext rqcxt;
-  private final ReviewAccessPermitter permitter;
+  private final ReviewAccessPermitter reviewPermitter;
   private final ResourcePermissionAware permissionAware;
 
 
@@ -60,7 +60,7 @@ public class ReviewWebAdapter {
     @RequestBody UpdateReviewReq req
   ) {
     UID uid = rqcxt.getUid();
-    ReviewPermission permission = permitter.grant(bookId, uid);
+    ReviewPermission permission = reviewPermitter.grant(reviewId, uid);
     permissionAware.addResourcePermission(permission);
     UpdateReviewCmd cmd = UpdateReviewCmd.of(
       reviewId,
@@ -79,7 +79,7 @@ public class ReviewWebAdapter {
     @PathVariable UUID reviewId
   ) {
     UID uid = rqcxt.getUid();
-    ReviewPermission permission = permitter.grant(bookId, uid);
+    ReviewPermission permission = reviewPermitter.grant(reviewId, uid);
     permissionAware.addResourcePermission(permission);
     reviewUseCase.deleteReview(reviewId);
   }

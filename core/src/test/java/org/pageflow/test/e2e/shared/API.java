@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import org.pageflow.common.api.ApiResponse;
+import org.pageflow.user.adapter.in.res.SessionInfoRes;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -66,6 +67,13 @@ public class API {
       _httpEntity(null),
       String.class
     ).getBody());
+  }
+
+
+  // 예약 api
+  public SessionInfoRes.SessionUser getSessionUser() {
+    JsonNode data = this.get("/user/session").getData();
+    return objectMapper.convertValue(data, SessionInfoRes.class).getUser();
   }
 
 

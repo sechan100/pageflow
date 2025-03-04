@@ -35,7 +35,7 @@ public class DefaultBookAccessPermitter implements BookAccessPermitter {
       return BookPermission.author(bookId);
     } else {
       // 작가가 아니라면 책의 상태에 따라 권한을 부여한다.
-      boolean isDraft = book.getStatus() == BookStatus.PUBLISHED;
+      boolean isDraft = book.getStatus() == BookStatus.DRAFT;
       if(!isDraft){
         return BookPermission.reader(bookId);
       } else {

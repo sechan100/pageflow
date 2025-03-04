@@ -37,7 +37,7 @@ public class ReviewService implements ReviewUseCase {
 
 
   @Override
-  @ResourceAccessPermissionRequired(permissionType = BookPermission.class)
+  @ResourceAccessPermissionRequired(actions = { "READ" }, permissionType = BookPermission.class)
   public ReviewDto createReview(@BookId("#cmd.bookId") AddReviewCmd cmd) {
     // TODO: 이미 리뷰를 작성한 경우 처리
     Author authorProxy = loadAuthorPort.loadAuthorProxy(cmd.getUid());

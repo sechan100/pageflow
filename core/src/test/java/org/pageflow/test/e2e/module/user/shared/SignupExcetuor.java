@@ -1,7 +1,8 @@
-package org.pageflow.test.e2e.user.shared;
+package org.pageflow.test.e2e.module.user.shared;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.pageflow.test.e2e.module.user.dto.TUser;
 import org.pageflow.test.e2e.shared.API;
 import org.pageflow.test.e2e.shared.ApiFactory;
 import org.pageflow.user.adapter.in.res.UserRes;
@@ -18,7 +19,7 @@ public class SignupExcetuor {
   private final ApiFactory apiFactory;
   private final ObjectMapper objectMapper;
 
-  public UserRes signup() {
+  public TUser signup() {
     String username = UUID
       .randomUUID()
       .toString()
@@ -33,10 +34,19 @@ public class SignupExcetuor {
         }
       """, username, username, username, username);
 
-    API api = apiFactory.createAPI();
+    API api = apiFactory.guest();
     var result = api.post("/signup", json);
     result.isSuccess();
     UserRes user = objectMapper.convertValue(result.getApiResponse().getData(), UserRes.class);
-    return user;
+    return TUser.builder()
+      .uid(user.getUid())
+      .username(username)
+      .password(username)
+      .email(user.getEmail())
+      .isEmailVerified(user.isEmailVerified())
+      .role(user.getRole())
+      .penname(user.getPenname())
+      .profileImageUrl(user.getProfileImageUrl())
+      .build();
   }
 }

@@ -1,11 +1,11 @@
-package org.pageflow.test.e2e.user;
+package org.pageflow.test.e2e.module.user;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.pageflow.common.result.code.CommonCode;
+import org.pageflow.test.e2e.config.PageflowIntegrationTest;
 import org.pageflow.test.e2e.shared.API;
-import org.pageflow.test.e2e.shared.PageflowIntegrationTest;
-import org.pageflow.test.e2e.shared.ResTestWrapper;
+import org.pageflow.test.e2e.shared.ApiResponseWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.test.annotation.Rollback;
@@ -33,7 +33,7 @@ public class SignupExcetuorUseCaseTest {
 
     API e2e = new API(restTemplate);
     // 회원가입
-    ResTestWrapper result = e2e.post("/signup", user1);
+    ApiResponseWrapper result = e2e.post("/signup", user1);
     result.isSuccess();
 
     // 중복 회원가입

@@ -3,7 +3,7 @@ package org.pageflow.test.global;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.pageflow.common.property.ApplicationProperties;
-import org.pageflow.test.e2e.shared.PageflowIntegrationTest;
+import org.pageflow.test.e2e.config.PageflowIntegrationTest;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.lang.reflect.Field;

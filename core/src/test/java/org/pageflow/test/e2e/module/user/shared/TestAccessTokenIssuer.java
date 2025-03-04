@@ -1,4 +1,4 @@
-package org.pageflow.test.e2e.user.shared;
+package org.pageflow.test.e2e.module.user.shared;
 
 import lombok.RequiredArgsConstructor;
 import org.pageflow.common.property.ApplicationProperties;

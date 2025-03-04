@@ -7,6 +7,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.lang.Nullable;
 
 /**
  * @author : sechan
@@ -23,18 +24,39 @@ public class API {
     this.headers = headers;
   }
 
-  public ResTestWrapper post(String url, String jsonBody) {
-    return wrap(delegate.postForObject(url, httpEntity(jsonBody), ApiResponse.class));
+
+  public ApiResponseWrapper get(String url) {
+    return _wrap(
+      delegate.exchange(
+        url,
+        HttpMethod.GET,
+        _httpEntity(null),
+        ApiResponse.class
+      ).getBody()
+    );
   }
 
-  public ResTestWrapper get(String url) {
-    return wrap(delegate.exchange(
+  public ApiResponseWrapper post(String url, String jsonBody) {
+    return _wrap(
+      delegate.exchange(
+        url,
+        HttpMethod.POST,
+        _httpEntity(jsonBody),
+        ApiResponse.class
+      ).getBody()
+    );
+  }
+
+  public ApiResponseWrapper delete(String url, String jsonBody) {
+    return _wrap(delegate.exchange(
       url,
-      HttpMethod.GET,
-      httpEntity(null),
+      HttpMethod.DELETE,
+      _httpEntity(jsonBody),
       ApiResponse.class
     ).getBody());
   }
+
+
 
   public API setAccessToken(String accessToken) {
     headers.setBearerAuth(accessToken);
@@ -46,21 +68,35 @@ public class API {
     return this;
   }
 
-  public API setCookie(String cookieString) {
+  /**
+   * 아예 문자열을 통째로 바꾸는 방식으로 쿠키를 설정한다.
+   * 만약 기존 쿠키를 유지하면서 쿠키를 추가하고싶다면 다른 방식을 사용해야한다.
+   * @param cookieString
+   * @return
+   */
+  public API setSessionIdCookie(String cookieString) {
     headers.add(HttpHeaders.COOKIE, cookieString);
     return this;
   }
 
-  public API clearCookie() {
+  /**
+   * 없으면 null을 반환한다.
+   * @return
+   */
+  public String getSessionIdCookie() {
+    return headers.getFirst(HttpHeaders.COOKIE);
+  }
+
+  public API clearSessionIdCookie() {
     headers.remove(HttpHeaders.COOKIE);
     return this;
   }
 
-  public HttpEntity httpEntity(String jsonBody) {
-    return new HttpEntity<>(jsonBody, headers);
+  private ApiResponseWrapper _wrap(ApiResponse response) {
+    return new ApiResponseWrapper(response);
   }
 
-  private ResTestWrapper wrap(ApiResponse response) {
-    return new ResTestWrapper(response);
+  private HttpEntity<String> _httpEntity(@Nullable String jsonBody) {
+    return new HttpEntity<>(jsonBody, headers);
   }
 }

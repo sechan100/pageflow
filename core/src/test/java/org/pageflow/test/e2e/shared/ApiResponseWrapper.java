@@ -12,11 +12,11 @@ import org.pageflow.common.result.code.ResultCode;
  * @author : sechan
  */
 @RequiredArgsConstructor
-public class ResTestWrapper {
+public class ApiResponseWrapper {
   @Getter
   private final ApiResponse apiResponse;
 
-  public ResTestWrapper isSuccess() {
+  public ApiResponseWrapper isSuccess() {
     ObjectMapper objectMapper = new ObjectMapper();
     try {
     assert apiResponse.getCode().equals(CommonCode.SUCCESS.name()):
@@ -27,7 +27,7 @@ public class ResTestWrapper {
     return this;
   }
 
-  public ResTestWrapper is(ResultCode code){
+  public ApiResponseWrapper is(ResultCode code){
     assert apiResponse.getCode().equals(code.name()): "Unexpected Code: expected: " + code.name() + ", actual: " + apiResponse.getCode();
     return this;
   }

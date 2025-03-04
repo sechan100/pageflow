@@ -1,27 +1,28 @@
 package org.pageflow.book.domain.entity;
 
-import jakarta.persistence.DiscriminatorValue;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicUpdate;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 /**
  * @author : sechan
  */
 @Entity
-@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(callSuper = true)
 @DynamicUpdate
 @DiscriminatorValue("folder")
 @Table(name = "folder")
 public class Folder extends TocNode {
+
+  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "parentNode")
+  private final List<TocNode> children = new ArrayList<>(7);
 
   public Folder(
     UUID id,

@@ -59,7 +59,6 @@ public class TocService implements TocUseCase, TocNodeUseCase {
         BookCode.TOC_HIERARCHY_VIOLATION, MessageData.of("root folder node는 이동할 수 없습니다.")
       ));
     }
-
     UUID destFolderId = cmd.getDestFolderId();
     Folder folderProxy = folderPersistencePort.getReferenceById(destFolderId);
     List<TocNode> siblings = nodePersistencePort.findChildrenByParentNode_IdOrderByOv(destFolderId);

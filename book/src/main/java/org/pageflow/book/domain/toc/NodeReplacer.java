@@ -57,7 +57,7 @@ public class NodeReplacer {
       );
     }
     if(this.isNodeChildOfThis(target)){
-      throw new IllegalArgumentException("node must not be in nodes for reparent operation");
+      throw new IllegalArgumentException("노드가 이미 이 폴더의 자식입니다.");
     }
 
     // NODE를 list에 삽입

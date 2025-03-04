@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.pageflow.common.api.RequestContext;
 import org.pageflow.common.result.Result;
-import org.pageflow.common.user.ProviderType;
 import org.pageflow.common.user.RoleType;
 import org.pageflow.user.adapter.in.auth.oauth2.owner.OAuth2ResourceOwner;
 import org.pageflow.user.adapter.in.auth.oauth2.presignup.OAuth2PreSignupForward;
@@ -63,8 +62,7 @@ public class SignupWebAdapter {
         form.getPassword(),
         form.getEmail(),
         form.getPenname(),
-        RoleType.ROLE_USER,
-        ProviderType.NATIVE
+        RoleType.ROLE_USER
       );
     }
 

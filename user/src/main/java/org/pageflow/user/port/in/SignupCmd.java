@@ -44,12 +44,8 @@ public class SignupCmd {
     String password,
     String email,
     String penname,
-    RoleType role,
-    ProviderType provider
+    RoleType role
   ){
-    if(provider != ProviderType.NATIVE){
-      throw new IllegalStateException("Native 회원가입자가 아닙니다.");
-    }
-    return new SignupCmd(username, Password.encrypt(password), email, penname, role, provider, PropsAware.use().user.defaultProfileImageUrl);
+    return new SignupCmd(username, Password.encrypt(password), email, penname, role, ProviderType.NATIVE, PropsAware.use().user.defaultProfileImageUrl);
   }
 }

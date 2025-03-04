@@ -58,6 +58,7 @@ public class ReviewService implements ReviewUseCase {
 
   @Override
   @PermissionRequired(
+    actions = { "FULL" },
     permissionType = ReviewPermission.class
   )
   public ReviewDto updateReview(@ReviewId("#cmd.reviewId") UpdateReviewCmd cmd) {
@@ -69,6 +70,7 @@ public class ReviewService implements ReviewUseCase {
 
   @Override
   @PermissionRequired(
+    actions = { "FULL" },
     permissionType = ReviewPermission.class
   )
   public void deleteReview(@ReviewId UUID reviewId) {

@@ -46,6 +46,9 @@ spring:
       ddl-auto: create-drop
     properties:
       hibernate:
+#        show_sql: true
+#        format_sql: true
+#        use_sql_comments: true
         type:
           preferred_uuid_jdbc_type: VARCHAR
 
@@ -111,12 +114,3 @@ pageflow:
   file:
     web-base-url: '${pageflow.site.base-url}/resources/image'
     parent: /Users/sechan/container/pageflow/image
-  dev:
-    data:
-      # enable, disable, according-to-ddl 중 택 1
-      enabled: according-to-ddl
-      random-seed: 1234
-      user:
-        count: 10
-      book:
-        count: 30

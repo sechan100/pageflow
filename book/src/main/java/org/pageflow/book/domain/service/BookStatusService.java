@@ -8,7 +8,7 @@ import org.pageflow.book.domain.entity.Book;
 import org.pageflow.book.dto.BookDto;
 import org.pageflow.book.port.in.BookStatusUseCase;
 import org.pageflow.book.port.out.jpa.BookPersistencePort;
-import org.pageflow.common.permission.ResourceAccessPermissionRequired;
+import org.pageflow.common.permission.PermissionRequired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,7 +26,10 @@ public class BookStatusService implements BookStatusUseCase {
 
 
   @Override
-  @ResourceAccessPermissionRequired(actions = { "UPDATE_STATUS" }, permissionType = BookPermission.class)
+  @PermissionRequired(
+    actions = { "UPDATE_STATUS" },
+    permissionType = BookPermission.class
+  )
   public BookDto publish(@BookId UUID bookId) {
     Book book = bookPersistencePort.findById(bookId).get();
     book.publish();
@@ -34,7 +37,10 @@ public class BookStatusService implements BookStatusUseCase {
   }
 
   @Override
-  @ResourceAccessPermissionRequired(actions = { "UPDATE_STATUS" }, permissionType = BookPermission.class)
+  @PermissionRequired(
+    actions = { "UPDATE_STATUS" },
+    permissionType = BookPermission.class
+  )
   public BookDto revise(@BookId UUID bookId) {
     Book book = bookPersistencePort.findById(bookId).get();
     book.revise();
@@ -42,7 +48,10 @@ public class BookStatusService implements BookStatusUseCase {
   }
 
   @Override
-  @ResourceAccessPermissionRequired(actions = { "UPDATE_STATUS" }, permissionType = BookPermission.class)
+  @PermissionRequired(
+    actions = { "UPDATE_STATUS" },
+    permissionType = BookPermission.class
+  )
   public BookDto cancelRevise(@BookId UUID bookId) {
     Book book = bookPersistencePort.findById(bookId).get();
     book.cancelRevise();
@@ -50,7 +59,10 @@ public class BookStatusService implements BookStatusUseCase {
   }
 
   @Override
-  @ResourceAccessPermissionRequired(actions = { "UPDATE_STATUS" }, permissionType = BookPermission.class)
+  @PermissionRequired(
+    actions = { "UPDATE_STATUS" },
+    permissionType = BookPermission.class
+  )
   public BookDto mergeRevision(@BookId UUID bookId) {
     Book book = bookPersistencePort.findById(bookId).get();
     book.mergeRevision();

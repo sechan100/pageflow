@@ -17,7 +17,7 @@ import org.pageflow.book.port.in.review.ReviewUseCase;
 import org.pageflow.book.port.out.LoadAuthorPort;
 import org.pageflow.book.port.out.jpa.BookPersistencePort;
 import org.pageflow.book.port.out.jpa.ReviewPersistencePort;
-import org.pageflow.common.permission.ResourceAccessPermissionRequired;
+import org.pageflow.common.permission.PermissionRequired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,7 +37,10 @@ public class ReviewService implements ReviewUseCase {
 
 
   @Override
-  @ResourceAccessPermissionRequired(actions = { "READ" }, permissionType = BookPermission.class)
+  @PermissionRequired(
+    actions = { "READ" },
+    permissionType = BookPermission.class
+  )
   public ReviewDto createReview(@BookId("#cmd.bookId") AddReviewCmd cmd) {
     // TODO: 이미 리뷰를 작성한 경우 처리
     Author authorProxy = loadAuthorPort.loadAuthorProxy(cmd.getUid());
@@ -54,7 +57,9 @@ public class ReviewService implements ReviewUseCase {
   }
 
   @Override
-  @ResourceAccessPermissionRequired(permissionType = ReviewPermission.class)
+  @PermissionRequired(
+    permissionType = ReviewPermission.class
+  )
   public ReviewDto updateReview(@ReviewId("#cmd.reviewId") UpdateReviewCmd cmd) {
     Review review = reviewPersistencePort.findById(cmd.getReviewId()).get();
     review.changeContent(cmd.getContent());
@@ -63,7 +68,9 @@ public class ReviewService implements ReviewUseCase {
   }
 
   @Override
-  @ResourceAccessPermissionRequired(permissionType = ReviewPermission.class)
+  @PermissionRequired(
+    permissionType = ReviewPermission.class
+  )
   public void deleteReview(@ReviewId UUID reviewId) {
     reviewPersistencePort.deleteById(reviewId);
   }

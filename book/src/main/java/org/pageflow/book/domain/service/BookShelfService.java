@@ -13,7 +13,7 @@ import org.pageflow.book.port.in.BookShelfUseCase;
 import org.pageflow.book.port.out.LoadAuthorPort;
 import org.pageflow.book.port.out.jpa.BookPersistencePort;
 import org.pageflow.book.port.out.jpa.ShelfItemPersistencePort;
-import org.pageflow.common.permission.ResourceAccessPermissionRequired;
+import org.pageflow.common.permission.PermissionRequired;
 import org.pageflow.common.user.UID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,7 +35,10 @@ public class BookShelfService implements BookShelfUseCase {
 
 
   @Override
-  @ResourceAccessPermissionRequired(actions = { "READ" }, permissionType = BookPermission.class)
+  @PermissionRequired(
+    actions = {"READ"},
+    permissionType = BookPermission.class
+  )
   public BookDto addBookToShelf(@BookId UUID bookId, UID shlefOwnerId) {
     Book book = bookPersistencePort.findById(bookId).get();
     Author shelfOwner = loadAuthorPort.loadAuthorProxy(shlefOwnerId);
@@ -45,7 +48,10 @@ public class BookShelfService implements BookShelfUseCase {
   }
 
   @Override
-  @ResourceAccessPermissionRequired(actions = { "READ" }, permissionType = BookPermission.class)
+  @PermissionRequired(
+    actions = {"READ"},
+    permissionType = BookPermission.class
+  )
   public void removeBookFromShelf(@BookId UUID bookId, UID shlefOwnerId) {
     shelfItemPersistencePort.deleteByBookIdAndShelfOwnerId(bookId, shlefOwnerId.getValue());
   }

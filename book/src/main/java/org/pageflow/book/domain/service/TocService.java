@@ -23,7 +23,7 @@ import org.pageflow.book.port.out.jpa.BookPersistencePort;
 import org.pageflow.book.port.out.jpa.FolderPersistencePort;
 import org.pageflow.book.port.out.jpa.NodePersistencePort;
 import org.pageflow.book.port.out.jpa.SectionPersistencePort;
-import org.pageflow.common.permission.ResourceAccessPermissionRequired;
+import org.pageflow.common.permission.PermissionRequired;
 import org.pageflow.common.result.MessageData;
 import org.pageflow.common.result.ProcessResultException;
 import org.pageflow.common.result.Result;
@@ -48,7 +48,10 @@ public class TocService implements TocUseCase, TocNodeUseCase {
 
 
   @Override
-  @ResourceAccessPermissionRequired(actions = { "EDIT" }, permissionType = BookPermission.class)
+  @PermissionRequired(
+    actions = { "EDIT" },
+    permissionType = BookPermission.class
+  )
   public void replaceNode(@BookId UUID bookId, ReplaceNodeCmd cmd) {
     TocNode node = nodePersistencePort.findById(cmd.getNodeId()).orElseThrow();
     if(node.getParentNode() == null){
@@ -71,7 +74,10 @@ public class TocService implements TocUseCase, TocNodeUseCase {
   }
 
   @Override
-  @ResourceAccessPermissionRequired(actions = { "READ" }, permissionType = BookPermission.class)
+  @PermissionRequired(
+    actions = { "READ" },
+    permissionType = BookPermission.class
+  )
   public TocDto.Toc loadToc(@BookId UUID bookId) {
     List<NodeProjection> nodeProjections = nodePersistencePort.queryNodesByBookId(bookId);
     TocDto.Folder root = buildTree(bookId, nodeProjections);
@@ -79,7 +85,10 @@ public class TocService implements TocUseCase, TocNodeUseCase {
   }
 
   @Override
-  @ResourceAccessPermissionRequired(actions = { "EDIT" }, permissionType = BookPermission.class)
+  @PermissionRequired(
+    actions = { "EDIT" },
+    permissionType = BookPermission.class
+  )
   public FolderDto createFolder(@BookId UUID bookId, CreateFolderCmd cmd) {
     UUID parentId = cmd.getParentNodeId();
     UUID folderId = UUID.randomUUID();
@@ -102,14 +111,20 @@ public class TocService implements TocUseCase, TocNodeUseCase {
   }
 
   @Override
-  @ResourceAccessPermissionRequired(actions = { "READ" }, permissionType = BookPermission.class)
+  @PermissionRequired(
+    actions = { "READ" },
+    permissionType = BookPermission.class
+  )
   public FolderDto queryFolder(@BookId UUID bookId, UUID folderId) {
     TocNode node = nodePersistencePort.findById(folderId).get();
     return FolderDto.from(node);
   }
 
   @Override
-  @ResourceAccessPermissionRequired(actions = { "EDIT" }, permissionType = BookPermission.class)
+  @PermissionRequired(
+    actions = { "EDIT" },
+    permissionType = BookPermission.class
+  )
   public FolderDto updateFolder(@BookId UUID bookId, UpdateFolderCmd cmd) {
     Folder folder = folderPersistencePort.findById(cmd.getId()).get();
     folder.changeTitle(cmd.getTitle().getValue());
@@ -117,7 +132,10 @@ public class TocService implements TocUseCase, TocNodeUseCase {
   }
 
   @Override
-  @ResourceAccessPermissionRequired(actions = { "EDIT" }, permissionType = BookPermission.class)
+  @PermissionRequired(
+    actions = { "EDIT" },
+    permissionType = BookPermission.class
+  )
   public void deleteFolder(@BookId UUID bookId, UUID folderId) {
     this.deleteNode(folderId);
   }
@@ -127,7 +145,10 @@ public class TocService implements TocUseCase, TocNodeUseCase {
   }
 
   @Override
-  @ResourceAccessPermissionRequired(actions = { "EDIT" }, permissionType = BookPermission.class)
+  @PermissionRequired(
+    actions = { "EDIT" },
+    permissionType = BookPermission.class
+  )
   public SectionDtoWithContent createSection(@BookId UUID bookId, CreateSectionCmd cmd) {
     UUID parentId = cmd.getParentNodeId();
     UUID sectionId = UUID.randomUUID();
@@ -152,21 +173,30 @@ public class TocService implements TocUseCase, TocNodeUseCase {
   }
 
   @Override
-  @ResourceAccessPermissionRequired(actions = { "READ" }, permissionType = BookPermission.class)
+  @PermissionRequired(
+    actions = { "READ" },
+    permissionType = BookPermission.class
+  )
   public SectionDto querySection(@BookId UUID bookId, UUID sectionId) {
     TocNode node = nodePersistencePort.findById(sectionId).get();
     return SectionDto.from(node);
   }
 
   @Override
-  @ResourceAccessPermissionRequired(actions = { "READ" }, permissionType = BookPermission.class)
+  @PermissionRequired(
+    actions = { "READ" },
+    permissionType = BookPermission.class
+  )
   public SectionDtoWithContent querySectionWithContent(@BookId UUID bookId, UUID sectionId) {
     Section section = sectionPersistencePort.findById(sectionId).get();
     return SectionDtoWithContent.from(section);
   }
 
   @Override
-  @ResourceAccessPermissionRequired(actions = { "EDIT" }, permissionType = BookPermission.class)
+  @PermissionRequired(
+    actions = { "EDIT" },
+    permissionType = BookPermission.class
+  )
   public SectionDtoWithContent updateSection(@BookId UUID bookId, UpdateSectionCmd cmd) {
     Section section = sectionPersistencePort.findById(cmd.getId()).get();
     section.changeTitle(cmd.getTitle().getValue());
@@ -175,7 +205,10 @@ public class TocService implements TocUseCase, TocNodeUseCase {
   }
 
   @Override
-  @ResourceAccessPermissionRequired(actions = { "EDIT" }, permissionType = BookPermission.class)
+  @PermissionRequired(
+    actions = { "EDIT" },
+    permissionType = BookPermission.class
+  )
   public void deleteSection(@BookId UUID bookId, UUID sectionId) {
     this.deleteNode(sectionId);
   }

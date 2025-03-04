@@ -4,7 +4,7 @@ import java.util.List;
 
 /**
  * 특정 요청, 일반적으로는 해당 리소스에 접근하는 주체(사용자)가 보장되는 context 안에서만 유지되는 permission들을 관리한다.
- * {@link ResourceAccessPermissionRequired}을 사용하기 위해서는 요구되는 Permission을 해당 인터페이스를 이용하여 할당해야한다.
+ * {@link PermissionRequired}을 사용하기 위해서는 요구되는 Permission을 해당 인터페이스를 이용하여 할당해야한다.
  * @author : sechan
  */
 public interface ResourcePermissionAware {

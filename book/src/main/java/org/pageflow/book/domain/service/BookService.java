@@ -16,7 +16,7 @@ import org.pageflow.book.port.in.BookUseCase;
 import org.pageflow.book.port.out.LoadAuthorPort;
 import org.pageflow.book.port.out.jpa.BookPersistencePort;
 import org.pageflow.book.port.out.jpa.FolderPersistencePort;
-import org.pageflow.common.permission.ResourceAccessPermissionRequired;
+import org.pageflow.common.permission.PermissionRequired;
 import org.pageflow.common.property.ApplicationProperties;
 import org.pageflow.common.user.UID;
 import org.pageflow.common.validation.ImageUrlValidator;
@@ -82,7 +82,10 @@ public class BookService implements BookUseCase {
 
 
   @Override
-  @ResourceAccessPermissionRequired(actions = { "READ" }, permissionType = BookPermission.class)
+  @PermissionRequired(
+    actions = { "READ" },
+    permissionType = BookPermission.class
+  )
   public BookDtoWithAuthor queryBook(@BookId UUID bookId) {
     Book book = bookPersistencePort.findBookWithAuthorById(bookId).get();
     return BookDtoWithAuthor.from(book);
@@ -101,7 +104,10 @@ public class BookService implements BookUseCase {
   }
 
   @Override
-  @ResourceAccessPermissionRequired(actions = { "EDIT" }, permissionType = BookPermission.class)
+  @PermissionRequired(
+    actions = { "EDIT" },
+    permissionType = BookPermission.class
+  )
   public BookDto changeBookTitle(@BookId UUID bookId, BookTitle title) {
     Book book = bookPersistencePort.findById(bookId).get();
     book.changeTitle(title);
@@ -109,7 +115,10 @@ public class BookService implements BookUseCase {
   }
 
   @Override
-  @ResourceAccessPermissionRequired(actions = { "EDIT" }, permissionType = BookPermission.class)
+  @PermissionRequired(
+    actions = { "EDIT" },
+    permissionType = BookPermission.class
+  )
   public BookDto changeBookCoverImage(@BookId UUID bookId, MultipartFile coverImage) {
     Book book = bookPersistencePort.findById(bookId).get();
 
@@ -125,7 +134,10 @@ public class BookService implements BookUseCase {
   }
 
   @Override
-  @ResourceAccessPermissionRequired(actions = { "DELETE" }, permissionType = BookPermission.class)
+  @PermissionRequired(
+    actions = { "DELETE" },
+    permissionType = BookPermission.class
+  )
   public void deleteBook(@BookId UUID bookId) {
     Book book = bookPersistencePort.findById(bookId).get();
     bookPersistencePort.delete(book);

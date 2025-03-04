@@ -12,7 +12,7 @@ import java.lang.annotation.*;
 @Target(ElementType.METHOD)
 @Repeatable(RAPRs.class)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ResourceAccessPermissionRequired {
+public @interface PermissionRequired {
 
   @AliasFor("actions")
   String[] value() default {"FULL"};

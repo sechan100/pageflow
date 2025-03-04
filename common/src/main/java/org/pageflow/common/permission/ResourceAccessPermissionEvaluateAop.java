@@ -31,17 +31,17 @@ public class ResourceAccessPermissionEvaluateAop {
   private final ResourcePermissionAware resourcePermissionAware;
 
   /**
-   * {@link ResourceAccessPermissionRequired} 어노테이션이 부착된 모든 메소드를 대상으로 한다.
+   * {@link PermissionRequired} 어노테이션이 부착된 모든 메소드를 대상으로 한다.
    */
-  @Pointcut("@annotation(org.pageflow.common.permission.ResourceAccessPermissionRequired)")
+  @Pointcut("@annotation(org.pageflow.common.permission.PermissionRequired)")
   public void resourcePermissionRequiredMethods(){}
 
 
   @Before("resourcePermissionRequiredMethods()")
   public <ID> void evaluatePermission(JoinPoint joinPoint){
-    ResourceAccessPermissionRequired[] annotations = this.extractAnnotations(joinPoint);
+    PermissionRequired[] annotations = this.extractAnnotations(joinPoint);
 
-    for(ResourceAccessPermissionRequired a : annotations){
+    for(PermissionRequired a : annotations){
       Class<? extends ResourcePermission> permissionType = a.permissionType();
       List<ResourcePermission> permissions = resourcePermissionAware.getResourcePermissions();
 
@@ -83,10 +83,10 @@ public class ResourceAccessPermissionEvaluateAop {
   }
 
 
-  private ResourceAccessPermissionRequired[] extractAnnotations(JoinPoint joinPoint){
+  private PermissionRequired[] extractAnnotations(JoinPoint joinPoint){
     MethodSignature signature = (MethodSignature) joinPoint.getSignature();
     Method method = signature.getMethod();
-    ResourceAccessPermissionRequired[] annotations = method.getAnnotationsByType(ResourceAccessPermissionRequired.class);
+    PermissionRequired[] annotations = method.getAnnotationsByType(PermissionRequired.class);
     return annotations;
   }
 

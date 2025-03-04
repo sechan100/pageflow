@@ -1,6 +1,7 @@
 package org.pageflow.test.e2e.shared;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -12,11 +13,12 @@ import org.pageflow.common.result.code.ResultCode;
  * @author : sechan
  */
 @RequiredArgsConstructor
-public class ApiResponseWrapper {
+public class TestRes<T> {
+  private final ApiResponse<T> apiResponse;
   @Getter
-  private final ApiResponse apiResponse;
+  private final JsonNode data;
 
-  public ApiResponseWrapper isSuccess() {
+  public TestRes isSuccess() {
     ObjectMapper objectMapper = new ObjectMapper();
     try {
     assert apiResponse.getCode().equals(CommonCode.SUCCESS.name()):
@@ -27,7 +29,7 @@ public class ApiResponseWrapper {
     return this;
   }
 
-  public ApiResponseWrapper is(ResultCode code){
+  public TestRes is(ResultCode code){
     assert apiResponse.getCode().equals(code.name()): "Unexpected Code: expected: " + code.name() + ", actual: " + apiResponse.getCode();
     return this;
   }

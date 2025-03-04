@@ -1,5 +1,8 @@
 package org.pageflow.test.e2e.shared;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import org.pageflow.common.api.ApiResponse;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -15,47 +18,55 @@ import org.springframework.lang.Nullable;
 @Getter
 public class API {
   private final TestRestTemplate delegate;
+  private final ObjectMapper objectMapper;
   private final HttpHeaders headers;
 
-  public API(TestRestTemplate delegate) {
+  public API(TestRestTemplate delegate, ObjectMapper objectMapper) {
     this.delegate = delegate;
+    this.objectMapper = objectMapper;
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_JSON);
     this.headers = headers;
   }
 
 
-  public ApiResponseWrapper get(String url) {
+  public TestRes get(String url) {
     return _wrap(
       delegate.exchange(
         url,
         HttpMethod.GET,
         _httpEntity(null),
-        ApiResponse.class
-      ).getBody()
-    );
+        String.class
+      ).getBody());
   }
 
-  public ApiResponseWrapper post(String url, String jsonBody) {
+  public TestRes post(String url, String jsonBody) {
     return _wrap(
       delegate.exchange(
         url,
         HttpMethod.POST,
         _httpEntity(jsonBody),
-        ApiResponse.class
-      ).getBody()
-    );
+        String.class
+      ).getBody());
   }
 
-  public ApiResponseWrapper delete(String url, String jsonBody) {
+  public TestRes delete(String url, String jsonBody) {
     return _wrap(delegate.exchange(
       url,
       HttpMethod.DELETE,
       _httpEntity(jsonBody),
-      ApiResponse.class
+      String.class
     ).getBody());
   }
 
+  public TestRes delete(String url) {
+    return _wrap(delegate.exchange(
+      url,
+      HttpMethod.DELETE,
+      _httpEntity(null),
+      String.class
+    ).getBody());
+  }
 
 
   public API setAccessToken(String accessToken) {
@@ -92,8 +103,13 @@ public class API {
     return this;
   }
 
-  private ApiResponseWrapper _wrap(ApiResponse response) {
-    return new ApiResponseWrapper(response);
+  private TestRes _wrap(String response) {
+    try {
+      JsonNode data = objectMapper.readTree(response).get("data");
+      return new TestRes(objectMapper.readValue(response, ApiResponse.class), data);
+    } catch(JsonProcessingException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   private HttpEntity<String> _httpEntity(@Nullable String jsonBody) {

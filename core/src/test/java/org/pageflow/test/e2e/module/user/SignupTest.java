@@ -1,26 +1,26 @@
 package org.pageflow.test.e2e.module.user;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.pageflow.common.result.code.CommonCode;
 import org.pageflow.test.e2e.config.PageflowIntegrationTest;
 import org.pageflow.test.e2e.shared.API;
-import org.pageflow.test.e2e.shared.ApiResponseWrapper;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.pageflow.test.e2e.shared.TestRes;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.test.annotation.Rollback;
 
 /**
  * @author : sechan
  */
 @PageflowIntegrationTest
-public class SignupExcetuorUseCaseTest {
-  @Autowired
-  private TestRestTemplate restTemplate;
+@RequiredArgsConstructor
+public class SignupTest {
+  private final TestRestTemplate restTemplate;
+  private final ObjectMapper objectMapper;
 
   @Test
-  @Rollback
-  @DisplayName("/signup")
+  @DisplayName("회원가입")
   void signup() {
     String user1 = """
       {
@@ -31,9 +31,9 @@ public class SignupExcetuorUseCaseTest {
       }
     """;
 
-    API e2e = new API(restTemplate);
+    API e2e = new API(restTemplate, objectMapper);
     // 회원가입
-    ApiResponseWrapper result = e2e.post("/signup", user1);
+    TestRes result = e2e.post("/signup", user1);
     result.isSuccess();
 
     // 중복 회원가입

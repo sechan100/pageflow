@@ -1,5 +1,6 @@
 package org.pageflow.test.e2e.shared;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.pageflow.common.api.ApiResponse;
 import org.pageflow.user.port.out.entity.AccountPersistencePort;
@@ -20,15 +21,16 @@ import java.util.Map;
 public class ApiFactory {
   private final TestRestTemplate restTemplate;
   private final AccountPersistencePort port;
+  private final ObjectMapper objectMapper;
 
 
   public API guest() {
-    return new API(restTemplate);
+    return new API(restTemplate, objectMapper);
   }
 
   public API user(String username, String password) {
     LoginResult login = _login(username, password);
-    API api = new API(restTemplate);
+    API api = new API(restTemplate, objectMapper);
     api.setAccessToken(login.getAccessToken());
     api.setSessionIdCookie(login.getSessionIdCookie());
     return api;

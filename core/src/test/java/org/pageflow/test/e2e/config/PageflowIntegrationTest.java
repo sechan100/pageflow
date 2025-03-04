@@ -2,7 +2,7 @@ package org.pageflow.test.e2e.config;
 
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.pageflow.core.PageflowApplication;
-import org.pageflow.test.e2e.data.FixtureExtension;
+import org.pageflow.test.e2e.shared.fixture.FixtureExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.TestConstructor;

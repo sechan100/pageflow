@@ -1,4 +1,4 @@
-package org.pageflow.test.e2e.module.book;
+package org.pageflow.test.e2e.fixture;
 
 import lombok.RequiredArgsConstructor;
 import org.pageflow.book.domain.BookTitle;
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @RequiredArgsConstructor
-public class BookCreator {
+public class Books {
   private final BookUseCase bookUseCase;
 
   public BookDto createBook(UID uid, String title) {

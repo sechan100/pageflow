@@ -1,4 +1,4 @@
-package org.pageflow.test.e2e.data;
+package org.pageflow.test.e2e.shared.fixture;
 
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
@@ -8,7 +8,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,26 +21,23 @@ public class FixtureExtension implements BeforeEachCallback, AfterEachCallback {
     Optional<Method> testMethod = context.getTestMethod();
     if(testMethod.isPresent()) {
       Method method = testMethod.get();
-      Fixture fixture = method.getAnnotation(Fixture.class);
-      if(fixture == null) {
+      Fixture fixtureAnnotation = method.getAnnotation(Fixture.class);
+      if(fixtureAnnotation == null) {
         return;
       }
       ApplicationContext applicationContext = SpringExtension.getApplicationContext(context);
       // DataFixture
-      Class<? extends DataFixture>[] dataFixtureClass = fixture.datas();
-      List<DataFixture> dataFixtures = new ArrayList<>(5);
-      for(Class<? extends DataFixture> clazz : dataFixtureClass) {
-        DataFixture dataFixture = applicationContext.getBean(clazz);
-        dataFixtures.add(dataFixture);
-      }
-      DataFixtureConfiguration dataFixtureConfiguration = new DataFixtureConfiguration(dataFixtures);
-      dataFixtureConfiguration.configure();
-    }
+      Class<? extends TestFixture>[] fixtureClass = fixtureAnnotation.value();
+      for(Class<? extends TestFixture> clazz : fixtureClass) {
+    TestFixture fixture = applicationContext.getBean(clazz);
+    fixture.configure();
+  }
+}
 //      context.getStore(ExtensionContext.Namespace.create(FixtureExtension.class)).put("dataFixture", context);
   }
 
-  @Override
-  public void afterEach(ExtensionContext context) {
+@Override
+public void afterEach(ExtensionContext context) {
     ApplicationContext applicationContext = SpringExtension.getApplicationContext(context);
     JdbcTemplate jdbcTemplate = applicationContext.getBean(JdbcTemplate.class);
     List<String> tableNames = jdbcTemplate.queryForList(

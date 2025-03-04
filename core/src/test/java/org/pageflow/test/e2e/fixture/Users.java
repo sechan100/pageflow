@@ -1,8 +1,8 @@
-package org.pageflow.test.e2e.data.fixture;
+package org.pageflow.test.e2e.fixture;
 
 import lombok.RequiredArgsConstructor;
 import org.pageflow.common.user.RoleType;
-import org.pageflow.test.e2e.data.DataFixture;
+import org.pageflow.test.e2e.shared.fixture.TestFixture;
 import org.pageflow.user.dto.UserDto;
 import org.pageflow.user.port.in.SignupCmd;
 import org.pageflow.user.port.in.SignupUseCase;
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @RequiredArgsConstructor
-public class Signup implements DataFixture {
+public class Users implements TestFixture {
   private static final int USER_COUNT = 10;
   private final SignupUseCase signupUseCase;
 

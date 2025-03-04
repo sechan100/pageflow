@@ -1,4 +1,4 @@
-package org.pageflow.test.e2e.data;
+package org.pageflow.test.e2e.shared.fixture;
 
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -9,6 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
  * @author : sechan
  */
 @Transactional(propagation = Propagation.REQUIRES_NEW)
-public interface DataFixture {
+public interface TestFixture {
   void configure();
 }

@@ -1,4 +1,4 @@
-package org.pageflow.test.e2e.module.user;
+package org.pageflow.test.module.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;

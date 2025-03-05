@@ -1,4 +1,4 @@
-package org.pageflow.test.e2e.module.user;
+package org.pageflow.test.module.user;
 
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.DisplayName;
@@ -6,11 +6,11 @@ import org.junit.jupiter.api.Test;
 import org.pageflow.common.result.code.CommonCode;
 import org.pageflow.test.e2e.config.PageflowIntegrationTest;
 import org.pageflow.test.e2e.fixture.Users;
-import org.pageflow.test.e2e.module.user.shared.TestAccessTokenIssuer;
 import org.pageflow.test.e2e.shared.API;
 import org.pageflow.test.e2e.shared.ApiFactory;
 import org.pageflow.test.e2e.shared.TestRes;
 import org.pageflow.test.e2e.shared.fixture.Fixture;
+import org.pageflow.test.module.user.shared.TestAccessTokenIssuer;
 import org.pageflow.user.application.UserCode;
 
 /**

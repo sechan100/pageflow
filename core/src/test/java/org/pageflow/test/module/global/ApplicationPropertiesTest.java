@@ -1,4 +1,4 @@
-package org.pageflow.test.global;
+package org.pageflow.test.module.global;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

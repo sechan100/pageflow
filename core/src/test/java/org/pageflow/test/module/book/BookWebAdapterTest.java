@@ -1,4 +1,4 @@
-package org.pageflow.test.e2e.module.book;
+package org.pageflow.test.module.book;
 
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Assertions;

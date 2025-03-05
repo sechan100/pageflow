@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.pageflow.common.result.code.CommonCode;
 import org.pageflow.common.user.UID;
 import org.pageflow.test.e2e.config.PageflowIntegrationTest;
-import org.pageflow.test.e2e.fixture.Users;
+import org.pageflow.test.e2e.fixture.UserFixture;
 import org.pageflow.test.e2e.shared.API;
 import org.pageflow.test.e2e.shared.ApiFactory;
 import org.pageflow.test.e2e.shared.TestRes;
@@ -25,7 +25,7 @@ public class BookWebAdapterTest {
   private final ApiFactory apiFactory;
 
   @Test
-  @Fixture(Users.class)
+  @Fixture(UserFixture.class)
   @DisplayName("책 CRUD")
   void bookCrudTest() {
     API userApi = apiFactory.user("user1", "user1");
@@ -61,7 +61,7 @@ public class BookWebAdapterTest {
   }
 
   @Test
-  @Fixture(Users.class)
+  @Fixture(UserFixture.class)
   @DisplayName("목차(TOC) 관련 테스트")
   void tocTest() {
     API userApi = apiFactory.user("user1", "user1");
@@ -121,7 +121,7 @@ public class BookWebAdapterTest {
   }
 
   @Test
-  @Fixture(Users.class)
+  @Fixture(UserFixture.class)
   @DisplayName("책 리뷰 기능 테스트")
   void reviewTest() {
     API user1 = apiFactory.user("user1", "user1");
@@ -174,7 +174,7 @@ public class BookWebAdapterTest {
   }
 
   @Test
-  @Fixture(Users.class)
+  @Fixture(UserFixture.class)
   @DisplayName("책장 기능 테스트")
   void shelfTest() {
     API userApi = apiFactory.user("user1", "user1");

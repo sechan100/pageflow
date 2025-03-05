@@ -13,7 +13,7 @@ import org.pageflow.book.port.in.cmd.UpdateReviewCmd;
 import org.pageflow.book.port.in.review.ReviewAccessPermitter;
 import org.pageflow.book.port.in.review.ReviewUseCase;
 import org.pageflow.common.api.RequestContext;
-import org.pageflow.common.permission.ResourcePermissionAware;
+import org.pageflow.common.permission.ResourcePermissionContext;
 import org.pageflow.common.user.UID;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -31,7 +31,7 @@ public class ReviewWebAdapter {
   private final ReviewUseCase reviewUseCase;
   private final RequestContext rqcxt;
   private final ReviewAccessPermitter reviewPermitter;
-  private final ResourcePermissionAware permissionAware;
+  private final ResourcePermissionContext permissionAware;
 
 
   @PostMapping("")

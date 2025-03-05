@@ -49,12 +49,12 @@ public class TocService implements TocUseCase, TocNodeUseCase {
 
   @Override
   @PermissionRequired(
-    actions = { "EDIT" },
+    actions = {"EDIT"},
     permissionType = BookPermission.class
   )
   public void relocateNode(@BookId UUID bookId, RelocateNodeCmd cmd) {
     TocNode target = nodePersistencePort.findById(cmd.getNodeId()).orElseThrow();
-    if(target.isRootFolder()){
+    if(target.isRootFolder()) {
       Result hierarchyViolationResult = Result.of(
         BookCode.TOC_HIERARCHY_VIOLATION,
         MessageData.of("root folder node는 이동할 수 없습니다.")
@@ -65,11 +65,11 @@ public class TocService implements TocUseCase, TocNodeUseCase {
     UUID destFolderId = cmd.getDestFolderId();
     Folder folderWithChildren = folderPersistencePort.findWithChildrenById(destFolderId);
     NodeRelocator relocator = new NodeRelocator(folderWithChildren);
-    // Reorder
-    if(target.ensureParentNode().getId().equals(destFolderId)){
+    if(target.ensureParentNode().getId().equals(destFolderId)) {
+      // Reorder
       relocator.reorder(cmd.getDestIndex(), target);
-    // Reparent
     } else {
+      // Reparent
       List<TocNode> allBookNodes = nodePersistencePort.findAllByBookId(bookId);
       relocator.reparent(cmd.getDestIndex(), target, allBookNodes);
     }
@@ -77,7 +77,7 @@ public class TocService implements TocUseCase, TocNodeUseCase {
 
   @Override
   @PermissionRequired(
-    actions = { "READ" },
+    actions = {"READ"},
     permissionType = BookPermission.class
   )
   public TocDto.Toc loadToc(@BookId UUID bookId) {
@@ -88,7 +88,7 @@ public class TocService implements TocUseCase, TocNodeUseCase {
 
   @Override
   @PermissionRequired(
-    actions = { "EDIT" },
+    actions = {"EDIT"},
     permissionType = BookPermission.class
   )
   public FolderDto createFolder(@BookId UUID bookId, CreateFolderCmd cmd) {
@@ -114,7 +114,7 @@ public class TocService implements TocUseCase, TocNodeUseCase {
 
   @Override
   @PermissionRequired(
-    actions = { "READ" },
+    actions = {"READ"},
     permissionType = BookPermission.class
   )
   public FolderDto queryFolder(@BookId UUID bookId, UUID folderId) {
@@ -124,7 +124,7 @@ public class TocService implements TocUseCase, TocNodeUseCase {
 
   @Override
   @PermissionRequired(
-    actions = { "EDIT" },
+    actions = {"EDIT"},
     permissionType = BookPermission.class
   )
   public FolderDto updateFolder(@BookId UUID bookId, UpdateFolderCmd cmd) {
@@ -135,7 +135,7 @@ public class TocService implements TocUseCase, TocNodeUseCase {
 
   @Override
   @PermissionRequired(
-    actions = { "EDIT" },
+    actions = {"EDIT"},
     permissionType = BookPermission.class
   )
   public void deleteFolder(@BookId UUID bookId, UUID folderId) {
@@ -148,7 +148,7 @@ public class TocService implements TocUseCase, TocNodeUseCase {
 
   @Override
   @PermissionRequired(
-    actions = { "EDIT" },
+    actions = {"EDIT"},
     permissionType = BookPermission.class
   )
   public SectionDtoWithContent createSection(@BookId UUID bookId, CreateSectionCmd cmd) {
@@ -176,7 +176,7 @@ public class TocService implements TocUseCase, TocNodeUseCase {
 
   @Override
   @PermissionRequired(
-    actions = { "READ" },
+    actions = {"READ"},
     permissionType = BookPermission.class
   )
   public SectionDto querySection(@BookId UUID bookId, UUID sectionId) {
@@ -186,7 +186,7 @@ public class TocService implements TocUseCase, TocNodeUseCase {
 
   @Override
   @PermissionRequired(
-    actions = { "READ" },
+    actions = {"READ"},
     permissionType = BookPermission.class
   )
   public SectionDtoWithContent querySectionWithContent(@BookId UUID bookId, UUID sectionId) {
@@ -196,7 +196,7 @@ public class TocService implements TocUseCase, TocNodeUseCase {
 
   @Override
   @PermissionRequired(
-    actions = { "EDIT" },
+    actions = {"EDIT"},
     permissionType = BookPermission.class
   )
   public SectionDtoWithContent updateSection(@BookId UUID bookId, UpdateSectionCmd cmd) {
@@ -208,7 +208,7 @@ public class TocService implements TocUseCase, TocNodeUseCase {
 
   @Override
   @PermissionRequired(
-    actions = { "EDIT" },
+    actions = {"EDIT"},
     permissionType = BookPermission.class
   )
   public void deleteSection(@BookId UUID bookId, UUID sectionId) {
@@ -226,10 +226,10 @@ public class TocService implements TocUseCase, TocNodeUseCase {
       .collect(Collectors.toMap(NodeProjection::getId, p -> p));
 
     NodeProjection rootProjection = null;
-    for(NodeProjection p : projections){
+    for(NodeProjection p : projections) {
       UUID parentId = p.getParentId();
       // Root Folder
-      if(parentId == null){
+      if(parentId == null) {
         rootProjection = p;
         continue;
       }
@@ -252,9 +252,9 @@ public class TocService implements TocUseCase, TocNodeUseCase {
   }
 
   private TocDto.Node projectRecursively(NodeProjection projection) {
-    if(projection.getType().equals(Folder.class)){
+    if(projection.getType().equals(Folder.class)) {
       List<TocDto.Node> children;
-      if(projection.getChildren()!=null){
+      if(projection.getChildren() != null) {
         children = projection.getChildren().stream()
           .map(c -> this.projectRecursively(c))
           .toList();

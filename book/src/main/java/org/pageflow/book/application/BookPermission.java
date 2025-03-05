@@ -27,15 +27,15 @@ public class BookPermission implements ResourcePermission<UUID> {
    * @param author
    * @return
    */
-  public static BookPermission author(UUID bookId) {
+  public static BookPermission ofAuthor(UUID bookId) {
     return new BookPermission(bookId, BookAction.values());
   }
 
-  public static BookPermission reader(UUID bookId) {
+  public static BookPermission ofReader(UUID bookId) {
     return new BookPermission(bookId, BookAction.READ);
   }
 
-  public static BookPermission denied(UUID bookId) {
+  public static BookPermission ofDenied(UUID bookId) {
     return new BookPermission(bookId);
   }
 

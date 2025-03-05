@@ -7,7 +7,7 @@ import java.util.List;
  * {@link PermissionRequired}을 사용하기 위해서는 요구되는 Permission을 해당 인터페이스를 이용하여 할당해야한다.
  * @author : sechan
  */
-public interface ResourcePermissionAware {
+public interface ResourcePermissionContext {
   /**
    * @implSpec 동일한 타입의 permission이 2개 이상 존재하도록 해서는 안된다.
    * 특정 리소스에 대한 permission 객체는 Context에서 단 1개만 존재해야한다.

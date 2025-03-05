@@ -32,14 +32,14 @@ public class DefaultBookAccessPermitter implements BookAccessPermitter {
 
     boolean isAuthor = book.getAuthor().getUid().equals(author.getUid());
     if(isAuthor){
-      return BookPermission.author(bookId);
+      return BookPermission.ofAuthor(bookId);
     } else {
       // 작가가 아니라면 책의 상태에 따라 권한을 부여한다.
       boolean isDraft = book.getStatus() == BookStatus.DRAFT;
       if(!isDraft){
-        return BookPermission.reader(bookId);
+        return BookPermission.ofReader(bookId);
       } else {
-        return BookPermission.denied(bookId);
+        return BookPermission.ofDenied(bookId);
       }
 
     }

@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class Users implements TestFixture {
+public class UserFixture implements TestFixture {
   private static final int USER_COUNT = 10;
   private final SignupUseCase signupUseCase;
 

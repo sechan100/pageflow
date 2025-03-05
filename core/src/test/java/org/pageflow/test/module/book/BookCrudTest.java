@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.pageflow.test.e2e.config.PageflowIntegrationTest;
-import org.pageflow.test.e2e.fixture.Users;
+import org.pageflow.test.e2e.fixture.UserFixture;
 import org.pageflow.test.e2e.shared.API;
 import org.pageflow.test.e2e.shared.ApiFactory;
 import org.pageflow.test.e2e.shared.TestRes;
@@ -22,7 +22,7 @@ public class BookCrudTest {
 
 
   @Test
-  @Fixture(Users.class)
+  @Fixture(UserFixture.class)
   @DisplayName("책 CRUD")
   void bookCrudTest(){
     API userApi = apiFactory.user("user1", "user1");

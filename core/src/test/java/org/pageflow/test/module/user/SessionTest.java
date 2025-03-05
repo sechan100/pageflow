@@ -5,7 +5,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.pageflow.common.result.code.CommonCode;
 import org.pageflow.test.e2e.config.PageflowIntegrationTest;
-import org.pageflow.test.e2e.fixture.Users;
+import org.pageflow.test.e2e.fixture.UserFixture;
 import org.pageflow.test.e2e.shared.API;
 import org.pageflow.test.e2e.shared.ApiFactory;
 import org.pageflow.test.e2e.shared.TestRes;
@@ -23,7 +23,7 @@ public class SessionTest {
   private final TestAccessTokenIssuer testAccessTokenIssuer;
 
   @Test
-  @Fixture(Users.class)
+  @Fixture(UserFixture.class)
   @DisplayName("로그인 & 로그아웃")
   void loginLogout() {
     API guestApi = apiFactory.guest();
@@ -44,7 +44,7 @@ public class SessionTest {
   }
 
   @Test
-  @Fixture(Users.class)
+  @Fixture(UserFixture.class)
   @DisplayName("refresh 테스트")
   void accessTokenExpiredAndRefresh() {
     // 로그인

@@ -29,15 +29,15 @@ public class FixtureExtension implements BeforeEachCallback, AfterEachCallback {
       // DataFixture
       Class<? extends TestFixture>[] fixtureClass = fixtureAnnotation.value();
       for(Class<? extends TestFixture> clazz : fixtureClass) {
-    TestFixture fixture = applicationContext.getBean(clazz);
-    fixture.configure();
-  }
-}
+        TestFixture fixture = applicationContext.getBean(clazz);
+        fixture.configure();
+      }
+    }
 //      context.getStore(ExtensionContext.Namespace.create(FixtureExtension.class)).put("dataFixture", context);
   }
 
-@Override
-public void afterEach(ExtensionContext context) {
+  @Override
+  public void afterEach(ExtensionContext context) {
     ApplicationContext applicationContext = SpringExtension.getApplicationContext(context);
     JdbcTemplate jdbcTemplate = applicationContext.getBean(JdbcTemplate.class);
     List<String> tableNames = jdbcTemplate.queryForList(
@@ -46,7 +46,7 @@ public void afterEach(ExtensionContext context) {
     // 외래 키 제약 조건 비활성화 (필요한 경우)
     jdbcTemplate.execute("SET REFERENTIAL_INTEGRITY FALSE");
     // 모든 테이블 truncate
-    for (String tableName : tableNames) {
+    for(String tableName : tableNames) {
       jdbcTemplate.execute("TRUNCATE TABLE " + tableName);
     }
     // 외래 키 제약 조건 다시 활성화

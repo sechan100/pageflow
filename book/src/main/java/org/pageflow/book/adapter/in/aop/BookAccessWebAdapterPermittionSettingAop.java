@@ -12,7 +12,7 @@ import org.pageflow.book.application.BookPermission;
 import org.pageflow.book.port.in.BookAccessPermitter;
 import org.pageflow.common.aop.JoinPointSpELDynamicValueExtractor;
 import org.pageflow.common.api.RequestContext;
-import org.pageflow.common.permission.ResourcePermissionAware;
+import org.pageflow.common.permission.ResourcePermissionContext;
 import org.pageflow.common.user.UID;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.stereotype.Component;
@@ -31,7 +31,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BookAccessWebAdapterPermittionSettingAop {
   private final BookAccessPermitter bookAccessPermitter;
-  private final ResourcePermissionAware resourcePermissionAware;
+  private final ResourcePermissionContext resourcePermissionContext;
   private final RequestContext rqcxt;
 
 
@@ -47,7 +47,7 @@ public class BookAccessWebAdapterPermittionSettingAop {
     UUID bookId = extractBookId(joinPoint);
     UID uid = rqcxt.getUid();
     BookPermission permission = bookAccessPermitter.grant(bookId, uid);
-    resourcePermissionAware.addResourcePermission(permission);
+    resourcePermissionContext.addResourcePermission(permission);
   }
 
   private UUID extractBookId(JoinPoint joinPoint){

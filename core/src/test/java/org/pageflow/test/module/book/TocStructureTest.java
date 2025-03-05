@@ -7,7 +7,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.pageflow.book.application.BookCode;
 import org.pageflow.test.e2e.config.PageflowIntegrationTest;
-import org.pageflow.test.e2e.fixture.Users;
+import org.pageflow.test.e2e.fixture.UserFixture;
 import org.pageflow.test.e2e.shared.API;
 import org.pageflow.test.e2e.shared.ApiFactory;
 import org.pageflow.test.e2e.shared.TestRes;
@@ -29,7 +29,7 @@ public class TocStructureTest {
   private final ApiFactory apiFactory;
 
   @Test
-  @Fixture(Users.class)
+  @Fixture(UserFixture.class)
   @SuppressWarnings("OverlyLongMethod")
   @DisplayName("목차 계층 구조 생성 및 이동 복합 테스트")
   void tocComplexStructureTest() {
@@ -215,7 +215,7 @@ public class TocStructureTest {
   }
 
   @Test
-  @Fixture(Users.class)
+  @Fixture(UserFixture.class)
   @DisplayName("부모 폴더를 자식 폴더로 이동 시 계층 구조 위반 검증")
   void parentToChildMoveTest() {
     // 1. 테스트 셋업 및 책 생성
@@ -244,7 +244,7 @@ public class TocStructureTest {
   }
 
   @Test
-  @Fixture(Users.class)
+  @Fixture(UserFixture.class)
   @DisplayName("부모 폴더를 손자 폴더로 이동 시 계층 구조 위반 검증")
   void parentToGrandchildMoveTest() {
     // 1. 테스트 셋업 및 책 생성
@@ -274,7 +274,7 @@ public class TocStructureTest {
   }
 
   @Test
-  @Fixture(Users.class)
+  @Fixture(UserFixture.class)
   @DisplayName("루트 폴더 이동 시도 시 실패 검증")
   void rootFolderMoveTest() {
     // 1. 테스트 셋업 및 책 생성
@@ -302,7 +302,7 @@ public class TocStructureTest {
   }
 
   @Test
-  @Fixture(Users.class)
+  @Fixture(UserFixture.class)
   @DisplayName("폴더가 자기 자신을 부모로 지정 시도 시 실패 검증")
   void selfParentTest() {
     // 1. 테스트 셋업 및 책 생성
@@ -330,7 +330,7 @@ public class TocStructureTest {
   }
 
   @Test
-  @Fixture(Users.class)
+  @Fixture(UserFixture.class)
   @DisplayName("복잡한 계층 구조에서 순환 참조 시도 시 실패 검증")
   void complexCyclicReferenceTest() {
     // 1. 테스트 셋업 및 책 생성

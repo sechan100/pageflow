@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ResourceAccessPermissionEvaluateAop {
 
-  private final ResourcePermissionAware resourcePermissionAware;
+  private final ResourcePermissionContext resourcePermissionContext;
 
   /**
    * {@link PermissionRequired} 어노테이션이 부착된 모든 메소드를 대상으로 한다.
@@ -43,7 +43,7 @@ public class ResourceAccessPermissionEvaluateAop {
 
     for(PermissionRequired a : annotations){
       Class<? extends ResourcePermission> permissionType = a.permissionType();
-      List<ResourcePermission> permissions = resourcePermissionAware.getResourcePermissions();
+      List<ResourcePermission> permissions = resourcePermissionContext.getResourcePermissions();
 
       // PermissionType으로 permission을 특정
       ResourcePermission<ID> permission = null;

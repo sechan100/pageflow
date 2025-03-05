@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.pageflow.book.application.BookCode;
 import org.pageflow.common.result.code.CommonCode;
 import org.pageflow.test.e2e.config.PageflowIntegrationTest;
-import org.pageflow.test.e2e.fixture.Users;
+import org.pageflow.test.e2e.fixture.UserFixture;
 import org.pageflow.test.e2e.shared.API;
 import org.pageflow.test.e2e.shared.ApiFactory;
 import org.pageflow.test.e2e.shared.TestRes;
@@ -25,7 +25,7 @@ public class StatusTest {
   private final ApiFactory apiFactory;
 
   @Test
-  @Fixture(Users.class)
+  @Fixture(UserFixture.class)
   @DisplayName("책 상태 변경 Happy Path 테스트")
   void bookStatusHappyPathTest() {
     API userApi = apiFactory.user("user1", "user1");
@@ -61,7 +61,7 @@ public class StatusTest {
   }
 
   @Test
-  @Fixture(Users.class)
+  @Fixture(UserFixture.class)
   @DisplayName("Draft 상태에서의 상태 변경 제약 테스트")
   void draftStatusConstraintTest() {
     API userApi = apiFactory.user("user1", "user1");
@@ -93,7 +93,7 @@ public class StatusTest {
   }
 
   @Test
-  @Fixture(Users.class)
+  @Fixture(UserFixture.class)
   @DisplayName("Published 상태에서의 상태 변경 제약 테스트")
   void publishedStatusConstraintTest() {
     API userApi = apiFactory.user("user1", "user1");
@@ -126,7 +126,7 @@ public class StatusTest {
   }
 
   @Test
-  @Fixture(Users.class)
+  @Fixture(UserFixture.class)
   @DisplayName("Revising 상태에서의 상태 변경 제약 테스트")
   void revisingStatusConstraintTest() {
     API userApi = apiFactory.user("user1", "user1");
@@ -159,7 +159,7 @@ public class StatusTest {
   }
 
   @Test
-  @Fixture(Users.class)
+  @Fixture(UserFixture.class)
   @DisplayName("다른 사용자의 책 상태 변경 권한 테스트")
   void bookStatusPermissionTest() {
     API user1 = apiFactory.user("user1", "user1");

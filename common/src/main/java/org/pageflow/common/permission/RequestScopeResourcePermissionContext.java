@@ -12,10 +12,10 @@ import java.util.List;
  */
 @Component
 @RequestScope
-public class RequestScopeResourcePermissionAware implements ResourcePermissionAware {
+public class RequestScopeResourcePermissionContext implements ResourcePermissionContext {
   private final List<ResourcePermission> permissions;
 
-  public RequestScopeResourcePermissionAware() {
+  public RequestScopeResourcePermissionContext() {
     this.permissions = new ArrayList<>();
   }
 

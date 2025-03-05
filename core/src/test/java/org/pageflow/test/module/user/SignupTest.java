@@ -5,9 +5,10 @@ import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.pageflow.common.result.code.CommonCode;
-import org.pageflow.test.e2e.config.PageflowIntegrationTest;
-import org.pageflow.test.e2e.shared.API;
-import org.pageflow.test.e2e.shared.TestRes;
+import org.pageflow.test.e2e.API;
+import org.pageflow.test.e2e.PageflowIntegrationTest;
+import org.pageflow.test.e2e.TestRes;
+import org.pageflow.test.shared.TestResourcePermissionContext;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 
 /**
@@ -18,6 +19,7 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 public class SignupTest {
   private final TestRestTemplate restTemplate;
   private final ObjectMapper objectMapper;
+  private final TestResourcePermissionContext permissionContext;
 
   @Test
   @DisplayName("회원가입")
@@ -31,7 +33,7 @@ public class SignupTest {
       }
     """;
 
-    API e2e = new API(restTemplate, objectMapper);
+    API e2e = new API(restTemplate, objectMapper, permissionContext);
     // 회원가입
     TestRes result = e2e.post("/signup", user1);
     result.isSuccess();

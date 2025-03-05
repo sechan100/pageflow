@@ -1,10 +1,11 @@
-package org.pageflow.test.e2e.shared;
+package org.pageflow.test.e2e;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import org.pageflow.common.api.ApiResponse;
+import org.pageflow.test.shared.TestResourcePermissionContext;
 import org.pageflow.user.adapter.in.res.SessionInfoRes;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpEntity;
@@ -20,11 +21,17 @@ import org.springframework.lang.Nullable;
 public class API {
   private final TestRestTemplate delegate;
   private final ObjectMapper objectMapper;
+  private final TestResourcePermissionContext permissionContext;
   private final HttpHeaders headers;
 
-  public API(TestRestTemplate delegate, ObjectMapper objectMapper) {
+  public API(
+    TestRestTemplate delegate,
+    ObjectMapper objectMapper,
+    TestResourcePermissionContext permissionContext
+  ) {
     this.delegate = delegate;
     this.objectMapper = objectMapper;
+    this.permissionContext = permissionContext;
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_JSON);
     this.headers = headers;
@@ -117,6 +124,8 @@ public class API {
       return new TestRes(objectMapper.readValue(response, ApiResponse.class), data);
     } catch(JsonProcessingException e) {
       throw new RuntimeException(e);
+    } finally {
+      permissionContext.clear();
     }
   }
 

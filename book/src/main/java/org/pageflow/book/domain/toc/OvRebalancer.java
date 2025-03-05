@@ -1,6 +1,5 @@
 package org.pageflow.book.domain.toc;
 
-import com.google.common.base.Preconditions;
 import org.pageflow.book.domain.entity.TocNode;
 import org.springframework.lang.Nullable;
 
@@ -74,18 +73,13 @@ public class OvRebalancer {
 
   /**
    * Rebalancing을 실행한다.
-   * @param nodes ov값에 따라서 오름차순 정렬되어있는 nodes.
-   *              nodes가 비어있는 경우, 아무것도 하지않고 OV_START를 반환한다.
+   * @param nodes 순서대로 새로운 ov를 할당한다. nodes가 비어있는 경우, 아무것도 하지않고 OV_START를 반환한다.
    * @return rebalancing이 끝난 후의 가장 큰 ov값, 즉 list 마지막 인덱스의 node.ov를 반환한다.
    */
   public int rebalance(List<TocNode> nodes) {
     if(nodes.isEmpty()){
       return OV_START;
     }
-    Preconditions.checkState(
-      NodeListAscendingValidator.isAscending(nodes),
-      "nodes이 ov값으로 오름차순 정렬되어있지 않습니다."
-    );
 
     int ov = OV_START;
     for(TocNode node : nodes){

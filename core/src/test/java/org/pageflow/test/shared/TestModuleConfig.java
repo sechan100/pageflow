@@ -1,4 +1,4 @@
-package org.pageflow.test.e2e.config;
+package org.pageflow.test.shared;
 
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 

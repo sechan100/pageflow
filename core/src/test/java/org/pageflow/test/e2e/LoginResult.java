@@ -1,4 +1,4 @@
-package org.pageflow.test.e2e.shared;
+package org.pageflow.test.e2e;
 
 import lombok.Value;
 

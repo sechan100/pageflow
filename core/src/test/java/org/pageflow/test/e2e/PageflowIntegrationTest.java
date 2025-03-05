@@ -1,8 +1,10 @@
-package org.pageflow.test.e2e.config;
+package org.pageflow.test.e2e;
 
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.pageflow.core.PageflowApplication;
-import org.pageflow.test.e2e.shared.fixture.FixtureExtension;
+import org.pageflow.test.shared.TestModuleConfig;
+import org.pageflow.test.shared.extension.DbClearExtension;
+import org.pageflow.test.shared.extension.ResourcePermissionClearExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.TestConstructor;
@@ -22,7 +24,7 @@ import java.lang.annotation.RetentionPolicy;
 @Import(TestModuleConfig.class)
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 @Transactional
-@ExtendWith(FixtureExtension.class)
+@ExtendWith({DbClearExtension.class, ResourcePermissionClearExtension.class})
 @Inherited
 public @interface PageflowIntegrationTest {
 }

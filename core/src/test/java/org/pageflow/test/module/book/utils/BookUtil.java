@@ -1,8 +1,8 @@
 package org.pageflow.test.module.book.utils;
 
 import org.pageflow.book.application.BookPermission;
-import org.pageflow.test.e2e.shared.API;
-import org.pageflow.test.e2e.shared.TestRes;
+import org.pageflow.test.e2e.API;
+import org.pageflow.test.e2e.TestRes;
 
 import java.util.UUID;
 

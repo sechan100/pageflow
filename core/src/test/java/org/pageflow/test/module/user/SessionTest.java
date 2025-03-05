@@ -4,13 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.pageflow.common.result.code.CommonCode;
-import org.pageflow.test.e2e.config.PageflowIntegrationTest;
-import org.pageflow.test.e2e.fixture.UserFixture;
-import org.pageflow.test.e2e.shared.API;
-import org.pageflow.test.e2e.shared.ApiFactory;
-import org.pageflow.test.e2e.shared.TestRes;
-import org.pageflow.test.e2e.shared.fixture.Fixture;
+import org.pageflow.test.e2e.API;
+import org.pageflow.test.e2e.ApiFactory;
+import org.pageflow.test.e2e.PageflowIntegrationTest;
+import org.pageflow.test.e2e.TestRes;
 import org.pageflow.test.module.user.shared.TestAccessTokenIssuer;
+import org.pageflow.test.shared.DataCreator;
 import org.pageflow.user.application.UserCode;
 
 /**
@@ -19,11 +18,11 @@ import org.pageflow.user.application.UserCode;
 @PageflowIntegrationTest
 @RequiredArgsConstructor
 public class SessionTest {
+  private final DataCreator dataCreator;
   private final ApiFactory apiFactory;
   private final TestAccessTokenIssuer testAccessTokenIssuer;
 
   @Test
-  @Fixture(UserFixture.class)
   @DisplayName("로그인 & 로그아웃")
   void loginLogout() {
     API guestApi = apiFactory.guest();
@@ -33,6 +32,7 @@ public class SessionTest {
 
     // 로그인 후에 세션을 조회하면 성공한다.
     String username = "user1";
+    dataCreator.createUser(username);
     API userApi = apiFactory.user(username, username);
     userApi.get("/user/session").isSuccess();
 
@@ -44,11 +44,11 @@ public class SessionTest {
   }
 
   @Test
-  @Fixture(UserFixture.class)
   @DisplayName("refresh 테스트")
   void accessTokenExpiredAndRefresh() {
     // 로그인
     String username = "user1";
+    dataCreator.createUser(username);
     API userApi = apiFactory.user(username, username);
 
     // 만약 토큰이 만료된 경우, session 조회 실패

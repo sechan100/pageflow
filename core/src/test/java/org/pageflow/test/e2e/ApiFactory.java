@@ -1,8 +1,9 @@
-package org.pageflow.test.e2e.shared;
+package org.pageflow.test.e2e;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.pageflow.common.api.ApiResponse;
+import org.pageflow.test.shared.TestResourcePermissionContext;
 import org.pageflow.user.port.out.entity.AccountPersistencePort;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpEntity;
@@ -22,15 +23,16 @@ public class ApiFactory {
   private final TestRestTemplate restTemplate;
   private final AccountPersistencePort port;
   private final ObjectMapper objectMapper;
+  private final TestResourcePermissionContext permissionContext;
 
 
   public API guest() {
-    return new API(restTemplate, objectMapper);
+    return new API(restTemplate, objectMapper, permissionContext);
   }
 
   public API user(String username, String password) {
     LoginResult login = _login(username, password);
-    API api = new API(restTemplate, objectMapper);
+    API api = new API(restTemplate, objectMapper, permissionContext);
     api.setAccessToken(login.getAccessToken());
     api.setSessionIdCookie(login.getSessionIdCookie());
     return api;

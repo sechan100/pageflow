@@ -95,7 +95,9 @@ public class NodeRelocator {
 
     // NODE를 list에 삽입
     parent.addChild(destIndex, target);
+    // 삽입된 node의 앞
     Integer prevOvOrNull = destIndex != 0 ? parent.getChild(destIndex - 1).getOv() : null;
+    // 삽입된 node의 뒤
     Integer nextOvOrNull = destIndex != parent.childrenSize() - 1 ? parent.getChild(destIndex + 1).getOv() : null;
 
     OvRebalancer rebalancer = new OvRebalancer();

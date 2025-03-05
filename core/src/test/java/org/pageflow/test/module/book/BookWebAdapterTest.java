@@ -6,12 +6,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.pageflow.common.result.code.CommonCode;
 import org.pageflow.common.user.UID;
-import org.pageflow.test.e2e.config.PageflowIntegrationTest;
-import org.pageflow.test.e2e.fixture.UserFixture;
-import org.pageflow.test.e2e.shared.API;
-import org.pageflow.test.e2e.shared.ApiFactory;
-import org.pageflow.test.e2e.shared.TestRes;
-import org.pageflow.test.e2e.shared.fixture.Fixture;
+import org.pageflow.test.e2e.API;
+import org.pageflow.test.e2e.ApiFactory;
+import org.pageflow.test.e2e.PageflowIntegrationTest;
+import org.pageflow.test.e2e.TestRes;
+import org.pageflow.test.shared.DataCreator;
 
 import java.util.UUID;
 import java.util.function.Supplier;
@@ -22,12 +21,13 @@ import java.util.function.Supplier;
 @PageflowIntegrationTest
 @RequiredArgsConstructor
 public class BookWebAdapterTest {
+  private final DataCreator dataCreator;
   private final ApiFactory apiFactory;
 
   @Test
-  @Fixture(UserFixture.class)
   @DisplayName("책 CRUD")
   void bookCrudTest() {
+    dataCreator.createUser("user1");
     API userApi = apiFactory.user("user1", "user1");
 
     // 책 생성
@@ -61,9 +61,9 @@ public class BookWebAdapterTest {
   }
 
   @Test
-  @Fixture(UserFixture.class)
   @DisplayName("목차(TOC) 관련 테스트")
   void tocTest() {
+    dataCreator.createUser("user1");
     API userApi = apiFactory.user("user1", "user1");
 
     // 책 생성
@@ -121,9 +121,10 @@ public class BookWebAdapterTest {
   }
 
   @Test
-  @Fixture(UserFixture.class)
   @DisplayName("책 리뷰 기능 테스트")
   void reviewTest() {
+    dataCreator.createUser("user1");
+    dataCreator.createUser("user2");
     API user1 = apiFactory.user("user1", "user1");
     API user2 = apiFactory.user("user2", "user2");
 
@@ -174,9 +175,10 @@ public class BookWebAdapterTest {
   }
 
   @Test
-  @Fixture(UserFixture.class)
   @DisplayName("책장 기능 테스트")
   void shelfTest() {
+    dataCreator.createUser("user1");
+    dataCreator.createUser("user2");
     API userApi = apiFactory.user("user1", "user1");
     API user2Api = apiFactory.user("user2", "user2");
 

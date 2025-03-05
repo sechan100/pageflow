@@ -3,12 +3,11 @@ package org.pageflow.test.module.book;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.pageflow.test.e2e.config.PageflowIntegrationTest;
-import org.pageflow.test.e2e.fixture.UserFixture;
-import org.pageflow.test.e2e.shared.API;
-import org.pageflow.test.e2e.shared.ApiFactory;
-import org.pageflow.test.e2e.shared.TestRes;
-import org.pageflow.test.e2e.shared.fixture.Fixture;
+import org.pageflow.test.e2e.API;
+import org.pageflow.test.e2e.ApiFactory;
+import org.pageflow.test.e2e.PageflowIntegrationTest;
+import org.pageflow.test.e2e.TestRes;
+import org.pageflow.test.shared.DataCreator;
 
 import java.util.UUID;
 
@@ -18,13 +17,14 @@ import java.util.UUID;
 @PageflowIntegrationTest
 @RequiredArgsConstructor
 public class BookCrudTest {
+  private final DataCreator dataCreator;
   private final ApiFactory apiFactory;
 
 
   @Test
-  @Fixture(UserFixture.class)
   @DisplayName("책 CRUD")
   void bookCrudTest(){
+    dataCreator.createUser("user1");
     API userApi = apiFactory.user("user1", "user1");
 
     // 책 생성

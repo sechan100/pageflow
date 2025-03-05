@@ -13,4 +13,8 @@ public class RelocateNodeCmd {
   UUID nodeId;
   UUID destFolderId;
   int destIndex;
+
+  public static RelocateNodeCmd of(UUID bookId, UUID nodeId, UUID destFolderId, int destIndex) {
+    return new RelocateNodeCmd(bookId, nodeId, destFolderId, destIndex);
+  }
 }

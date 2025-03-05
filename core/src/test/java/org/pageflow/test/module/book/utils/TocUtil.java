@@ -2,8 +2,8 @@ package org.pageflow.test.module.book.utils;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.jupiter.api.Assertions;
-import org.pageflow.test.e2e.shared.API;
-import org.pageflow.test.e2e.shared.TestRes;
+import org.pageflow.test.e2e.API;
+import org.pageflow.test.e2e.TestRes;
 
 import java.util.List;
 import java.util.UUID;

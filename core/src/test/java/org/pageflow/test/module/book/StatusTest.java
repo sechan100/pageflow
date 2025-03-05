@@ -5,12 +5,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.pageflow.book.application.BookCode;
 import org.pageflow.common.result.code.CommonCode;
-import org.pageflow.test.e2e.config.PageflowIntegrationTest;
-import org.pageflow.test.e2e.fixture.UserFixture;
-import org.pageflow.test.e2e.shared.API;
-import org.pageflow.test.e2e.shared.ApiFactory;
-import org.pageflow.test.e2e.shared.TestRes;
-import org.pageflow.test.e2e.shared.fixture.Fixture;
+import org.pageflow.test.e2e.API;
+import org.pageflow.test.e2e.ApiFactory;
+import org.pageflow.test.e2e.PageflowIntegrationTest;
+import org.pageflow.test.e2e.TestRes;
+import org.pageflow.test.shared.DataCreator;
 
 import java.util.UUID;
 
@@ -22,12 +21,13 @@ import java.util.UUID;
 @PageflowIntegrationTest
 @RequiredArgsConstructor
 public class StatusTest {
+  private final DataCreator dataCreator;
   private final ApiFactory apiFactory;
 
   @Test
-  @Fixture(UserFixture.class)
   @DisplayName("책 상태 변경 Happy Path 테스트")
   void bookStatusHappyPathTest() {
+    dataCreator.createUser("user1");
     API userApi = apiFactory.user("user1", "user1");
 
     // 책 생성 (기본 상태: DRAFT)
@@ -61,9 +61,9 @@ public class StatusTest {
   }
 
   @Test
-  @Fixture(UserFixture.class)
   @DisplayName("Draft 상태에서의 상태 변경 제약 테스트")
   void draftStatusConstraintTest() {
+    dataCreator.createUser("user1");
     API userApi = apiFactory.user("user1", "user1");
 
     // 책 생성 (기본 상태: DRAFT)
@@ -93,9 +93,9 @@ public class StatusTest {
   }
 
   @Test
-  @Fixture(UserFixture.class)
   @DisplayName("Published 상태에서의 상태 변경 제약 테스트")
   void publishedStatusConstraintTest() {
+    dataCreator.createUser("user1");
     API userApi = apiFactory.user("user1", "user1");
 
     // 책 생성 및 출판
@@ -126,9 +126,9 @@ public class StatusTest {
   }
 
   @Test
-  @Fixture(UserFixture.class)
   @DisplayName("Revising 상태에서의 상태 변경 제약 테스트")
   void revisingStatusConstraintTest() {
+    dataCreator.createUser("user1");
     API userApi = apiFactory.user("user1", "user1");
 
     // 책 생성, 출판, 개정 상태로 변경
@@ -159,9 +159,10 @@ public class StatusTest {
   }
 
   @Test
-  @Fixture(UserFixture.class)
   @DisplayName("다른 사용자의 책 상태 변경 권한 테스트")
   void bookStatusPermissionTest() {
+    dataCreator.createUser("user1");
+    dataCreator.createUser("user2");
     API user1 = apiFactory.user("user1", "user1");
     API user2 = apiFactory.user("user2", "user2");
 

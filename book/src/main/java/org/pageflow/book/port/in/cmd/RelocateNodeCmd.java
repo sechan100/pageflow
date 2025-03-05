@@ -8,7 +8,7 @@ import java.util.UUID;
  * @author : sechan
  */
 @Value
-public class ReplaceNodeCmd {
+public class RelocateNodeCmd {
   UUID bookId;
   UUID nodeId;
   UUID destFolderId;

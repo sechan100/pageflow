@@ -11,7 +11,7 @@ import org.pageflow.book.domain.entity.Section;
 import org.pageflow.book.domain.entity.TocNode;
 import org.pageflow.book.domain.toc.LastIndexInserter;
 import org.pageflow.book.domain.toc.NodeProjection;
-import org.pageflow.book.domain.toc.NodeReplacer;
+import org.pageflow.book.domain.toc.NodeRelocator;
 import org.pageflow.book.dto.FolderDto;
 import org.pageflow.book.dto.SectionDto;
 import org.pageflow.book.dto.SectionDtoWithContent;
@@ -52,23 +52,26 @@ public class TocService implements TocUseCase, TocNodeUseCase {
     actions = { "EDIT" },
     permissionType = BookPermission.class
   )
-  public void replaceNode(@BookId UUID bookId, ReplaceNodeCmd cmd) {
-    TocNode node = nodePersistencePort.findById(cmd.getNodeId()).orElseThrow();
-    if(node.getParentNode() == null){
-      throw new ProcessResultException(Result.of(
-        BookCode.TOC_HIERARCHY_VIOLATION, MessageData.of("root folder node는 이동할 수 없습니다.")
-      ));
+  public void relocateNode(@BookId UUID bookId, RelocateNodeCmd cmd) {
+    TocNode target = nodePersistencePort.findById(cmd.getNodeId()).orElseThrow();
+    if(target.isRootFolder()){
+      Result hierarchyViolationResult = Result.of(
+        BookCode.TOC_HIERARCHY_VIOLATION,
+        MessageData.of("root folder node는 이동할 수 없습니다.")
+      );
+      throw new ProcessResultException(hierarchyViolationResult);
     }
+
     UUID destFolderId = cmd.getDestFolderId();
-    Folder folderProxy = folderPersistencePort.getReferenceById(destFolderId);
-    List<TocNode> siblings = nodePersistencePort.findChildrenByParentNode_IdOrderByOv(destFolderId);
-    NodeReplacer replacer = new NodeReplacer(folderProxy, siblings);
+    Folder folderWithChildren = folderPersistencePort.findWithChildrenById(destFolderId);
+    NodeRelocator relocator = new NodeRelocator(folderWithChildren);
     // Reorder
-    if(node.getParentNode().getId().equals(destFolderId)){
-      replacer.reorder(cmd.getDestIndex(), node);
+    if(target.ensureParentNode().getId().equals(destFolderId)){
+      relocator.reorder(cmd.getDestIndex(), target);
     // Reparent
     } else {
-      replacer.reparent(cmd.getDestIndex(), node);
+      List<TocNode> allBookNodes = nodePersistencePort.findAllByBookId(bookId);
+      relocator.reparent(cmd.getDestIndex(), target, allBookNodes);
     }
   }
 

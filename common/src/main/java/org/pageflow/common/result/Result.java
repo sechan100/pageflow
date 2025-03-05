@@ -11,9 +11,10 @@ import java.util.Objects;
  * 애플리케이션 전반에 걸쳐서 사용하는 응답객체.
  * 기본적으로 Api응답은 모두 200을 반환하고, 내부에서 사용하는 추가적인 코드를 응답객체에 담아서 반환한다.
  * 만약 데이터와 함께 특별한 응답코드를 반환하고 싶다면 해당객체를 반환하면된다.
- *
+ * <p>
  * 해당 객체는 Service에서 반환할 수도 있고, Controller에서 반환할 수도 있다.
  * Controller에서 반환하는 경우, Result.code를 담은 {@link ApiResponse}를 반환한다.
+ *
  * @author : sechan
  */
 public class Result<T> {
@@ -30,7 +31,7 @@ public class Result<T> {
   private static <T> void matchCodeDataWithActualData(ResultCode code, T data) {
     Class<?> expectedDataType = Objects.requireNonNullElse(code.getDataType(), NullDataType.class);
     Class<?> actualDataType = Objects.requireNonNullElse(data, new NullDataType()).getClass();
-    if(!expectedDataType.isAssignableFrom(actualDataType)){
+    if(!expectedDataType.isAssignableFrom(actualDataType)) {
       throw new ResultDataTypeMisMatchException(code, expectedDataType, actualDataType);
     }
   }
@@ -47,12 +48,20 @@ public class Result<T> {
     return new Result<>(CommonCode.SUCCESS, data);
   }
 
+  public static <T> Result<T> success() {
+    return new Result<>(CommonCode.SUCCESS, null);
+  }
+
   public boolean is(ResultCode code) {
     return this.code.equals(code);
   }
 
   public boolean isSuccess() {
     return is(CommonCode.SUCCESS);
+  }
+
+  public boolean isFail() {
+    return !isSuccess();
   }
 
   /**

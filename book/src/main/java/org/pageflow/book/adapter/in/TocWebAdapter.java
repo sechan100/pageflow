@@ -3,12 +3,12 @@ package org.pageflow.book.adapter.in;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.pageflow.book.adapter.in.aop.SetBookPermission;
-import org.pageflow.book.adapter.in.request.NodeReplaceReq;
+import org.pageflow.book.adapter.in.request.NodeRelocateReq;
 import org.pageflow.book.application.BookId;
 import org.pageflow.book.dto.TocDto;
 import org.pageflow.book.port.in.TocNodeUseCase;
 import org.pageflow.book.port.in.TocUseCase;
-import org.pageflow.book.port.in.cmd.ReplaceNodeCmd;
+import org.pageflow.book.port.in.cmd.RelocateNodeCmd;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,20 +34,20 @@ public class TocWebAdapter {
     return toc;
   }
 
-  @PostMapping("/replace-node")
+  @PostMapping("/relocate-node")
   @Operation(summary = "목차 노드 재배치")
   @SetBookPermission
-  public void reorder(
+  public void relocateNode(
     @PathVariable @BookId UUID bookId,
-    @RequestBody NodeReplaceReq req
+    @RequestBody NodeRelocateReq req
   ){
-    ReplaceNodeCmd cmd = new ReplaceNodeCmd(
+    RelocateNodeCmd cmd = new RelocateNodeCmd(
       bookId,
       req.getTargetNodeId(),
       req.getDestFolderId(),
       req.getDestIndex()
     );
-    tocNodeUseCase.replaceNode(bookId, cmd);
+    tocNodeUseCase.relocateNode(bookId, cmd);
   }
 
 }

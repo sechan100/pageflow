@@ -46,4 +46,6 @@ public interface NodePersistencePort extends BaseJpaRepository<TocNode, UUID> {
   List<TocNode> findNodeWithSiblings(UUID nodeId);
 
   List<TocNode> findChildrenByParentNode_IdOrderByOv(UUID parentId);
+
+  List<TocNode> findAllByBookId(UUID bookId);
 }

@@ -11,7 +11,7 @@ import java.util.UUID;
  * @author : sechan
  */
 public interface TocNodeUseCase {
-  void replaceNode(UUID bookId, ReplaceNodeCmd cmd);
+  void relocateNode(UUID bookId, RelocateNodeCmd cmd);
 
   FolderDto createFolder(UUID bookId, CreateFolderCmd cmd);
   FolderDto queryFolder(UUID bookId, UUID folderId);

@@ -60,7 +60,7 @@ public class LastIndexInserter {
    */
   public int insertLast(TocNode node) {
     Optional<Integer> lastIndexOptional = this.maxOvSupplier.get();
-    node.changeParentNode(this.folderProxy);
+    node._setParentNode(this.folderProxy);
 
     // folder에 자식이 없음
     if(lastIndexOptional.isEmpty()){

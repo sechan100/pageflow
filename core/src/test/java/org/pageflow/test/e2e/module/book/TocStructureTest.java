@@ -257,7 +257,7 @@ public class TocStructureTest {
    * 노드 이동
    */
   private void moveNode(API api, UUID bookId, UUID nodeId, UUID destFolderId, int destIndex) {
-    TestRes moveRes = api.post("/user/books/" + bookId + "/toc/replace-node", String.format("""
+    TestRes moveRes = api.post("/user/books/" + bookId + "/toc/relocate-node", String.format("""
         {
           "targetNodeId": "%s",
           "destFolderId": "%s",

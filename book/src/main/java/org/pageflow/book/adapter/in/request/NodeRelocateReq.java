@@ -10,7 +10,7 @@ import java.util.UUID;
  * @author : sechan
  */
 @Data
-public class NodeReplaceReq {
+public class NodeRelocateReq {
   @NotBlank
   private UUID targetNodeId;
 

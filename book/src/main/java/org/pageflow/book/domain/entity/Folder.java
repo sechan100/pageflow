@@ -5,8 +5,10 @@ import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicUpdate;
+import org.springframework.util.Assert;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,8 +23,9 @@ import java.util.UUID;
 @Table(name = "folder")
 public class Folder extends TocNode {
 
-  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "parentNode")
-  private final List<TocNode> children = new ArrayList<>(7);
+  @OrderBy("ov ASC")
+  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, mappedBy = "parentNode")
+  private final List<TocNode> children = new ArrayList<>(8);
 
   public Folder(
     UUID id,
@@ -46,5 +49,35 @@ public class Folder extends TocNode {
 
   public void changeTitle(String title) {
     this.title = title;
+  }
+
+  public List<TocNode> getReadOnlyChildren() {
+    return Collections.unmodifiableList(children);
+  }
+
+  public int childrenSize() {
+    return children.size();
+  }
+
+  public void addChild(int index, TocNode child) {
+    Assert.isTrue(!children.contains(child), "이미 자식으로 존재하는 노드입니다.");
+    children.add(index, child);
+    child._setParentNode(this);
+  }
+
+  public void addChild(TocNode child) {
+    this.addChild(children.size(), child);
+  }
+
+  public boolean removeChild(TocNode child) {
+    return children.remove(child);
+  }
+
+  public boolean hasChild(TocNode child) {
+    return children.contains(child);
+  }
+
+  public TocNode getChild(int index) {
+    return children.get(index);
   }
 }

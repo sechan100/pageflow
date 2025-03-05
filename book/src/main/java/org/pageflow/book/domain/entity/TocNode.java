@@ -1,6 +1,7 @@
 package org.pageflow.book.domain.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -46,7 +47,6 @@ public abstract class TocNode extends BaseJpaEntity {
    * 생명주기는 소속된 Book과 일치한다.
    */
   @Nullable
-  @Getter
   @ManyToOne(fetch = FetchType.LAZY, optional = true)
   @JoinColumn(name = "parent_id", nullable = true)
   private Folder parentNode;
@@ -71,8 +71,14 @@ public abstract class TocNode extends BaseJpaEntity {
     this.ov = ov;
   }
 
-  public void changeParentNode(Folder parentNode){
-    Assert.notNull(parentNode, "Node cannot be root folder(parentNode is null)");
+  /**
+   * Folder에서 주로 호출한다. 다른 곳에서는 어지간하면 호출하지 말 것.
+   * 호출하는 경우, Folder.children과 일관성이 깨지지 않도록 Folder가 그 자체로만 로드되었거나, 아예 메모리로 올리지 않은 상태에서 사용해야한다.
+   * @see Folder
+   * @param parentNode
+   */
+  public void _setParentNode(Folder parentNode){
+    Assert.notNull(parentNode, "null을 부모로 설정할 수 없습니다. (root folder만 가능)");
     this.parentNode = parentNode;
   }
 
@@ -80,7 +86,12 @@ public abstract class TocNode extends BaseJpaEntity {
     this.ov = ov;
   }
 
-  @SuppressWarnings("BooleanMethodIsAlwaysInverted")
+  @NotNull
+  public Folder ensureParentNode(){
+    Assert.notNull(this.parentNode, "Root Folder는 부모 노드를 가지지 않습니다.");
+    return this.parentNode;
+  }
+
   public boolean isRootFolder(){
     return this.parentNode == null;
   }

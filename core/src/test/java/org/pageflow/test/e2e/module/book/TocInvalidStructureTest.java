@@ -41,7 +41,7 @@ public class TocInvalidStructureTest {
     UUID childFolderId = createFolder(userApi, bookId, parentFolderId, "자식 폴더");
 
     // 4. 부모 폴더를 자식 폴더로 이동 시도 (계층 구조 위반)
-    TestRes moveRes = userApi.post("/user/books/" + bookId + "/toc/replace-node", String.format("""
+    TestRes moveRes = userApi.post("/user/books/" + bookId + "/toc/relocate-node", String.format("""
         {
           "targetNodeId": "%s",
           "destFolderId": "%s",
@@ -50,7 +50,6 @@ public class TocInvalidStructureTest {
       """, parentFolderId, childFolderId));
 
     // 5. 계층 구조 위반으로 실패 검증
-    moveRes.isSuccess();
     moveRes.is(BookCode.TOC_HIERARCHY_VIOLATION);
   }
 
@@ -72,7 +71,7 @@ public class TocInvalidStructureTest {
     UUID grandchildFolderId = createFolder(userApi, bookId, childFolderId, "손자 폴더");
 
     // 4. 부모 폴더를 손자 폴더로 이동 시도 (계층 구조 위반)
-    TestRes moveRes = userApi.post("/user/books/" + bookId + "/toc/replace-node", String.format("""
+    TestRes moveRes = userApi.post("/user/books/" + bookId + "/toc/relocate-node", String.format("""
         {
           "targetNodeId": "%s",
           "destFolderId": "%s",
@@ -81,7 +80,6 @@ public class TocInvalidStructureTest {
       """, parentFolderId, grandchildFolderId));
 
     // 5. 계층 구조 위반으로 실패 검증
-    moveRes.isSuccess();
     moveRes.is(BookCode.TOC_HIERARCHY_VIOLATION);
   }
 
@@ -101,7 +99,7 @@ public class TocInvalidStructureTest {
     UUID normalFolderId = createFolder(userApi, bookId, rootFolderId, "일반 폴더");
 
     // 4. 루트 폴더를 일반 폴더로 이동 시도
-    TestRes moveRes = userApi.post("/user/books/" + bookId + "/toc/replace-node", String.format("""
+    TestRes moveRes = userApi.post("/user/books/" + bookId + "/toc/relocate-node", String.format("""
         {
           "targetNodeId": "%s",
           "destFolderId": "%s",
@@ -110,7 +108,6 @@ public class TocInvalidStructureTest {
       """, rootFolderId, normalFolderId));
 
     // 5. 루트 폴더 이동 불가 검증
-    moveRes.isSuccess();
     moveRes.is(BookCode.TOC_HIERARCHY_VIOLATION);
   }
 
@@ -130,7 +127,7 @@ public class TocInvalidStructureTest {
     UUID folderAId = createFolder(userApi, bookId, rootFolderId, "폴더 A");
 
     // 4. 폴더가 자기 자신을 부모로 지정 시도
-    TestRes moveRes = userApi.post("/user/books/" + bookId + "/toc/replace-node", String.format("""
+    TestRes moveRes = userApi.post("/user/books/" + bookId + "/toc/relocate-node", String.format("""
         {
           "targetNodeId": "%s",
           "destFolderId": "%s",
@@ -139,7 +136,6 @@ public class TocInvalidStructureTest {
       """, folderAId, folderAId));
 
     // 5. 자기 자신을 부모로 지정 불가 검증
-    moveRes.isSuccess();
     moveRes.is(BookCode.TOC_HIERARCHY_VIOLATION);
   }
 
@@ -168,7 +164,7 @@ public class TocInvalidStructureTest {
 
     // 4. 다양한 순환 참조 시도
     // 4.1. A를 D로 이동 시도 (A > B > C > D > A 순환 발생)
-    TestRes moveResAtoD = userApi.post("/user/books/" + bookId + "/toc/replace-node", String.format("""
+    TestRes moveResAtoD = userApi.post("/user/books/" + bookId + "/toc/relocate-node", String.format("""
         {
           "targetNodeId": "%s",
           "destFolderId": "%s",
@@ -176,11 +172,10 @@ public class TocInvalidStructureTest {
         }
       """, folderAId, folderDId));
 
-    moveResAtoD.isSuccess();
     moveResAtoD.is(BookCode.TOC_HIERARCHY_VIOLATION);
 
     // 4.2. E를 F로 이동 시도 (E > F > E 순환 발생)
-    TestRes moveResEtoF = userApi.post("/user/books/" + bookId + "/toc/replace-node", String.format("""
+    TestRes moveResEtoF = userApi.post("/user/books/" + bookId + "/toc/relocate-node", String.format("""
         {
           "targetNodeId": "%s",
           "destFolderId": "%s",
@@ -188,11 +183,10 @@ public class TocInvalidStructureTest {
         }
       """, folderEId, folderFId));
 
-    moveResEtoF.isSuccess();
     moveResEtoF.is(BookCode.TOC_HIERARCHY_VIOLATION);
 
     // 5. 유효한 이동 확인 (F를 C로 이동 - 순환 참조 없음)
-    TestRes validMove = userApi.post("/user/books/" + bookId + "/toc/replace-node", String.format("""
+    TestRes validMove = userApi.post("/user/books/" + bookId + "/toc/relocate-node", String.format("""
         {
           "targetNodeId": "%s",
           "destFolderId": "%s",
@@ -238,7 +232,7 @@ public class TocInvalidStructureTest {
    * 노드 이동
    */
   private TestRes moveNode(API api, UUID bookId, UUID nodeId, UUID destFolderId, int destIndex) {
-    return api.post("/user/books/" + bookId + "/toc/replace-node", String.format("""
+    return api.post("/user/books/" + bookId + "/toc/relocate-node", String.format("""
         {
           "targetNodeId": "%s",
           "destFolderId": "%s",

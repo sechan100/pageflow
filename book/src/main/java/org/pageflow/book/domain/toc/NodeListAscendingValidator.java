@@ -9,6 +9,7 @@ import java.util.List;
  */
 public class NodeListAscendingValidator {
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public static boolean isAscending(List<TocNode> nodes) {
       for(int i = 0; i < nodes.size() - 1; i++){
         if(!(nodes.get(i).getOv() < nodes.get(i + 1).getOv())){

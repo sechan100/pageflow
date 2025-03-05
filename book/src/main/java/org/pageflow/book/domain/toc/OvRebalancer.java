@@ -1,5 +1,6 @@
 package org.pageflow.book.domain.toc;
 
+import com.google.common.base.Preconditions;
 import org.pageflow.book.domain.entity.TocNode;
 import org.springframework.lang.Nullable;
 
@@ -81,10 +82,10 @@ public class OvRebalancer {
     if(nodes.isEmpty()){
       return OV_START;
     }
-
-    if(!NodeListAscendingValidator.isAscending(nodes)){
-      throw new IllegalArgumentException("nodes ov must be in ascending order");
-    }
+    Preconditions.checkState(
+      NodeListAscendingValidator.isAscending(nodes),
+      "nodes이 ov값으로 오름차순 정렬되어있지 않습니다."
+    );
 
     int ov = OV_START;
     for(TocNode node : nodes){

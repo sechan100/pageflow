@@ -19,7 +19,7 @@ public class ThymeleafEmailTemplateProcessor implements EmailTemplateProcessor {
   public EmailContent process(EmailTemplate emailTemplate) {
     String content = thymeleafEngine.process(
       emailTemplate.getTemplatePath(),
-      emailTemplate
+      emailTemplate.getContext()
     );
     return EmailContent.fromProcessedTemplate(content);
   }

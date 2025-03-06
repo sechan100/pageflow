@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Pageflow - 이메일 인증 성공</title>
+</head>
+<body>
+<div class="relative flex min-h-screen flex-col items-center justify-center overflow-hidden py-6 sm:py-12 bg-white">
+    <div class="max-w-xl px-5 text-center">
+        <h2 class="mb-2 text-[42px] font-bold text-zinc-800">이메일이 인증되었습니다.</h2>
+        <p class="mb-2 text-lg text-zinc-500">[[${message}]]</p>
+        <a th:href="${clientUrl}"
+           class="mt-3 inline-block w-96 rounded bg-indigo-600 px-5 py-3 font-medium text-white shadow-md shadow-indigo-500/20 hover:bg-indigo-700">페이지로
+            이동하기 →</a>
+    </div>
+</div>
+</body>
+</html>

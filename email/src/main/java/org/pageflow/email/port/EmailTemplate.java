@@ -1,19 +1,23 @@
 package org.pageflow.email.port;
 
 import lombok.Getter;
-import org.thymeleaf.context.AbstractContext;
+import lombok.experimental.Delegate;
+import org.thymeleaf.context.Context;
 
 
 /**
  * @author : sechan
  */
-public class EmailTemplate extends AbstractContext {
+public class EmailTemplate {
+  @Getter
+  @Delegate
+  private final Context context;
   @Getter
   private final String templatePath;
 
   private EmailTemplate(String templatePath) {
-    super();
     this.templatePath = templatePath;
+    this.context = new Context();
   }
 
   public static EmailTemplate of(String templatePath) {

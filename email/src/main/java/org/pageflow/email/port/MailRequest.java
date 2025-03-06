@@ -1,22 +1,18 @@
-package org.pageflow.email;
+package org.pageflow.email.port;
 
 
 import lombok.Value;
 
-import java.util.HashMap;
-import java.util.Map;
-
 @Value
-public class SendMailCmd {
+public class MailRequest {
   String to;
   String from;
   String fromName;
   String subject;
-  String templatePath;
-  Map<String, String> variables;
+  EmailContent emailContent;
 
   public static BuildStep0 builder() {
-    return new SendMailCmd.Builder();
+    return new MailRequest.Builder();
   }
 
 
@@ -29,25 +25,28 @@ public class SendMailCmd {
   public interface BuildStep1 {
     BuildStep2 from(String fromAddress);
 
+    /**
+     * @param fromAddress
+     * @param fromName 사용자에게 fromName이 표시됨.
+     * @return
+     */
     BuildStep2 from(String fromAddress, String fromName);
   }
 
   public interface BuildStep2 {
+    /**
+     * @param subject 제목
+     * @return
+     */
     BuildStep3 subject(String subject);
-
   }
 
   public interface BuildStep3 {
-    BuildStep4 templatePath(String templatePath);
-
+    BuildStep4 content(EmailContent content);
   }
 
   public interface BuildStep4 {
-    BuildStep4 addVar(String key, String value);
-
-    BuildStep4 variables(Map<String, String> variables);
-
-    SendMailCmd build();
+    MailRequest build();
   }
 
   public static class Builder implements BuildStep0, BuildStep1, BuildStep2, BuildStep3, BuildStep4 {
@@ -55,8 +54,8 @@ public class SendMailCmd {
     private String from;
     private String fromName;
     private String subject;
-    private String templatePath;
-    private Map<String, String> variables = new HashMap<>();
+    private EmailContent emailContent;
+
 
     @Override
     public BuildStep1 to(String to) {
@@ -83,29 +82,21 @@ public class SendMailCmd {
     }
 
     @Override
-    public BuildStep4 templatePath(String templatePath) {
-      this.templatePath = templatePath;
+    public BuildStep4 content(EmailContent emailContent) {
+      this.emailContent = emailContent;
       return this;
     }
 
-    @Override
-    public BuildStep4 addVar(String key, String value) {
-      if(this.variables==null){
-        this.variables = new HashMap<>();
-      }
-      this.variables.put(key, value);
-      return this;
-    }
 
     @Override
-    public BuildStep4 variables(Map<String, String> variables) {
-      this.variables = Map.copyOf(variables);
-      return this;
-    }
-
-    @Override
-    public SendMailCmd build() {
-      return new SendMailCmd(to, from, fromName, subject, templatePath, variables);
+    public MailRequest build() {
+      return new MailRequest(
+        to,
+        from,
+        fromName,
+        subject,
+        emailContent
+      );
     }
   }
 

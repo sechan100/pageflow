@@ -71,7 +71,7 @@ public abstract class TemporaryEntity<D> extends BaseJpaEntity {
       this.dataObjectCache = dataObject;
       return dataObject;
     } catch (JsonProcessingException e) {
-      throw new RuntimeException("Could not deserialize data for 'TemporaryEntity'", e);
+      throw new RuntimeException("'TemporaryEntity'를 직렬화 할 수 없습니다. 자식 클래스의 구현이 잘못되었을 수 있습니다.", e);
     }
   }
 

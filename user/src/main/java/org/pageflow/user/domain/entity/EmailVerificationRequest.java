@@ -17,6 +17,7 @@ public class EmailVerificationRequest extends TemporaryEntity<EmailVerificationR
 
   @Data
   @AllArgsConstructor
+  @NoArgsConstructor
   public static class EmailCode {
     private String email;
     private UUID authCode;

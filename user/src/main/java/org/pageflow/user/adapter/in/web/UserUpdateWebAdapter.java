@@ -23,7 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
  */
 @Validated
 @RestController
-@RequestMapping("/user/profile")
+@RequestMapping("/user")
 @RequiredArgsConstructor
 @Tag(name = "user-update", description = "다양한 사용자 필드 변경")
 public class UserUpdateWebAdapter {
@@ -49,7 +49,7 @@ public class UserUpdateWebAdapter {
 
 
   @PostMapping("/profile-image")
-  @Operation(summary = "프로필 이미지 변경", description = "프로필 이미지를 변경합니다.")
+  @Operation(summary = "프로필 이미지 변경")
   public ProfileRes changeProfileImage(
     @RequestPart(required = false)
     MultipartFile file,

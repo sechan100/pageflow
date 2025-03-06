@@ -51,10 +51,10 @@ public class EmailTest {
     verificationPersistencePort.flush();
 
     // user1 이메일 인증
-    accountEmailService.verify(EmailVerificationCmd.of(
-      user1.getUid().getValue(),
+    accountEmailService.verify(new EmailVerificationCmd(
+      user1.getUid(),
       evRequest.getData().getEmail(),
-      evRequest.getData().getAuthCode().toString()
+      evRequest.getData().getAuthCode()
     ));
     accountPersistencePort.flush();
 

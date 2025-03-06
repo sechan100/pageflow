@@ -40,22 +40,22 @@ public class AccountEmailService {
     return validator.validate();
   }
 
-  public void sendVerificationEmail(UID uid, String verificationUri) {
+  public Result sendVerificationEmail(UID uid, String verificationUri) {
     // 새로운 request 생성
     Account account = accountPersistencePort.findById(uid.getValue()).get();
     String email = account.getEmail();
     EmailVerificationRequest evRequest = EmailVerificationRequest.of(uid, email);
-    verificationPersistencePort.persist(evRequest);
 
     // 인증메일 발송전에 이메일 유효성 한번 더 검사
     FieldValidationResult validation = validate(email);
     if(!validation.isValid()){
-      throw new ProcessResultException(Result.of(UserCode.INVALID_EMAIL, validation));
+      return Result.of(UserCode.INVALID_EMAIL, validation);
     }
 
-    // 기존 request가 있다면 삭제
+    // 기존 request가 있다면 삭제 후 새로 생성
     String requestId = EmailVerificationRequest.generateIdFromUid(uid);
     verificationPersistencePort.deleteById(requestId);
+    verificationPersistencePort.persist(evRequest);
 
     // template 파싱
     EmailTemplate template = new EmailTemplate("/email-verification-request");
@@ -73,7 +73,7 @@ public class AccountEmailService {
       .subject("이메일 인증 요청")
       .content(content)
       .build();
-    sendMailPort.sendEmail(mailRequest);
+    return sendMailPort.sendEmail(mailRequest);
   }
 
   public void verify(EmailVerificationCmd cmd) {

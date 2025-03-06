@@ -24,7 +24,7 @@ public class UsernameValidator {
   private static final int MAX_LENGTH = 100;
   private static final String REGEX = "^[a-zA-Z0-9-]{" + MIN_LENGTH + "," + MAX_LENGTH + "}$";
   private static final Collection<String> INVALID_USERNAME = Set.of(
-    "admin", "administrator", "anonymous", "pageflow"
+    "admin", "administrator", "anonymous", "pageflow", "guest"
   );
 
   private final AccountPersistencePort accountPersistencePort;

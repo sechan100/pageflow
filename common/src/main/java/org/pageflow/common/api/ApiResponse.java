@@ -17,7 +17,7 @@ public class ApiResponse<T> {
    * {@link ResultCode}의 name()이다.
    */
   private final String code;
-  private final String message;
+  private final String description;
   @Nullable
   private final T data;
 
@@ -25,18 +25,18 @@ public class ApiResponse<T> {
   @JsonCreator
   public ApiResponse(
     @JsonProperty("code") String code,
-    @JsonProperty("message") String message,
+    @JsonProperty("description") String description,
     @JsonProperty("data") T data
   ) {
     this.code = code;
-    this.message = message;
+    this.description = description;
     this.data = data;
   }
 
   private ApiResponse(Result<T> result) {
     ResultCode code = result.getCode();
     this.code = code.getCode();
-    this.message = code.getDescription();
+    this.description = code.getDescription();
     this.data = result.dangerouslyGetData();
   }
 

@@ -10,6 +10,6 @@ import java.lang.annotation.*;
 @Documented
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface RAPRs {
+public @interface ContainerPermissionRequired {
   PermissionRequired[] value();
 }

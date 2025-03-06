@@ -8,7 +8,7 @@ import java.lang.annotation.*;
  */
 @Documented
 @Target(ElementType.METHOD)
-@Repeatable(RAPRs.class)
+@Repeatable(ContainerPermissionRequired.class)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface PermissionRequired {
 

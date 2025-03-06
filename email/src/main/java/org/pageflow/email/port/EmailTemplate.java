@@ -15,13 +15,9 @@ public class EmailTemplate {
   @Getter
   private final String templatePath;
 
-  private EmailTemplate(String templatePath) {
+  public EmailTemplate(String templatePath) {
     this.templatePath = templatePath;
     this.context = new Context();
-  }
-
-  public static EmailTemplate of(String templatePath) {
-    return new EmailTemplate(templatePath);
   }
 
 }

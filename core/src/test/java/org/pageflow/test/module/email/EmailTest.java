@@ -16,7 +16,7 @@ public class EmailTest {
 
   @Test
   void sendEmail() {
-    EmailTemplate emailTemplate = EmailTemplate.of("/test");
+    EmailTemplate emailTemplate = new EmailTemplate("/test");
     emailTemplate.setVariable("message", "테스트 이메일 입니다. message variable 주입 테스트 문자열");
     EmailContent content = emailTemplateProcessor.process(emailTemplate);
     MailRequest request = MailRequest.builder()

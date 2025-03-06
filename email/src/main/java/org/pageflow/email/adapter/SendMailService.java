@@ -23,7 +23,7 @@ import java.io.UnsupportedEncodingException;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class EmailService implements SendMailPort {
+public class SendMailService implements SendMailPort {
   private final JavaMailSender javaMailSender;
 
 
@@ -48,11 +48,3 @@ public class EmailService implements SendMailPort {
     }
   }
 }
-
-
-
-
-
-
-
-

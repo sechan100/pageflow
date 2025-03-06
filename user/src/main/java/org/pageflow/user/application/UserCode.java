@@ -23,6 +23,9 @@ public enum UserCode implements ResultCode {
   // 사용자 조회
   USER_NOT_FOUND("사용자를 찾을 수 없음"),
 
+  // 인증
+  EMAIL_VERIFICATION_ERROR("이메일 인증에 실패했습니다."),
+
   // 기타
   EXTERNAL_PROFILE_IMAGE_URL("외부 프로필 이미지 url은 사용할 수 없습니다."),
 

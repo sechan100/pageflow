@@ -16,3 +16,9 @@ spring:
           auth: true
           starttls:
           enable: true
+
+pageflow:
+  email:
+    sender:
+      no-reply: 'no-reply@${pageflow.site.domain}'
+      support: 'support@${pageflow.site.domain}'

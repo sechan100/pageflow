@@ -14,6 +14,7 @@ public class ApplicationProperties {
   Auth auth;
   User user;
   Book book;
+  Email email;
   File file;
 
 
@@ -44,6 +45,19 @@ public class ApplicationProperties {
   @FieldDefaults(makeFinal = true, level = AccessLevel.PUBLIC)
   public static class Book {
     String defaultCoverImageUrl;
+  }
+
+  @AllArgsConstructor
+  @FieldDefaults(makeFinal = true, level = AccessLevel.PUBLIC)
+  public static class Email {
+    Sender sender;
+
+    @AllArgsConstructor
+    @FieldDefaults(makeFinal = true, level = AccessLevel.PUBLIC)
+    public static class Sender {
+      String noReply;
+      String support;
+    }
   }
 
   @AllArgsConstructor

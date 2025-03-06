@@ -4,6 +4,7 @@ import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import lombok.*;
 import org.pageflow.common.jpa.TemporaryEntity;
+import org.pageflow.common.user.UID;
 
 import java.util.UUID;
 
@@ -12,32 +13,37 @@ import java.util.UUID;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(callSuper = true)
 @DiscriminatorValue("email_verification_request")
-public class EmailVerificationRequest extends TemporaryEntity<EmailVerificationRequest.Data> {
+public class EmailVerificationRequest extends TemporaryEntity<EmailVerificationRequest.EmailCode> {
 
-  @Value
-  public static class Data {
-    String email;
-    UUID authorizationCode;
+  @Data
+  @AllArgsConstructor
+  public static class EmailCode {
+    private String email;
+    private UUID authCode;
   }
 
-  public static final Long EXPIRED_MILLIS = 1000 * 60 * 5L; // 5분
+  public static final Long EXPIRED_MILLIS = 1000 * 60 * 10L; // 10분
 
-  private EmailVerificationRequest(UUID uid, Data data, Long expiredAt) {
-    super(uid.toString(), data, expiredAt);
+  private EmailVerificationRequest(String id, EmailCode emailCode, Long expiredAt) {
+    super(id, emailCode, expiredAt);
   }
 
-  public static EmailVerificationRequest of(UUID uid, String email) {
+  public static EmailVerificationRequest of(UID uid, String email) {
     UUID authorizationCode = UUID.randomUUID();
     Long expiredAt = System.currentTimeMillis() + EXPIRED_MILLIS;
     return new EmailVerificationRequest(
-      uid,
-      new Data(email, authorizationCode),
+      generateIdFromUid(uid),
+      new EmailCode(email, authorizationCode),
       expiredAt
     );
   }
 
+  public static String generateIdFromUid(UID uid) {
+    return EmailVerificationRequest.class.getSimpleName() + "-" + uid;
+  }
+
   @Override
-  protected Class<Data> getDataClassType() {
-    return Data.class;
+  protected Class<EmailCode> getDataClassType() {
+    return EmailCode.class;
   }
 }

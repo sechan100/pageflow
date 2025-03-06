@@ -11,10 +11,9 @@ import lombok.NoArgsConstructor;
 /**
  * 일시적으로 저장되는 크게 중요하지 않은 데이터를 저장하는데 사용되는 Entity.
  * 사용하기 위해서, 해당 클래스를 상속받고, data 필드에 저장하고 싶은 데이터를 저장하면 된다.
- * 자식 클래스에서는 다른 칼럼을 만들어서는 안된다.
+ * @apiNote 자식 클래스에서는 다른 칼럼을 만들어서는 안된다.
  * @author : sechan
  */
-@Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(of = "id", callSuper = false)
@@ -25,14 +24,15 @@ public abstract class TemporaryEntity<D> extends BaseJpaEntity {
   private static final ObjectMapper objectMapper = new ObjectMapper();
 
   @Id
+  @Getter
   private String id;
 
   /**
+   * 계층형 데이터는 사용하지 말 것. 1 계층만 허용
    * JSON 형태로 데이터를 저장한다.
    */
   @Lob
   @Column(columnDefinition = "TEXT")
-  @Getter(AccessLevel.NONE)
   private String data;
 
   /**
@@ -46,9 +46,14 @@ public abstract class TemporaryEntity<D> extends BaseJpaEntity {
   private Long expiredAt;
 
 
-  public TemporaryEntity(String id, D data, Long expiredAt) {
+  ///////////////////////
+  @Transient
+  private D dataObjectCache;
+
+  protected TemporaryEntity(String id, D data, Long expiredAt) {
     this.id = id;
     this.expiredAt = expiredAt;
+    this.dataObjectCache = data;
     try {
       this.data = objectMapper.writeValueAsString(data);
     } catch(JsonProcessingException e){
@@ -57,9 +62,14 @@ public abstract class TemporaryEntity<D> extends BaseJpaEntity {
   }
 
   public D getData() {
+    if(dataObjectCache != null){
+      return dataObjectCache;
+    }
     try {
       Class<D> clazz = getDataClassType();
-      return objectMapper.readValue(this.data, clazz);
+      D dataObject = objectMapper.readValue(this.data, clazz);
+      this.dataObjectCache = dataObject;
+      return dataObject;
     } catch (JsonProcessingException e) {
       throw new RuntimeException("Could not deserialize data for 'TemporaryEntity'", e);
     }

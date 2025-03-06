@@ -22,12 +22,12 @@ public class AccountService implements AccountUseCase {
   private final ProfilePersistencePort profilePersistencePort;
   private final UsernameValidator usernameValidator;
   private final PennameValidator pennameValidator;
-  private final UserEmailService userEmailService;
+  private final EmailService emailService;
 
 
   @Override
   public AccountDto changeEmail(UID uid, String email) {
-    var validation = userEmailService.validate(email);
+    var validation = emailService.validate(email);
     if(!validation.isValid()){
       throw new FieldValidationException(validation);
     }

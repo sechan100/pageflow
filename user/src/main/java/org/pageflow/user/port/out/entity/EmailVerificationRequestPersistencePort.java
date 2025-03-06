@@ -1,10 +1,10 @@
 package org.pageflow.user.port.out.entity;
 
+import org.pageflow.common.jpa.repository.BaseJpaRepository;
 import org.pageflow.user.domain.entity.EmailVerificationRequest;
-import org.springframework.data.repository.CrudRepository;
 
 /**
  * @author : sechan
  */
-public interface EmailVerificationRequestPersistencePort extends CrudRepository<EmailVerificationRequest, String> {
+public interface EmailVerificationRequestPersistencePort extends BaseJpaRepository<EmailVerificationRequest, String> {
 }

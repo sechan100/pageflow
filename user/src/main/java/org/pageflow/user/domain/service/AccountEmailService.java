@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pageflow.common.property.ApplicationProperties;
 import org.pageflow.common.result.ProcessResultException;
+import org.pageflow.common.result.Result;
 import org.pageflow.common.user.UID;
 import org.pageflow.common.validation.FieldReason;
 import org.pageflow.common.validation.FieldValidationResult;
@@ -25,7 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class EmailService {
+public class AccountEmailService {
   private final AccountPersistencePort accountPersistencePort;
   private final ApplicationProperties properties;
   private final EmailVerificationRequestPersistencePort verificationPersistencePort;
@@ -44,6 +45,13 @@ public class EmailService {
     Account account = accountPersistencePort.findById(uid.getValue()).get();
     String email = account.getEmail();
     EmailVerificationRequest evRequest = EmailVerificationRequest.of(uid, email);
+    verificationPersistencePort.persist(evRequest);
+
+    // 인증메일 발송전에 이메일 유효성 한번 더 검사
+    FieldValidationResult validation = validate(email);
+    if(!validation.isValid()){
+      throw new ProcessResultException(Result.of(UserCode.INVALID_EMAIL, validation));
+    }
 
     // 기존 request가 있다면 삭제
     String requestId = EmailVerificationRequest.generateIdFromUid(uid);
@@ -71,7 +79,8 @@ public class EmailService {
   public void verify(EmailVerificationCmd cmd) {
     UID uid = cmd.getUid();
     String id = EmailVerificationRequest.generateIdFromUid(uid);
-    EmailVerificationRequest ev = verificationPersistencePort.findById(id).get();
+    EmailVerificationRequest ev = verificationPersistencePort.findById(id)
+      .orElseThrow(() -> new ProcessResultException(UserCode.EMAIL_VERIFICATION_EXPIRED));
     Account account = accountPersistencePort.findById(uid.getValue()).get();
 
     // 이메일 일치

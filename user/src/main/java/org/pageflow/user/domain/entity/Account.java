@@ -16,9 +16,12 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(of = "id", callSuper = false)
-@Table(name = "account", indexes = {
-  @Index(name = "idx_account_username", columnList = "username")
-})
+@Table(
+  name = "account",
+  indexes = {
+    @Index(name = "idx_account_username", columnList = "username")
+  }
+)
 public class Account extends BaseJpaEntity {
 
   @Id
@@ -31,10 +34,10 @@ public class Account extends BaseJpaEntity {
   @Column(nullable = false)
   private String password;
 
-  @Column(nullable = false, unique = true)
+  @Column(name = "email", nullable = false)
   private String email;
 
-  @Column(nullable = false)
+  @Column(name = "email_verified", nullable = false)
   private Boolean emailVerified;
 
   /**

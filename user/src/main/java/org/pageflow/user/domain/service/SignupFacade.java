@@ -28,14 +28,14 @@ public class SignupFacade implements SignupUseCase {
   private final ProfilePersistencePort profilePersistencePort;
   private final UsernameValidator usernameValidator;
   private final PennameValidator pennameValidator;
-  private final EmailService emailService;
+  private final AccountEmailService accountEmailService;
 
   @Override
   public UserDto signup(SignupCmd cmd) {
     // 검증
     var usernameValidation = usernameValidator.validate(cmd.getUsername());
     var pennameValidation = pennameValidator.validate(cmd.getPenname());
-    var emailValidation = emailService.validate(cmd.getEmail());
+    var emailValidation = accountEmailService.validate(cmd.getEmail());
     var validation = FieldValidationResult.combine(
       usernameValidation,
       pennameValidation,

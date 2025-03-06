@@ -45,7 +45,7 @@ public class FilePath {
       "올바른 내부 서버 WebUrl 형식이 아닙니다."
     );
     return new FilePath(webUrl.substring(
-      PropsAware.use().file.webBaseUrl.length()
+      PropsAware.use().file.public_.webBaseUrl.length()
     ));
   }
 
@@ -55,7 +55,7 @@ public class FilePath {
       "올바른 FullPath 형식이 아닙니다."
     );
     return new FilePath(fullPath.substring(
-      PropsAware.use().file.parent.length()
+      PropsAware.use().file.public_.serverDirectory.length()
     ));
   }
 
@@ -90,11 +90,11 @@ public class FilePath {
 
 
   private static String getWebBaseUrl() {
-    return PropsAware.use().file.webBaseUrl;
+    return PropsAware.use().file.public_.webBaseUrl;
   }
 
   private static String getParent() {
-    return PropsAware.use().file.parent;
+    return PropsAware.use().file.public_.serverDirectory;
   }
 
   private static void checkIsStaticPath(String path) {

@@ -1,0 +1,5 @@
+pageflow:
+  file:
+    public:
+      web-base-url: '${pageflow.site.base-url}/public/files'
+      server-directory: ${SERVER_IMAGE_DIRECTORY}

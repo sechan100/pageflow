@@ -3,7 +3,6 @@ package org.pageflow.common.property;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.pageflow.common.utility.UriUtility;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 
@@ -15,8 +14,6 @@ public class ApplicationProperties {
   Auth auth;
   User user;
   Book book;
-  Email email;
-  Admin admin;
   File file;
 
 
@@ -51,35 +48,19 @@ public class ApplicationProperties {
 
   @AllArgsConstructor
   @FieldDefaults(makeFinal = true, level = AccessLevel.PUBLIC)
-  public static class Email {
-    From from;
+  public static class File {
+    /**
+     * public 키워드 사용 불가라 _ 붙임
+     */
+    Public public_;
 
     @AllArgsConstructor
     @FieldDefaults(makeFinal = true, level = AccessLevel.PUBLIC)
-    public static class From {
-      String noReply;
-      String defaultFromName;
+    public static class Public {
+      String webBaseUrl;
+      String serverDirectory;
     }
-  }
 
-  @AllArgsConstructor
-  @FieldDefaults(makeFinal = true, level = AccessLevel.PUBLIC)
-  public static class Admin {
-    String username;
-    String password;
-    String penname;
-    String email;
-  }
-
-  @FieldDefaults(makeFinal = true, level = AccessLevel.PUBLIC)
-  public static class File {
-    String webBaseUrl;
-    String parent;
-
-    public File(String webBaseUrl, String parent) {
-      this.webBaseUrl = webBaseUrl;
-      this.parent = UriUtility.addStartSlashAndRemoveEndSlash(parent);
-    }
 
   }
 

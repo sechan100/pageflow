@@ -28,7 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Transactional
 @RequiredArgsConstructor
 public class ProfileService implements ProfileUseCase {
-  private static final String WEB_BASE_URL = PropsAware.use().file.webBaseUrl;
+  private static final String WEB_BASE_URL = PropsAware.use().file.public_.webBaseUrl;
   private static final String DEFAULT_PROFILE_IMAGE_URL = PropsAware.use().user.defaultProfileImageUrl;
 
   private final PennameValidator pennameValidator;

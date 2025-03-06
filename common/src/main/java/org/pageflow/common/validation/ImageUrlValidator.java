@@ -19,6 +19,6 @@ public class ImageUrlValidator {
   }
 
   public boolean isInternalUrl(String url) {
-    return url.startsWith(applicationProperties.file.webBaseUrl);
+    return url.startsWith(applicationProperties.file.public_.webBaseUrl);
   }
 }

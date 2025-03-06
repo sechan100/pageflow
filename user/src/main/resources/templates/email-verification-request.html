@@ -5,190 +5,110 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Pageflow 이메일 인증</title>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap"
-    rel="stylesheet"
-  />
-  <style>
-    :root {
-      --accent-color: #e69f2c;
-    }
-  </style>
 </head>
 
-<body
-  style="
-      font-family: 'Noto Sans KR', Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #f7f7f7;
-    "
->
-<th:block
-  th:with="url=|${serverHost}${verificationUri}?email=${email}&uid=${uid}&authCode=${authCode}|,
-                  reportUrl=|${serverHost}/report-unauthorized?email=${email}&uid=${uid}|"
->
-  <div
-    style="
-          width: 100%;
-          max-width: 600px;
-          margin: 20px auto;
-          background-color: #ffffff;
-          border-radius: 8px;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-          overflow: hidden;
-        "
-  >
-    <!-- 헤더 -->
-    <div
-      style="
-            background-color: var(--accent-color);
-            padding: 30px 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-          "
-    >
-      <div
-        style="
-              max-width: 150px;
-              height: auto;
-              font-size: 1.5em;
-              color: white;
-            "
-      >
-        Pageflow
-      </div>
-    </div>
+<body style="font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f7f7f7;">
+<th:block th:with="url=|${serverBaseUrl}${verificationUri}?email=${email}&uid=${uid}&authCode=${authCode}|">
+  <table cellpadding="0" cellspacing="0" border="0" width="100%">
+    <tr>
+      <td align="center" valign="top" style="padding: 20px 0;">
+        <table cellpadding="0" cellspacing="0" border="0" width="600" style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);">
+          <!-- 헤더 -->
+          <tr>
+            <td align="center" style="background-color: #ffc66b; padding: 30px 20px;">
+              <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                <tr>
+                  <td align="center" style="font-size: 24px; color: #ffffff; font-weight: bold;">
+                    Pageflow
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
 
-    <!-- 본문 -->
-    <div style="padding: 30px 40px">
-      <h1
-        style="
-              font-size: 24px;
-              color: #333333;
-              margin-top: 0;
-              margin-bottom: 20px;
-            "
-      >
-        이메일 인증을 완료해 주세요
-      </h1>
-      <p
-        style="
-              font-size: 16px;
-              color: #555555;
-              line-height: 1.6;
-              margin-bottom: 25px;
-            "
-      >
-        안녕하세요! Pageflow 서비스 이용을 위해 아래의 '이메일 인증하기'
-        버튼을 클릭하여 계정 인증을 완료해 주세요.
-      </p>
+          <!-- 본문 -->
+          <tr>
+            <td style="padding: 30px 40px;">
+              <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                <tr>
+                  <td style="font-size: 24px; color: #333333; font-weight: bold; padding-bottom: 20px;">
+                    이메일 인증을 완료해 주세요
+                  </td>
+                </tr>
+                <tr>
+                  <td style="font-size: 16px; color: #555555; line-height: 1.6; padding-bottom: 25px;">
+                    안녕하세요! Pageflow 서비스 이용을 위해 아래의 '이메일 인증하기' 버튼을 클릭하여 계정 인증을 완료해 주세요.
+                  </td>
+                </tr>
 
-      <!-- 버튼 -->
-      <div style="text-align: center; margin: 30px 0">
-        <a
-          th:href="${url}"
-          style="
-                background-color: var(--accent-color);
-                color: #ffffff;
-                font-weight: 500;
-                padding: 14px 30px;
-                border-radius: 50px;
-                text-decoration: none;
-                display: inline-block;
-                font-size: 16px;
-                box-shadow: 0 4px 8px rgba(0, 224, 216, 0.3);
-                transition: all 0.3s;
-              "
-        >이메일 인증하기</a
-        >
-      </div>
+                <!-- 버튼 -->
+                <tr>
+                  <td align="center" style="padding: 30px 0;">
+                    <table cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                        <td align="center" style="background-color: #ffc66b; border-radius: 50px; padding: 14px 30px;">
+                          <a th:href="${url}" style="color: #ffffff; font-weight: bold; text-decoration: none; display: inline-block; font-size: 16px;">
+                            이메일 인증하기
+                          </a>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
 
-      <!-- 링크 안내 -->
-      <div
-        style="
-              background-color: #f8f9fa;
-              border-radius: 6px;
-              padding: 20px;
-              margin-bottom: 20px;
-            "
-      >
-        <p
-          style="
-                font-size: 15px;
-                color: #666666;
-                margin-top: 0;
-                margin-bottom: 12px;
-              "
-        >
-          버튼이 작동하지 않거나 다른 디바이스에서 인증하시려면 아래 링크를
-          사용하세요.
-        </p>
-        <p
-          style="
-                font-size: 14px;
-                color: #777777;
-                margin-bottom: 10px;
-                word-break: break-all;
-              "
-        >
-          <a
-            th:href="${url}"
-            th:text="${url}"
-            style="color: var(--accent-color); text-decoration: none"
-          ></a>
-        </p>
-        <p
-          style="
-                font-size: 14px;
-                color: #999999;
-                margin-top: 15px;
-                margin-bottom: 0;
-              "
-        >
-              <span
-                style="
-                  display: inline-block;
-                  width: 18px;
-                  height: 18px;
-                  background-color: #ffcc00;
-                  border-radius: 50%;
-                  vertical-align: middle;
-                  margin-right: 8px;
-                  text-align: center;
-                  line-height: 18px;
-                  color: white;
-                  font-weight: bold;
-                "
-              >!</span
-              >
-          해당 링크는 10분간만 유효합니다.
-        </p>
-      </div>
+                <!-- 링크 안내 -->
+                <tr>
+                  <td style="background-color: #f8f9fa; border-radius: 6px; padding: 20px; margin-bottom: 20px;">
+                    <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                      <tr>
+                        <td style="font-size: 15px; color: #666666; padding-bottom: 12px;">
+                          버튼이 작동하지 않거나 다른 디바이스에서 인증하시려면 아래 링크를 사용하세요.
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="font-size: 14px; color: #777777; padding-bottom: 10px; word-break: break-all;">
+                          <a th:href="${url}" th:text="${url}" style="color: #ffc66b; text-decoration: none"></a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="font-size: 14px; color: #999999; padding-top: 15px;">
+                          <table cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                              <td style="width: 18px; height: 18px; background-color: #ffcc00; border-radius: 50%; text-align: center; vertical-align: middle; color: white; font-weight: bold;">!</td>
+                              <td style="padding-left: 8px;">해당 링크는 10분간만 유효합니다.</td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
 
-      <!-- 푸터 -->
-      <div
-        style="
-            background-color: #f0f0f0;
-            padding: 20px;
-            text-align: center;
-            font-size: 13px;
-            color: #999999;
-          "
-      >
-        <p style="margin: 0 0 10px 0">
-          © 2025 Pageflow. All rights reserved.
-        </p>
-        <p style="margin: 0">
-          이 메일은 발신 전용이며 회신하실 수 없습니다. 문의사항은
-          <a th:href="|mailto:${supportEmail}|" style="color: #777777"
-          >support@pageflow.com</a
-          >으로 연락해 주세요.
-        </p>
-      </div>
-    </div>
-  </div>
+          <!-- 푸터 -->
+          <tr>
+            <td style="background-color: #f0f0f0; padding: 20px; text-align: center; font-size: 13px; color: #999999;">
+              <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                <tr>
+                  <td style="padding-bottom: 10px;">
+                    © 2025 Pageflow. All rights reserved.
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    이 메일은 발신 전용이며 회신하실 수 없습니다. 문의사항은
+                    <a th:href="|mailto:${supportEmail}|" style="color: #777777">[[${supportEmail}]]</a>으로 연락해 주세요.
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
 </th:block>
 </body>
 </html>

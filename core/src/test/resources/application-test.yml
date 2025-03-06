@@ -47,6 +47,7 @@ spring:
 pageflow:
   site:
     protocol: http
-    base-url: '${pageflow.site.protocol}://localhost:${server.port}'
-    client-url: '${pageflow.site.protocol}://localhost:3000'
+    domain: localhost
+    base-url: '${pageflow.site.protocol}://${pageflow.site.domain}:${server.port}'
+    client-url: '${pageflow.site.protocol}://${pageflow.site.domain}:3000'
     client-proxy-prefix: '/PROXY'

@@ -51,7 +51,7 @@ public class EmailService {
 
     // template 파싱
     EmailTemplate template = new EmailTemplate("/email-verification-request");
-    template.setVariable("serverHost", properties.site.baseUrl);
+    template.setVariable("serverBaseUrl", properties.site.baseUrl);
     template.setVariable("verificationUri", verificationUri);
     template.setVariable("email", email);
     template.setVariable("uid", uid);

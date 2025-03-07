@@ -21,7 +21,7 @@ public class LoginFailureHandler implements AuthenticationFailureHandler {
   ) {
     switch(exception.getClass().getSimpleName()){
       case "UsernameNotFoundException":
-        throw new ProcessResultException(UserCode.USERNAME_NOT_FOUND);
+        throw new ProcessResultException(UserCode.USER_NOT_FOUND);
       case "BadCredentialsException":
         throw new ProcessResultException(UserCode.BAD_CREDENTIALS);
       default:

@@ -17,12 +17,11 @@ public enum UserCode implements ResultCode {
   SESSION_EXPIRED("세션(refreshToken) 만료"),
   ACCESS_TOKEN_EXPIRED("AccessToken 만료"),
 
-  // 로그인
-  USERNAME_NOT_FOUND("아이디를 찾을 수 없음"),
-  BAD_CREDENTIALS("자격증명 실패"),
-
   // 사용자 조회
   USER_NOT_FOUND("사용자를 찾을 수 없음"),
+
+  // 로그인
+  BAD_CREDENTIALS("자격증명 실패"),
 
   // 이메일 인증
   EMAIL_VERIFICATION_ERROR("이메일 인증에 실패했습니다."),

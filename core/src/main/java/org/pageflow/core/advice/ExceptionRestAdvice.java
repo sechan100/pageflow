@@ -7,6 +7,7 @@ import org.pageflow.common.result.Result;
 import org.pageflow.common.result.code.CommonCode;
 import org.pageflow.common.validation.FieldValidationException;
 import org.springframework.http.converter.HttpMessageConversionException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -42,6 +43,11 @@ public class ExceptionRestAdvice {
   public ApiResponse<Void> handleFieldValidationException(FieldValidationException e) {
     log.debug("FieldValidationException을 처리했습니다. Fields: {}", e.getResult().getInvalidFields());
     return ApiResponse.of(Result.of(CommonCode.FIELD_VALIDATION_FAIL, e.getResult()));
+  }
+
+  @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+  public ApiResponse<Void> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException e) {
+    return ApiResponse.of(Result.of(CommonCode.METHOD_NOT_ALLOWED));
   }
 
   @ExceptionHandler(Throwable.class)

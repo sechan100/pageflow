@@ -63,9 +63,6 @@ public class AuthService implements SessionUseCase {
   @Override
   public void logout(UUID sessionId) {
     int isDeleted = sessionPersistencePort.deleteSessionById(sessionId);
-    if(isDeleted == 0) {
-      throw new ProcessResultException(UserCode.ALREADY_LOGOUT);
-    }
   }
 
 

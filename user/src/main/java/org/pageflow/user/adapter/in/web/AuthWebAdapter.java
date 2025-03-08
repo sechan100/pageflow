@@ -44,7 +44,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Tag(name = "auth", description = "인증관련")
 public class AuthWebAdapter {
-  public static final String SESSION_ID_COOKIE_PATH = "/auth/session";
+  public static final String SESSION_ID_COOKIE_PATH = "/auth";
   public static final String SESSION_ID_COOKIE_NAME = "PAGEFLOW_SESSION_IDENTIFIER";
 
   private final ApplicationProperties props;

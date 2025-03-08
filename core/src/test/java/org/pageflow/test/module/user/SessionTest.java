@@ -38,9 +38,6 @@ public class SessionTest {
 
     // 로그아웃 성공
     userApi.post("/auth/logout", null).isSuccess();
-
-    // 로그아웃 재시도하면 실패
-    userApi.post("/auth/logout", null).is(UserCode.ALREADY_LOGOUT);
   }
 
   @Test

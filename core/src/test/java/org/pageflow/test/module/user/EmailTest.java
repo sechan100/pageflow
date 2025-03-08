@@ -4,9 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.pageflow.common.result.ProcessResultException;
+import org.pageflow.common.result.Result;
 import org.pageflow.test.e2e.PageflowIntegrationTest;
 import org.pageflow.test.shared.DataCreator;
+import org.pageflow.user.application.UserCode;
 import org.pageflow.user.domain.entity.EmailVerificationRequest;
 import org.pageflow.user.domain.service.AccountEmailService;
 import org.pageflow.user.dto.UserDto;
@@ -59,11 +60,8 @@ public class EmailTest {
     accountPersistencePort.flush();
 
     // 이제 user1@pageflow.org는 사용할 수 없음
-    Assertions.assertThrows(
-      ProcessResultException.class,
-      () -> accountEmailService.sendVerificationEmail(user2.getUid(), "/verify"),
-      "이미 사용중인 이메일은 사용할 수 없는데 있네..?"
-    );
+    Result result = accountEmailService.sendVerificationEmail(user2.getUid(), "/verify");
+    Assertions.assertEquals(UserCode.INVALID_EMAIL, result.getCode());
     accountPersistencePort.flush();
   }
 }

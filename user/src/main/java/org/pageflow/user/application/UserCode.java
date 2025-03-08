@@ -13,12 +13,8 @@ public enum UserCode implements ResultCode {
   OAUTH2_SIGNUP_REQUIRED("OAuth2 회원가입이 필요", PreSignupedUser.class),
 
   // 세션
-  ALREADY_LOGOUT("이미 로그아웃됨"),
   SESSION_EXPIRED("세션(refreshToken) 만료"),
   ACCESS_TOKEN_EXPIRED("AccessToken 만료"),
-
-  // 사용자 조회
-  USER_NOT_FOUND("사용자를 찾을 수 없음"),
 
   // 로그인
   BAD_CREDENTIALS("자격증명 실패"),

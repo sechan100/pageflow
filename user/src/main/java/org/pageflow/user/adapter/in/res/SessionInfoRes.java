@@ -34,7 +34,7 @@ public class SessionInfoRes {
         dto.getUid(),
         dto.getUsername(),
         dto.getEmail(),
-        dto.isEmailVerified(),
+        dto.getIsEmailVerified(),
         dto.getRole(),
         dto.getPenname(),
         dto.getProfileImageUrl()

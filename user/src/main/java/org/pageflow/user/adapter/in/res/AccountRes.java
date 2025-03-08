@@ -25,7 +25,7 @@ public class AccountRes implements IdentifiableUser {
       dto.getUid(),
       dto.getUsername(),
       dto.getEmail(),
-      dto.isEmailVerified(),
+      dto.getIsEmailVerified(),
       dto.getProvider(),
       dto.getRole()
     );

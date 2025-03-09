@@ -12,10 +12,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
  * @author : sechan
  */
 public class Password extends SingleValueWrapper<String> {
-  private static final PasswordEncoder ENCODER = PasswordEncoderConfig.PASSWORD_ENCODER;
-  private static final int MIN_LENGTH = 5;
-  private static final int MAX_LENGTH = 36;
-  private static final String REGEX = "^(?=.*[A-Za-z])(?=.*[0-9])([A-Za-z0-9~!@#$%^&*()+_|=]|-){" + MIN_LENGTH + "," + MAX_LENGTH + "}$";
+  public static final PasswordEncoder ENCODER = PasswordEncoderConfig.PASSWORD_ENCODER;
+  public static final int MIN_LENGTH = 5;
+  public static final int MAX_LENGTH = 36;
+  public static final String REGEX = "^(?=.*[A-Za-z])(?=.*[0-9])([A-Za-z0-9~!@#$%^&*()+_|=]|-){" + MIN_LENGTH + "," + MAX_LENGTH + "}$";
+  public static final String REGEX_MESSAGE = "비밀번호는 영문, 숫자, 특수문자를 조합하여 입력해주세요.";
 
   private Password(String value) {
     super(value);
@@ -37,7 +38,7 @@ public class Password extends SingleValueWrapper<String> {
     FieldValidator<String> validator = new FieldValidator<>("password", password)
       .minLength(MIN_LENGTH, "비밀번호는 최소 " + MIN_LENGTH + "자 이상이어야 합니다.")
       .maxLength(MAX_LENGTH, "비밀번호는 최대 " + MAX_LENGTH + "자 이하여야 합니다.")
-      .regex(REGEX, "비밀번호는 영문, 숫자, 특수문자를 조합하여 입력해주세요.");
+      .regex(REGEX, REGEX_MESSAGE);
 
     return validator.validate();
   }

@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.pageflow.book.adapter.in.aop.SetBookPermission;
 import org.pageflow.book.adapter.in.request.CreateBookReq;
-import org.pageflow.book.adapter.in.response.BookRes;
 import org.pageflow.book.application.BookId;
 import org.pageflow.book.domain.BookTitle;
 import org.pageflow.book.dto.BookDto;
@@ -32,11 +31,11 @@ public class BookWebAdapter {
 
   @PostMapping("")
   @Operation(summary = "책 생성")
-  public BookRes createBook(@RequestBody CreateBookReq req) {
+  public BookDto createBook(@RequestBody CreateBookReq req) {
     UID uid = rqcxt.getUid();
     BookTitle title = BookTitle.of(req.getTitle());
     BookDto result = bookUseCase.createBook(uid, title, null);
-    return BookRes.from(result);
+    return result;
   }
 
   @GetMapping("/{bookId}")

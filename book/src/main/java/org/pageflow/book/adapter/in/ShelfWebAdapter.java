@@ -3,7 +3,6 @@ package org.pageflow.book.adapter.in;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.pageflow.book.adapter.in.aop.SetBookPermission;
-import org.pageflow.book.adapter.in.response.BookRes;
 import org.pageflow.book.application.BookId;
 import org.pageflow.book.dto.BookDto;
 import org.pageflow.book.port.in.BookShelfUseCase;
@@ -29,12 +28,12 @@ public class ShelfWebAdapter {
   @PostMapping("")
   @Operation(summary = "책을 책장에 추가")
   @SetBookPermission
-  public BookRes addBookToShelf(
+  public BookDto addBookToShelf(
     @BookId @PathVariable UUID bookId
   ) {
     UID uid = rqcxt.getUid();
     BookDto result = bookShelfUseCase.addBookToShelf(bookId, uid);
-    return BookRes.from(result);
+    return result;
   }
 
   @DeleteMapping("")

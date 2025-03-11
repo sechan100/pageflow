@@ -43,21 +43,20 @@ public class UserProfileUpdateWebAdapter {
     @RequestPart(required = false)
     MultipartFile file,
     @Parameter(description = "해당 플래그를 true로하면 기존 프로필 이미지를 삭제하고 기본 값으로 되돌립니다.")
-    @RequestParam(defaultValue = "false") boolean delete
+    @RequestParam(defaultValue = "false") boolean toDefaultProfileImage
   ) {
     UID uid = rqrxt.getUid();
-    if(req.getEmail() != null){
+    if(req.getEmail() != null) {
       accountUsecase.changeEmail(uid, req.getEmail());
     }
-    if(req.getPenname() != null){
+    if(req.getPenname() != null) {
       profileUseCase.changePenname(uid, req.getPenname());
     }
     if(file != null) {
-      if(delete){
-        profileUseCase.deleteProfileImage(uid);
-      } else {
-        profileUseCase.changeProfileImage(uid, file);
-      }
+      profileUseCase.changeProfileImage(uid, file);
+    }
+    if(toDefaultProfileImage) {
+      profileUseCase.deleteProfileImage(uid);
     }
     Optional<UserDto> userDtoOpt = userUseCase.queryUser(uid);
     assert userDtoOpt.isPresent();

@@ -3,7 +3,6 @@ package org.pageflow.book.adapter.in;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.pageflow.book.adapter.in.aop.SetBookPermission;
-import org.pageflow.book.adapter.in.response.BookRes;
 import org.pageflow.book.application.BookId;
 import org.pageflow.book.dto.BookDto;
 import org.pageflow.book.port.in.BookStatusUseCase;
@@ -31,7 +30,7 @@ public class BookStatusWebAdapter {
   @PostMapping("/user/books/{bookId}/status")
   @Operation(summary = "책 상태 변경")
   @SetBookPermission
-  public BookRes changeBookStatus(
+  public BookDto changeBookStatus(
     @BookId @PathVariable UUID bookId,
     @RequestParam BookStatusCmd cmd
   ) {
@@ -42,7 +41,7 @@ public class BookStatusWebAdapter {
       case MERGE_REVISION -> bookStatusUseCase.mergeRevision(bookId);
       case REVISE -> bookStatusUseCase.revise(bookId);
     };
-    return BookRes.from(result);
+    return result;
   }
 
 

@@ -14,7 +14,6 @@ import org.pageflow.user.adapter.in.auth.oauth2.presignup.OAuth2PreSignupService
 import org.pageflow.user.adapter.in.auth.oauth2.presignup.PreSignupDto;
 import org.pageflow.user.adapter.in.req.SignupForm;
 import org.pageflow.user.adapter.in.res.PreSignupedUser;
-import org.pageflow.user.adapter.in.res.UserRes;
 import org.pageflow.user.application.UserCode;
 import org.pageflow.user.dto.UserDto;
 import org.pageflow.user.port.in.SignupCmd;
@@ -39,7 +38,7 @@ public class SignupWebAdapter {
 
   @PostMapping("/signup")
   @Operation(summary = "회원가입", description = "새로운 사용자의 회원가입을 요청")
-  public UserRes signup(@RequestBody SignupForm form) {
+  public UserDto signup(@RequestBody SignupForm form) {
     Optional<PreSignupDto> preSignupOptional = preSignupService.loadAndRemove(form.getUsername());
 
     SignupCmd cmd = null;
@@ -67,7 +66,7 @@ public class SignupWebAdapter {
     }
 
     UserDto userDto = signupUseCase.signup(cmd);
-    return UserRes.from(userDto);
+    return userDto;
   }
 
 

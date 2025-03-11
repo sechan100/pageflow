@@ -30,7 +30,7 @@ public class EmailVerificationWebAdapter {
 
   private static final String VERIFY_URI = "/email/verify";
 
-  @PostMapping("/user/email/request-verification")
+  @PostMapping("/user/email/verification")
   @Operation(summary = "이메일 인증 메일 요청")
   public void requestEmailVerification() {
     UID uid = rqrxt.getUid();

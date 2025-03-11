@@ -40,8 +40,8 @@ public class UserProfileUpdateWebAdapter {
   public Result<UserDto> changeProfile(
     @RequestPart("form")
     ProfileUpdateReq req,
-    @RequestPart(required = false)
-    MultipartFile file,
+    @RequestPart(name = "profileImage", required = false)
+    MultipartFile profileImage,
     @Parameter(description = "해당 플래그를 true로하면 기존 프로필 이미지를 삭제하고 기본 값으로 되돌립니다.")
     @RequestParam(defaultValue = "false") boolean toDefaultProfileImage
   ) {
@@ -52,8 +52,8 @@ public class UserProfileUpdateWebAdapter {
     if(req.getPenname() != null) {
       profileUseCase.changePenname(uid, req.getPenname());
     }
-    if(file != null) {
-      profileUseCase.changeProfileImage(uid, file);
+    if(profileImage != null) {
+      profileUseCase.changeProfileImage(uid, profileImage);
     }
     if(toDefaultProfileImage) {
       profileUseCase.deleteProfileImage(uid);

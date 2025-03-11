@@ -8,18 +8,22 @@ import org.pageflow.common.validation.FieldValidationException;
 import org.pageflow.common.validation.FieldValidationResult;
 import org.pageflow.user.domain.entity.Account;
 import org.pageflow.user.dto.AccountDto;
+import org.pageflow.user.dto.UserDto;
 import org.pageflow.user.port.in.AccountUseCase;
 import org.pageflow.user.port.in.EmailVerificationCmd;
+import org.pageflow.user.port.in.UserUseCase;
 import org.pageflow.user.port.out.entity.AccountPersistencePort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 
 @Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class AccountService implements AccountUseCase {
+public class AccountService implements AccountUseCase, UserUseCase {
   private final AccountPersistencePort accountPersistencePort;
   private final UsernameValidator usernameValidator;
   private final AccountEmailService accountEmailService;
@@ -47,9 +51,14 @@ public class AccountService implements AccountUseCase {
     accountEmailService.verify(cmd);
   }
 
+  @Override
+  public Optional<UserDto> queryUser(UID uid) {
+    Optional<Account> accountOptional = accountPersistencePort.findWithProfileById(uid.getValue());
+    return accountOptional.map(UserDto::from);
+  }
+
 
   private Account _load(UID uid) {
     return accountPersistencePort.findById(uid.getValue()).orElseThrow();
   }
-
 }

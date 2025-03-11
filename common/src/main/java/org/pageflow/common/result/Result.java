@@ -6,6 +6,7 @@ import org.pageflow.common.result.code.CommonCode;
 import org.pageflow.common.result.code.ResultCode;
 
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * 애플리케이션 전반에 걸쳐서 사용하는 응답객체.
@@ -50,6 +51,11 @@ public class Result<T> {
 
   public static <T> Result<T> success() {
     return new Result<>(CommonCode.SUCCESS, null);
+  }
+
+  @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+  public static <T> Result<T> from(Optional<T> optional, ResultCode notFoundCode) {
+    return optional.map(Result::success).orElseGet(() -> Result.of(notFoundCode));
   }
 
   public boolean is(ResultCode code) {

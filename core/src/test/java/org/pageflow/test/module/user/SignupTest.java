@@ -40,6 +40,6 @@ public class SignupTest {
 
     // 중복 회원가입
     e2e.post("/signup", user1)
-      .is(CommonCode.FIELD_VALIDATION_FAIL);
+      .is(CommonCode.FIELD_VALIDATION_ERROR);
   }
 }

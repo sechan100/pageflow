@@ -11,7 +11,7 @@ import org.springframework.lang.Nullable;
  * @author : sechan
  */
 @Getter
-public class ApiResponse<T> {
+public class ApiResponse {
 
   /**
    * {@link ResultCode}의 name()이다.
@@ -19,29 +19,29 @@ public class ApiResponse<T> {
   private final String code;
   private final String description;
   @Nullable
-  private final T data;
+  private final Object data;
 
 
   @JsonCreator
   public ApiResponse(
     @JsonProperty("code") String code,
     @JsonProperty("description") String description,
-    @JsonProperty("data") T data
+    @JsonProperty("data") Object data
   ) {
     this.code = code;
     this.description = description;
     this.data = data;
   }
 
-  private ApiResponse(Result<T> result) {
+  private ApiResponse(Result result) {
     ResultCode code = result.getCode();
     this.code = code.getCode();
     this.description = code.getDescription();
-    this.data = result.dangerouslyGetData();
+    this.data = result.getRawDataWithoutCodeCheck();
   }
 
-  public static <T> ApiResponse<T> of(Result<T> result) {
-    return new ApiResponse<>(result);
+  public static ApiResponse of(Result result) {
+    return new ApiResponse(result);
   }
 
 }

@@ -35,7 +35,7 @@ public class EmailVerificationWebAdapter {
   public void requestEmailVerification() {
     UID uid = rqrxt.getUid();
     Result result = accountUsecase.sendEmailVerificationMail(uid, VERIFY_URI);
-    if(result.isFail()) {
+    if(result.isFailure()) {
       throw new ProcessResultException(result);
     }
   }

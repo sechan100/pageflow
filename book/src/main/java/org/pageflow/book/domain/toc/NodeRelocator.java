@@ -164,7 +164,7 @@ public class NodeRelocator {
         .value(destIndex)
         .build()
       );
-      throw new ProcessResultException(Result.of(CommonCode.FIELD_VALIDATION_FAIL, indexOutOfRangeResult));
+      throw new ProcessResultException(Result.of(CommonCode.FIELD_VALIDATION_ERROR, indexOutOfRangeResult));
     }
   }
 

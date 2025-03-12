@@ -23,7 +23,7 @@ public class ExceptionRestAdvice {
    * ProcessResultException 처리
    */
   @ExceptionHandler(ProcessResultException.class)
-  public ApiResponse<?> handleProcessResultException(ProcessResultException e) {
+  public ApiResponse handleProcessResultException(ProcessResultException e) {
     log.debug("ProcessResultException을 처리했습니다. CODE: {}", e.getResult().getCode());
     return ApiResponse.of(e.getResult());
   }
@@ -32,7 +32,7 @@ public class ExceptionRestAdvice {
    * HTTP 요청 해석 실패
    */
   @ExceptionHandler(HttpMessageConversionException.class)
-  public ApiResponse<Void> handleHttpMessageConversionException(HttpMessageConversionException e) {
+  public ApiResponse handleHttpMessageConversionException(HttpMessageConversionException e) {
     return ApiResponse.of(Result.of(CommonCode.FAIL_TO_PARSE_HTTP_REQUEST));
   }
 
@@ -40,18 +40,18 @@ public class ExceptionRestAdvice {
    * FieldValidationException
    */
   @ExceptionHandler(FieldValidationException.class)
-  public ApiResponse<Void> handleFieldValidationException(FieldValidationException e) {
+  public ApiResponse handleFieldValidationException(FieldValidationException e) {
     log.debug("FieldValidationException을 처리했습니다. Fields: {}", e.getResult().getInvalidFields());
-    return ApiResponse.of(Result.of(CommonCode.FIELD_VALIDATION_FAIL, e.getResult()));
+    return ApiResponse.of(Result.of(CommonCode.FIELD_VALIDATION_ERROR, e.getResult()));
   }
 
   @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-  public ApiResponse<Void> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException e) {
+  public ApiResponse handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException e) {
     return ApiResponse.of(Result.of(CommonCode.METHOD_NOT_ALLOWED));
   }
 
   @ExceptionHandler(Throwable.class)
-  public ApiResponse<Void> handleException(Throwable e) {
+  public ApiResponse handleException(Throwable e) {
     // TODO: 이거 이메일 보내야댐(911)
     log.error("알 수 없는 예외가 발생하여 INTERNAL_SERVER_ERROR 응답을 반환했습니다. 해당 예외를 처리하려면 적절한 ExceptionHandler를 등록하세요.", e);
     return ApiResponse.of(Result.of(CommonCode.INTERNAL_SERVER_ERROR));

@@ -1,6 +1,7 @@
 package org.pageflow.common.result.code;
 
 import org.pageflow.common.result.Result;
+import org.springframework.lang.Nullable;
 
 /**
  * <p>{@link Result}가 가지는 code 필드에 사용되는 enum의 스펙을 정의한다.
@@ -27,6 +28,7 @@ public interface ResultCode {
    * dataType은 Result 객체가 가지는 타입을 명시한다.
    * Collection이나 Map등을 반환하는 경우 반드시 DTO를 사용해야한다.
    */
+  @Nullable
   Class<?> getDataType();
 
   String name();

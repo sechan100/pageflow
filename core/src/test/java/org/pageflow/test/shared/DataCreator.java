@@ -29,7 +29,7 @@ public class DataCreator {
       username + "@pageflow.org",
       username,
       RoleType.ROLE_USER
-    );
+    ).getSuccessData();
     return signupUseCase.signup(cmd);
   }
 

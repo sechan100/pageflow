@@ -27,5 +27,5 @@ public interface AccountPersistencePort extends BaseJpaRepository<Account, UUID>
   @EntityGraph(attributePaths = {"profile"})
   Optional<Account> findWithProfileById(UUID id);
 
-  boolean existsByEmailAndEmailVerifiedIsTrue(String email);
+  boolean existsByEmailAndIsEmailVerifiedIsTrue(String email);
 }

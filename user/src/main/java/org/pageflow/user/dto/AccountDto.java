@@ -23,7 +23,7 @@ public class AccountDto implements IdentifiableUser {
       account.getUid(),
       account.getUsername(),
       account.getEmail(),
-      account.getEmailVerified(),
+      account.getIsEmailVerified(),
       account.getProvider(),
       account.getRole()
     );

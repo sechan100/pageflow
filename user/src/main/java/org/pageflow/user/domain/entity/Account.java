@@ -4,16 +4,20 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.pageflow.common.jpa.BaseJpaEntity;
+import org.pageflow.common.result.NullData;
+import org.pageflow.common.result.Result;
 import org.pageflow.common.user.ProviderType;
 import org.pageflow.common.user.RoleType;
 import org.pageflow.common.user.UID;
-import org.pageflow.user.application.config.PasswordEncoderConfig;
+import org.pageflow.user.application.UserCode;
+import org.pageflow.user.domain.Password;
 
 import java.util.UUID;
 
 @Getter
 @Entity
 @Builder
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(of = "id", callSuper = false)
 @Table(
@@ -37,8 +41,8 @@ public class Account extends BaseJpaEntity {
   @Column(name = "email", nullable = false)
   private String email;
 
-  @Column(name = "email_verified", nullable = false)
-  private Boolean emailVerified;
+  @Column(name = "is_email_verified", nullable = false)
+  private Boolean isEmailVerified;
 
   /**
    * NATIVE, GOOGLE, KAKAO, NAVER, GITHUB
@@ -60,26 +64,6 @@ public class Account extends BaseJpaEntity {
   private Profile profile;
 
 
-  public Account(
-    UUID id,
-    String username,
-    String password,
-    String email,
-    boolean emailVerified,
-    ProviderType provider,
-    RoleType role,
-    Profile profile
-  ) {
-    this.id = id;
-    this.username = username;
-    this.password = password;
-    this.email = email;
-    this.emailVerified = emailVerified;
-    this.provider = provider;
-    this.role = role;
-    this.profile = profile;
-  }
-
   /**
    * 아직 Profile이 할당되지 않은 Account에 대하여, 해당 Profile을 연결한다.
    * @param profile
@@ -100,29 +84,43 @@ public class Account extends BaseJpaEntity {
     profile.setAccount(this);
   }
 
-
   public UID getUid() {
     return new UID(id);
   }
 
   public void changeEmail(String email) {
     this.email = email;
-    this.emailVerified = false;
+    this.isEmailVerified = false;
   }
 
-  public void changePassword(String password) {
-    this.password = password;
+  /**
+   *
+   * @param currentPassword
+   * @param password
+   * @return Result
+   * - BAD_CREDENTIALS: currentPassword가 일치하지 않는 경우
+   * - PASSWORD_SAME_AS_BEFORE: 새로운 비밀번호가 기존 비밀번호와 동일한 경우
+   */
+  public Result<NullData> changePassword(String currentPassword, Password password) {
+    if(!passwordMatches(currentPassword)){
+      return Result.of(UserCode.BAD_CREDENTIALS);
+    }
+    if(currentPassword.equals(password.getValue())){
+      return Result.of(UserCode.PASSWORD_SAME_AS_BEFORE);
+    }
+    this.password = password.getValue();
+    return Result.success();
   }
 
   public void verifyEmail() {
-    this.emailVerified = true;
+    this.isEmailVerified = true;
   }
 
   public void unverifyEmail() {
-    this.emailVerified = false;
+    this.isEmailVerified = false;
   }
 
   public boolean passwordMatches(String rawPassword) {
-    return PasswordEncoderConfig.PASSWORD_ENCODER.matches(rawPassword, this.password);
+    return Password.matches(rawPassword, this.password);
   }
 }

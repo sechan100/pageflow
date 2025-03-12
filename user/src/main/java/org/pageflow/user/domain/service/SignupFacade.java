@@ -59,7 +59,7 @@ public class SignupFacade implements SignupUseCase {
       .username(cmd.getUsername())
       .password(cmd.getPassword().toString())
       .email(cmd.getEmail())
-      .emailVerified(false)
+      .isEmailVerified(false)
       .provider(cmd.getProvider())
       .role(cmd.getRole())
       .build();

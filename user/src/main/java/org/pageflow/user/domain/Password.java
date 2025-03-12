@@ -1,8 +1,9 @@
 package org.pageflow.user.domain;
 
 
+import org.pageflow.common.result.Result;
+import org.pageflow.common.result.code.CommonCode;
 import org.pageflow.common.utility.SingleValueWrapper;
-import org.pageflow.common.validation.FieldValidationException;
 import org.pageflow.common.validation.FieldValidationResult;
 import org.pageflow.common.validation.FieldValidator;
 import org.pageflow.user.application.config.PasswordEncoderConfig;
@@ -22,14 +23,24 @@ public class Password extends SingleValueWrapper<String> {
     super(value);
   }
 
-  public static Password encrypt(String rawPassword) {
+  /**
+   * Password 객체를 암호화하여 반환
+   * @param rawPassword
+   * @return Result
+   * - FIELD_VALIDATION_ERROR : 비밀번호가 유효하지 않을 때
+   */
+  public static Result<Password> encrypt(String rawPassword) {
     FieldValidationResult result = validate(rawPassword);
     if(result.isValid()){
       String encrypted = ENCODER.encode(rawPassword);
-      return new Password(encrypted);
+      return Result.success(new Password(encrypted));
     } else {
-      throw new FieldValidationException(result);
+      return Result.of(CommonCode.FIELD_VALIDATION_ERROR, result);
     }
+  }
+
+  public static boolean matches(String rawPassword, String encryptedPassword) {
+    return ENCODER.matches(rawPassword, encryptedPassword);
   }
 
   private static FieldValidationResult validate(String password) {

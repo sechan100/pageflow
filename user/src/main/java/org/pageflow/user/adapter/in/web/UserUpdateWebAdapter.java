@@ -5,9 +5,12 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.pageflow.common.api.RequestContext;
+import org.pageflow.common.result.NullData;
 import org.pageflow.common.result.Result;
 import org.pageflow.common.user.UID;
+import org.pageflow.user.adapter.in.req.ChangePasswordReq;
 import org.pageflow.user.adapter.in.req.ProfileUpdateReq;
+import org.pageflow.user.dto.AccountDto;
 import org.pageflow.user.dto.UserDto;
 import org.pageflow.user.port.in.AccountUseCase;
 import org.pageflow.user.port.in.ProfileUseCase;
@@ -27,7 +30,7 @@ import java.util.Optional;
 @RequestMapping("/user")
 @RequiredArgsConstructor
 @Tag(name = "user-update", description = "다양한 사용자 필드 변경")
-public class UserProfileUpdateWebAdapter {
+public class UserUpdateWebAdapter {
   private final RequestContext rqrxt;
   private final UserUseCase userUseCase;
   private final AccountUseCase accountUsecase;
@@ -61,5 +64,15 @@ public class UserProfileUpdateWebAdapter {
     Optional<UserDto> userDtoOpt = userUseCase.queryUser(uid);
     assert userDtoOpt.isPresent();
     return Result.success(userDtoOpt.get());
+  }
+
+
+  @PostMapping("/password")
+  @Operation(summary = "비밀번호 변경")
+  public Result<NullData> changePassword(@RequestBody ChangePasswordReq req) {
+    UID uid = rqrxt.getUid();
+    Result<AccountDto> result = accountUsecase.changePassword(uid, req.getCurrentPassword(), req.getNewPassword());
+    if(result.isFailure()) return (Result) result;
+    return Result.success();
   }
 }

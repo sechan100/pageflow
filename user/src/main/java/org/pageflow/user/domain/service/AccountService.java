@@ -2,10 +2,12 @@ package org.pageflow.user.domain.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.pageflow.common.result.NullData;
 import org.pageflow.common.result.Result;
 import org.pageflow.common.user.UID;
 import org.pageflow.common.validation.FieldValidationException;
 import org.pageflow.common.validation.FieldValidationResult;
+import org.pageflow.user.domain.Password;
 import org.pageflow.user.domain.entity.Account;
 import org.pageflow.user.dto.AccountDto;
 import org.pageflow.user.dto.UserDto;
@@ -57,6 +59,30 @@ public class AccountService implements AccountUseCase, UserUseCase {
     return accountOptional.map(UserDto::from);
   }
 
+  /**
+   *
+   * @param uid
+   * @param currentPassword
+   * @param newPassword
+   * @return Result
+   * - FIELD_VALIDATION_ERROR : 새로운 비밀번호가 유효하지 않을 때
+   * - BAD_CREDENTIALS: currentPassword가 일치하지 않는 경우
+   * - PASSWORD_SAME_AS_BEFORE: 새로운 비밀번호가 기존 비밀번호와 동일한 경우
+   */
+  @Override
+  public Result<AccountDto> changePassword(UID uid, String currentPassword, String newPassword) {
+    Account account = _load(uid);
+    Result<Password> encryptResult = Password.encrypt(newPassword);
+    if(encryptResult.isFailure()){
+      return (Result) encryptResult;
+    }
+    Result<NullData> changeResult = account.changePassword(currentPassword, encryptResult.getSuccessData());
+    if(changeResult.isFailure()){
+      return (Result) changeResult;
+    }
+    AccountDto accountDto = AccountDto.from(account);
+    return Result.success(accountDto);
+  }
 
   private Account _load(UID uid) {
     return accountPersistencePort.findById(uid.getValue()).orElseThrow();

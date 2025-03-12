@@ -11,4 +11,5 @@ public interface AccountUseCase {
   AccountDto changeEmail(UID uid, String email);
   Result sendEmailVerificationMail(UID uid, String verificationUri);
   void verifyEmail(EmailVerificationCmd cmd);
+  Result<AccountDto> changePassword(UID uid, String currentPassword, String newPassword);
 }

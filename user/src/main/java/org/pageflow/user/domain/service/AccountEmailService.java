@@ -36,7 +36,7 @@ public class AccountEmailService {
   public FieldValidationResult validate(String email) {
     FieldValidator<String> validator = new FieldValidator<>("email", email)
       .email()
-      .rule(e -> !accountPersistencePort.existsByEmailAndEmailVerifiedIsTrue(e), FieldReason.DUPLICATED, "이미 사용중인 이메일입니다.");
+      .rule(e -> !accountPersistencePort.existsByEmailAndIsEmailVerifiedIsTrue(e), FieldReason.DUPLICATED, "이미 사용중인 이메일입니다.");
     return validator.validate();
   }
 

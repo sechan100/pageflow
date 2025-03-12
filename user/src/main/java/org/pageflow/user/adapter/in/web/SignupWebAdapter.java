@@ -38,14 +38,14 @@ public class SignupWebAdapter {
 
   @PostMapping("/signup")
   @Operation(summary = "회원가입", description = "새로운 사용자의 회원가입을 요청")
-  public UserDto signup(@RequestBody SignupForm form) {
+  public Result<UserDto> signup(@RequestBody SignupForm form) {
     Optional<PreSignupDto> preSignupOptional = preSignupService.loadAndRemove(form.getUsername());
 
-    SignupCmd cmd = null;
+    Result<SignupCmd> cmdResult = null;
     // OAuth
     if(preSignupOptional.isPresent()){
       PreSignupDto preSignup = preSignupOptional.get();
-      cmd = SignupCmd.oAuthSignup(
+      cmdResult = SignupCmd.oAuthSignup(
         form.getUsername(),
         UUID.randomUUID().toString(),
         form.getEmail(),
@@ -56,7 +56,7 @@ public class SignupWebAdapter {
       );
     // Native
     } else {
-      cmd = SignupCmd.nativeSignup(
+      cmdResult = SignupCmd.nativeSignup(
         form.getUsername(),
         form.getPassword(),
         form.getEmail(),
@@ -65,8 +65,12 @@ public class SignupWebAdapter {
       );
     }
 
-    UserDto userDto = signupUseCase.signup(cmd);
-    return userDto;
+    if(cmdResult.isFailure()){
+      return (Result) cmdResult;
+    }
+
+    UserDto userDto = signupUseCase.signup(cmdResult.getSuccessData());
+    return Result.success(userDto);
   }
 
 

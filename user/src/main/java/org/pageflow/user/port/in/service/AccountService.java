@@ -34,17 +34,9 @@ public class AccountService implements AccountUseCase, UserUseCase {
    * @param uid
    * @param verificationUri
    * @return
-   * <ul>
-   *   <li>
-   *     FIELD_VALIDATION_ERROR: 이메일 유효성 검사{@link AccountEmailService#validate(String)}에서 실패한 경우
-   *   </li>
-   *   <li>
-   *     FAIL_TO_SEND_MAIL: 메일 전송 중 오류가 발생한 경우
-   *   </li>
-   *   <li>
-   *     EMAIL_ALREADY_VERIFIED: 이미 인증된 본인의 이메일로 다시 인증요청을 보내려고 시도한 경우
-   *   </li>
-   * </ul>
+   * @code FIELD_VALIDATION_ERROR: 이메일 유효성 검사{@link AccountEmailService#validate(String)}에서 실패한 경우
+   * @code FAIL_TO_SEND_MAIL: 메일 전송 중 오류가 발생한 경우
+   * @code EMAIL_ALREADY_VERIFIED: 이미 인증된 본인의 이메일로 다시 인증요청을 보내려고 시도한 경우
    */
   @Override
   public Result sendVerificationMail(UID uid, String verificationUri) {
@@ -58,17 +50,9 @@ public class AccountService implements AccountUseCase, UserUseCase {
    * @param email
    * @param verificationUri
    * @return
-   * <ul>
-   *   <li>
-   *     FIELD_VALIDATION_ERROR: 이메일 유효성 검사{@link AccountEmailService#validate(String)}에서 실패한 경우
-   *   </li>
-   *   <li>
-   *     FAIL_TO_SEND_MAIL: 메일 전송 중 오류가 발생한 경우
-   *   </li>
-   *   <li>
-   *     EMAIL_ALREADY_VERIFIED: 이미 인증된 본인의 이메일로 다시 인증요청을 보내려고 시도한 경우
-   *   </li>
-   * </ul>
+   * @code FIELD_VALIDATION_ERROR: 이메일 유효성 검사{@link AccountEmailService#validate(String)}에서 실패한 경우
+   * @code FAIL_TO_SEND_MAIL: 메일 전송 중 오류가 발생한 경우
+   * @code EMAIL_ALREADY_VERIFIED: 이미 인증된 본인의 이메일로 다시 인증요청을 보내려고 시도한 경우
    */
   @Override
   public Result sendVerificationMailForChangeEmail(UID uid, String email, String verificationUri) {
@@ -79,14 +63,8 @@ public class AccountService implements AccountUseCase, UserUseCase {
    *
    * @param cmd
    * @return
-   * <ul>
-   *   <li>
-   *     EMAIL_VERIFICATION_EXPIRED: 인증 요청이 존재하지 않거나 만료된 경우
-   *   </li>
-   *   <li>
-   *     EMAIL_VERIFICATION_ERROR: 이메일 또는 인증코드가 일치하지 않는 경우
-   *   </li>
-   * </ul>
+   * @code EMAIL_VERIFICATION_EXPIRED: 인증 요청이 존재하지 않거나 만료된 경우
+   * @code EMAIL_VERIFICATION_ERROR: 이메일 또는 인증코드가 일치하지 않는 경우
    */
   @Override
   public Result<NullData> verifyEmail(EmailVerificationCmd cmd) {
@@ -97,14 +75,8 @@ public class AccountService implements AccountUseCase, UserUseCase {
    *
    * @param cmd
    * @return
-   * <ul>
-   *   <li>
-   *     EMAIL_VERIFICATION_EXPIRED: 인증 요청이 존재하지 않거나 만료된 경우
-   *   </li>
-   *   <li>
-   *     EMAIL_VERIFICATION_ERROR: 이메일 또는 인증코드가 일치하지 않는 경우
-   *   </li>
-   * </ul>
+   * @code EMAIL_VERIFICATION_EXPIRED: 인증 요청이 존재하지 않거나 만료된 경우
+   * @code EMAIL_VERIFICATION_ERROR: 이메일 또는 인증코드가 일치하지 않는 경우
    */
   @Override
   public Result verifyAndChangeEmail(EmailVerificationCmd cmd) {

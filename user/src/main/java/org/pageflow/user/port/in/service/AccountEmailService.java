@@ -50,17 +50,9 @@ public class AccountEmailService {
    * @param email 인증할 이메일. 반드시 uid의 사용자의 이메일일 필요는 없다.
    * @param verificationUri 이메일 인증 링크
    * @return
-   * <ul>
-   *   <li>
-   *     FIELD_VALIDATION_ERROR: 이메일 유효성 검사{@link AccountEmailService#validate(String)}에서 실패한 경우
-   *   </li>
-   *   <li>
-   *     FAIL_TO_SEND_MAIL: 메일 전송 중 오류가 발생한 경우
-   *   </li>
-   *   <li>
-   *     EMAIL_ALREADY_VERIFIED: 이미 인증된 본인의 이메일로 다시 인증요청을 보내려고 시도한 경우
-   *   </li>
-   * </ul>
+   * @code FIELD_VALIDATION_ERROR: 이메일 유효성 검사{@link AccountEmailService#validate(String)}에서 실패한 경우
+   * @code FAIL_TO_SEND_MAIL: 메일 전송 중 오류가 발생한 경우
+   * @code EMAIL_ALREADY_VERIFIED: 이미 인증된 본인의 이메일로 다시 인증요청을 보내려고 시도한 경우
    */
   public Result sendVerificationEmail(UID uid, String email, String verificationUri) {
     // 새로운 request 생성
@@ -108,14 +100,8 @@ public class AccountEmailService {
    * {@link AccountEmailService#sendVerificationEmail(UID, String, String)}로 먼저 이메일 인증 요청을 보내야한다.
    * uid를 key로하여 서버에 저장한 인증요청을 찾고, 그 요청의 인증코드와 이메일이 cmd의 그것과 일치하는지 확인한다.
    * @return
-   * <ul>
-   *   <li>
-   *     EMAIL_VERIFICATION_EXPIRED: 인증 요청이 존재하지 않거나 만료된 경우
-   *   </li>
-   *   <li>
-   *     EMAIL_VERIFICATION_ERROR: 이메일 또는 인증코드가 일치하지 않는 경우
-   *   </li>
-   * </ul>
+   * @code EMAIL_VERIFICATION_EXPIRED: 인증 요청이 존재하지 않거나 만료된 경우
+   * @code EMAIL_VERIFICATION_ERROR: 이메일 또는 인증코드가 일치하지 않는 경우
    */
   public Result verify(EmailVerificationCmd cmd) {
     UID uid = cmd.getUid();

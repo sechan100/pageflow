@@ -39,54 +39,21 @@ public class AccountService implements AccountUseCase, UserUseCase {
    * @code EMAIL_ALREADY_VERIFIED: 이미 인증된 본인의 이메일로 다시 인증요청을 보내려고 시도한 경우
    */
   @Override
-  public Result sendVerificationMail(UID uid, String verificationUri) {
-    Account account = _ensureAccount(uid);
-    return accountEmailService.sendVerificationMail(uid, account.getEmail(), verificationUri);
-  }
-
-  /**
-   *
-   * @param uid
-   * @param email
-   * @param verificationUri
-   * @return
-   * @code FIELD_VALIDATION_ERROR: 이메일 유효성 검사{@link AccountEmailService#validate(String)}에서 실패한 경우
-   * @code FAIL_TO_SEND_MAIL: 메일 전송 중 오류가 발생한 경우
-   * @code EMAIL_ALREADY_VERIFIED: 이미 인증된 본인의 이메일로 다시 인증요청을 보내려고 시도한 경우
-   */
-  @Override
-  public Result sendVerificationMailForChangeEmail(UID uid, String email, String verificationUri) {
+  public Result sendVerificationMail(UID uid, String email, String verificationUri) {
     return accountEmailService.sendVerificationMail(uid, email, verificationUri);
   }
 
   /**
-   *
    * @param cmd
    * @return
    * @code EMAIL_VERIFICATION_EXPIRED: 인증 요청이 존재하지 않거나 만료된 경우
    * @code EMAIL_VERIFICATION_ERROR: 이메일 또는 인증코드가 일치하지 않는 경우
    */
   @Override
-  public Result<NullData> verifyEmail(EmailVerificationCmd cmd) {
+  public Result verifyEmail(EmailVerificationCmd cmd) {
     return accountEmailService.verify(cmd);
   }
 
-  /**
-   *
-   * @param cmd
-   * @return
-   * @code EMAIL_VERIFICATION_EXPIRED: 인증 요청이 존재하지 않거나 만료된 경우
-   * @code EMAIL_VERIFICATION_ERROR: 이메일 또는 인증코드가 일치하지 않는 경우
-   */
-  @Override
-  public Result verifyAndChangeEmail(EmailVerificationCmd cmd) {
-    Result verifyResult = accountEmailService.verify(cmd);
-    if(verifyResult.isFailure()) return verifyResult;
-
-    Account account = _ensureAccount(cmd.getUid());
-    account.changeVerifiedEmail(cmd.getEmail());
-    return Result.success();
-  }
 
   @Override
   public Optional<UserDto> queryUser(UID uid) {

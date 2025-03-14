@@ -26,18 +26,16 @@ public class UserEmailWebAdapter {
   private final AccountUseCase accountUsecase;
 
   private static final String VERIFY_URI = "/email/verify";
-  private static final String CHANGE_URI = "/email/change";
 
-  // [[ 이메일 최초 인증 endpoints
   @PostMapping("/user/email/verification")
   @Operation(summary = "이메일 인증 메일 요청")
-  public Result requestEmailVerification() {
+  public Result requestEmailVerification(@RequestBody EmailReq req) {
     UID uid = rqrxt.getUid();
-    return accountUsecase.sendVerificationMail(uid, VERIFY_URI);
+    return accountUsecase.sendVerificationMail(uid, req.getEmail(), VERIFY_URI);
   }
 
   @GetMapping(VERIFY_URI)
-  @Operation(summary = "이메일 인증")
+  @Operation(summary = "이메일 인증 및 변경")
   public Result verifyEmail(
     @RequestParam UID uid,
     @RequestParam String email,
@@ -50,29 +48,5 @@ public class UserEmailWebAdapter {
     );
     return accountUsecase.verifyEmail(cmd);
   }
-  // ]]
 
-  // [[ 이메일 변경 endpoints
-  @PostMapping("/user/email/change")
-  @Operation(summary = "이메일 변경 인증 메일 요청")
-  public Result requestEmailChange(@RequestBody EmailReq req) {
-    UID uid = rqrxt.getUid();
-    return accountUsecase.sendVerificationMailForChangeEmail(uid, req.getEmail(), VERIFY_URI);
-  }
-
-  @GetMapping(CHANGE_URI)
-  @Operation(summary = "이메일 인증 및 변경")
-  public Result verifyAndChangeEmail(
-    @RequestParam UID uid,
-    @RequestParam String email,
-    @RequestParam UUID authCode
-  ) {
-    EmailVerificationCmd cmd = new EmailVerificationCmd(
-      uid,
-      email,
-      authCode
-    );
-    return accountUsecase.verifyAndChangeEmail(cmd);
-  }
-  // ]]
 }

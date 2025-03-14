@@ -88,12 +88,6 @@ public class Account extends BaseJpaEntity {
     return new UID(id);
   }
 
-  /**
-   * @param verifiedEmail 인증처리가 완료된 이메일을 받아서 변경한다.
-   */
-  public void changeVerifiedEmail(String verifiedEmail) {
-    this.email = verifiedEmail;
-  }
 
   /**
    *
@@ -115,10 +109,10 @@ public class Account extends BaseJpaEntity {
   }
 
   /**
-   * 한번 이메일을 인증한 사용한 사용자는 다시는 isEmailVerified를 false로 변경할 수 없다.
-   * 이메일 변경은 인증과 동시에 이루어져야한다.
+   * 언제나 이메일의 인증과 변경은 함께 이루어진다.
    */
-  public void verifyEmail() {
+  public void verifyAndChangeEmail(String email) {
+    this.email = email;
     this.isEmailVerified = true;
   }
 

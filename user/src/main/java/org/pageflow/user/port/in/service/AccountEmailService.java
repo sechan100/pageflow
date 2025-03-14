@@ -100,9 +100,10 @@ public class AccountEmailService {
   }
 
   /**
-   * 이메일을 인증처리한다.
+   * 이메일을 인증하고 변경한다.
    * {@link AccountEmailService#sendVerificationMail(UID, String, String)}로 먼저 이메일 인증 요청을 보내야한다.
    * uid를 key로하여 서버에 저장한 인증요청을 찾고, 그 요청의 인증코드와 이메일이 cmd의 그것과 일치하는지 확인한다.
+   * 일치한다면 이메일을 인증하면서 인증된 이메일로 변경한다.(기존 이메일과 동일한 경우 신경쓰지 않아도 됨)
    * @return
    * @code EMAIL_VERIFICATION_EXPIRED: 인증 요청이 존재하지 않거나 만료된 경우
    * @code EMAIL_VERIFICATION_ERROR: 이메일 또는 인증코드가 일치하지 않는 경우
@@ -130,7 +131,7 @@ public class AccountEmailService {
     }
     // 인증처리 및 ev 삭제
     Account account = accountPersistencePort.findById(uid.getValue()).orElseThrow();
-    account.verifyEmail();
+    account.verifyAndChangeEmail(email);
     verificationPersistencePort.delete(ev);
     return Result.success();
   }

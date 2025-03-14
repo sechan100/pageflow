@@ -54,17 +54,21 @@ public class AccountEmailService {
    * @code FAIL_TO_SEND_MAIL: 메일 전송 중 오류가 발생한 경우
    * @code EMAIL_ALREADY_VERIFIED: 이미 인증된 본인의 이메일로 다시 인증요청을 보내려고 시도한 경우
    */
-  public Result sendVerificationEmail(UID uid, String email, String verificationUri) {
+  public Result sendVerificationMail(UID uid, String email, String verificationUri) {
     // 새로운 request 생성
     EmailVerificationRequest evRequest = EmailVerificationRequest.of(uid, email);
 
     // 인증메일 발송전에 이메일 유효성 한번 더 검사
     FieldValidationResult validation = validate(email);
     if(!validation.isValid()){
-      // validation에서 DUPLICATED로 실패했는데, 그 이메일이 다른 사용자가 아니라 본인의 이메일인 경우, 조금 더 구체적인 에러코드로 바꿔서 반환해준다.
+      /**
+       * validation에서 DUPLICATED로 실패했는데,
+       * 그 이메일이 다른 사용자가 아니라 본인의 이메일이면서 인증된 이메일인 경우,
+       * 조금 더 구체적인 에러코드로 바꿔서 반환해준다.
+       */
       if(validation.getInvalidFields().get(0).getReason() == FieldReason.DUPLICATED){
         Account account = accountPersistencePort.findById(uid.getValue()).get();
-        if(account.getEmail().equals(email)) {
+        if(account.getEmail().equals(email) && account.getIsEmailVerified()) {
           return Result.of(UserCode.EMAIL_ALREADY_VERIFIED);
         }
       }
@@ -97,7 +101,7 @@ public class AccountEmailService {
 
   /**
    * 이메일을 인증처리한다.
-   * {@link AccountEmailService#sendVerificationEmail(UID, String, String)}로 먼저 이메일 인증 요청을 보내야한다.
+   * {@link AccountEmailService#sendVerificationMail(UID, String, String)}로 먼저 이메일 인증 요청을 보내야한다.
    * uid를 key로하여 서버에 저장한 인증요청을 찾고, 그 요청의 인증코드와 이메일이 cmd의 그것과 일치하는지 확인한다.
    * @return
    * @code EMAIL_VERIFICATION_EXPIRED: 인증 요청이 존재하지 않거나 만료된 경우

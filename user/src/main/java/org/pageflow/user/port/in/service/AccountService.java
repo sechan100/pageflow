@@ -41,7 +41,7 @@ public class AccountService implements AccountUseCase, UserUseCase {
   @Override
   public Result sendVerificationMail(UID uid, String verificationUri) {
     Account account = _ensureAccount(uid);
-    return accountEmailService.sendVerificationEmail(uid, account.getEmail(), verificationUri);
+    return accountEmailService.sendVerificationMail(uid, account.getEmail(), verificationUri);
   }
 
   /**
@@ -56,7 +56,7 @@ public class AccountService implements AccountUseCase, UserUseCase {
    */
   @Override
   public Result sendVerificationMailForChangeEmail(UID uid, String email, String verificationUri) {
-    return accountEmailService.sendVerificationEmail(uid, email, verificationUri);
+    return accountEmailService.sendVerificationMail(uid, email, verificationUri);
   }
 
   /**

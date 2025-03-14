@@ -26,6 +26,15 @@ public class SendMailService implements SendMailPort {
   private final JavaMailSender javaMailSender;
 
 
+  /**
+   * @param request
+   * @return Result
+   * <ul>
+   *   <li>
+   *     FAIL_TO_SEND_MAIL: 메일 전송 중 오류가 발생한 경우
+   *   </li>
+   * </ul>
+   */
   @Override
   public Result sendEmail(MailRequest request) {
     try {

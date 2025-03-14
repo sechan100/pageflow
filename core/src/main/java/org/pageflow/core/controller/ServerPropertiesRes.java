@@ -3,7 +3,7 @@ package org.pageflow.core.controller;
 import lombok.Value;
 import org.pageflow.common.property.ApplicationProperties;
 import org.pageflow.user.domain.Password;
-import org.pageflow.user.domain.service.PennameValidator;
+import org.pageflow.user.port.in.service.PennameValidator;
 
 /**
  * @author : sechan

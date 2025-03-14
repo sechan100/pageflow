@@ -1,4 +1,4 @@
-package org.pageflow.user.domain.service;
+package org.pageflow.user.port.in.service;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;

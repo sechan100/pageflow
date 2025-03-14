@@ -1,4 +1,4 @@
-package org.pageflow.user.domain.service;
+package org.pageflow.user.port.in.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

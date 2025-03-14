@@ -1,10 +1,10 @@
-package org.pageflow.user.domain.service;
+package org.pageflow.user.port.in.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pageflow.common.property.ApplicationProperties;
-import org.pageflow.common.result.ProcessResultException;
 import org.pageflow.common.result.Result;
+import org.pageflow.common.result.code.CommonCode;
 import org.pageflow.common.user.UID;
 import org.pageflow.common.validation.FieldReason;
 import org.pageflow.common.validation.FieldValidationResult;
@@ -18,6 +18,9 @@ import org.pageflow.user.port.out.entity.AccountPersistencePort;
 import org.pageflow.user.port.out.entity.EmailVerificationRequestPersistencePort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
+import java.util.UUID;
 
 /**
  * @author : sechan
@@ -33,6 +36,7 @@ public class AccountEmailService {
   private final SendMailPort sendMailPort;
   private final EmailTemplateProcessor emailTemplateProcessor;
 
+
   public FieldValidationResult validate(String email) {
     FieldValidator<String> validator = new FieldValidator<>("email", email)
       .email()
@@ -40,16 +44,39 @@ public class AccountEmailService {
     return validator.validate();
   }
 
-  public Result sendVerificationEmail(UID uid, String verificationUri) {
+  /**
+   * 인증 이메일을 발송한다.
+   * @param uid 만약 같은 uid로 먼저 발송된 인증요청이 있다면 삭제 후 새로 생성한다.
+   * @param email 인증할 이메일. 반드시 uid의 사용자의 이메일일 필요는 없다.
+   * @param verificationUri 이메일 인증 링크
+   * @return
+   * <ul>
+   *   <li>
+   *     FIELD_VALIDATION_ERROR: 이메일 유효성 검사{@link AccountEmailService#validate(String)}에서 실패한 경우
+   *   </li>
+   *   <li>
+   *     FAIL_TO_SEND_MAIL: 메일 전송 중 오류가 발생한 경우
+   *   </li>
+   *   <li>
+   *     EMAIL_ALREADY_VERIFIED: 이미 인증된 본인의 이메일로 다시 인증요청을 보내려고 시도한 경우
+   *   </li>
+   * </ul>
+   */
+  public Result sendVerificationEmail(UID uid, String email, String verificationUri) {
     // 새로운 request 생성
-    Account account = accountPersistencePort.findById(uid.getValue()).get();
-    String email = account.getEmail();
     EmailVerificationRequest evRequest = EmailVerificationRequest.of(uid, email);
 
     // 인증메일 발송전에 이메일 유효성 한번 더 검사
     FieldValidationResult validation = validate(email);
     if(!validation.isValid()){
-      return Result.of(UserCode.INVALID_EMAIL, validation);
+      // validation에서 DUPLICATED로 실패했는데, 그 이메일이 다른 사용자가 아니라 본인의 이메일인 경우, 조금 더 구체적인 에러코드로 바꿔서 반환해준다.
+      if(validation.getInvalidFields().get(0).getReason() == FieldReason.DUPLICATED){
+        Account account = accountPersistencePort.findById(uid.getValue()).get();
+        if(account.getEmail().equals(email)) {
+          return Result.of(UserCode.EMAIL_ALREADY_VERIFIED);
+        }
+      }
+      return Result.of(CommonCode.FIELD_VALIDATION_ERROR, validation);
     }
 
     // 기존 request가 있다면 삭제 후 새로 생성
@@ -76,24 +103,46 @@ public class AccountEmailService {
     return sendMailPort.sendEmail(mailRequest);
   }
 
-  public void verify(EmailVerificationCmd cmd) {
+  /**
+   * 이메일을 인증처리한다.
+   * {@link AccountEmailService#sendVerificationEmail(UID, String, String)}로 먼저 이메일 인증 요청을 보내야한다.
+   * uid를 key로하여 서버에 저장한 인증요청을 찾고, 그 요청의 인증코드와 이메일이 cmd의 그것과 일치하는지 확인한다.
+   * @return
+   * <ul>
+   *   <li>
+   *     EMAIL_VERIFICATION_EXPIRED: 인증 요청이 존재하지 않거나 만료된 경우
+   *   </li>
+   *   <li>
+   *     EMAIL_VERIFICATION_ERROR: 이메일 또는 인증코드가 일치하지 않는 경우
+   *   </li>
+   * </ul>
+   */
+  public Result verify(EmailVerificationCmd cmd) {
     UID uid = cmd.getUid();
     String id = EmailVerificationRequest.generateIdFromUid(uid);
-    EmailVerificationRequest ev = verificationPersistencePort.findById(id)
-      .orElseThrow(() -> new ProcessResultException(UserCode.EMAIL_VERIFICATION_EXPIRED));
-    Account account = accountPersistencePort.findById(uid.getValue()).get();
+    Optional<EmailVerificationRequest> evOpt = verificationPersistencePort.findById(id);
+
+    if(evOpt.isEmpty()){
+      return Result.of(UserCode.EMAIL_VERIFICATION_EXPIRED);
+    }
+
+    EmailVerificationRequest ev = evOpt.get();
+    String email = ev.getData().getEmail();
+    UUID authCode = ev.getData().getAuthCode();
 
     // 이메일 일치
-    if(!account.getEmail().equals(cmd.getEmail())){
-      throw new ProcessResultException(UserCode.EMAIL_VERIFICATION_ERROR);
+    if(!email.equals(cmd.getEmail())){
+      return Result.of(UserCode.EMAIL_VERIFICATION_ERROR);
     }
     // 인증코드 일치
-    if(!ev.getData().getAuthCode().equals(cmd.getAuthCode())){
-      throw new ProcessResultException(UserCode.EMAIL_VERIFICATION_ERROR);
+    if(!authCode.equals(cmd.getAuthCode())){
+      return Result.of(UserCode.EMAIL_VERIFICATION_ERROR);
     }
     // 인증처리 및 ev 삭제
+    Account account = accountPersistencePort.findById(uid.getValue()).orElseThrow();
     account.verifyEmail();
     verificationPersistencePort.delete(ev);
+    return Result.success();
   }
 
 }

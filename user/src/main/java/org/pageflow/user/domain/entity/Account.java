@@ -88,9 +88,11 @@ public class Account extends BaseJpaEntity {
     return new UID(id);
   }
 
-  public void changeEmail(String email) {
-    this.email = email;
-    this.isEmailVerified = false;
+  /**
+   * @param verifiedEmail 인증처리가 완료된 이메일을 받아서 변경한다.
+   */
+  public void changeVerifiedEmail(String verifiedEmail) {
+    this.email = verifiedEmail;
   }
 
   /**
@@ -112,12 +114,12 @@ public class Account extends BaseJpaEntity {
     return Result.success();
   }
 
+  /**
+   * 한번 이메일을 인증한 사용한 사용자는 다시는 isEmailVerified를 false로 변경할 수 없다.
+   * 이메일 변경은 인증과 동시에 이루어져야한다.
+   */
   public void verifyEmail() {
     this.isEmailVerified = true;
-  }
-
-  public void unverifyEmail() {
-    this.isEmailVerified = false;
   }
 
   public boolean passwordMatches(String rawPassword) {

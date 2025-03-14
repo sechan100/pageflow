@@ -7,6 +7,4 @@ import org.springframework.lang.Nullable;
 public class ProfileUpdateReq {
   @Nullable
   private String penname;
-  @Nullable
-  private String email;
 }

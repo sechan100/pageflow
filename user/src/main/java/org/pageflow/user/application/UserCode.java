@@ -2,7 +2,6 @@ package org.pageflow.user.application;
 
 import lombok.Getter;
 import org.pageflow.common.result.code.ResultCode;
-import org.pageflow.common.validation.FieldValidationResult;
 import org.pageflow.user.adapter.in.res.PreSignupedUser;
 
 /**
@@ -21,18 +20,18 @@ public enum UserCode implements ResultCode {
 
   // 이메일 인증
   EMAIL_VERIFICATION_ERROR("이메일 인증에 실패했습니다."),
-  INVALID_EMAIL("유효하지 않은 이메일입니다.", FieldValidationResult.class),
   EMAIL_VERIFICATION_EXPIRED("이메일 인증 요청이 만료되었거나 없습니다."),
+  EMAIL_ALREADY_VERIFIED("이미 인증 완료된 이메일입니다."), // 본인 이메일이 이미 인증 받은 상태에서 다시 인증 이메일을 보낸 경우
 
   // 기타
   EXTERNAL_PROFILE_IMAGE_URL("외부 프로필 이미지 url은 사용할 수 없습니다."),
   USER_NOT_FOUND("사용자를 찾을 수 없습니다."),
   PASSWORD_SAME_AS_BEFORE("이전 비밀번호와 동일합니다."),
+  ;
 
   /********************************************************************************
    ********* 새로운 ResultCode를 만들 때, 해당 주석을 포함하여 아래부분을 붙여넣으면 된다. ********
    ********************************************************************************/
-  ;
   private final String description;
   private final Class<?> dataType;
 

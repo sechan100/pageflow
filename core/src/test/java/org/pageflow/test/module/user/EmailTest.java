@@ -5,14 +5,14 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.pageflow.common.result.Result;
+import org.pageflow.common.result.code.CommonCode;
 import org.pageflow.test.e2e.PageflowIntegrationTest;
 import org.pageflow.test.shared.DataCreator;
-import org.pageflow.user.application.UserCode;
 import org.pageflow.user.domain.entity.EmailVerificationRequest;
-import org.pageflow.user.domain.service.AccountEmailService;
 import org.pageflow.user.dto.UserDto;
 import org.pageflow.user.port.in.AccountUseCase;
 import org.pageflow.user.port.in.EmailVerificationCmd;
+import org.pageflow.user.port.in.service.AccountEmailService;
 import org.pageflow.user.port.out.entity.AccountPersistencePort;
 import org.pageflow.user.port.out.entity.EmailVerificationRequestPersistencePort;
 
@@ -34,7 +34,7 @@ public class EmailTest {
     UserDto user1 = dataCreator.createUser("user1");
     accountUseCase.changeEmail(user1.getUid(), "sechan100@gmail.com");
     accountPersistencePort.flush();
-    accountEmailService.sendVerificationEmail(user1.getUid(), "/verify");
+    accountEmailService.sendVerificationEmail(user1.getUid(), user1.getEmail(), "/verify");
   }
 
   @Test
@@ -60,8 +60,8 @@ public class EmailTest {
     accountPersistencePort.flush();
 
     // 이제 user1@pageflow.org는 사용할 수 없음
-    Result result = accountEmailService.sendVerificationEmail(user2.getUid(), "/verify");
-    Assertions.assertEquals(UserCode.INVALID_EMAIL, result.getCode());
+    Result result = accountEmailService.sendVerificationEmail(user2.getUid(), user2.getEmail(), "/verify");
+    Assertions.assertEquals(CommonCode.FIELD_VALIDATION_ERROR, result.getCode());
     accountPersistencePort.flush();
   }
 }

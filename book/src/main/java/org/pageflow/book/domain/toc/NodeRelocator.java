@@ -5,12 +5,7 @@ import org.pageflow.book.application.BookCode;
 import org.pageflow.book.domain.entity.Folder;
 import org.pageflow.book.domain.entity.TocNode;
 import org.pageflow.common.result.MessageData;
-import org.pageflow.common.result.ProcessResultException;
 import org.pageflow.common.result.Result;
-import org.pageflow.common.result.code.CommonCode;
-import org.pageflow.common.validation.FieldReason;
-import org.pageflow.common.validation.FieldValidationResult;
-import org.pageflow.common.validation.InvalidField;
 import org.springframework.lang.Nullable;
 
 import java.util.*;
@@ -36,51 +31,76 @@ public class NodeRelocator {
     this.parent = folderWithChildren;
   }
 
-  public void reorder(int destIndex, TocNode target) {
-    _checkMoveToSelf(target, parent);
-    _checkRootFolderMove(target);
-    _checkDestIndex(parent.childrenSize(), destIndex);
+  /**
+   * @param destIndex
+   * @param target
+   * @return
+   * @code TOC_HIERARCHY_ERROR: 자기 자신에게 이동, root folder 이동, 계층 구조 파괴, destIndex가 올바르지 않은 경우, parent에 target이 없는 경우 등
+   */
+  public Result reorder(int destIndex, TocNode target) {
+    // 자기 자신에게 이동 검사
+    Result checkMoveToSelfResult = _checkMoveToSelf(target, parent);
+    if(checkMoveToSelfResult.isFailure()) return checkMoveToSelfResult;
+    // root folder 이동 검사
+    Result checkRootFolderMoveResult = _checkRootFolderMove(target);
+    if(checkRootFolderMoveResult.isFailure()) return checkRootFolderMoveResult;
+    // destIndex 검사
+    Result checkDestIndexResult = _checkDestIndex(parent.childrenSize(), destIndex);
+    if(checkDestIndexResult.isFailure()) return checkDestIndexResult;
 
-    Preconditions.checkState(
-      parent.hasChild(target),
-      "reorder를 수행할 수 없습니다. 이동할 노드가 폴더의 자식이 아닙니다."
-    );
+    if(!parent.hasChild(target)) {
+      return Result.of(BookCode.TOC_HIERARCHY_ERROR, MessageData.of("순서를 변경할 노드가 폴더의 자식이 아닙니다."));
+    }
     // 전체 list에서 target node를 제거하고 relocate를 실행한다.
     parent.removeChild(target);
-    relocate(destIndex, target);
+    return _relocate(destIndex, target);
   }
 
-  public void reparent(int destIndex, TocNode target, Collection<TocNode> allBookNodes) {
+  /**
+   * @param destIndex
+   * @param target
+   * @param allBookNodes
+   * @return
+   * @code TOC_HIERARCHY_ERROR: 자기 자신에게 이동, root folder 이동, 계층 구조 파괴, destIndex가 올바르지 않은 경우, 이미 parent에 target이 속한 경우 등
+   */
+  public Result reparent(int destIndex, TocNode target, Collection<TocNode> allBookNodes) {
     Map<UUID, TocNode> nodeMap = new HashMap<>();
     assert allBookNodes != null;
     Folder rootFolder = null;
-    for(TocNode node : allBookNodes){
+    for(TocNode node : allBookNodes) {
       nodeMap.put(node.getId(), node);
-      if(node instanceof Folder folderNode && folderNode.isRootFolder()){
+      if(node instanceof Folder folderNode && folderNode.isRootFolder()) {
         assert rootFolder == null;
         rootFolder = folderNode;
       }
     }
     Preconditions.checkNotNull(rootFolder, "root folder가 존재하지 않습니다.");
+
     // 자기 자신에게 이동 검사
-    _checkMoveToSelf(target, parent);
-    _checkRootFolderMove(target);
-    Preconditions.checkState(
-      !this.parent.hasChild(target),
-      "reparent를 수행할 수 없습니다. targetNode가 이미 parent에 속해있습니다."
-    );
+    Result checkMoveToSelfResult = _checkMoveToSelf(target, parent);
+    if(checkMoveToSelfResult.isFailure()) return checkMoveToSelfResult;
+    // root folder 이동 검사
+    Result checkRootFolderMoveResult = _checkRootFolderMove(target);
+    if(checkRootFolderMoveResult.isFailure()) return checkRootFolderMoveResult;
+
+    // 이미 parent에 속해있는 경우
+    if(parent.hasChild(target)) {
+      return Result.of(BookCode.TOC_HIERARCHY_ERROR, MessageData.of("targetNode가 이미 parent에 속해있습니다."));
+    }
 
     // 계층 구조 파괴 검사
-    if(target instanceof Folder targetFolder){
+    if(target instanceof Folder targetFolder) {
       // parent에서 출발해서 조상중에 targetFolder가 있는지 검증한다.
-      if(_isAncestorOf(targetFolder, this.parent, nodeMap)){
-        throw _getHierarchyViolation("toc의 계층 구조를 파괴하는 이동입니다.");
+      if(_isAncestorOf(targetFolder, this.parent, nodeMap)) {
+        return Result.of(BookCode.TOC_HIERARCHY_ERROR, MessageData.of("toc의 계층 구조를 파괴하는 이동입니다."));
       }
     }
 
+
     // destIndex 검사
-    _checkDestIndex(parent.childrenSize(), destIndex);
-    relocate(destIndex, target);
+    Result checkDestIndexResult = _checkDestIndex(parent.childrenSize(), destIndex);
+    if(checkDestIndexResult.isFailure()) return checkDestIndexResult;
+    return _relocate(destIndex, target);
   }
 
   /**
@@ -90,8 +110,8 @@ public class NodeRelocator {
    * @param destIndex 목적지로 갈 index. 함수 호출 당시의 List의 length를 기준으로 0부터 length까지의 값이다.
    * @param target    삽입대상. this.childen에서 빼고나서 호출할 것.
    */
-  private void relocate(int destIndex, TocNode target) {
-    assert !parent.hasChild(target): "target이 parent에 속해있는 경우 relocate 할 수 없습니다.";
+  private Result _relocate(int destIndex, TocNode target) {
+    assert !parent.hasChild(target) : "target이 parent에 속해있는 경우 relocate 할 수 없습니다.";
 
     // NODE를 list에 삽입
     parent.addChild(destIndex, target);
@@ -107,6 +127,8 @@ public class NodeRelocator {
       int newOv = this._resolveOv(prevOvOrNull, nextOvOrNull);
       target.setOv(newOv);
     }
+
+    return Result.success();
   }
 
   /**
@@ -136,36 +158,49 @@ public class NodeRelocator {
   }
 
 
-  private static ProcessResultException _getHierarchyViolation(String message) {
-    return new ProcessResultException(Result.of(BookCode.TOC_HIERARCHY_VIOLATION, MessageData.of(message)));
-  }
-
-  private static boolean _isSameNode(TocNode n1, TocNode n2){
+  private static boolean _isSameNode(TocNode n1, TocNode n2) {
     return n1.getId().equals(n2.getId());
   }
 
-  private static void _checkMoveToSelf(TocNode target, Folder destFolder) {
+  /**
+   * @param target
+   * @param destFolder
+   * @return
+   * @code TOC_HIERARCHY_ERROR: node는 자기 자신의 자식이 될 수 없습니다.
+   */
+  private static Result _checkMoveToSelf(TocNode target, Folder destFolder) {
     if(_isSameNode(target, destFolder)) {
-      throw _getHierarchyViolation("node는 자기 자신의 자식이 될 수 없습니다.");
+      return org.pageflow.common.result.Result.of(BookCode.TOC_HIERARCHY_ERROR, MessageData.of("node는 자기 자신의 자식이 될 수 없습니다."));
     }
+
+    return org.pageflow.common.result.Result.success();
   }
 
-  private static void _checkRootFolderMove(TocNode target){
-    if(target.isRootFolder()){
-      throw _getHierarchyViolation("root folder는 이동할 수 없습니다.");
+  /**
+   * @param target
+   * @return
+   * @code TOC_HIERARCHY_ERROR: root folder는 이동할 수 없습니다.
+   */
+  private static Result _checkRootFolderMove(TocNode target) {
+    if(target.isRootFolder()) {
+      return org.pageflow.common.result.Result.of(BookCode.TOC_HIERARCHY_ERROR, MessageData.of("root folder는 이동할 수 없습니다."));
     }
+
+    return org.pageflow.common.result.Result.success();
   }
 
-  private static void _checkDestIndex(int destFolderChildrenSize, int destIndex) {
+  /**
+   * @param destFolderChildrenSize
+   * @param destIndex
+   * @return
+   * @code TOC_HIERARCHY_ERROR: destIndex가 0보다 작거나 destFolderChildrenSize보다 큰 경우
+   */
+  private static Result _checkDestIndex(int destFolderChildrenSize, int destIndex) {
     if(destIndex < 0 || destIndex > destFolderChildrenSize) {
-      FieldValidationResult indexOutOfRangeResult = FieldValidationResult.of(InvalidField.builder()
-        .field("destIndex")
-        .reason(FieldReason.OUT_OF_RANGE)
-        .value(destIndex)
-        .build()
-      );
-      throw new ProcessResultException(Result.of(CommonCode.FIELD_VALIDATION_ERROR, indexOutOfRangeResult));
+      return Result.of(BookCode.TOC_HIERARCHY_ERROR, MessageData.of("destIndex가 올바르지 않습니다."));
     }
+
+    return Result.success();
   }
 
   private static boolean _isAncestorOf(Folder ancestor, Folder descendant, Map<UUID, TocNode> nodeMap) {
@@ -174,7 +209,7 @@ public class NodeRelocator {
     }
     assert descendant.ensureParentNode() != null;
     UUID parentId = descendant.ensureParentNode().getId();
-    if(parentId.equals(ancestor.getId())){
+    if(parentId.equals(ancestor.getId())) {
       return true;
     } else {
       return _isAncestorOf(ancestor, (Folder) nodeMap.get(parentId), nodeMap

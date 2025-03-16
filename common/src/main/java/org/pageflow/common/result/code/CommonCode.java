@@ -1,6 +1,7 @@
 package org.pageflow.common.result.code;
 
 import lombok.Getter;
+import org.pageflow.common.result.MessageData;
 import org.pageflow.common.validation.FieldValidationResult;
 import org.pageflow.common.validation.InvalidField;
 
@@ -36,6 +37,7 @@ public enum CommonCode implements ResultCode {
 
   /** 데이터 접근 */
   RESOURCE_PERMISSION_DENIED("리소스 접근 권한 없음"),
+  DATA_NOT_FOUND("데이터를 찾을 수 없음", MessageData.class),
 
 
 

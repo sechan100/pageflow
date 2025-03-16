@@ -240,7 +240,7 @@ public class TocStructureTest {
       """, parentFolderId, childFolderId));
 
     // 5. 계층 구조 위반으로 실패 검증
-    moveRes.is(BookCode.TOC_HIERARCHY_VIOLATION);
+    moveRes.is(BookCode.TOC_HIERARCHY_ERROR);
   }
 
   @Test
@@ -270,7 +270,7 @@ public class TocStructureTest {
       """, parentFolderId, grandchildFolderId));
 
     // 5. 계층 구조 위반으로 실패 검증
-    moveRes.is(BookCode.TOC_HIERARCHY_VIOLATION);
+    moveRes.is(BookCode.TOC_HIERARCHY_ERROR);
   }
 
   @Test
@@ -298,7 +298,7 @@ public class TocStructureTest {
       """, rootFolderId, normalFolderId));
 
     // 5. 루트 폴더 이동 불가 검증
-    moveRes.is(BookCode.TOC_HIERARCHY_VIOLATION);
+    moveRes.is(BookCode.TOC_HIERARCHY_ERROR);
   }
 
   @Test
@@ -326,7 +326,7 @@ public class TocStructureTest {
       """, folderAId, folderAId));
 
     // 5. 자기 자신을 부모로 지정 불가 검증
-    moveRes.is(BookCode.TOC_HIERARCHY_VIOLATION);
+    moveRes.is(BookCode.TOC_HIERARCHY_ERROR);
   }
 
   @Test
@@ -362,7 +362,7 @@ public class TocStructureTest {
         }
       """, folderAId, folderDId));
 
-    moveResAtoD.is(BookCode.TOC_HIERARCHY_VIOLATION);
+    moveResAtoD.is(BookCode.TOC_HIERARCHY_ERROR);
 
     // 4.2. E를 F로 이동 시도 (E > F > E 순환 발생)
     TestRes moveResEtoF = userApi.post("/user/books/" + bookId + "/toc/relocate-node", String.format("""
@@ -373,7 +373,7 @@ public class TocStructureTest {
         }
       """, folderEId, folderFId));
 
-    moveResEtoF.is(BookCode.TOC_HIERARCHY_VIOLATION);
+    moveResEtoF.is(BookCode.TOC_HIERARCHY_ERROR);
 
     // 5. 유효한 이동 확인 (F를 C로 이동 - 순환 참조 없음)
     TestRes validMove = userApi.post("/user/books/" + bookId + "/toc/relocate-node", String.format("""

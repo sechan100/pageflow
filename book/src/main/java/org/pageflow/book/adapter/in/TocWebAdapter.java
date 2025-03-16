@@ -9,6 +9,7 @@ import org.pageflow.book.dto.TocDto;
 import org.pageflow.book.port.in.TocNodeUseCase;
 import org.pageflow.book.port.in.TocUseCase;
 import org.pageflow.book.port.in.cmd.RelocateNodeCmd;
+import org.pageflow.common.result.Result;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,17 +38,17 @@ public class TocWebAdapter {
   @PostMapping("/relocate-node")
   @Operation(summary = "목차 노드 재배치")
   @SetBookPermission
-  public void relocateNode(
+  public Result relocateNode(
     @PathVariable @BookId UUID bookId,
     @RequestBody NodeRelocateReq req
-  ){
+  ) {
     RelocateNodeCmd cmd = new RelocateNodeCmd(
       bookId,
       req.getTargetNodeId(),
       req.getDestFolderId(),
       req.getDestIndex()
     );
-    tocNodeUseCase.relocateNode(bookId, cmd);
+    return tocNodeUseCase.relocateNode(bookId, cmd);
   }
 
 }

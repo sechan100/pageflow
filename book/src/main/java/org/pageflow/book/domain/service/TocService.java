@@ -25,8 +25,8 @@ import org.pageflow.book.port.out.jpa.NodePersistencePort;
 import org.pageflow.book.port.out.jpa.SectionPersistencePort;
 import org.pageflow.common.permission.PermissionRequired;
 import org.pageflow.common.result.MessageData;
-import org.pageflow.common.result.ProcessResultException;
 import org.pageflow.common.result.Result;
+import org.pageflow.common.result.code.CommonCode;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,31 +47,51 @@ public class TocService implements TocUseCase, TocNodeUseCase {
   private final NodePersistencePort nodePersistencePort;
 
 
+  /**
+   * @param bookId
+   * @param cmd
+   * @return
+   * @code DATA_NOT_FOUND: target, destFolder를 찾을 수 없는 경우
+   * @code TOC_HIERARCHY_ERROR: 자기 자신에게 이동, root folder 이동, 계층 구조 파괴, destIndex가 올바르지 않은 경우 등
+   */
   @Override
   @PermissionRequired(
     actions = {"EDIT"},
     permissionType = BookPermission.class
   )
-  public void relocateNode(@BookId UUID bookId, RelocateNodeCmd cmd) {
-    TocNode target = nodePersistencePort.findById(cmd.getNodeId()).orElseThrow();
+  public Result relocateNode(@BookId UUID bookId, RelocateNodeCmd cmd) {
+    Optional<TocNode> targetOpt = nodePersistencePort.findById(cmd.getNodeId());
+    if(targetOpt.isEmpty()) {
+      return Result.of(
+        CommonCode.DATA_NOT_FOUND,
+        MessageData.of("target node를 찾을 수 없습니다.")
+      );
+    }
+    TocNode target = targetOpt.get();
     if(target.isRootFolder()) {
-      Result hierarchyViolationResult = Result.of(
-        BookCode.TOC_HIERARCHY_VIOLATION,
+      return Result.of(
+        BookCode.TOC_HIERARCHY_ERROR,
         MessageData.of("root folder node는 이동할 수 없습니다.")
       );
-      throw new ProcessResultException(hierarchyViolationResult);
     }
 
     UUID destFolderId = cmd.getDestFolderId();
-    Folder folderWithChildren = folderPersistencePort.findWithChildrenById(destFolderId);
+    Optional<Folder> folderOpt = folderPersistencePort.findWithChildrenById(destFolderId);
+    if(folderOpt.isEmpty()) {
+      return Result.of(
+        CommonCode.DATA_NOT_FOUND,
+        MessageData.of("dest folder를 찾을 수 없습니다.")
+      );
+    }
+    Folder folderWithChildren = folderOpt.get();
     NodeRelocator relocator = new NodeRelocator(folderWithChildren);
     if(target.ensureParentNode().getId().equals(destFolderId)) {
       // Reorder
-      relocator.reorder(cmd.getDestIndex(), target);
+      return relocator.reorder(cmd.getDestIndex(), target);
     } else {
       // Reparent
       List<TocNode> allBookNodes = nodePersistencePort.findAllByBookId(bookId);
-      relocator.reparent(cmd.getDestIndex(), target, allBookNodes);
+      return relocator.reparent(cmd.getDestIndex(), target, allBookNodes);
     }
   }
 

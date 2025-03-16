@@ -4,6 +4,7 @@ import org.pageflow.book.dto.FolderDto;
 import org.pageflow.book.dto.SectionDto;
 import org.pageflow.book.dto.SectionDtoWithContent;
 import org.pageflow.book.port.in.cmd.*;
+import org.pageflow.common.result.Result;
 
 import java.util.UUID;
 
@@ -11,7 +12,7 @@ import java.util.UUID;
  * @author : sechan
  */
 public interface TocNodeUseCase {
-  void relocateNode(UUID bookId, RelocateNodeCmd cmd);
+  Result relocateNode(UUID bookId, RelocateNodeCmd cmd);
 
   FolderDto createFolder(UUID bookId, CreateFolderCmd cmd);
   FolderDto queryFolder(UUID bookId, UUID folderId);

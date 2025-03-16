@@ -5,6 +5,7 @@ import org.pageflow.book.domain.entity.Folder;
 import org.pageflow.common.jpa.repository.BaseJpaRepository;
 import org.springframework.data.jpa.repository.EntityGraph;
 
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -12,5 +13,5 @@ import java.util.UUID;
  */
 public interface FolderPersistencePort extends BaseJpaRepository<Folder, UUID> {
   @EntityGraph(attributePaths = {"children"})
-  Folder findWithChildrenById(UUID folderId);
+  Optional<Folder> findWithChildrenById(UUID folderId);
 }

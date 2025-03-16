@@ -1,3 +1,4 @@
 pageflow:
   book:
+#    default-cover-image-url: '${pageflow.site.base-url}/public/book/default-book-cover-image.png'
     default-cover-image-url: '${pageflow.site.base-url}/public/book/default-book-cover-image.png'

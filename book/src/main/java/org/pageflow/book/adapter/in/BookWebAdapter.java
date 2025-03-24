@@ -11,6 +11,7 @@ import org.pageflow.book.dto.BookDtoWithAuthor;
 import org.pageflow.book.dto.MyBooks;
 import org.pageflow.book.port.in.BookUseCase;
 import org.pageflow.common.api.RequestContext;
+import org.pageflow.common.result.Result;
 import org.pageflow.common.user.UID;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -31,10 +32,10 @@ public class BookWebAdapter {
 
   @PostMapping("")
   @Operation(summary = "책 생성")
-  public BookDto createBook(@RequestBody CreateBookReq req) {
+  public Result<BookDto> createBook(@RequestBody CreateBookReq req) {
     UID uid = rqcxt.getUid();
     BookTitle title = BookTitle.of(req.getTitle());
-    BookDto result = bookUseCase.createBook(uid, title, null);
+    Result<BookDto> result = bookUseCase.createBook(uid, title, null);
     return result;
   }
 

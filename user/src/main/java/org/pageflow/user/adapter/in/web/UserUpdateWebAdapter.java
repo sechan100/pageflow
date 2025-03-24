@@ -11,6 +11,7 @@ import org.pageflow.common.user.UID;
 import org.pageflow.user.adapter.in.req.ChangePasswordReq;
 import org.pageflow.user.adapter.in.req.ProfileUpdateReq;
 import org.pageflow.user.dto.AccountDto;
+import org.pageflow.user.dto.ProfileDto;
 import org.pageflow.user.dto.UserDto;
 import org.pageflow.user.port.in.AccountUseCase;
 import org.pageflow.user.port.in.ProfileUseCase;
@@ -53,13 +54,22 @@ public class UserUpdateWebAdapter {
   ) {
     UID uid = rqrxt.getUid();
     if(req.getPenname() != null) {
-      profileUseCase.changePenname(uid, req.getPenname());
+      Result<ProfileDto> changePennameResult = profileUseCase.changePenname(uid, req.getPenname());
+      if(changePennameResult.isFailure()) {
+        return (Result) changePennameResult;
+      }
     }
     if(profileImage != null) {
-      profileUseCase.changeProfileImage(uid, profileImage);
+      Result<ProfileDto> changeProfileImageResult = profileUseCase.changeProfileImage(uid, profileImage);
+      if(changeProfileImageResult.isFailure()) {
+        return (Result) changeProfileImageResult;
+      }
     }
     if(toDefaultProfileImage) {
-      profileUseCase.deleteProfileImage(uid);
+      Result deleteProfileImageResult = profileUseCase.deleteProfileImage(uid);
+      if(deleteProfileImageResult.isFailure()) {
+        return (Result) deleteProfileImageResult;
+      }
     }
     Optional<UserDto> userDtoOpt = userUseCase.queryUser(uid);
     assert userDtoOpt.isPresent();

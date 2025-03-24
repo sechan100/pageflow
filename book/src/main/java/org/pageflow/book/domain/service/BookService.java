@@ -18,11 +18,13 @@ import org.pageflow.book.port.out.jpa.BookPersistencePort;
 import org.pageflow.book.port.out.jpa.FolderPersistencePort;
 import org.pageflow.common.permission.PermissionRequired;
 import org.pageflow.common.property.ApplicationProperties;
+import org.pageflow.common.result.Result;
 import org.pageflow.common.user.UID;
 import org.pageflow.common.validation.ImageUrlValidator;
 import org.pageflow.file.model.FilePath;
-import org.pageflow.file.model.ImageFileUploadCmd;
+import org.pageflow.file.model.FileUploadCmd;
 import org.pageflow.file.service.FileService;
+import org.pageflow.file.shared.FileType;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,22 +49,29 @@ public class BookService implements BookUseCase {
   private final FileService fileService;
 
 
+  /**
+   * @code FILED_VALIDATION_ERROR: coverImage file의 데이터가 올바르지 않은 경우
+   * @code FAIL_TO_UPLOAD_FILE: CoverImage 업로드에 실패한 경우
+   */
   @Override
-  public BookDto createBook(
+  public Result<BookDto> createBook(
     UID authorId,
     BookTitle title,
     @Nullable MultipartFile coverImage
   ) {
     // author
     Author author = loadAuthorPort.loadAuthorProxy(authorId);
-
     // book
     UUID bookId = UUID.randomUUID();
-    String coverImageUrl = coverImage != null
-      ?
-      this.uploadCoverImage(bookId, coverImage)
-      :
-      applicationProperties.book.defaultCoverImageUrl;
+    String coverImageUrl = applicationProperties.book.defaultCoverImageUrl;
+    if(coverImage != null) {
+      Result<FilePath> uploadResult = _uploadCoverImage(bookId, coverImage);
+      if(uploadResult.isSuccess()) {
+        coverImageUrl = uploadResult.getSuccessData().getWebUrl();
+      } else {
+        return (Result) uploadResult;
+      }
+    }
 
     Book book = Book.create(
       bookId,
@@ -76,7 +85,7 @@ public class BookService implements BookUseCase {
     Folder rootFolder = Folder.createRootFolder(book);
     folderPersistencePort.persist(rootFolder);
 
-    return BookDto.from(book);
+    return Result.success(BookDto.from(book));
   }
 
 
@@ -113,23 +122,35 @@ public class BookService implements BookUseCase {
     return BookDto.from(book);
   }
 
+  /**
+   * @code FILED_VALIDATION_ERROR: coverImage file의 데이터가 올바르지 않은 경우
+   * @code FAIL_TO_DELETE_FILE: 기존 CoverImage 삭제에 실패한 경우
+   * @code FAIL_TO_UPLOAD_FILE: 새 CoverImage 업로드에 실패한 경우
+   */
   @Override
   @PermissionRequired(
     actions = {"EDIT"},
     permissionType = BookPermission.class
   )
-  public BookDto changeBookCoverImage(@BookId UUID bookId, MultipartFile coverImage) {
+  public Result<BookDto> changeBookCoverImage(@BookId UUID bookId, MultipartFile coverImage) {
+    // 내부에 저장된 이미지인 경우, 기존 이미지를 삭제 =============
     Book book = bookPersistencePort.findById(bookId).get();
-
-    // 내부에 저장된 이미지인 경우, 기존 이미지를 삭제
     String oldUrl = book.getCoverImageUrl();
     if(imageUrlValidator.isInternalUrl(oldUrl)) {
-      fileService.delete(oldUrl);
+      FilePath path = FilePath.fromWebUrl(oldUrl);
+      Result deleteResult = fileService.delete(path);
+      if(deleteResult.isFailure()) {
+        return (Result) deleteResult;
+      }
     }
 
-    String newCoverImageUrl = this.uploadCoverImage(bookId, coverImage);
-    book.changeCoverImageUrl(newCoverImageUrl);
-    return BookDto.from(book);
+    // 새 이미지 업로드 ================
+    Result<FilePath> uploadResult = _uploadCoverImage(bookId, coverImage);
+    if(uploadResult.isFailure()) {
+      return (Result) uploadResult;
+    }
+    book.changeCoverImageUrl(uploadResult.getSuccessData().getWebUrl());
+    return Result.success(BookDto.from(book));
   }
 
   @Override
@@ -143,14 +164,19 @@ public class BookService implements BookUseCase {
   }
 
 
-  private String uploadCoverImage(UUID bookId, MultipartFile coverImage) {
-    // 새 이미지 업로드
-    ImageFileUploadCmd cmd = new ImageFileUploadCmd(
+  /**
+   * @code FILED_VALIDATION_ERROR: coverImage file의 데이터가 올바르지 않은 경우
+   * @code FAIL_TO_UPLOAD_FILE: CoverImage 업로드에 실패한 경우
+   */
+  private Result<FilePath> _uploadCoverImage(UUID bookId, MultipartFile coverImage) {
+    Result<FileUploadCmd> cmdResult = FileUploadCmd.createCmd(
+      coverImage,
       bookId.toString(),
-      FileTypeeee.BOOK.COVER_IMAGE,
-      coverImage
+      FileType.BOOK_COVER_IMAGE
     );
-    FilePath path = fileService.upload(cmd);
-    return path.getWebUrl();
+    if(cmdResult.isFailure()) {
+      return (Result) cmdResult;
+    }
+    return fileService.upload(cmdResult.getSuccessData());
   }
 }

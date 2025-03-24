@@ -34,6 +34,6 @@ public class DataCreator {
   }
 
   public BookDto createBook(UserDto user, String title) {
-    return bookUseCase.createBook(user.getUid(), BookTitle.of(title), null);
+    return bookUseCase.createBook(user.getUid(), BookTitle.of(title), null).getSuccessData();
   }
 }

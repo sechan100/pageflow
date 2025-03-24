@@ -1,6 +1,7 @@
 package org.pageflow.file.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.pageflow.common.result.Result;
 import org.pageflow.file.entity.FileData;
 import org.pageflow.file.model.FilePath;
@@ -10,24 +11,39 @@ import org.pageflow.file.shared.FileCode;
 import org.pageflow.file.shared.FileType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
 
 import java.io.File;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class FileService {
   private final FileDataJpaRepository repository;
-  private final List<ImageFileValidatior> ImageFileValidatior;
+  private final List<FileValidator> fileValidators;
 
 
-  public FilePath upload(FileUploadCmd cmd) {
+  /**
+   * @code FAIL_TO_UPLOAD_FILE: 파일 업로드에 실패한 경우
+   * @code 그 외 FileValidator에 따라서 다양한 ResultCode 발생 가능
+   */
+  public Result<FilePath> upload(FileUploadCmd cmd) {
+    // 파일 유효성 검사 ===============================
+    Result fileValidationResult = fileValidators.stream()
+      .filter(v -> v.accept(cmd.getFileType()))
+      .findFirst()
+      .map(validator -> validator.validateFile(cmd.getFile()))
+      .orElse(Result.success());
+    if(fileValidationResult.isFailure()) {
+      return fileValidationResult;
+    }
+
+    // 파일 데이터 엔티티 저장 ====================================
     String originalFilename = cmd.getFile().getOriginalFilename();
-    assert originalFilename != null; // UploadCmd에서 이미 Runtime 검증
+    assert originalFilename != null;
 
     FilePath filePath = new FilePath(
       getDailyStaticParent(),
@@ -40,28 +56,31 @@ public class FileService {
       .filename(filePath.getFilename())
       .extension(filePath.getExtension())
       .size(cmd.getFile().getSize())
-      .ownerId(cmd.getFileIdentity().getOwnerId())
-      .ownerType(cmd.getFileIdentity().getFileType())
-      .fileType(cmd.getFileIdentity().getFileType().name())
+      .ownerId(cmd.getOwnerId())
+      .fileType(cmd.getFileType())
       .staticParent(filePath.getStaticParent())
       .build();
     repository.persist(fileData);
 
+    // 실제 파일 저장 ===========================
     try {
       File file = new File(filePath.getFullPath());
       File parent = file.getParentFile();
-
       // 파일을 저장할 디렉토리가 없다면 생성
       if(!parent.exists()) {
         boolean mkdirSuccess = parent.mkdirs();
-        Assert.state(mkdirSuccess, "파일을 저장할 디렉토리를 생성하는데 실패했습니다.");
+        if(!mkdirSuccess) {
+          log.error("파일을 저장할 디렉토리를 생성하는데 실패했습니다. parent: {}, fileData: {}", parent, fileData);
+          return Result.of(FileCode.FAIL_TO_UPLOAD_FILE, originalFilename);
+        }
       }
       // 파일 저장
       cmd.getFile().transferTo(file);
+      return Result.success(filePath);
     } catch(Exception e) {
-      throw new FileProcessingException("파일을 저장하는데 실패했습니다.", e);
+      log.error("파일 저장에 실패했습니다. fileData: {}", fileData, e);
+      return Result.of(FileCode.FAIL_TO_UPLOAD_FILE, originalFilename);
     }
-    return fileData.getFilePath();
   }
 
 

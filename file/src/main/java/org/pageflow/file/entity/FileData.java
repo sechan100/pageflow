@@ -1,27 +1,26 @@
-package org.pageflow.file.persistence;
+package org.pageflow.file.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
 import org.pageflow.common.jpa.BaseJpaEntity;
 import org.pageflow.file.model.FilePath;
-import org.pageflow.file.shared.FileOwnerType;
+import org.pageflow.file.shared.FileType;
 
 import java.util.UUID;
 
-@Data
 @Entity
-@Builder
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-@EqualsAndHashCode(of = "managedFilename", callSuper = false)
+@EqualsAndHashCode(of = "filename", callSuper = false)
 @Table(
   name = "file_data",
-  indexes = {@Index(name = "idx_owner_identity", columnList = "owner_id, owner_type"),}
+  indexes = {@Index(name = "idx_owner_file_type", columnList = "owner_id, file_type"),}
 )
 public class FileData extends BaseJpaEntity {
 
   @Id
-  private UUID managedFilename; // UUID
+  private UUID filename;
 
   // /{YYYY}/{MM}/{DD}
   @Column(name = "static_parent")
@@ -37,22 +36,17 @@ public class FileData extends BaseJpaEntity {
   @Column(name = "size")
   private Long size;
 
+  // 파일을 소유한 리소스 엔티티의 id
   @Column(name = "owner_id")
   private String ownerId;
 
   @Enumerated(EnumType.STRING)
-  @Column(name = "owner_type")
-  private FileOwnerType ownerType;
-
-  /*
-   * enum 타입이지만, 인터페이스 구현체인 enum 타입이라서 @Enumerated를 사용할 수가 없음
-   **/
   @Column(name = "file_type")
-  private String fileType;
+  private FileType fileType;
 
 
-  public FilePath toStaticPath() {
-    return new FilePath(staticParent, managedFilename, extension);
+  public FilePath getFilePath() {
+    return new FilePath(staticParent, filename, extension);
   }
 
 }

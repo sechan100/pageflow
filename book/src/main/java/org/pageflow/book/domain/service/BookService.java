@@ -21,9 +21,8 @@ import org.pageflow.common.property.ApplicationProperties;
 import org.pageflow.common.user.UID;
 import org.pageflow.common.validation.ImageUrlValidator;
 import org.pageflow.file.model.FilePath;
-import org.pageflow.file.model.FileUploadCmd;
+import org.pageflow.file.model.ImageFileUploadCmd;
 import org.pageflow.file.service.FileService;
-import org.pageflow.file.shared.FileType;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -61,9 +60,9 @@ public class BookService implements BookUseCase {
     UUID bookId = UUID.randomUUID();
     String coverImageUrl = coverImage != null
       ?
-    this.uploadCoverImage(bookId, coverImage)
+      this.uploadCoverImage(bookId, coverImage)
       :
-    applicationProperties.book.defaultCoverImageUrl;
+      applicationProperties.book.defaultCoverImageUrl;
 
     Book book = Book.create(
       bookId,
@@ -83,7 +82,7 @@ public class BookService implements BookUseCase {
 
   @Override
   @PermissionRequired(
-    actions = { "READ" },
+    actions = {"READ"},
     permissionType = BookPermission.class
   )
   public BookDtoWithAuthor queryBook(@BookId UUID bookId) {
@@ -105,7 +104,7 @@ public class BookService implements BookUseCase {
 
   @Override
   @PermissionRequired(
-    actions = { "EDIT" },
+    actions = {"EDIT"},
     permissionType = BookPermission.class
   )
   public BookDto changeBookTitle(@BookId UUID bookId, BookTitle title) {
@@ -116,7 +115,7 @@ public class BookService implements BookUseCase {
 
   @Override
   @PermissionRequired(
-    actions = { "EDIT" },
+    actions = {"EDIT"},
     permissionType = BookPermission.class
   )
   public BookDto changeBookCoverImage(@BookId UUID bookId, MultipartFile coverImage) {
@@ -124,7 +123,7 @@ public class BookService implements BookUseCase {
 
     // 내부에 저장된 이미지인 경우, 기존 이미지를 삭제
     String oldUrl = book.getCoverImageUrl();
-    if(imageUrlValidator.isInternalUrl(oldUrl)){
+    if(imageUrlValidator.isInternalUrl(oldUrl)) {
       fileService.delete(oldUrl);
     }
 
@@ -135,7 +134,7 @@ public class BookService implements BookUseCase {
 
   @Override
   @PermissionRequired(
-    actions = { "DELETE" },
+    actions = {"DELETE"},
     permissionType = BookPermission.class
   )
   public void deleteBook(@BookId UUID bookId) {
@@ -146,9 +145,9 @@ public class BookService implements BookUseCase {
 
   private String uploadCoverImage(UUID bookId, MultipartFile coverImage) {
     // 새 이미지 업로드
-    FileUploadCmd cmd = new FileUploadCmd(
+    ImageFileUploadCmd cmd = new ImageFileUploadCmd(
       bookId.toString(),
-      FileType.BOOK.COVER_IMAGE,
+      FileTypeeee.BOOK.COVER_IMAGE,
       coverImage
     );
     FilePath path = fileService.upload(cmd);

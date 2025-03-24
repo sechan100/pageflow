@@ -1,13 +1,13 @@
 package org.pageflow.file.service;
 
 import lombok.RequiredArgsConstructor;
-import org.pageflow.file.model.FileIdentity;
+import org.pageflow.common.result.Result;
+import org.pageflow.file.entity.FileData;
 import org.pageflow.file.model.FilePath;
 import org.pageflow.file.model.FileUploadCmd;
-import org.pageflow.file.persistence.FileData;
-import org.pageflow.file.persistence.FileDataJpaRepository;
-import org.pageflow.file.shared.FileOwnerType;
-import org.pageflow.file.shared.FileProcessingException;
+import org.pageflow.file.repository.FileDataJpaRepository;
+import org.pageflow.file.shared.FileCode;
+import org.pageflow.file.shared.FileType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -22,25 +22,26 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class FileService {
   private final FileDataJpaRepository repository;
+  private final List<ImageFileValidatior> ImageFileValidatior;
 
 
-  public FilePath upload(final FileUploadCmd cmd) {
+  public FilePath upload(FileUploadCmd cmd) {
     String originalFilename = cmd.getFile().getOriginalFilename();
-    assert originalFilename!=null; // UploadCmd에서 이미 Runtime 검증
+    assert originalFilename != null; // UploadCmd에서 이미 Runtime 검증
 
     FilePath filePath = new FilePath(
       getDailyStaticParent(),
       UUID.randomUUID(),
-      extractExtension(originalFilename)
+      _extractExtension(originalFilename)
     );
 
     FileData fileData = FileData.builder()
       .originalFilename(originalFilename)
-      .managedFilename(filePath.getFilename())
+      .filename(filePath.getFilename())
       .extension(filePath.getExtension())
       .size(cmd.getFile().getSize())
       .ownerId(cmd.getFileIdentity().getOwnerId())
-      .ownerType(cmd.getFileIdentity().getFileOwnerType())
+      .ownerType(cmd.getFileIdentity().getFileType())
       .fileType(cmd.getFileIdentity().getFileType().name())
       .staticParent(filePath.getStaticParent())
       .build();
@@ -51,58 +52,59 @@ public class FileService {
       File parent = file.getParentFile();
 
       // 파일을 저장할 디렉토리가 없다면 생성
-      if(!parent.exists()){
+      if(!parent.exists()) {
         boolean mkdirSuccess = parent.mkdirs();
         Assert.state(mkdirSuccess, "파일을 저장할 디렉토리를 생성하는데 실패했습니다.");
       }
       // 파일 저장
       cmd.getFile().transferTo(file);
-    } catch(Exception e){
+    } catch(Exception e) {
       throw new FileProcessingException("파일을 저장하는데 실패했습니다.", e);
     }
-    return fileData.toStaticPath();
+    return fileData.getFilePath();
   }
 
 
-  public List<FileData> findAll(FileIdentity identity) {
-    return repository.findAll(identity);
-  }
-
-
-  public void delete(FileData fileData) {
-    deleteByFilePath(fileData.toStaticPath());
+  public List<FileData> findAll(String ownerId, FileType type) {
+    return repository.findAll(ownerId, type);
   }
 
   /**
-   * @param webUrl /{webUrl}/{YYYY}/{MM}/{DD}/{UUID}.{ext}
+   * @code FAIL_TO_DELETE_FILE: 파일 삭제에 실패시
    */
-  public void delete(String webUrl) {
-    FilePath filePath = FilePath.fromWebUrl(webUrl);
-    deleteByFilePath(filePath);
+  public Result delete(FileData fileData) {
+    return _deleteByFilePath(fileData.getFilePath());
   }
 
-  public void deleteAll(FileIdentity identity) {
-    repository.deleteAll(identity);
+  /**
+   * @code FAIL_TO_DELETE_FILE: 파일 삭제에 실패시
+   */
+  public Result delete(FilePath path) {
+    return _deleteByFilePath(path);
   }
 
-  public void deleteAll(UUID ownerId, FileOwnerType ownerType) {
+  public void deleteAll(String ownerId, FileType ownerType) {
     repository.deleteAll(ownerId, ownerType);
   }
 
-  private void deleteByFilePath(FilePath filePath) {
+  /**
+   * @code FAIL_TO_DELETE_FILE: 파일 삭제에 실패시
+   */
+  private Result _deleteByFilePath(FilePath filePath) {
     File file = new File(filePath.getFullPath());
     boolean isSuccess = file.delete();
-    if(isSuccess){
+    if(isSuccess) {
       repository.deleteById(filePath.getFilename());
+      return Result.success();
     } else {
-      throw new FileProcessingException("파일을 삭제하는데 실패했습니다.");
+      return Result.of(FileCode.FAIL_TO_DELETE_FILE, filePath.getStaticPath());
     }
   }
 
 
-  private String extractExtension(String filename) {
+  private String _extractExtension(String filename) {
     String extension = filename.substring(filename.lastIndexOf('.') + 1);
-    if(extension.isEmpty()){
+    if(extension.isEmpty()) {
       throw new IllegalArgumentException("파일명에 확장자가 없습니다.");
     } else {
       return extension;

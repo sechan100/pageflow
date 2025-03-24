@@ -9,9 +9,8 @@ import org.pageflow.common.validation.FieldValidationException;
 import org.pageflow.common.validation.FieldValidator;
 import org.pageflow.common.validation.ImageUrlValidator;
 import org.pageflow.file.model.FilePath;
-import org.pageflow.file.model.FileUploadCmd;
+import org.pageflow.file.model.ImageFileUploadCmd;
 import org.pageflow.file.service.FileService;
-import org.pageflow.file.shared.FileType;
 import org.pageflow.user.domain.entity.Profile;
 import org.pageflow.user.dto.ProfileDto;
 import org.pageflow.user.port.in.ProfileUseCase;
@@ -49,14 +48,14 @@ public class ProfileService implements ProfileUseCase {
     String oldUrl = profile.getProfileImageUrl();
 
     // 내부에 저장된 이미지인 경우, 기존 이미지를 삭제
-    if(imageUrlValidator.isInternalUrl(oldUrl)){
+    if(imageUrlValidator.isInternalUrl(oldUrl)) {
       fileService.delete(oldUrl);
     }
 
     // 새 이미지 업로드
-    FileUploadCmd cmd = new FileUploadCmd(
+    ImageFileUploadCmd cmd = new ImageFileUploadCmd(
       uid.getValue().toString(),
-      FileType.USER.PROFILE_IMAGE,
+      FileTypeeee.USER.PROFILE_IMAGE,
       file
     );
     FilePath path = fileService.upload(cmd);
@@ -71,7 +70,7 @@ public class ProfileService implements ProfileUseCase {
     String oldUrl = user.getProfileImageUrl();
 
     // 내부에 저장된 이미지인 경우, 기존 이미지를 삭제
-    if(imageUrlValidator.isInternalUrl(oldUrl)){
+    if(imageUrlValidator.isInternalUrl(oldUrl)) {
       fileService.delete(oldUrl);
     }
 
@@ -83,7 +82,7 @@ public class ProfileService implements ProfileUseCase {
   @Override
   public ProfileDto changePenname(UID uid, String penname) {
     var validation = pennameValidator.validate(penname);
-    if(!validation.isValid()){
+    if(!validation.isValid()) {
       throw new FieldValidationException(validation);
     }
 

@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.pageflow.book.adapter.in.aop.SetBookPermission;
 import org.pageflow.book.adapter.in.request.SectionCreateReq;
+import org.pageflow.book.adapter.in.request.SectionForm;
 import org.pageflow.book.application.BookId;
 import org.pageflow.book.dto.SectionAttachmentUrl;
 import org.pageflow.book.dto.SectionDto;
@@ -105,6 +106,17 @@ public class SectionWebAdapter {
     @RequestPart MultipartFile image
   ) {
     return sectionWriteUseCase.uploadAttachmentImage(bookId, sectionId, image);
+  }
+
+  @PostMapping("/{sectionId}/content")
+  @Operation(summary = "섹션 내용 작성")
+  @SetBookPermission
+  public Result<SectionDtoWithContent> writeContent(
+    @PathVariable @BookId UUID bookId,
+    @PathVariable UUID sectionId,
+    @RequestBody SectionForm.Content form
+  ) {
+    return sectionWriteUseCase.writeContent(bookId, sectionId, form.getContent());
   }
 
 

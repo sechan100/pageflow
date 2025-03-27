@@ -1,9 +1,10 @@
 dependencies {
-    implementation project(':common')
-    implementation project(':user')
-    implementation project(':file')
+  implementation project(':common')
+  implementation project(':user')
+  implementation project(':file')
+  implementation 'org.jsoup:jsoup:1.19.1'
 }
 
 test {
-    useJUnitPlatform()
+  useJUnitPlatform()
 }

@@ -17,7 +17,7 @@ public interface SectionWriteUseCase {
 
   Result<SectionDto> updateSection(UUID bookId, UpdateSectionCmd cmd);
 
-  Result<SectionDtoWithContent> writeContent(UUID bookId, UUID sectionId, LexicalHtmlSectionContent content);
+  Result<SectionDtoWithContent> writeContent(UUID bookId, UUID sectionId, String content);
 
   Result<SectionAttachmentUrl> uploadAttachmentImage(UUID bookId, UUID sectionId, MultipartFile file);
 }

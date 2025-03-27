@@ -4,11 +4,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pageflow.book.application.BookId;
 import org.pageflow.book.application.BookPermission;
+import org.pageflow.book.domain.SectionHtmlContent;
 import org.pageflow.book.domain.entity.Section;
 import org.pageflow.book.dto.SectionAttachmentUrl;
 import org.pageflow.book.dto.SectionDto;
 import org.pageflow.book.dto.SectionDtoWithContent;
-import org.pageflow.book.port.in.LexicalHtmlSectionContent;
 import org.pageflow.book.port.in.SectionWriteUseCase;
 import org.pageflow.book.port.in.cmd.UpdateSectionCmd;
 import org.pageflow.book.port.out.jpa.SectionPersistencePort;
@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -57,14 +58,33 @@ public class SectionWriteService implements SectionWriteUseCase {
     return Result.success(SectionDto.from(section));
   }
 
+  /**
+   * @code SECTION_HTML_CONTENT_PARSE_ERROR: html 파싱에 실패한 경우
+   * @code DATA_NOT_FOUND: 섹션을 찾을 수 없는 경우
+   */
   @Override
   @PermissionRequired(
     actions = {"EDIT"},
     permissionType = BookPermission.class
   )
-  public Result<SectionDtoWithContent> writeContent(@BookId UUID bookId, UUID sectionId, LexicalHtmlSectionContent content) {
+  public Result<SectionDtoWithContent> writeContent(@BookId UUID bookId, UUID sectionId, String content) {
+    Result<SectionHtmlContent> htmlRes = SectionHtmlContent.of(content);
+    if(htmlRes.isFailure()) {
+      return (Result) htmlRes;
+    }
 
-    return null;
+    Optional<Section> sectionOpt = sectionPersistencePort.findById(sectionId);
+    if(sectionOpt.isEmpty()) {
+      return Result.of(CommonCode.DATA_NOT_FOUND, "섹션을 찾을 수 없습니다.");
+    }
+
+    Section section = sectionOpt.get();
+    SectionHtmlContent html = htmlRes.getSuccessData();
+    if(!html.getIsSanitizationConsistent()) {
+      log.warn("Section({})의 content의 html sanitize 결과가 원본과 다릅니다. \n[original]\n{} \n================================================================= \n[sanitized]\n{}", sectionId, content, html.getContent());
+    }
+    section.updateContent(html);
+    return Result.success(SectionDtoWithContent.from(section));
   }
 
   /**

@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicUpdate;
+import org.pageflow.book.domain.SectionHtmlContent;
 
 import java.util.UUID;
 
@@ -38,8 +39,8 @@ public class Section extends TocNode {
     this.content = content;
   }
 
-  public void updateContent(String content) {
-    this.content = content;
+  public void updateContent(SectionHtmlContent content) {
+    this.content = content.getContent();
   }
 
   public void changeTitle(String title) {

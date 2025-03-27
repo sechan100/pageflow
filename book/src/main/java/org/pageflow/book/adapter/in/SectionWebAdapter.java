@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.pageflow.book.adapter.in.aop.SetBookPermission;
 import org.pageflow.book.adapter.in.request.SectionCreateReq;
 import org.pageflow.book.application.BookId;
+import org.pageflow.book.dto.SectionAttachmentUrl;
 import org.pageflow.book.dto.SectionDto;
 import org.pageflow.book.dto.SectionDtoWithContent;
 import org.pageflow.book.port.in.SectionWriteUseCase;
@@ -16,6 +17,7 @@ import org.pageflow.book.port.in.cmd.UpdateSectionCmd;
 import org.pageflow.common.result.Result;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.UUID;
 
@@ -92,6 +94,17 @@ public class SectionWebAdapter {
     @PathVariable UUID sectionId
   ) {
     tocUseCase.deleteSection(bookId, sectionId);
+  }
+
+  @PostMapping("/{sectionId}/upload-image")
+  @Operation(summary = "섹션 이미지 업로드")
+  @SetBookPermission
+  public Result<SectionAttachmentUrl> uploadSectionAttachmentImage(
+    @PathVariable @BookId UUID bookId,
+    @PathVariable UUID sectionId,
+    @RequestPart MultipartFile image
+  ) {
+    return sectionWriteUseCase.uploadAttachmentImage(bookId, sectionId, image);
   }
 
 

@@ -23,6 +23,6 @@ public class HtmlXssEscapeJacksonHttpMessageConverterWebConfig implements WebMvc
 
   @Override
   public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
-    converters.add(0, jsonEscapeConverter(new ObjectMapper()));
+    converters.add(1, jsonEscapeConverter(new ObjectMapper()));
   }
 }

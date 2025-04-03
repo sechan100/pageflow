@@ -27,7 +27,7 @@ public class BookStatusService implements BookStatusUseCase {
 
   @Override
   @PermissionRequired(
-    actions = { "UPDATE_STATUS" },
+    actions = {"UPDATE_STATUS"},
     permissionType = BookPermission.class
   )
   public BookDto publish(@BookId UUID bookId) {
@@ -38,10 +38,10 @@ public class BookStatusService implements BookStatusUseCase {
 
   @Override
   @PermissionRequired(
-    actions = { "UPDATE_STATUS" },
+    actions = {"UPDATE_STATUS"},
     permissionType = BookPermission.class
   )
-  public BookDto revise(@BookId UUID bookId) {
+  public BookDto startRevise(@BookId UUID bookId) {
     Book book = bookPersistencePort.findById(bookId).get();
     book.revise();
     return BookDto.from(book);
@@ -49,7 +49,7 @@ public class BookStatusService implements BookStatusUseCase {
 
   @Override
   @PermissionRequired(
-    actions = { "UPDATE_STATUS" },
+    actions = {"UPDATE_STATUS"},
     permissionType = BookPermission.class
   )
   public BookDto cancelRevise(@BookId UUID bookId) {
@@ -60,10 +60,10 @@ public class BookStatusService implements BookStatusUseCase {
 
   @Override
   @PermissionRequired(
-    actions = { "UPDATE_STATUS" },
+    actions = {"UPDATE_STATUS"},
     permissionType = BookPermission.class
   )
-  public BookDto mergeRevision(@BookId UUID bookId) {
+  public BookDto revise(@BookId UUID bookId) {
     Book book = bookPersistencePort.findById(bookId).get();
     book.mergeRevision();
     return BookDto.from(book);

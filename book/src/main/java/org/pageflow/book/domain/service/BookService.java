@@ -111,15 +111,18 @@ public class BookService implements BookUseCase {
     );
   }
 
+  /**
+   * @code
+   */
   @Override
   @PermissionRequired(
     actions = {"EDIT"},
     permissionType = BookPermission.class
   )
-  public BookDto changeBookTitle(@BookId UUID bookId, BookTitle title) {
+  public Result<BookDto> changeBookTitle(@BookId UUID bookId, BookTitle title) {
     Book book = bookPersistencePort.findById(bookId).get();
     book.changeTitle(title);
-    return BookDto.from(book);
+    return Result.success(BookDto.from(book));
   }
 
   /**

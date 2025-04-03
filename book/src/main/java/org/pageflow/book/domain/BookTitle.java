@@ -16,7 +16,7 @@ public class BookTitle extends SingleValueWrapper<String> {
     super(value);
   }
 
-  public static BookTitle of(String value) {
+  public static BookTitle create(String value) {
     FieldValidationResult result = validate(value);
     if(result.isValid()) {
       return new BookTitle(value);

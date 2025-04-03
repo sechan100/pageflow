@@ -38,8 +38,8 @@ public class BookStatusWebAdapter {
     BookDto result = switch(cmd) {
       case PUBLISH -> bookStatusUseCase.publish(bookId);
       case CANCEL_REVISE -> bookStatusUseCase.cancelRevise(bookId);
-      case MERGE_REVISION -> bookStatusUseCase.mergeRevision(bookId);
-      case REVISE -> bookStatusUseCase.revise(bookId);
+      case MERGE_REVISION -> bookStatusUseCase.revise(bookId);
+      case REVISE -> bookStatusUseCase.startRevise(bookId);
     };
     return result;
   }

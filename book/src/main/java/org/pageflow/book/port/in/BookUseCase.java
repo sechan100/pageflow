@@ -25,7 +25,7 @@ public interface BookUseCase {
 
   MyBooks queryMyBooks(UID uid);
 
-  BookDto changeBookTitle(UUID bookId, BookTitle title);
+  Result<BookDto> changeBookTitle(UUID bookId, BookTitle title);
 
   Result<BookDto> changeBookCoverImage(UUID bookId, MultipartFile file);
 

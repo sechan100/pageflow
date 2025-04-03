@@ -48,7 +48,7 @@ public class UserUpdateWebAdapter {
     @RequestPart(name = "profileImage", required = false)
     MultipartFile profileImage,
 
-    @Parameter(description = "해당 플래그를 true로하면 기존 프로필 이미지를 삭제하고 기본 값으로 되돌립니다.")
+    @Parameter(description = "해당 플래그를 켜면, 기존 프로필 이미지를 삭제하고 기본 값으로 되돌립니다.")
     @RequestParam(defaultValue = "false")
     boolean toDefaultProfileImage
   ) {

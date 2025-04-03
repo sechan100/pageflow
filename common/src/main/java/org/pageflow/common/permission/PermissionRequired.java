@@ -13,8 +13,9 @@ import java.lang.annotation.*;
 public @interface PermissionRequired {
 
   /**
-   * @see ResourceAction 을 구현하는 enum의 name을 사용할 수 있다.
+   * {@link ResourceAction}를 구현하는 enum의 name을 사용할 수 있다.
    * 또는 "FULL"을 사용하여 특정 enum set의 모든 권한을 필요로 함을 표현할 수 있다.
+   *
    * @return
    */
   String[] actions();

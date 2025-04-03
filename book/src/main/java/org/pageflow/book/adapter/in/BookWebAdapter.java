@@ -2,14 +2,13 @@ package org.pageflow.book.adapter.in;
 
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
-import org.pageflow.book.adapter.in.aop.SetBookPermission;
 import org.pageflow.book.adapter.in.request.CreateBookReq;
 import org.pageflow.book.adapter.in.request.UpdateBookForm;
-import org.pageflow.book.application.BookId;
 import org.pageflow.book.domain.BookTitle;
 import org.pageflow.book.dto.BookDto;
 import org.pageflow.book.dto.BookDtoWithAuthor;
 import org.pageflow.book.dto.MyBooks;
+import org.pageflow.book.port.in.BookAccessPermitter;
 import org.pageflow.book.port.in.BookUseCase;
 import org.pageflow.common.api.RequestContext;
 import org.pageflow.common.result.Result;
@@ -28,6 +27,7 @@ import java.util.UUID;
 @RequestMapping("/user/books")
 @RequiredArgsConstructor
 public class BookWebAdapter {
+  private final BookAccessPermitter bookAccessPermitter;
   private final BookUseCase bookUseCase;
   private final RequestContext rqcxt;
 
@@ -50,19 +50,21 @@ public class BookWebAdapter {
 
   @GetMapping("/{bookId}")
   @Operation(summary = "책 조회")
-  @SetBookPermission
-  public BookDtoWithAuthor getBook(@PathVariable @BookId UUID bookId) {
+  public BookDtoWithAuthor getBook(@PathVariable UUID bookId) {
+    UID uid = rqcxt.getUid();
+    bookAccessPermitter.setPermission(bookId, uid);
     BookDtoWithAuthor bookWithAuthor = bookUseCase.queryBook(bookId);
     return bookWithAuthor;
   }
 
   @PostMapping("/{bookId}/title")
   @Operation(summary = "책 제목 수정")
-  @SetBookPermission
   public Result<BookDto> changeBookTitle(
-    @PathVariable @BookId UUID bookId,
+    @PathVariable UUID bookId,
     @RequestBody UpdateBookForm form
   ) {
+    UID uid = rqcxt.getUid();
+    bookAccessPermitter.setPermission(bookId, uid);
     BookTitle title = BookTitle.create(form.getTitle());
     Result<BookDto> result = bookUseCase.changeBookTitle(bookId, title);
     return result;
@@ -70,19 +72,21 @@ public class BookWebAdapter {
 
   @PostMapping("/{bookId}/cover-image")
   @Operation(summary = "책 표지 이미지 수정")
-  @SetBookPermission
   public Result<BookDto> changeBookCoverImage(
-    @PathVariable @BookId UUID bookId,
+    @PathVariable UUID bookId,
     @RequestPart(name = "coverImage") MultipartFile coverImage
   ) {
+    UID uid = rqcxt.getUid();
+    bookAccessPermitter.setPermission(bookId, uid);
     Result<BookDto> result = bookUseCase.changeBookCoverImage(bookId, coverImage);
     return result;
   }
 
   @DeleteMapping("/{bookId}")
   @Operation(summary = "책 삭제")
-  @SetBookPermission
-  public void deleteBook(@PathVariable @BookId UUID bookId) {
+  public void deleteBook(@PathVariable UUID bookId) {
+    UID uid = rqcxt.getUid();
+    bookAccessPermitter.setPermission(bookId, uid);
     bookUseCase.deleteBook(bookId);
   }
 

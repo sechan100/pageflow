@@ -4,13 +4,14 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import org.pageflow.book.adapter.in.aop.SetBookPermission;
 import org.pageflow.book.adapter.in.request.CreateFolderReq;
-import org.pageflow.book.application.BookId;
 import org.pageflow.book.dto.FolderDto;
+import org.pageflow.book.port.in.BookAccessPermitter;
 import org.pageflow.book.port.in.TocUseCase;
 import org.pageflow.book.port.in.cmd.CreateFolderCmd;
 import org.pageflow.book.port.in.cmd.UpdateFolderCmd;
+import org.pageflow.common.api.RequestContext;
+import org.pageflow.common.user.UID;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,15 +26,18 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class FolderWebAdapter {
   private final TocUseCase tocUseCase;
+  private final BookAccessPermitter bookAccessPermitter;
+  private final RequestContext rqcxt;
 
 
   @PostMapping("")
   @Operation(summary = "폴더 생성")
-  @SetBookPermission
   public FolderDto createFolder(
-    @PathVariable @BookId UUID bookId,
+    @PathVariable UUID bookId,
     @RequestBody CreateFolderReq req
   ) {
+    UID uid = rqcxt.getUid();
+    bookAccessPermitter.setPermission(bookId, uid);
     CreateFolderCmd cmd = CreateFolderCmd.withTitle(
       bookId,
       req.getParentNodeId(),
@@ -45,23 +49,25 @@ public class FolderWebAdapter {
 
   @GetMapping("/{folderId}")
   @Operation(summary = "폴더 조회")
-  @SetBookPermission
   public FolderDto getFolder(
-    @PathVariable @BookId UUID bookId,
+    @PathVariable UUID bookId,
     @PathVariable UUID folderId
   ) {
+    UID uid = rqcxt.getUid();
+    bookAccessPermitter.setPermission(bookId, uid);
     FolderDto folder = tocUseCase.getFolder(bookId, folderId);
     return folder;
   }
 
   @PostMapping("/{folderId}")
   @Operation(summary = "폴더 업데이트")
-  @SetBookPermission
   public FolderDto updateFolder(
-    @PathVariable @BookId UUID bookId,
+    @PathVariable UUID bookId,
     @PathVariable UUID folderId,
     @RequestBody FolderUpdateReq req
   ) {
+    UID uid = rqcxt.getUid();
+    bookAccessPermitter.setPermission(bookId, uid);
     UpdateFolderCmd cmd = UpdateFolderCmd.of(
       folderId,
       req.getTitle()
@@ -73,11 +79,12 @@ public class FolderWebAdapter {
 
   @DeleteMapping("/{folderId}")
   @Operation(summary = "폴더 삭제")
-  @SetBookPermission
   public void deleteFolder(
-    @PathVariable @BookId UUID bookId,
+    @PathVariable UUID bookId,
     @PathVariable UUID folderId
   ) {
+    UID uid = rqcxt.getUid();
+    bookAccessPermitter.setPermission(bookId, uid);
     tocUseCase.deleteFolder(bookId, folderId);
   }
 

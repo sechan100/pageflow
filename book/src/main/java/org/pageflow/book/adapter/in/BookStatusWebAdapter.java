@@ -2,9 +2,8 @@ package org.pageflow.book.adapter.in;
 
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
-import org.pageflow.book.adapter.in.aop.SetBookPermission;
-import org.pageflow.book.application.BookId;
 import org.pageflow.book.dto.BookDto;
+import org.pageflow.book.port.in.BookAccessPermitter;
 import org.pageflow.book.port.in.BookStatusUseCase;
 import org.pageflow.common.api.RequestContext;
 import org.pageflow.common.user.UID;
@@ -23,18 +22,19 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 public class BookStatusWebAdapter {
-  private final BookStatusUseCase bookStatusUseCase;
+  private final BookAccessPermitter bookAccessPermitter;
   private final RequestContext rqcxt;
+  private final BookStatusUseCase bookStatusUseCase;
 
 
   @PostMapping("/user/books/{bookId}/status")
   @Operation(summary = "책 상태 변경")
-  @SetBookPermission
   public BookDto changeBookStatus(
-    @BookId @PathVariable UUID bookId,
+    @PathVariable UUID bookId,
     @RequestParam BookStatusCmd cmd
   ) {
     UID uid = rqcxt.getUid();
+    bookAccessPermitter.setPermission(bookId, uid);
     BookDto result = switch(cmd) {
       case PUBLISH -> bookStatusUseCase.publish(bookId);
       case CANCEL_REVISE -> bookStatusUseCase.cancelRevise(bookId);

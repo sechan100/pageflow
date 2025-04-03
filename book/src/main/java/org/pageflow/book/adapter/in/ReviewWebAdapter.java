@@ -2,18 +2,15 @@ package org.pageflow.book.adapter.in;
 
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
-import org.pageflow.book.adapter.in.aop.SetBookPermission;
 import org.pageflow.book.adapter.in.request.CreateReviewReq;
 import org.pageflow.book.adapter.in.request.UpdateReviewReq;
-import org.pageflow.book.application.BookId;
-import org.pageflow.book.application.review.ReviewPermission;
 import org.pageflow.book.dto.ReviewDto;
-import org.pageflow.book.port.in.cmd.AddReviewCmd;
-import org.pageflow.book.port.in.cmd.UpdateReviewCmd;
+import org.pageflow.book.port.in.BookAccessPermitter;
+import org.pageflow.book.port.in.review.AddReviewCmd;
 import org.pageflow.book.port.in.review.ReviewAccessPermitter;
 import org.pageflow.book.port.in.review.ReviewUseCase;
+import org.pageflow.book.port.in.review.UpdateReviewCmd;
 import org.pageflow.common.api.RequestContext;
-import org.pageflow.common.permission.ResourcePermissionContext;
 import org.pageflow.common.user.UID;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -30,18 +27,18 @@ import java.util.UUID;
 public class ReviewWebAdapter {
   private final ReviewUseCase reviewUseCase;
   private final RequestContext rqcxt;
+  private final BookAccessPermitter bookPermitter;
   private final ReviewAccessPermitter reviewPermitter;
-  private final ResourcePermissionContext permissionAware;
 
 
   @PostMapping("")
   @Operation(summary = "책에 리뷰를 작성")
-  @SetBookPermission
   public ReviewDto createReview(
-    @BookId @PathVariable UUID bookId,
+    @PathVariable UUID bookId,
     @RequestBody CreateReviewReq req
-    ) {
+  ) {
     UID uid = rqcxt.getUid();
+    bookPermitter.setPermission(bookId, uid);
     AddReviewCmd cmd = AddReviewCmd.of(
       uid,
       bookId,
@@ -60,8 +57,7 @@ public class ReviewWebAdapter {
     @RequestBody UpdateReviewReq req
   ) {
     UID uid = rqcxt.getUid();
-    ReviewPermission permission = reviewPermitter.grant(reviewId, uid);
-    permissionAware.addResourcePermission(permission);
+    reviewPermitter.setPermission(reviewId, uid);
     UpdateReviewCmd cmd = UpdateReviewCmd.of(
       reviewId,
       req.getContent(),
@@ -71,7 +67,6 @@ public class ReviewWebAdapter {
   }
 
 
-
   @DeleteMapping("/{reviewId}")
   @Operation(summary = "리뷰 삭제")
   public void deleteReview(
@@ -79,8 +74,7 @@ public class ReviewWebAdapter {
     @PathVariable UUID reviewId
   ) {
     UID uid = rqcxt.getUid();
-    ReviewPermission permission = reviewPermitter.grant(reviewId, uid);
-    permissionAware.addResourcePermission(permission);
+    reviewPermitter.setPermission(reviewId, uid);
     reviewUseCase.deleteReview(reviewId);
   }
 

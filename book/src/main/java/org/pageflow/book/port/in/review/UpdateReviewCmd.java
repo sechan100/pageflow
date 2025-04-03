@@ -1,4 +1,4 @@
-package org.pageflow.book.port.in.cmd;
+package org.pageflow.book.port.in.review;
 
 import lombok.Value;
 

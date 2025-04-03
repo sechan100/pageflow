@@ -11,9 +11,9 @@ import org.pageflow.book.domain.Author;
 import org.pageflow.book.domain.entity.Book;
 import org.pageflow.book.domain.entity.Review;
 import org.pageflow.book.dto.ReviewDto;
-import org.pageflow.book.port.in.cmd.AddReviewCmd;
-import org.pageflow.book.port.in.cmd.UpdateReviewCmd;
+import org.pageflow.book.port.in.review.AddReviewCmd;
 import org.pageflow.book.port.in.review.ReviewUseCase;
+import org.pageflow.book.port.in.review.UpdateReviewCmd;
 import org.pageflow.book.port.out.LoadAuthorPort;
 import org.pageflow.book.port.out.jpa.BookPersistencePort;
 import org.pageflow.book.port.out.jpa.ReviewPersistencePort;
@@ -38,7 +38,7 @@ public class ReviewService implements ReviewUseCase {
 
   @Override
   @PermissionRequired(
-    actions = { "READ" },
+    actions = {"READ"},
     permissionType = BookPermission.class
   )
   public ReviewDto createReview(@BookId("#cmd.bookId") AddReviewCmd cmd) {
@@ -58,7 +58,7 @@ public class ReviewService implements ReviewUseCase {
 
   @Override
   @PermissionRequired(
-    actions = { "FULL" },
+    actions = {"FULL"},
     permissionType = ReviewPermission.class
   )
   public ReviewDto updateReview(@ReviewId("#cmd.reviewId") UpdateReviewCmd cmd) {
@@ -70,7 +70,7 @@ public class ReviewService implements ReviewUseCase {
 
   @Override
   @PermissionRequired(
-    actions = { "FULL" },
+    actions = {"FULL"},
     permissionType = ReviewPermission.class
   )
   public void deleteReview(@ReviewId UUID reviewId) {

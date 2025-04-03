@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicUpdate;
+import org.pageflow.book.domain.NodeTitle;
 import org.pageflow.book.domain.SectionHtmlContent;
 
 import java.util.UUID;
@@ -27,7 +28,7 @@ public class Section extends TocNode {
   @Column(nullable = false, columnDefinition = "MEDIUMTEXT")
   private String content;
 
-  public Section(
+  private Section(
     UUID id,
     Book book,
     String title,
@@ -39,12 +40,28 @@ public class Section extends TocNode {
     this.content = content;
   }
 
+  public static Section create(
+    Book book,
+    NodeTitle title,
+    Folder parentNode,
+    int ov
+  ) {
+    return new Section(
+      UUID.randomUUID(),
+      book,
+      title.getValue(),
+      parentNode,
+      "",
+      0
+    );
+  }
+
   public void updateContent(SectionHtmlContent content) {
     this.content = content.getContent();
   }
 
-  public void changeTitle(String title) {
-    this.title = title;
+  public void changeTitle(NodeTitle title) {
+    this.title = title.getValue();
   }
 
 }

@@ -9,7 +9,7 @@ import java.util.UUID;
 /**
  * @author : sechan
  */
-public abstract class SectionForm {
+public abstract class FolderForm {
 
   @Data
   public static class Create {
@@ -21,14 +21,8 @@ public abstract class SectionForm {
   }
 
   @Data
-  public static class Title {
+  public static class Update {
     @NotBlank
     private String title;
-  }
-
-  @Data
-  public static class Content {
-    @NotBlank
-    private String content;
   }
 }

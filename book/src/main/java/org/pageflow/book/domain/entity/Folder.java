@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicUpdate;
+import org.pageflow.book.domain.NodeTitle;
 import org.springframework.util.Assert;
 
 import java.util.ArrayList;
@@ -27,7 +28,7 @@ public class Folder extends TocNode {
   @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, mappedBy = "parentNode")
   private final List<TocNode> children = new ArrayList<>(8);
 
-  public Folder(
+  private Folder(
     UUID id,
     Book book,
     String title,
@@ -35,6 +36,21 @@ public class Folder extends TocNode {
     Integer ov
   ) {
     super(id, book, title, parentNode, ov);
+  }
+
+  public static Folder create(
+    Book book,
+    NodeTitle title,
+    Folder parentNode,
+    Integer ov
+  ) {
+    return new Folder(
+      UUID.randomUUID(),
+      book,
+      title.getValue(),
+      parentNode,
+      ov
+    );
   }
 
   public static Folder createRootFolder(Book book) {
@@ -47,8 +63,8 @@ public class Folder extends TocNode {
     );
   }
 
-  public void changeTitle(String title) {
-    this.title = title;
+  public void changeTitle(NodeTitle title) {
+    this.title = title.getValue();
   }
 
   public List<TocNode> getReadOnlyChildren() {

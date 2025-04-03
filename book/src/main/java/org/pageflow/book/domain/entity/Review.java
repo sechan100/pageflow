@@ -3,7 +3,13 @@ package org.pageflow.book.domain.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.pageflow.book.domain.Author;
+import org.pageflow.book.domain.ReviewScore;
 import org.pageflow.common.jpa.BaseJpaEntity;
+import org.pageflow.common.result.Result;
+import org.pageflow.common.result.code.CommonCode;
+import org.pageflow.common.validation.FieldReason;
+import org.pageflow.common.validation.FieldValidationResult;
+import org.pageflow.common.validation.InvalidField;
 import org.pageflow.user.domain.entity.Profile;
 
 import java.util.UUID;
@@ -44,19 +50,26 @@ public class Review extends BaseJpaEntity {
   private int score;
 
 
-  public static Review create(
+  /**
+   * @code FIELD_VALIDATION_ERROR: score가 1 ~ 5사이의 정수가 아닌 경우
+   */
+  public static Result<Review> create(
     Author writer,
     Book book,
     String content,
     int score
   ) {
-    return new Review(
+    Result<Integer> scoreValidationRes = _validateScore(score);
+    if(scoreValidationRes.isFailure()) return (Result) scoreValidationRes;
+
+    Review review = new Review(
       UUID.randomUUID(),
       writer.getProfileJpaEntity(),
       book,
       content,
-      _validateScore(score)
+      scoreValidationRes.getSuccessData()
     );
+    return Result.success(review);
   }
 
 
@@ -68,19 +81,32 @@ public class Review extends BaseJpaEntity {
     this.content = content;
   }
 
-  public void changeScore(int score) {
-    this.score = _validateScore(score);
+  /**
+   * @code FIELD_VALIDATION_ERROR: score가 1 ~ 5사이의 정수가 아닌 경우
+   */
+  public Result changeScore(int score) {
+    Result<Integer> scoreValidationRes = _validateScore(score);
+    if(scoreValidationRes.isFailure()) return scoreValidationRes;
+    this.score = scoreValidationRes.getSuccessData();
+    return scoreValidationRes;
   }
 
   /**
    * score가 1 ~ 5사이의 정수인지 확인한다.
    *
-   * @param score
+   * @code FIELD_VALIDATION_ERROR: score가 1 ~ 5사이의 정수가 아닌 경우
    */
-  private static int _validateScore(int score) {
-    if(score < 1 || score > 5) {
-      throw new IllegalArgumentException("score는 1 ~ 5 사이의 정수입니다. score:" + score);
+  private static Result<Integer> _validateScore(int score) {
+    if(score < ReviewScore.MIN || score > ReviewScore.MAX) {
+      return Result.of(CommonCode.FIELD_VALIDATION_ERROR, FieldValidationResult.of(
+        InvalidField.builder()
+          .field("score")
+          .value(score)
+          .reason(FieldReason.OUT_OF_RANGE)
+          .message(String.format("리뷰 점수는 %d ~ %d 사이의 숫자입니다.", ReviewScore.MIN, ReviewScore.MAX))
+          .build()
+      ));
     }
-    return score;
+    return Result.success(score);
   }
 }

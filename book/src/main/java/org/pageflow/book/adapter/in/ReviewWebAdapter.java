@@ -1,18 +1,16 @@
 package org.pageflow.book.adapter.in;
 
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.pageflow.book.adapter.in.form.CreateReviewReq;
-import org.pageflow.book.adapter.in.form.UpdateReviewReq;
-import org.pageflow.book.dto.ReviewDto;
-import org.pageflow.book.port.in.BookAccessPermitter;
-import org.pageflow.book.port.in.review.AddReviewCmd;
-import org.pageflow.book.port.in.review.ReviewAccessPermitter;
-import org.pageflow.book.port.in.review.ReviewUseCase;
-import org.pageflow.book.port.in.review.UpdateReviewCmd;
+import org.pageflow.book.adapter.in.form.ReviewForm;
+import org.pageflow.book.application.BookId;
+import org.pageflow.book.application.ReviewId;
+import org.pageflow.book.application.dto.ReviewDto;
+import org.pageflow.book.port.in.ReviewUseCase;
 import org.pageflow.common.api.RequestContext;
+import org.pageflow.common.result.Result;
 import org.pageflow.common.user.UID;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -20,62 +18,58 @@ import java.util.UUID;
 /**
  * @author : sechan
  */
-@Validated
 @RequestMapping("/user/books/{bookId}/reviews")
 @RestController
 @RequiredArgsConstructor
 public class ReviewWebAdapter {
   private final ReviewUseCase reviewUseCase;
   private final RequestContext rqcxt;
-  private final BookAccessPermitter bookPermitter;
-  private final ReviewAccessPermitter reviewPermitter;
 
 
   @PostMapping("")
   @Operation(summary = "책에 리뷰를 작성")
-  public ReviewDto createReview(
+  public Result<ReviewDto> createReview(
     @PathVariable UUID bookId,
-    @RequestBody CreateReviewReq req
+    @Valid @RequestBody ReviewForm.Create form
   ) {
     UID uid = rqcxt.getUid();
-    bookPermitter.setPermission(bookId, uid);
-    AddReviewCmd cmd = AddReviewCmd.of(
+    Result<ReviewDto> result = reviewUseCase.createReview(
       uid,
-      bookId,
-      req.getContent(),
-      req.getScore()
+      new BookId(bookId),
+      form.getContent(),
+      form.getScore()
     );
-    return reviewUseCase.createReview(cmd);
+    return result;
   }
 
 
   @PostMapping("/{reviewId}")
   @Operation(summary = "리뷰 수정")
-  public ReviewDto updateReview(
+  public Result<ReviewDto> updateReview(
     @PathVariable UUID bookId,
     @PathVariable UUID reviewId,
-    @RequestBody UpdateReviewReq req
+    @Valid @RequestBody ReviewForm.Update form
   ) {
     UID uid = rqcxt.getUid();
-    reviewPermitter.setPermission(reviewId, uid);
-    UpdateReviewCmd cmd = UpdateReviewCmd.of(
-      reviewId,
-      req.getContent(),
-      req.getScore()
+    Result<ReviewDto> result = reviewUseCase.updateReview(
+      uid,
+      new ReviewId(reviewId),
+      form.getContent(),
+      form.getScore()
     );
-    return reviewUseCase.updateReview(cmd);
+    return result;
   }
 
 
   @DeleteMapping("/{reviewId}")
   @Operation(summary = "리뷰 삭제")
-  public void deleteReview(
+  public Result deleteReview(
     @PathVariable UUID bookId,
     @PathVariable UUID reviewId
   ) {
     UID uid = rqcxt.getUid();
-    reviewPermitter.setPermission(reviewId, uid);
-    reviewUseCase.deleteReview(reviewId);
+    Result result = reviewUseCase.deleteReview(uid, new ReviewId(reviewId));
+    return result;
   }
 
 }

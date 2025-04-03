@@ -1,20 +1,18 @@
 package org.pageflow.book.application;
 
-import org.pageflow.book.domain.BookPermission;
-import org.pageflow.common.permission.ResourceId;
-import org.springframework.core.annotation.AliasFor;
+import org.pageflow.common.utility.SingleValueWrapper;
 
-import java.lang.annotation.*;
+import java.util.UUID;
 
 /**
- * @author : sechan
+ * @author: sechan
  */
-@Documented
-@Target(ElementType.PARAMETER)
-@Retention(RetentionPolicy.RUNTIME)
-@ResourceId(permissionType = BookPermission.class)
-public @interface BookId {
+public class BookId extends SingleValueWrapper<UUID> {
+  public BookId(UUID value) {
+    super(value);
+  }
 
-  @AliasFor(annotation = ResourceId.class, attribute = "value")
-  String value() default "";
+  public static BookId from(String string) {
+    return new BookId(UUID.fromString(string));
+  }
 }

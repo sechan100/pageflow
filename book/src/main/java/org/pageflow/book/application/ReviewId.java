@@ -1,20 +1,18 @@
 package org.pageflow.book.application;
 
-import org.pageflow.book.domain.ReviewPermission;
-import org.pageflow.common.permission.ResourceId;
-import org.springframework.core.annotation.AliasFor;
+import org.pageflow.common.utility.SingleValueWrapper;
 
-import java.lang.annotation.*;
+import java.util.UUID;
 
 /**
  * @author : sechan
  */
-@Documented
-@Target(ElementType.PARAMETER)
-@Retention(RetentionPolicy.RUNTIME)
-@ResourceId(permissionType = ReviewPermission.class)
-public @interface ReviewId {
+public class ReviewId extends SingleValueWrapper<UUID> {
+  public ReviewId(UUID value) {
+    super(value);
+  }
 
-  @AliasFor(annotation = ResourceId.class, attribute = "value")
-  String value() default "";
+  public static ReviewId from(String string) {
+    return new ReviewId(UUID.fromString(string));
+  }
 }

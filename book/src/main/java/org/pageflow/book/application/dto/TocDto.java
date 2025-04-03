@@ -1,4 +1,4 @@
-package org.pageflow.book.dto;
+package org.pageflow.book.application.dto;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

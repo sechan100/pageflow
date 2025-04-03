@@ -1,18 +1,18 @@
 package org.pageflow.book.adapter.in;
 
 import io.swagger.v3.oas.annotations.Operation;
-import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.pageflow.book.adapter.in.form.CreateFolderReq;
-import org.pageflow.book.dto.FolderDto;
-import org.pageflow.book.port.in.BookAccessPermitter;
+import org.pageflow.book.adapter.in.form.FolderForm;
+import org.pageflow.book.application.BookId;
+import org.pageflow.book.application.NodeId;
+import org.pageflow.book.application.dto.FolderDto;
 import org.pageflow.book.port.in.TocUseCase;
 import org.pageflow.book.port.in.cmd.CreateFolderCmd;
-import org.pageflow.book.port.in.cmd.UpdateFolderCmd;
+import org.pageflow.book.port.in.cmd.NodeAccessIds;
 import org.pageflow.common.api.RequestContext;
+import org.pageflow.common.result.Result;
 import org.pageflow.common.user.UID;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -20,79 +20,81 @@ import java.util.UUID;
 /**
  * @author : sechan
  */
-@Validated
 @RestController
 @RequestMapping("/user/books/{bookId}/toc/folders")
 @RequiredArgsConstructor
 public class FolderWebAdapter {
   private final TocUseCase tocUseCase;
-  private final BookAccessPermitter bookAccessPermitter;
   private final RequestContext rqcxt;
 
 
   @PostMapping("")
   @Operation(summary = "폴더 생성")
-  public FolderDto createFolder(
+  public Result<FolderDto> createFolder(
     @PathVariable UUID bookId,
-    @RequestBody CreateFolderReq req
+    @Valid @RequestBody FolderForm.Create form
   ) {
     UID uid = rqcxt.getUid();
-    bookAccessPermitter.setPermission(bookId, uid);
+    BookId bookId_ = new BookId(bookId);
+    NodeId nodeId = new NodeId(form.getParentNodeId());
     CreateFolderCmd cmd = CreateFolderCmd.withTitle(
-      bookId,
-      req.getParentNodeId(),
-      req.getTitle()
+      uid,
+      bookId_,
+      nodeId,
+      form.getTitle()
     );
-    FolderDto folderDto = tocUseCase.createFolder(bookId, cmd);
-    return folderDto;
+    Result<FolderDto> result = tocUseCase.createFolder(cmd);
+    return result;
   }
 
   @GetMapping("/{folderId}")
   @Operation(summary = "폴더 조회")
-  public FolderDto getFolder(
+  public Result<FolderDto> getFolder(
     @PathVariable UUID bookId,
     @PathVariable UUID folderId
   ) {
     UID uid = rqcxt.getUid();
-    bookAccessPermitter.setPermission(bookId, uid);
-    FolderDto folder = tocUseCase.getFolder(bookId, folderId);
-    return folder;
+    NodeAccessIds ids = new NodeAccessIds(
+      uid,
+      new BookId(bookId),
+      new NodeId(folderId)
+    );
+    Result<FolderDto> result = tocUseCase.getFolder(ids);
+    return result;
   }
 
   @PostMapping("/{folderId}")
   @Operation(summary = "폴더 업데이트")
-  public FolderDto updateFolder(
+  public Result<FolderDto> updateFolder(
     @PathVariable UUID bookId,
     @PathVariable UUID folderId,
-    @RequestBody FolderUpdateReq req
+    @Valid @RequestBody FolderForm.Update form
   ) {
     UID uid = rqcxt.getUid();
-    bookAccessPermitter.setPermission(bookId, uid);
-    UpdateFolderCmd cmd = UpdateFolderCmd.of(
-      folderId,
-      req.getTitle()
+    NodeAccessIds ids = new NodeAccessIds(
+      uid,
+      new BookId(bookId),
+      new NodeId(folderId)
     );
-    FolderDto folderDto = tocUseCase.updateFolder(bookId, cmd);
-    return folderDto;
+    Result<FolderDto> result = tocUseCase.changeFolderTitle(ids, form.getTitle());
+    return result;
   }
 
 
   @DeleteMapping("/{folderId}")
   @Operation(summary = "폴더 삭제")
-  public void deleteFolder(
+  public Result deleteFolder(
     @PathVariable UUID bookId,
     @PathVariable UUID folderId
   ) {
     UID uid = rqcxt.getUid();
-    bookAccessPermitter.setPermission(bookId, uid);
-    tocUseCase.deleteFolder(bookId, folderId);
-  }
-
-
-  @Data
-  public static class FolderUpdateReq {
-    @NotBlank
-    private String title;
+    NodeAccessIds ids = new NodeAccessIds(
+      uid,
+      new BookId(bookId),
+      new NodeId(folderId)
+    );
+    Result result = tocUseCase.deleteFolder(ids);
+    return result;
   }
 }
 

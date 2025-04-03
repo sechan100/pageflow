@@ -3,8 +3,7 @@ package org.pageflow.test.module.book;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.pageflow.book.port.in.BookAccessPermitter;
-import org.pageflow.book.port.in.review.ReviewUseCase;
+import org.pageflow.book.port.in.ReviewUseCase;
 import org.pageflow.test.shared.PageflowTest;
 
 /**
@@ -14,7 +13,6 @@ import org.pageflow.test.shared.PageflowTest;
 @RequiredArgsConstructor
 public class ReviewTest {
   private final ReviewUseCase reviewUseCase;
-  private final BookAccessPermitter bookAccessPermitter;
 
   @Test
   @DisplayName("책 리뷰 기능 테스트")

@@ -4,7 +4,6 @@ import com.google.common.base.Preconditions;
 import org.pageflow.book.application.BookCode;
 import org.pageflow.book.domain.entity.Folder;
 import org.pageflow.book.domain.entity.TocNode;
-import org.pageflow.common.result.MessageData;
 import org.pageflow.common.result.Result;
 import org.springframework.lang.Nullable;
 
@@ -49,7 +48,7 @@ public class NodeRelocator {
     if(checkDestIndexResult.isFailure()) return checkDestIndexResult;
 
     if(!parent.hasChild(target)) {
-      return Result.of(BookCode.TOC_HIERARCHY_ERROR, MessageData.of("순서를 변경할 노드가 폴더의 자식이 아닙니다."));
+      return Result.of(BookCode.TOC_HIERARCHY_ERROR, "순서를 변경할 노드가 폴더의 자식이 아닙니다.");
     }
     // 전체 list에서 target node를 제거하고 relocate를 실행한다.
     parent.removeChild(target);
@@ -85,14 +84,14 @@ public class NodeRelocator {
 
     // 이미 parent에 속해있는 경우
     if(parent.hasChild(target)) {
-      return Result.of(BookCode.TOC_HIERARCHY_ERROR, MessageData.of("targetNode가 이미 parent에 속해있습니다."));
+      return Result.of(BookCode.TOC_HIERARCHY_ERROR, "targetNode가 이미 parent에 속해있습니다.");
     }
 
     // 계층 구조 파괴 검사
     if(target instanceof Folder targetFolder) {
       // parent에서 출발해서 조상중에 targetFolder가 있는지 검증한다.
       if(_isAncestorOf(targetFolder, this.parent, nodeMap)) {
-        return Result.of(BookCode.TOC_HIERARCHY_ERROR, MessageData.of("toc의 계층 구조를 파괴하는 이동입니다."));
+        return Result.of(BookCode.TOC_HIERARCHY_ERROR, "toc의 계층 구조를 파괴하는 이동입니다.");
       }
     }
 
@@ -170,7 +169,7 @@ public class NodeRelocator {
    */
   private static Result _checkMoveToSelf(TocNode target, Folder destFolder) {
     if(_isSameNode(target, destFolder)) {
-      return org.pageflow.common.result.Result.of(BookCode.TOC_HIERARCHY_ERROR, MessageData.of("node는 자기 자신의 자식이 될 수 없습니다."));
+      return org.pageflow.common.result.Result.of(BookCode.TOC_HIERARCHY_ERROR, "node는 자기 자신의 자식이 될 수 없습니다.");
     }
 
     return org.pageflow.common.result.Result.success();
@@ -183,7 +182,7 @@ public class NodeRelocator {
    */
   private static Result _checkRootFolderMove(TocNode target) {
     if(target.isRootFolder()) {
-      return org.pageflow.common.result.Result.of(BookCode.TOC_HIERARCHY_ERROR, MessageData.of("root folder는 이동할 수 없습니다."));
+      return org.pageflow.common.result.Result.of(BookCode.TOC_HIERARCHY_ERROR, "root folder는 이동할 수 없습니다.");
     }
 
     return org.pageflow.common.result.Result.success();
@@ -197,7 +196,7 @@ public class NodeRelocator {
    */
   private static Result _checkDestIndex(int destFolderChildrenSize, int destIndex) {
     if(destIndex < 0 || destIndex > destFolderChildrenSize) {
-      return Result.of(BookCode.TOC_HIERARCHY_ERROR, MessageData.of("destIndex가 올바르지 않습니다."));
+      return Result.of(BookCode.TOC_HIERARCHY_ERROR, "destIndex가 올바르지 않습니다.");
     }
 
     return Result.success();

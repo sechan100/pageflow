@@ -1,6 +1,5 @@
 package org.pageflow.test.shared;
 
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.pageflow.core.PageflowApplication;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
@@ -20,7 +19,6 @@ import java.lang.annotation.RetentionPolicy;
 @SpringBootTest(classes = PageflowApplication.class)
 @Import(TestModuleConfig.class)
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
-@ExtendWith({ResourcePermissionClearExtension.class})
 @Transactional
 @Inherited
 public @interface PageflowTest {

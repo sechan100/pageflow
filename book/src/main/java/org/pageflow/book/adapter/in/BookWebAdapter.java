@@ -1,19 +1,18 @@
 package org.pageflow.book.adapter.in;
 
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.pageflow.book.adapter.in.form.CreateBookReq;
-import org.pageflow.book.adapter.in.form.UpdateBookForm;
+import org.pageflow.book.adapter.in.form.BookForm;
+import org.pageflow.book.application.BookId;
+import org.pageflow.book.application.dto.BookDto;
+import org.pageflow.book.application.dto.BookDtoWithAuthor;
+import org.pageflow.book.application.dto.MyBooks;
 import org.pageflow.book.domain.BookTitle;
-import org.pageflow.book.dto.BookDto;
-import org.pageflow.book.dto.BookDtoWithAuthor;
-import org.pageflow.book.dto.MyBooks;
-import org.pageflow.book.port.in.BookAccessPermitter;
 import org.pageflow.book.port.in.BookUseCase;
 import org.pageflow.common.api.RequestContext;
 import org.pageflow.common.result.Result;
 import org.pageflow.common.user.UID;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,21 +21,19 @@ import java.util.UUID;
 /**
  * @author : sechan
  */
-@Validated
 @RestController
 @RequestMapping("/user/books")
 @RequiredArgsConstructor
 public class BookWebAdapter {
-  private final BookAccessPermitter bookAccessPermitter;
   private final BookUseCase bookUseCase;
   private final RequestContext rqcxt;
 
 
   @PostMapping("")
   @Operation(summary = "책 생성")
-  public Result<BookDto> createBook(@RequestBody CreateBookReq req) {
+  public Result<BookDto> createBook(@Valid @RequestBody BookForm.Create form) {
     UID uid = rqcxt.getUid();
-    BookTitle title = BookTitle.create(req.getTitle());
+    BookTitle title = BookTitle.create(form.getTitle());
     Result<BookDto> result = bookUseCase.createBook(uid, title, null);
     return result;
   }
@@ -50,23 +47,25 @@ public class BookWebAdapter {
 
   @GetMapping("/{bookId}")
   @Operation(summary = "책 조회")
-  public BookDtoWithAuthor getBook(@PathVariable UUID bookId) {
+  public Result<BookDtoWithAuthor> getBook(@PathVariable UUID bookId) {
     UID uid = rqcxt.getUid();
-    bookAccessPermitter.setPermission(bookId, uid);
-    BookDtoWithAuthor bookWithAuthor = bookUseCase.queryBook(bookId);
-    return bookWithAuthor;
+    Result<BookDtoWithAuthor> result = bookUseCase.readBook(
+      uid,
+      new BookId(bookId)
+    );
+    return result;
   }
 
   @PostMapping("/{bookId}/title")
   @Operation(summary = "책 제목 수정")
   public Result<BookDto> changeBookTitle(
     @PathVariable UUID bookId,
-    @RequestBody UpdateBookForm form
+    @Valid @RequestBody BookForm.Update form
   ) {
+    BookId bookId_ = new BookId(bookId);
     UID uid = rqcxt.getUid();
-    bookAccessPermitter.setPermission(bookId, uid);
     BookTitle title = BookTitle.create(form.getTitle());
-    Result<BookDto> result = bookUseCase.changeBookTitle(bookId, title);
+    Result<BookDto> result = bookUseCase.changeBookTitle(uid, bookId_, title);
     return result;
   }
 
@@ -76,18 +75,19 @@ public class BookWebAdapter {
     @PathVariable UUID bookId,
     @RequestPart(name = "coverImage") MultipartFile coverImage
   ) {
+    BookId bookId_ = new BookId(bookId);
     UID uid = rqcxt.getUid();
-    bookAccessPermitter.setPermission(bookId, uid);
-    Result<BookDto> result = bookUseCase.changeBookCoverImage(bookId, coverImage);
+    Result<BookDto> result = bookUseCase.changeBookCoverImage(uid, bookId_, coverImage);
     return result;
   }
 
   @DeleteMapping("/{bookId}")
   @Operation(summary = "책 삭제")
-  public void deleteBook(@PathVariable UUID bookId) {
+  public Result deleteBook(@PathVariable UUID bookId) {
+    BookId bookId_ = new BookId(bookId);
     UID uid = rqcxt.getUid();
-    bookAccessPermitter.setPermission(bookId, uid);
-    bookUseCase.deleteBook(bookId);
+    Result result = bookUseCase.deleteBook(uid, bookId_);
+    return result;
   }
 
 }

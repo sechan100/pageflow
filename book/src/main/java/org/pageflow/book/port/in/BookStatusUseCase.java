@@ -3,15 +3,15 @@ package org.pageflow.book.port.in;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pageflow.book.application.BookId;
-import org.pageflow.book.domain.BookPermission;
+import org.pageflow.book.application.dto.BookDto;
+import org.pageflow.book.domain.BookAccessGranter;
 import org.pageflow.book.domain.entity.Book;
-import org.pageflow.book.dto.BookDto;
+import org.pageflow.book.domain.enums.BookAccess;
 import org.pageflow.book.port.out.jpa.BookPersistencePort;
-import org.pageflow.common.permission.PermissionRequired;
+import org.pageflow.common.result.Result;
+import org.pageflow.common.user.UID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.UUID;
 
 /**
  * @author : sechan
@@ -27,19 +27,25 @@ public class BookStatusUseCase {
    * 책을 출판한다.
    * {@link org.pageflow.book.domain.enums.BookStatus#DRAFT}
    * 또는 {@link org.pageflow.book.domain.enums.BookStatus#REVISING}에서 사용 가능하다.
-   * <p>
    * edition을 1 증가시킨다.
    *
-   * @return
+   * @code BOOK_PERMISSION_DENIED: 책 권한이 없는 경우
+   * @code BOOK_INVALID_STATUS: 이미 발행된 책인 경우
    */
-  @PermissionRequired(
-    actions = {"UPDATE_STATUS"},
-    permissionType = BookPermission.class
-  )
-  public BookDto publish(@BookId UUID bookId) {
-    Book book = bookPersistencePort.findById(bookId).get();
-    book.publish();
-    return BookDto.from(book);
+  public Result<BookDto> publish(UID uid, BookId bookId) {
+    Book book = bookPersistencePort.findById(bookId.getValue()).get();
+
+    // 작가 권한 검사
+    BookAccessGranter accessGranter = new BookAccessGranter(uid, book);
+    Result grant = accessGranter.grant(BookAccess.UPDATE);
+    if(grant.isFailure()) {
+      return grant;
+    }
+
+    // 상태 변경
+    Result publishRes = book.publish();
+    if(publishRes.isFailure()) return publishRes;
+    return Result.success(BookDto.from(book));
   }
 
   /**
@@ -47,32 +53,46 @@ public class BookStatusUseCase {
    * {@link org.pageflow.book.domain.enums.BookStatus#PUBLISHED}일 때 사용 가능하며,
    * 기존의 출판상태인 책은 독자들에게 여전히 유효하다.
    *
-   * @return
+   * @code BOOK_PERMISSION_DENIED: 책 권한이 없는 경우
+   * @code BOOK_INVALID_STATUS: 출판된 책이 아닌 경우
    */
-  @PermissionRequired(
-    actions = {"UPDATE_STATUS"},
-    permissionType = BookPermission.class
-  )
-  public BookDto startRevise(@BookId UUID bookId) {
-    Book book = bookPersistencePort.findById(bookId).get();
-    book.revise();
-    return BookDto.from(book);
+  public Result<BookDto> startRevision(UID uid, BookId bookId) {
+    Book book = bookPersistencePort.findById(bookId.getValue()).get();
+
+    // 작가 권한 검사
+    BookAccessGranter accessGranter = new BookAccessGranter(uid, book);
+    Result grant = accessGranter.grant(BookAccess.UPDATE);
+    if(grant.isFailure()) {
+      return grant;
+    }
+
+    // 상태 변경
+    Result startRevisionRes = book.startRevision();
+    if(startRevisionRes.isFailure()) return startRevisionRes;
+    return Result.success(BookDto.from(book));
   }
 
   /**
    * 개정을 취소하고 출판상태로 변경한다.
    * {@link org.pageflow.book.domain.enums.BookStatus#REVISING}일 때 사용 가능하다.
    *
-   * @return
+   * @code BOOK_PERMISSION_DENIED: 책 권한이 없는 경우
+   * @code BOOK_INVALID_STATUS: 개정 중인 책이 아닌 경우
    */
-  @PermissionRequired(
-    actions = {"UPDATE_STATUS"},
-    permissionType = BookPermission.class
-  )
-  public BookDto cancelRevise(@BookId UUID bookId) {
-    Book book = bookPersistencePort.findById(bookId).get();
-    book.cancelRevise();
-    return BookDto.from(book);
+  public Result<BookDto> cancelRevision(UID uid, BookId bookId) {
+    Book book = bookPersistencePort.findById(bookId.getValue()).get();
+
+    // 작가 권한 검사
+    BookAccessGranter accessGranter = new BookAccessGranter(uid, book);
+    Result grant = accessGranter.grant(BookAccess.UPDATE);
+    if(grant.isFailure()) {
+      return grant;
+    }
+
+    // 상태 변경
+    Result cancelRevisionRes = book.cancelRevision();
+    if(cancelRevisionRes.isFailure()) return cancelRevisionRes;
+    return Result.success(BookDto.from(book));
   }
 
   /**
@@ -80,18 +100,25 @@ public class BookStatusUseCase {
    * {@link org.pageflow.book.domain.enums.BookStatus#REVISING}일 때 사용 가능하다.
    * edition을 올리지 않는다.
    *
-   * @return
    * @apiNote 해당 함수는 edition을 증가시키지 않음으로 간단한 오탈자 수정등의 변경에 용의하다.
    * 책의 내용에 주요한 변경이 있는 경우 사용자는 {@link #publish}를 이용하여 책을 재출판 및 개정하는 것이 좋다.
+   * @code BOOK_PERMISSION_DENIED: 책 권한이 없는 경우
+   * @code BOOK_INVALID_STATUS: 개정 중인 책이 아닌 경우
    */
-  @PermissionRequired(
-    actions = {"UPDATE_STATUS"},
-    permissionType = BookPermission.class
-  )
-  public BookDto revise(@BookId UUID bookId) {
-    Book book = bookPersistencePort.findById(bookId).get();
-    book.mergeRevision();
-    return BookDto.from(book);
+  public Result<BookDto> mergeRevision(UID uid, BookId bookId) {
+    Book book = bookPersistencePort.findById(bookId.getValue()).get();
+
+    // 작가 권한 검사
+    BookAccessGranter accessGranter = new BookAccessGranter(uid, book);
+    Result grant = accessGranter.grant(BookAccess.UPDATE);
+    if(grant.isFailure()) {
+      return grant;
+    }
+
+    // 상태 변경
+    Result mergeRevisionRes = book.mergeRevision();
+    if(mergeRevisionRes.isFailure()) return mergeRevisionRes;
+    return Result.success(BookDto.from(book));
   }
 
 }

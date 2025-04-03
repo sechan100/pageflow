@@ -3,31 +3,31 @@ package org.pageflow.book.port.in;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pageflow.book.application.BookCode;
-import org.pageflow.book.application.BookId;
-import org.pageflow.book.domain.BookPermission;
+import org.pageflow.book.application.dto.FolderDto;
+import org.pageflow.book.application.dto.SectionDto;
+import org.pageflow.book.application.dto.SectionDtoWithContent;
+import org.pageflow.book.application.dto.TocDto;
+import org.pageflow.book.domain.BookAccessGranter;
+import org.pageflow.book.domain.NodeTitle;
 import org.pageflow.book.domain.entity.Book;
 import org.pageflow.book.domain.entity.Folder;
 import org.pageflow.book.domain.entity.Section;
 import org.pageflow.book.domain.entity.TocNode;
+import org.pageflow.book.domain.enums.BookAccess;
 import org.pageflow.book.domain.toc.LastIndexInserter;
 import org.pageflow.book.domain.toc.NodeProjection;
 import org.pageflow.book.domain.toc.NodeRelocator;
-import org.pageflow.book.dto.FolderDto;
-import org.pageflow.book.dto.SectionDto;
-import org.pageflow.book.dto.SectionDtoWithContent;
-import org.pageflow.book.dto.TocDto;
 import org.pageflow.book.port.in.cmd.CreateFolderCmd;
 import org.pageflow.book.port.in.cmd.CreateSectionCmd;
+import org.pageflow.book.port.in.cmd.NodeAccessIds;
 import org.pageflow.book.port.in.cmd.RelocateNodeCmd;
-import org.pageflow.book.port.in.cmd.UpdateFolderCmd;
 import org.pageflow.book.port.out.jpa.BookPersistencePort;
 import org.pageflow.book.port.out.jpa.FolderPersistencePort;
 import org.pageflow.book.port.out.jpa.NodePersistencePort;
 import org.pageflow.book.port.out.jpa.SectionPersistencePort;
-import org.pageflow.common.permission.PermissionRequired;
-import org.pageflow.common.result.MessageData;
 import org.pageflow.common.result.Result;
 import org.pageflow.common.result.code.CommonCode;
+import org.pageflow.common.user.UID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,38 +49,43 @@ public class TocUseCase {
 
 
   /**
-   * @param bookId
-   * @param cmd
-   * @return
+   * @code BOOK_ACCESS_DENIED: 작가 권한이 없는 경우
+   * @code INVALID_BOOK_STATUS: 출판된 책을 수정하려는 경우
    * @code DATA_NOT_FOUND: target, destFolder를 찾을 수 없는 경우
    * @code TOC_HIERARCHY_ERROR: 자기 자신에게 이동, root folder 이동, 계층 구조 파괴, destIndex가 올바르지 않은 경우 등
    */
-  @PermissionRequired(
-    actions = {"EDIT"},
-    permissionType = BookPermission.class
-  )
-  public Result relocateNode(@BookId UUID bookId, RelocateNodeCmd cmd) {
-    Optional<TocNode> targetOpt = nodePersistencePort.findById(cmd.getNodeId());
+  public Result relocateNode(RelocateNodeCmd cmd) {
+    UID uid = cmd.getUid();
+    // 책 쓰기 권한 확인 ========
+    Book book = bookPersistencePort.findById(cmd.getBookId().getValue()).get();
+    BookAccessGranter accessGranter = new BookAccessGranter(uid, book);
+    Result grant = accessGranter.grant(BookAccess.WRITE);
+    if(grant.isFailure()) {
+      return grant;
+    }
+    // ==================
+
+    Optional<TocNode> targetOpt = nodePersistencePort.findById(cmd.getNodeId().getValue());
     if(targetOpt.isEmpty()) {
       return Result.of(
         CommonCode.DATA_NOT_FOUND,
-        MessageData.of("target node를 찾을 수 없습니다.")
+        "target node를 찾을 수 없습니다."
       );
     }
     TocNode target = targetOpt.get();
     if(target.isRootFolder()) {
       return Result.of(
         BookCode.TOC_HIERARCHY_ERROR,
-        MessageData.of("root folder node는 이동할 수 없습니다.")
+        "root folder node는 이동할 수 없습니다."
       );
     }
 
-    UUID destFolderId = cmd.getDestFolderId();
+    UUID destFolderId = cmd.getDestFolderId().getValue();
     Optional<Folder> folderOpt = folderPersistencePort.findWithChildrenById(destFolderId);
     if(folderOpt.isEmpty()) {
       return Result.of(
         CommonCode.DATA_NOT_FOUND,
-        MessageData.of("dest folder를 찾을 수 없습니다.")
+        "dest folder를 찾을 수 없습니다."
       );
     }
     Folder folderWithChildren = folderOpt.get();
@@ -90,119 +95,214 @@ public class TocUseCase {
       return relocator.reorder(cmd.getDestIndex(), target);
     } else {
       // Reparent
-      List<TocNode> allBookNodes = nodePersistencePort.findAllByBookId(bookId);
+      List<TocNode> allBookNodes = nodePersistencePort.findAllByBookId(cmd.getBookId().getValue());
       return relocator.reparent(cmd.getDestIndex(), target, allBookNodes);
     }
   }
 
-  @PermissionRequired(
-    actions = {"READ"},
-    permissionType = BookPermission.class
-  )
-  public TocDto.Toc getToc(@BookId UUID bookId) {
+  public TocDto.Toc getToc(UUID bookId) {
     List<NodeProjection> nodeProjections = nodePersistencePort.queryNodesByBookId(bookId);
     TocDto.Folder root = buildTree(bookId, nodeProjections);
     return new TocDto.Toc(bookId, root);
   }
 
-  @PermissionRequired(
-    actions = {"EDIT"},
-    permissionType = BookPermission.class
-  )
-  public FolderDto createFolder(@BookId UUID bookId, CreateFolderCmd cmd) {
-    UUID parentId = cmd.getParentNodeId();
-    UUID folderId = UUID.randomUUID();
+  /**
+   * @code BOOK_ACCESS_DENIED: 작가 권한이 없는 경우
+   * @code INVALID_BOOK_STATUS: 출판된 책을 수정하려는 경우
+   * @code FIELD_VALIDATION_ERROR: title이 유효하지 않은 경우
+   */
+  public Result<FolderDto> createFolder(CreateFolderCmd cmd) {
+    UID uid = cmd.getUid();
+    UUID parentId = cmd.getParentNodeId().getValue();
+    Result<NodeTitle> titleRes = NodeTitle.create(cmd.getTitle());
+    if(titleRes.isFailure()) {
+      return (Result) titleRes;
+    }
+    NodeTitle title = titleRes.getSuccessData();
 
-    // Folder 생성
-    Book bookProxy = bookPersistencePort.getReferenceById(cmd.getBookId());
-    Folder folder = new Folder(
-      folderId,
+    // 책 쓰기 권한 확인 ==============
+    Book book = bookPersistencePort.findById(cmd.getBookId().getValue()).get();
+    BookAccessGranter accessGranter = new BookAccessGranter(uid, book);
+    Result grant = accessGranter.grant(BookAccess.WRITE);
+    if(grant.isFailure()) {
+      return grant;
+    }
+
+    // Folder 생성 ===================
+    Book bookProxy = bookPersistencePort.getReferenceById(cmd.getBookId().getValue());
+    Folder folder = Folder.create(
       bookProxy,
-      cmd.getTitle().getValue(),
+      title,
       null,
       0
     );
-    // 부모 지정해주고 마지막 순서로 끼워넣기
-    LastIndexInserter inserter = new LastIndexInserter(bookId, parentId, nodePersistencePort);
+
+    // Toc 삽입 ======================
+    LastIndexInserter inserter = new LastIndexInserter(cmd.getBookId().getValue(), parentId, nodePersistencePort);
     inserter.insertLast(folder);
-    // insert
     Folder persisted = folderPersistencePort.persist(folder);
-    return FolderDto.from(persisted);
+    return Result.success(FolderDto.from(persisted));
   }
 
-  @PermissionRequired(
-    actions = {"READ"},
-    permissionType = BookPermission.class
-  )
-  public FolderDto getFolder(@BookId UUID bookId, UUID folderId) {
-    TocNode node = nodePersistencePort.findById(folderId).get();
-    return FolderDto.from(node);
+  /**
+   * @code BOOK_ACCESS_DENIED: 작가 권한이 없는 경우
+   * @code INVALID_BOOK_STATUS: 출판된 책을 수정하려는 경우
+   */
+  public Result<FolderDto> getFolder(NodeAccessIds ids) {
+    UID uid = ids.getUid();
+    // 책 쓰기 권한 확인 ==============
+    Book book = bookPersistencePort.findById(ids.getBookId().getValue()).get();
+    BookAccessGranter accessGranter = new BookAccessGranter(uid, book);
+    Result grant = accessGranter.grant(BookAccess.WRITE);
+    if(grant.isFailure()) {
+      return grant;
+    }
+
+    TocNode node = nodePersistencePort.findById(ids.getNodeId().getValue()).get();
+    return Result.success(FolderDto.from(node));
   }
 
-  @PermissionRequired(
-    actions = {"EDIT"},
-    permissionType = BookPermission.class
-  )
-  public FolderDto updateFolder(@BookId UUID bookId, UpdateFolderCmd cmd) {
-    Folder folder = folderPersistencePort.findById(cmd.getId()).get();
-    folder.changeTitle(cmd.getTitle().getValue());
-    return FolderDto.from(folder);
+  /**
+   * @code BOOK_ACCESS_DENIED: 작가 권한이 없는 경우
+   * @code INVALID_BOOK_STATUS: 출판된 책을 수정하려는 경우
+   * @code FIELD_VALIDATION_ERROR: title이 유효하지 않은 경우
+   */
+  public Result<FolderDto> changeFolderTitle(NodeAccessIds ids, String title) {
+    UID uid = ids.getUid();
+    // 책 쓰기 권한 확인 ==============
+    Book book = bookPersistencePort.findById(ids.getBookId().getValue()).get();
+    BookAccessGranter accessGranter = new BookAccessGranter(uid, book);
+    Result grant = accessGranter.grant(BookAccess.WRITE);
+    if(grant.isFailure()) {
+      return grant;
+    }
+
+    Folder folder = folderPersistencePort.findById(ids.getNodeId().getValue()).get();
+    Result<NodeTitle> newTitleRes = NodeTitle.create(title);
+    if(newTitleRes.isFailure()) {
+      return (Result) newTitleRes;
+    }
+    folder.changeTitle(newTitleRes.getSuccessData());
+    return Result.success(FolderDto.from(folder));
   }
 
-  @PermissionRequired(
-    actions = {"EDIT"},
-    permissionType = BookPermission.class
-  )
-  public void deleteFolder(@BookId UUID bookId, UUID folderId) {
-    this.deleteNode(folderId);
+  /**
+   * @code BOOK_ACCESS_DENIED: 작가 권한이 없는 경우
+   * @code INVALID_BOOK_STATUS: 출판된 책을 수정하려는 경우
+   */
+  public Result deleteFolder(NodeAccessIds ids) {
+    UID uid = ids.getUid();
+    // 책 쓰기 권한 확인 ==============
+    Book book = bookPersistencePort.findById(ids.getBookId().getValue()).get();
+    BookAccessGranter accessGranter = new BookAccessGranter(uid, book);
+    Result grant = accessGranter.grant(BookAccess.WRITE);
+    if(grant.isFailure()) {
+      return grant;
+    }
+
+    nodePersistencePort.deleteById(ids.getNodeId().getValue());
+    return Result.success();
   }
 
-  private void deleteNode(UUID nodeId) {
-    nodePersistencePort.deleteById(nodeId);
-  }
+  /**
+   * @code BOOK_ACCESS_DENIED: 작가 권한이 없는 경우
+   * @code INVALID_BOOK_STATUS: 출판된 책을 수정하려는 경우
+   * @code FIELD_VALIDATION_ERROR: title이 유효하지 않은 경우
+   */
+  public Result<SectionDtoWithContent> createSection(CreateSectionCmd cmd) {
+    UUID bookId = cmd.getBookId().getValue();
+    UID uid = cmd.getUid();
+    UUID parentId = cmd.getParentNodeId().getValue();
+    Result<NodeTitle> newTitleRes = NodeTitle.create(cmd.getTitle());
+    if(newTitleRes.isFailure()) {
+      return (Result) newTitleRes;
+    }
+    NodeTitle title = newTitleRes.getSuccessData();
 
-  @PermissionRequired(
-    actions = {"EDIT"},
-    permissionType = BookPermission.class
-  )
-  public SectionDtoWithContent createSection(@BookId UUID bookId, CreateSectionCmd cmd) {
-    UUID parentId = cmd.getParentNodeId();
-    UUID sectionId = UUID.randomUUID();
+    // 책 쓰기 권한 확인 ==============
+    Book book = bookPersistencePort.findById(bookId).get();
+    BookAccessGranter accessGranter = new BookAccessGranter(uid, book);
+    Result grant = accessGranter.grant(BookAccess.WRITE);
+    if(grant.isFailure()) {
+      return grant;
+    }
 
-    // Section 생성
-    Book bookProxy = bookPersistencePort.getReferenceById(cmd.getBookId());
+    // Section 생성 ===========
+    Book bookProxy = bookPersistencePort.getReferenceById(bookId);
     Folder parentFolder = folderPersistencePort.findById(parentId).orElseThrow();
-    Section section = new Section(
-      sectionId,
+    Section section = Section.create(
       bookProxy,
-      cmd.getTitle().getValue(),
+      title,
       parentFolder,
-      cmd.getContent(),
       0
     );
-    // 부모 지정해주고 마지막 순서로 끼워넣기
+
+    // Toc 삽입 ============
     LastIndexInserter inserter = new LastIndexInserter(bookId, parentId, nodePersistencePort);
     inserter.insertLast(section);
-    // insert
     Section persisted = sectionPersistencePort.persist(section);
-    return SectionDtoWithContent.from(persisted);
+    return Result.success(SectionDtoWithContent.from(persisted));
   }
 
-  @PermissionRequired(
-    actions = {"READ"},
-    permissionType = BookPermission.class
-  )
-  public SectionDto getSection(@BookId UUID bookId, UUID sectionId) {
-    TocNode node = nodePersistencePort.findById(sectionId).get();
-    return SectionDto.from(node);
+  /**
+   * @code BOOK_ACCESS_DENIED: 작가 권한이 없는 경우
+   * @code INVALID_BOOK_STATUS: 출판된 책을 수정하려는 경우
+   */
+  public Result<SectionDto> getSection(NodeAccessIds ids) {
+    UID uid = ids.getUid();
+    // 책 쓰기 권한 확인 ==============
+    Book book = bookPersistencePort.findById(ids.getBookId().getValue()).get();
+    BookAccessGranter accessGranter = new BookAccessGranter(uid, book);
+    Result grant = accessGranter.grant(BookAccess.WRITE);
+    if(grant.isFailure()) {
+      return grant;
+    }
+
+    TocNode node = nodePersistencePort.findById(ids.getNodeId().getValue()).get();
+    return Result.success(SectionDto.from(node));
   }
 
-  @PermissionRequired(
-    actions = {"EDIT"},
-    permissionType = BookPermission.class
-  )
-  public void deleteSection(@BookId UUID bookId, UUID sectionId) {
-    this.deleteNode(sectionId);
+  /**
+   * @code BOOK_ACCESS_DENIED: 작가 권한이 없는 경우
+   * @code INVALID_BOOK_STATUS: 출판된 책을 수정하려는 경우
+   * @code FIELD_VALIDATION_ERROR: title이 유효하지 않은 경우
+   */
+  public Result<SectionDto> changeSectionTitle(NodeAccessIds ids, String title) {
+    UID uid = ids.getUid();
+    // 책 쓰기 권한 확인 ==============
+    Book book = bookPersistencePort.findById(ids.getBookId().getValue()).get();
+    BookAccessGranter accessGranter = new BookAccessGranter(uid, book);
+    Result grant = accessGranter.grant(BookAccess.WRITE);
+    if(grant.isFailure()) {
+      return grant;
+    }
+
+    Section section = sectionPersistencePort.findById(ids.getNodeId().getValue()).get();
+    Result<NodeTitle> newTitleRes = NodeTitle.create(title);
+    if(newTitleRes.isFailure()) {
+      return (Result) newTitleRes;
+    }
+
+    section.changeTitle(newTitleRes.getSuccessData());
+    return Result.success(SectionDto.from(section));
+  }
+
+  /**
+   * @code BOOK_ACCESS_DENIED: 작가 권한이 없는 경우
+   * @code INVALID_BOOK_STATUS: 출판된 책을 수정하려는 경우
+   */
+  public Result deleteSection(NodeAccessIds ids) {
+    UID uid = ids.getUid();
+    // 책 쓰기 권한 확인 ==============
+    Book book = bookPersistencePort.findById(ids.getBookId().getValue()).get();
+    BookAccessGranter accessGranter = new BookAccessGranter(uid, book);
+    Result grant = accessGranter.grant(BookAccess.WRITE);
+    if(grant.isFailure()) {
+      return grant;
+    }
+
+    nodePersistencePort.deleteById(ids.getNodeId().getValue());
+    return Result.success();
   }
 
 
@@ -264,7 +364,7 @@ public class TocUseCase {
     }
   }
 
-  private Optional<Integer> loadMaxOvAmongSiblings(@BookId UUID bookId, UUID parentNodeId) {
+  private Optional<Integer> loadMaxOvAmongSiblings(UUID bookId, UUID parentNodeId) {
     return nodePersistencePort.findMaxOvAmongSiblings(bookId, parentNodeId);
   }
 }

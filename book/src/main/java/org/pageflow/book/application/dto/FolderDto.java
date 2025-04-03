@@ -1,4 +1,4 @@
-package org.pageflow.book.dto;
+package org.pageflow.book.application.dto;
 
 import lombok.Value;
 import org.pageflow.book.domain.entity.Folder;

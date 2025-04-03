@@ -1,6 +1,6 @@
 package org.pageflow.book.adapter.in.form;
 
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.Data;
 
@@ -10,11 +10,11 @@ import java.util.UUID;
  * @author : sechan
  */
 @Data
-public class NodeRelocateReq {
-  @NotBlank
+public class NodeRelocateForm {
+  @NotNull
   private UUID targetNodeId;
 
-  @NotBlank
+  @NotNull
   private UUID destFolderId;
 
   @PositiveOrZero

@@ -3,14 +3,13 @@ package org.pageflow.book.domain.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.pageflow.book.application.BookCode;
-import org.pageflow.book.application.BookStatusData;
 import org.pageflow.book.domain.Author;
 import org.pageflow.book.domain.BookTitle;
 import org.pageflow.book.domain.enums.BookStatus;
 import org.pageflow.book.domain.enums.BookVisibility;
 import org.pageflow.common.jpa.BaseJpaEntity;
-import org.pageflow.common.result.ProcessResultException;
 import org.pageflow.common.result.Result;
+import org.pageflow.common.user.UID;
 import org.pageflow.user.domain.entity.Profile;
 
 import java.util.ArrayList;
@@ -103,6 +102,10 @@ public class Book extends BaseJpaEntity {
     return new Author(author);
   }
 
+  public boolean isAuthor(UID uid) {
+    return this.author.getUid().equals(uid);
+  }
+
   public void changeTitle(BookTitle title) {
     this.title = title.getValue();
   }
@@ -115,67 +118,87 @@ public class Book extends BaseJpaEntity {
    * 책의 visibility를 변경한다.
    * {@link BookStatus#DRAFT}인 경우 변경 할 수 없고, PRIVATE로 강제된다.
    *
-   * @param visibility
+   * @code BOOK_INVALID_STATUS: DRAFT 상태인 경우
    */
-  public void changeVisibility(BookVisibility visibility) {
+  public Result changeVisibility(BookVisibility visibility) {
     if(this.status == BookStatus.DRAFT) {
-      throw _getInvalidBookStatusException("DRAFT 상태의 책은 공개범위를 변경할 수 없습니다.");
+      return Result.of(
+        BookCode.INVALID_BOOK_STATUS,
+        "DRAFT 상태의 책은 공개범위를 변경할 수 없습니다."
+      );
     }
-
     this.visibility = visibility;
+    return Result.success();
   }
 
   /**
    * 책을 출판하고 edition을 1 증가시킨다.
+   *
+   * @code BOOK_INVALID_STATUS: 이미 발행된 책인 경우
    */
-  public void publish() {
+  public Result publish() {
     if(this.status == BookStatus.PUBLISHED) {
-      throw _getInvalidBookStatusException("이미 발행된 책입니다.");
+      return Result.of(
+        BookCode.INVALID_BOOK_STATUS,
+        "이미 발행된 책입니다."
+      );
     }
 
     this.status = BookStatus.PUBLISHED;
     this.edition++;
+    return Result.success();
   }
 
   /**
-   * 책을 개정상태로 변경한다.
+   * 책을 개정중 상태로 변경한다.
+   *
+   * @code BOOK_INVALID_STATUS: 출판된 책이 아닌 경우
    */
-  public void revise() {
+  public Result startRevision() {
     if(this.status == BookStatus.PUBLISHED) {
       this.status = BookStatus.REVISING;
+      return Result.success();
     } else {
-      throw _getInvalidBookStatusException("출판된 책만 개정을 시작할 수 있습니다.");
+      return Result.of(
+        BookCode.INVALID_BOOK_STATUS,
+        "출판된 책만 개정을 시작할 수 있습니다."
+      );
     }
   }
 
   /**
    * 개정을 취소하고 출판상태로 변경한다.
+   *
+   * @code BOOK_INVALID_STATUS: 개정 중인 책이 아닌 경우
    */
-  public void cancelRevise() {
+  public Result cancelRevision() {
     if(this.status == BookStatus.REVISING) {
       this.status = BookStatus.PUBLISHED;
+      return Result.success();
     } else {
-      throw this._getInvalidBookStatusException("개정 중인 책만 개정을 취소할 수 있습니다.");
+      return Result.of(
+        BookCode.INVALID_BOOK_STATUS,
+        "개정 중인 책만 개정을 취소할 수 있습니다."
+      );
     }
   }
 
   /**
-   * 개정을 병합하여 출판상태로 변경한다.
+   * 개정중인 책을 기존 책과 병합하고 출판상태로 변경한다.
    * edition을 올리지 않는다.
+   *
+   * @code BOOK_INVALID_STATUS: 개정 중인 책이 아닌 경우
    */
-  public void mergeRevision() {
+  public Result mergeRevision() {
     if(this.status == BookStatus.REVISING) {
       this.status = BookStatus.PUBLISHED;
+      return Result.success();
     } else {
-      throw this._getInvalidBookStatusException("개정을 병합하려면 개정 중인 책이어야 합니다.");
+      return Result.of(
+        BookCode.INVALID_BOOK_STATUS,
+        "개정을 병합하려면 개정 중인 책이어야 합니다."
+      );
     }
-  }
-
-  private ProcessResultException _getInvalidBookStatusException(String message) {
-    return new ProcessResultException(Result.of(
-      BookCode.INVALID_BOOK_STATUS,
-      BookStatusData.of(this.status, message)
-    ));
   }
 
 }

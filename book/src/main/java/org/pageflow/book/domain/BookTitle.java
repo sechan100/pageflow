@@ -9,8 +9,8 @@ import org.pageflow.common.validation.FieldValidator;
  * @author : sechan
  */
 public class BookTitle extends SingleValueWrapper<String> {
-  private static final int MIN_LENGTH = 1;
-  private static final int MAX_LENGTH = 100;
+  public static final int MIN_LENGTH = 1;
+  public static final int MAX_LENGTH = 50;
 
   private BookTitle(String value) {
     super(value);

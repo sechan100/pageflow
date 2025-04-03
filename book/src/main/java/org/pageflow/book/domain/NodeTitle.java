@@ -1,8 +1,9 @@
 package org.pageflow.book.domain;
 
 
+import org.pageflow.common.result.Result;
+import org.pageflow.common.result.code.CommonCode;
 import org.pageflow.common.utility.SingleValueWrapper;
-import org.pageflow.common.validation.FieldValidationException;
 import org.pageflow.common.validation.FieldValidationResult;
 import org.pageflow.common.validation.FieldValidator;
 
@@ -11,30 +12,34 @@ import org.pageflow.common.validation.FieldValidator;
  */
 public class NodeTitle extends SingleValueWrapper<String> {
 
-  private static final int MIN_LENGTH = 1;
-  private static final int MAX_LENGTH = 100;
+  public static final int MIN_LENGTH = 1;
+  public static final int MAX_LENGTH = 50;
 
   private NodeTitle(String value) {
     super(value);
   }
 
-  public static NodeTitle of(String value) {
-    FieldValidationResult result = validate(value);
+  /**
+   * @code FIELD_VALIDATION_ERROR: title이 유효하지 않은 경우
+   */
+  public static Result<NodeTitle> create(String value) {
+    FieldValidationResult result = _validate(value);
     if(result.isValid()) {
-      return new NodeTitle(value);
+      return Result.success(new NodeTitle(value));
     } else {
-      throw new FieldValidationException(result);
+      return Result.of(CommonCode.FIELD_VALIDATION_ERROR, result);
     }
   }
 
-  public static FieldValidationResult validate(String value) {
+  /**
+   * @code FIELD_VALIDATION_ERROR: title이 유효하지 않은 경우
+   */
+  private static FieldValidationResult _validate(String value) {
     FieldValidator<String> validator = FieldValidator
-    .of("nodeTitle", value)
-    .minLength(MIN_LENGTH)
-    .maxLength(MAX_LENGTH);
+      .of("title", value)
+      .minLength(MIN_LENGTH)
+      .maxLength(MAX_LENGTH);
 
     return validator.validate();
   }
-
-
 }

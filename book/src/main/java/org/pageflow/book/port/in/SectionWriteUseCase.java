@@ -3,17 +3,19 @@ package org.pageflow.book.port.in;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pageflow.book.application.BookId;
-import org.pageflow.book.domain.BookPermission;
+import org.pageflow.book.application.dto.SectionAttachmentUrl;
+import org.pageflow.book.application.dto.SectionDtoWithContent;
+import org.pageflow.book.domain.BookAccessGranter;
 import org.pageflow.book.domain.SectionHtmlContent;
+import org.pageflow.book.domain.entity.Book;
 import org.pageflow.book.domain.entity.Section;
-import org.pageflow.book.dto.SectionAttachmentUrl;
-import org.pageflow.book.dto.SectionDto;
-import org.pageflow.book.dto.SectionDtoWithContent;
-import org.pageflow.book.port.in.cmd.UpdateSectionCmd;
+import org.pageflow.book.domain.enums.BookAccess;
+import org.pageflow.book.port.in.cmd.NodeAccessIds;
+import org.pageflow.book.port.out.jpa.BookPersistencePort;
 import org.pageflow.book.port.out.jpa.SectionPersistencePort;
-import org.pageflow.common.permission.PermissionRequired;
 import org.pageflow.common.result.Result;
 import org.pageflow.common.result.code.CommonCode;
+import org.pageflow.common.user.UID;
 import org.pageflow.file.model.FilePath;
 import org.pageflow.file.model.FileUploadCmd;
 import org.pageflow.file.service.FileService;
@@ -33,41 +35,43 @@ import java.util.UUID;
 @Transactional
 @RequiredArgsConstructor
 public class SectionWriteUseCase {
+  private final BookPersistencePort bookPersistencePort;
   private final SectionPersistencePort sectionPersistencePort;
   private final FileService fileService;
 
-  @PermissionRequired(
-    actions = {"READ"},
-    permissionType = BookPermission.class
-  )
-  public SectionDtoWithContent getSectionWithContent(@BookId UUID bookId, UUID sectionId) {
-    Section section = sectionPersistencePort.findById(sectionId).get();
-    return SectionDtoWithContent.from(section);
-  }
+  /**
+   * 작가 권한으로 section을 읽어온다.
+   * 독자의 section read를 위해서는 다른 메소드를 사용.
+   *
+   * @code BOOK_ACCESS_DENIED: 작가 권한이 없는 경우
+   * @code INVALID_BOOK_STATUS: 출판된 책을 수정하려는 경우
+   */
+  public Result<SectionDtoWithContent> getSectionWithContent(NodeAccessIds ids) {
+    Result checkWriteAuthorityRes = _grantWriteAccess(ids.getBookId(), ids.getUid());
+    if(checkWriteAuthorityRes.isFailure()) return checkWriteAuthorityRes;
 
-  @PermissionRequired(
-    actions = {"EDIT"},
-    permissionType = BookPermission.class
-  )
-  public Result<SectionDto> updateSection(@BookId UUID bookId, UpdateSectionCmd cmd) {
-    Section section = sectionPersistencePort.findById(cmd.getId()).get();
-    section.changeTitle(cmd.getTitle().getValue());
-    return Result.success(SectionDto.from(section));
+    Section section = sectionPersistencePort.findById(ids.getNodeId().getValue()).get();
+    return Result.success(SectionDtoWithContent.from(section));
   }
 
   /**
+   * @code BOOK_ACCESS_DENIED: 작가 권한이 없는 경우
+   * @code INVALID_BOOK_STATUS: 출판된 책을 수정하려는 경우
    * @code SECTION_HTML_CONTENT_PARSE_ERROR: html 파싱에 실패한 경우
    * @code DATA_NOT_FOUND: 섹션을 찾을 수 없는 경우
    */
-  @PermissionRequired(
-    actions = {"EDIT"},
-    permissionType = BookPermission.class
-  )
-  public Result<SectionDtoWithContent> writeContent(@BookId UUID bookId, UUID sectionId, String content) {
+  public Result<SectionDtoWithContent> writeContent(NodeAccessIds ids, String content) {
+    Result checkWriteAuthorityRes = _grantWriteAccess(ids.getBookId(), ids.getUid());
+    if(checkWriteAuthorityRes.isFailure()) {
+      return checkWriteAuthorityRes;
+    }
+
     Result<SectionHtmlContent> htmlRes = SectionHtmlContent.of(content);
     if(htmlRes.isFailure()) {
       return (Result) htmlRes;
     }
+
+    UUID sectionId = ids.getNodeId().getValue();
 
     Optional<Section> sectionOpt = sectionPersistencePort.findById(sectionId);
     if(sectionOpt.isEmpty()) {
@@ -84,16 +88,21 @@ public class SectionWriteUseCase {
   }
 
   /**
+   * @code BOOK_ACCESS_DENIED: 작가 권한이 없는 경우
+   * @code INVALID_BOOK_STATUS: 출판된 책을 수정하려는 경우
    * @code DATA_NOT_FOUND: 섹션을 찾을 수 없는 경우
    * @code FIELD_VALIDATION_ERROR: file 데이터가 올바르지 않은 경우
    * @code FAIL_TO_UPLOAD_FILE: 파일 업로드에 실패한 경우
    * @code 그 외 FileValidator에 따라서 다양한 ResultCode 발생 가능
    */
-  @PermissionRequired(
-    actions = {"EDIT"},
-    permissionType = BookPermission.class
-  )
-  public Result<SectionAttachmentUrl> uploadAttachmentImage(@BookId UUID bookId, UUID sectionId, MultipartFile file) {
+  public Result<SectionAttachmentUrl> uploadAttachmentImage(NodeAccessIds ids, MultipartFile file) {
+    Result checkWriteAuthorityRes = _grantWriteAccess(ids.getBookId(), ids.getUid());
+    if(checkWriteAuthorityRes.isFailure()) {
+      return checkWriteAuthorityRes;
+    }
+
+    UUID sectionId = ids.getNodeId().getValue();
+
     boolean isSectionExist = sectionPersistencePort.existsById(sectionId);
     if(!isSectionExist) {
       return Result.of(CommonCode.DATA_NOT_FOUND, "섹션을 찾을 수 없습니다.");
@@ -115,5 +124,15 @@ public class SectionWriteUseCase {
 
     SectionAttachmentUrl attachmentUrl = new SectionAttachmentUrl(uploadResult.getSuccessData().getWebUrl());
     return Result.success(attachmentUrl);
+  }
+
+  /**
+   * @code BOOK_ACCESS_DENIED: 작가 권한이 없는 경우
+   * @code INVALID_BOOK_STATUS: 출판된 책을 수정하려는 경우
+   */
+  private Result _grantWriteAccess(BookId bookId, UID uid) {
+    Book book = bookPersistencePort.findById(bookId.getValue()).get();
+    BookAccessGranter accessGranter = new BookAccessGranter(uid, book);
+    return accessGranter.grant(BookAccess.WRITE);
   }
 }

@@ -1,6 +1,6 @@
 package org.pageflow.book.port.in;
 
-import org.pageflow.book.application.BookPermission;
+import org.pageflow.book.domain.BookPermission;
 import org.pageflow.common.user.UID;
 
 import java.util.UUID;

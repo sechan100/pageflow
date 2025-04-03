@@ -2,8 +2,8 @@ package org.pageflow.book.adapter.in;
 
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
-import org.pageflow.book.adapter.in.request.CreateBookReq;
-import org.pageflow.book.adapter.in.request.UpdateBookForm;
+import org.pageflow.book.adapter.in.form.CreateBookReq;
+import org.pageflow.book.adapter.in.form.UpdateBookForm;
 import org.pageflow.book.domain.BookTitle;
 import org.pageflow.book.dto.BookDto;
 import org.pageflow.book.dto.BookDtoWithAuthor;

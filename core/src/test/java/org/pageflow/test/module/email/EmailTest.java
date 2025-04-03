@@ -4,12 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
 import org.pageflow.email.port.EmailTemplateProcessor;
 import org.pageflow.email.port.SendMailPort;
-import org.pageflow.test.e2e.PageflowIntegrationTest;
+import org.pageflow.test.shared.PageflowTest;
 
 /**
  * @author : sechan
  */
-@PageflowIntegrationTest
+@PageflowTest
 @RequiredArgsConstructor
 public class EmailTest {
   private final SendMailPort sendMailPort;

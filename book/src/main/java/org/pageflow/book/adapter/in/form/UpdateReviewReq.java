@@ -1,4 +1,4 @@
-package org.pageflow.book.adapter.in.request;
+package org.pageflow.book.adapter.in.form;
 
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;

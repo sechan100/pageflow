@@ -2,7 +2,7 @@ package org.pageflow.book.adapter.in;
 
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
-import org.pageflow.book.adapter.in.request.NodeRelocateReq;
+import org.pageflow.book.adapter.in.form.NodeRelocateReq;
 import org.pageflow.book.dto.TocDto;
 import org.pageflow.book.port.in.BookAccessPermitter;
 import org.pageflow.book.port.in.TocUseCase;

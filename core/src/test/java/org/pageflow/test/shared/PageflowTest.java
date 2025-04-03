@@ -1,10 +1,7 @@
-package org.pageflow.test.e2e;
+package org.pageflow.test.shared;
 
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.pageflow.core.PageflowApplication;
-import org.pageflow.test.shared.TestModuleConfig;
-import org.pageflow.test.shared.extension.DbClearExtension;
-import org.pageflow.test.shared.extension.ResourcePermissionClearExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.TestConstructor;
@@ -20,11 +17,11 @@ import java.lang.annotation.RetentionPolicy;
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-@SpringBootTest(classes = PageflowApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes = PageflowApplication.class)
 @Import(TestModuleConfig.class)
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
+@ExtendWith({ResourcePermissionClearExtension.class})
 @Transactional
-@ExtendWith({DbClearExtension.class, ResourcePermissionClearExtension.class})
 @Inherited
-public @interface PageflowIntegrationTest {
+public @interface PageflowTest {
 }

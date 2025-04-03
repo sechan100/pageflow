@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pageflow.book.application.BookCode;
 import org.pageflow.book.application.BookId;
-import org.pageflow.book.application.BookPermission;
+import org.pageflow.book.domain.BookPermission;
 import org.pageflow.book.domain.entity.Book;
 import org.pageflow.book.domain.entity.Folder;
 import org.pageflow.book.domain.entity.Section;

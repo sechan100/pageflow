@@ -1,4 +1,4 @@
-package org.pageflow.book.adapter.in.request;
+package org.pageflow.book.adapter.in.form;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
@@ -9,7 +9,7 @@ import java.util.UUID;
  * @author : sechan
  */
 @Data
-public class CreateFolderReq {
+public class SectionCreateReq {
   @NotBlank
   private UUID parentNodeId;
 

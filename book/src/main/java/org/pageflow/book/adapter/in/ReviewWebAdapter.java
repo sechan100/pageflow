@@ -2,8 +2,8 @@ package org.pageflow.book.adapter.in;
 
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
-import org.pageflow.book.adapter.in.request.CreateReviewReq;
-import org.pageflow.book.adapter.in.request.UpdateReviewReq;
+import org.pageflow.book.adapter.in.form.CreateReviewReq;
+import org.pageflow.book.adapter.in.form.UpdateReviewReq;
 import org.pageflow.book.dto.ReviewDto;
 import org.pageflow.book.port.in.BookAccessPermitter;
 import org.pageflow.book.port.in.review.AddReviewCmd;

@@ -37,19 +37,11 @@ public class BookStatusWebAdapter {
     bookAccessPermitter.setPermission(bookId, uid);
     BookDto result = switch(cmd) {
       case PUBLISH -> bookStatusUseCase.publish(bookId);
-      case CANCEL_REVISE -> bookStatusUseCase.cancelRevise(bookId);
-      case MERGE_REVISION -> bookStatusUseCase.revise(bookId);
-      case REVISE -> bookStatusUseCase.startRevise(bookId);
+      case CANCEL_REVISION -> bookStatusUseCase.cancelRevise(bookId);
+      case REVISE -> bookStatusUseCase.revise(bookId);
+      case START_REVISION -> bookStatusUseCase.startRevise(bookId);
     };
     return result;
-  }
-
-
-  public enum BookStatusCmd {
-    PUBLISH,
-    REVISE,
-    CANCEL_REVISE,
-    MERGE_REVISION
   }
 
 }

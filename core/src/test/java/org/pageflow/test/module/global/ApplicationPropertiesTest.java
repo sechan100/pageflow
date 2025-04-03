@@ -3,7 +3,7 @@ package org.pageflow.test.module.global;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.pageflow.common.property.ApplicationProperties;
-import org.pageflow.test.e2e.PageflowIntegrationTest;
+import org.pageflow.test.shared.PageflowTest;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.lang.reflect.Field;
@@ -12,9 +12,10 @@ import java.util.List;
 
 /**
  * properties가 생성될 때, 잘못된 속성값이 있는지 검증한다.
+ *
  * @author : sechan
  */
-@PageflowIntegrationTest
+@PageflowTest
 public class ApplicationPropertiesTest {
   @Autowired
   private ApplicationProperties properties;
@@ -37,18 +38,18 @@ public class ApplicationPropertiesTest {
     }
     // 현재 클래스의 모든 필드 조회
     Class<?> clazz = object.getClass();
-    for (Field field : clazz.getDeclaredFields()) {
+    for(Field field : clazz.getDeclaredFields()) {
       field.setAccessible(true);
       try {
         Object value = field.get(object);
         // String 타입인 필드만 추출
         if(value instanceof String) {
           stringValues.add((String) value);
-        // String이 아니라면 재귀 호출(중첩 properties)
-        } else if (value != null && !field.getType().isPrimitive()) {
+          // String이 아니라면 재귀 호출(중첩 properties)
+        } else if(value != null && !field.getType().isPrimitive()) {
           stringValues.addAll(extractStringFields(value));
         }
-      } catch (IllegalAccessException e) {
+      } catch(IllegalAccessException e) {
         e.printStackTrace();
       }
     }

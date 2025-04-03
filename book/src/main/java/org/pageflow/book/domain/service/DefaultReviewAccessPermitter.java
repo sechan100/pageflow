@@ -2,7 +2,7 @@ package org.pageflow.book.domain.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.pageflow.book.application.review.ReviewPermission;
+import org.pageflow.book.domain.ReviewPermission;
 import org.pageflow.book.domain.entity.Review;
 import org.pageflow.book.port.in.review.ReviewAccessPermitter;
 import org.pageflow.book.port.out.jpa.ReviewPersistencePort;

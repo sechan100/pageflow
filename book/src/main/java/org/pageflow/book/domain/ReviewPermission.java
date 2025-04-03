@@ -1,4 +1,4 @@
-package org.pageflow.book.application.review;
+package org.pageflow.book.domain;
 
 import org.pageflow.book.domain.enums.ReviewAction;
 import org.pageflow.common.permission.ResourceAction;
@@ -10,6 +10,7 @@ import java.util.UUID;
 
 /**
  * Review 데이터에 접근하여 데이터를 쓰거나 읽을 수 있는 권한을 나타내는 토큰
+ *
  * @author : sechan
  */
 public class ReviewPermission implements ResourcePermission<UUID> {
@@ -31,7 +32,7 @@ public class ReviewPermission implements ResourcePermission<UUID> {
 
 
   @Override
-  public UUID getResourceId(){
+  public UUID getResourceId() {
     return this.reviewId;
   }
 

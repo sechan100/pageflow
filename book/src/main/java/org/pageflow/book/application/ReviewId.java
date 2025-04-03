@@ -1,5 +1,6 @@
-package org.pageflow.book.application.review;
+package org.pageflow.book.application;
 
+import org.pageflow.book.domain.ReviewPermission;
 import org.pageflow.common.permission.ResourceId;
 import org.springframework.core.annotation.AliasFor;
 

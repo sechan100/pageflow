@@ -1,4 +1,4 @@
-package org.pageflow.test.module.user.shared;
+package org.pageflow.test.module.user;
 
 import lombok.RequiredArgsConstructor;
 import org.pageflow.common.property.ApplicationProperties;
@@ -16,7 +16,7 @@ import java.lang.reflect.Field;
  */
 @Component
 @RequiredArgsConstructor
-public class  TestAccessTokenIssuer {
+public class TestAccessTokenIssuer {
   private final SessionUseCase sessionUseCase;
   private final LoadAccountPort loadAccountPort;
   private final ApplicationProperties applicationProperties;
@@ -44,8 +44,8 @@ public class  TestAccessTokenIssuer {
       field.setAccessible(false);
       return result.getAccessToken().getCompact();
 
-    } catch (NoSuchFieldException | IllegalAccessException e) {
-        throw new RuntimeException(e);
+    } catch(NoSuchFieldException | IllegalAccessException e) {
+      throw new RuntimeException(e);
     }
   }
 }

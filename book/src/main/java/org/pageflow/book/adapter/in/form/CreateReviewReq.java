@@ -1,24 +1,15 @@
-package org.pageflow.book.adapter.in.request;
+package org.pageflow.book.adapter.in.form;
 
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
-import org.pageflow.common.user.UID;
-
-import java.util.UUID;
 
 /**
  * @author : sechan
  */
 @Data
 public class CreateReviewReq {
-  @NotBlank
-  private UID uid;
-
-  @NotBlank
-  private UUID bookId;
-
   @NotBlank
   private String content;
 

@@ -3,7 +3,7 @@ package org.pageflow.book.domain.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.pageflow.book.domain.Author;
-import org.pageflow.book.domain.ReviewScore;
+import org.pageflow.book.domain.config.ReviewScoreConfig;
 import org.pageflow.common.jpa.BaseJpaEntity;
 import org.pageflow.common.result.Result;
 import org.pageflow.common.result.code.CommonCode;
@@ -103,13 +103,13 @@ public class Review extends BaseJpaEntity {
    * @code FIELD_VALIDATION_ERROR: score가 1 ~ 5사이의 정수가 아닌 경우
    */
   private static Result<Integer> _validateScore(int score) {
-    if(score < ReviewScore.MIN || score > ReviewScore.MAX) {
+    if(score < ReviewScoreConfig.MIN || score > ReviewScoreConfig.MAX) {
       return Result.of(CommonCode.FIELD_VALIDATION_ERROR, FieldValidationResult.of(
         InvalidField.builder()
           .field("score")
           .value(score)
           .reason(FieldReason.OUT_OF_RANGE)
-          .message(String.format("리뷰 점수는 %d ~ %d 사이의 숫자입니다.", ReviewScore.MIN, ReviewScore.MAX))
+          .message(String.format("리뷰 점수는 %d ~ %d 사이의 숫자입니다.", ReviewScoreConfig.MIN, ReviewScoreConfig.MAX))
           .build()
       ));
     }

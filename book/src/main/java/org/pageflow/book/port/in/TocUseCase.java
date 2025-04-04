@@ -123,11 +123,10 @@ public class TocUseCase {
     Folder folder = Folder.create(
       book,
       title,
-      null,
       0
     );
     // Toc 삽입
-    LastIndexInserter inserter = new LastIndexInserter(book.getId(), parentId, nodePersistencePort);
+    LastIndexInserter inserter = new LastIndexInserter(parentFolder);
     inserter.insertLast(folder);
     Folder persisted = folderPersistencePort.persist(folder);
     return Result.success(FolderDto.from(persisted));
@@ -220,11 +219,10 @@ public class TocUseCase {
     Section section = Section.create(
       book,
       title,
-      parentFolder,
       0
     );
     // Toc 삽입
-    LastIndexInserter inserter = new LastIndexInserter(book.getId(), parentFolder.getId(), nodePersistencePort);
+    LastIndexInserter inserter = new LastIndexInserter(parentFolder);
     inserter.insertLast(section);
     Section persisted = sectionPersistencePort.persist(section);
     return Result.success(SectionDtoWithContent.from(persisted));
@@ -351,7 +349,4 @@ public class TocUseCase {
     }
   }
 
-  private Optional<Integer> loadMaxOvAmongSiblings(UUID bookId, UUID parentNodeId) {
-    return nodePersistencePort.findMaxOvAmongSiblings(bookId, parentNodeId);
-  }
 }

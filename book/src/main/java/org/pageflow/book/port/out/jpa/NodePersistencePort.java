@@ -19,33 +19,12 @@ public interface NodePersistencePort extends BaseJpaRepository<TocNode, UUID> {
   List<NodeProjection> queryNodesByBookId(@Param("bookId") UUID bookId);
 
   @Query("""
-      SELECT MAX(n.ov)
-      FROM TocNode n
-      WHERE n.book.id = :bookId
-      AND n.parentNode.id = :parentId
-    """)
-  Optional<Integer> findMaxOvAmongSiblings(@Param("bookId") UUID bookId, @Param("parentId") UUID parentId);
-
-  @Query("""
       SELECT n
       FROM Folder n
       WHERE n.book.id = :bookId
       AND n.parentNode IS NULL
     """)
   Optional<Folder> findRootNode(@Param("bookId") UUID bookId);
-
-  @Query("""
-    SELECT siblings
-    FROM TocNode siblings
-    WHERE siblings.parentNode.id = (
-        SELECT node.parentNode.id
-        FROM TocNode node
-        WHERE node.id = :nodeId
-    )
-  """)
-  List<TocNode> findNodeWithSiblings(UUID nodeId);
-
-  List<TocNode> findChildrenByParentNode_IdOrderByOv(UUID parentId);
 
   List<TocNode> findAllByBookId(UUID bookId);
 }

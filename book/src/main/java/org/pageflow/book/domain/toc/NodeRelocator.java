@@ -2,32 +2,34 @@ package org.pageflow.book.domain.toc;
 
 import com.google.common.base.Preconditions;
 import org.pageflow.book.application.BookCode;
+import org.pageflow.book.domain.config.TocNodeConfig;
 import org.pageflow.book.domain.entity.Folder;
 import org.pageflow.book.domain.entity.TocNode;
 import org.pageflow.common.result.Result;
 import org.springframework.lang.Nullable;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * @author : sechan
  */
 public class NodeRelocator {
+  private static final int OV_GAP = TocNodeConfig.OV_GAP;
 
-  private static final int OV_GAP = OvRebalancer.OV_GAP;
-  private final Folder parent;
+  private final Folder parentFolder;
 
   /**
-   * @param folderWithChildren children을 모두 초기화한 folder. children은 ov 기준으로 오름차순 정렬되어야한다.
-   *                           만약 children이 초기화되어있지 않다면 lazy loading이 발생할 수 있다.
+   * @param folder children을 모두 초기화한 folder. children은 ov 기준으로 오름차순 정렬되어야한다.
+   *               만약 children이 초기화되어있지 않다면 lazy loading이 발생할 수 있다.
    */
-  public NodeRelocator(Folder folderWithChildren) {
-    List<TocNode> children = folderWithChildren.getReadOnlyChildren();
-    Preconditions.checkState(
-      NodeListAscendingValidator.isAscending(children),
-      "nodes ov가 오름차순으로 정렬되어 있지 않습니다."
+  public NodeRelocator(Folder folder) {
+    Preconditions.checkState(NodeListAscendingValidator.isAscending(folder),
+      "folder의 자식 TocNode들의 ov가 오름차순으로 정렬되어 있지 않습니다. folderId: " + folder.getId()
     );
-    this.parent = folderWithChildren;
+    this.parentFolder = folder;
   }
 
   /**
@@ -38,20 +40,20 @@ public class NodeRelocator {
    */
   public Result reorder(int destIndex, TocNode target) {
     // 자기 자신에게 이동 검사
-    Result checkMoveToSelfResult = _checkMoveToSelf(target, parent);
+    Result checkMoveToSelfResult = _checkMoveToSelf(target, parentFolder);
     if(checkMoveToSelfResult.isFailure()) return checkMoveToSelfResult;
     // root folder 이동 검사
     Result checkRootFolderMoveResult = _checkRootFolderMove(target);
     if(checkRootFolderMoveResult.isFailure()) return checkRootFolderMoveResult;
     // destIndex 검사
-    Result checkDestIndexResult = _checkDestIndex(parent.childrenSize(), destIndex);
+    Result checkDestIndexResult = _checkDestIndex(parentFolder.childrenSize(), destIndex);
     if(checkDestIndexResult.isFailure()) return checkDestIndexResult;
 
-    if(!parent.hasChild(target)) {
+    if(!parentFolder.hasChild(target)) {
       return Result.of(BookCode.TOC_HIERARCHY_ERROR, "순서를 변경할 노드가 폴더의 자식이 아닙니다.");
     }
     // 전체 list에서 target node를 제거하고 relocate를 실행한다.
-    parent.removeChild(target);
+    parentFolder.removeChild(target);
     return _relocate(destIndex, target);
   }
 
@@ -76,28 +78,28 @@ public class NodeRelocator {
     Preconditions.checkNotNull(rootFolder, "root folder가 존재하지 않습니다.");
 
     // 자기 자신에게 이동 검사
-    Result checkMoveToSelfResult = _checkMoveToSelf(target, parent);
+    Result checkMoveToSelfResult = _checkMoveToSelf(target, parentFolder);
     if(checkMoveToSelfResult.isFailure()) return checkMoveToSelfResult;
     // root folder 이동 검사
     Result checkRootFolderMoveResult = _checkRootFolderMove(target);
     if(checkRootFolderMoveResult.isFailure()) return checkRootFolderMoveResult;
 
     // 이미 parent에 속해있는 경우
-    if(parent.hasChild(target)) {
+    if(parentFolder.hasChild(target)) {
       return Result.of(BookCode.TOC_HIERARCHY_ERROR, "targetNode가 이미 parent에 속해있습니다.");
     }
 
     // 계층 구조 파괴 검사
     if(target instanceof Folder targetFolder) {
       // parent에서 출발해서 조상중에 targetFolder가 있는지 검증한다.
-      if(_isAncestorOf(targetFolder, this.parent, nodeMap)) {
+      if(_isAncestorOf(targetFolder, this.parentFolder, nodeMap)) {
         return Result.of(BookCode.TOC_HIERARCHY_ERROR, "toc의 계층 구조를 파괴하는 이동입니다.");
       }
     }
 
 
     // destIndex 검사
-    Result checkDestIndexResult = _checkDestIndex(parent.childrenSize(), destIndex);
+    Result checkDestIndexResult = _checkDestIndex(parentFolder.childrenSize(), destIndex);
     if(checkDestIndexResult.isFailure()) return checkDestIndexResult;
     return _relocate(destIndex, target);
   }
@@ -110,18 +112,18 @@ public class NodeRelocator {
    * @param target    삽입대상. this.childen에서 빼고나서 호출할 것.
    */
   private Result _relocate(int destIndex, TocNode target) {
-    assert !parent.hasChild(target) : "target이 parent에 속해있는 경우 relocate 할 수 없습니다.";
+    assert !parentFolder.hasChild(target) : "target이 parent에 속해있는 경우 relocate 할 수 없습니다.";
 
     // NODE를 list에 삽입
-    parent.addChild(destIndex, target);
+    parentFolder.addChild(destIndex, target);
     // 삽입된 node의 앞
-    Integer prevOvOrNull = destIndex != 0 ? parent.getChild(destIndex - 1).getOv() : null;
+    Integer prevOvOrNull = destIndex != 0 ? parentFolder.getChild(destIndex - 1).getOv() : null;
     // 삽입된 node의 뒤
-    Integer nextOvOrNull = destIndex != parent.childrenSize() - 1 ? parent.getChild(destIndex + 1).getOv() : null;
+    Integer nextOvOrNull = destIndex != parentFolder.childrenSize() - 1 ? parentFolder.getChild(destIndex + 1).getOv() : null;
 
     OvRebalancer rebalancer = new OvRebalancer();
     if(rebalancer.isRequireRebalance(prevOvOrNull, nextOvOrNull)) {
-      rebalancer.rebalance(parent.getReadOnlyChildren());
+      rebalancer.rebalance(parentFolder.getReadOnlyChildren());
     } else {
       int newOv = this._resolveOv(prevOvOrNull, nextOvOrNull);
       target.setOv(newOv);

@@ -43,14 +43,13 @@ public class Section extends TocNode {
   public static Section create(
     Book book,
     NodeTitle title,
-    Folder parentNode,
     int ov
   ) {
     return new Section(
       UUID.randomUUID(),
       book,
       title.getValue(),
-      parentNode,
+      null,
       "",
       0
     );

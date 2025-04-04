@@ -6,6 +6,7 @@ import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.pageflow.book.domain.config.TocNodeConfig;
 import org.pageflow.common.jpa.BaseJpaEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
@@ -93,13 +94,18 @@ public abstract class TocNode extends BaseJpaEntity {
   }
 
   public boolean isRootFolder() {
-    return this.parentNode == null;
+    return this.parentNode == null && this.title.equals(TocNodeConfig.ROOT_NODE_TITLE);
   }
 
   @PreUpdate
   private void preventRootFolderUpdate() {
-    if(isRootFolder()) {
-      throw new IllegalStateException("Root Folder cannot be updated");
+    // root folder title은 예약
+    if(this.title.equals(TocNodeConfig.ROOT_NODE_TITLE)) {
+      throw new IllegalStateException("root node folder로는 제목을 변경할 수 없습니다.");
+    }
+    // 원래 root folder가 아닌 놈을 나중에 root로 만드는 것 금지.
+    if(this.parentNode == null) {
+      throw new IllegalStateException("노드를 root folder로 만들 수 없습니다.");
     }
   }
 

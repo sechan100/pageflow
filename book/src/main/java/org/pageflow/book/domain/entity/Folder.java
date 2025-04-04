@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicUpdate;
 import org.pageflow.book.domain.NodeTitle;
+import org.pageflow.book.domain.config.TocNodeConfig;
 import org.springframework.util.Assert;
 
 import java.util.ArrayList;
@@ -25,30 +26,24 @@ import java.util.UUID;
 public class Folder extends TocNode {
 
   @OrderBy("ov ASC")
-  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, mappedBy = "parentNode")
+  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
   private final List<TocNode> children = new ArrayList<>(8);
 
-  private Folder(
-    UUID id,
-    Book book,
-    String title,
-    Folder parentNode,
-    Integer ov
-  ) {
+
+  private Folder(UUID id, Book book, String title, Folder parentNode, Integer ov) {
     super(id, book, title, parentNode, ov);
   }
 
   public static Folder create(
     Book book,
     NodeTitle title,
-    Folder parentNode,
     Integer ov
   ) {
     return new Folder(
       UUID.randomUUID(),
       book,
       title.getValue(),
-      parentNode,
+      null,
       ov
     );
   }
@@ -57,7 +52,7 @@ public class Folder extends TocNode {
     return new Folder(
       UUID.randomUUID(),
       book,
-      ":root",
+      TocNodeConfig.ROOT_NODE_TITLE,
       null,
       0
     );

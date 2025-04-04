@@ -1,216 +1,149 @@
-//package org.pageflow.test.module.book;
-//
-//import lombok.RequiredArgsConstructor;
-//import org.hibernate.Hibernate;
-//import org.junit.jupiter.api.Assertions;
-//import org.junit.jupiter.api.DisplayName;
-//import org.junit.jupiter.api.Test;
-//import org.pageflow.book.domain.BookPermission;
-//import org.pageflow.book.domain.entity.Book;
-//import org.pageflow.book.domain.entity.TocNode;
-//import org.pageflow.book.dto.BookDto;
-//import org.pageflow.book.dto.FolderDto;
-//import org.pageflow.book.dto.SectionDtoWithContent;
-//import org.pageflow.book.dto.TocDto;
-//import org.pageflow.book.port.in.TocUseCase;
-//import org.pageflow.book.port.in.cmd.CreateFolderCmd;
-//import org.pageflow.book.port.in.cmd.CreateSectionCmd;
-//import org.pageflow.book.port.in.cmd.RelocateNodeCmd;
-//import org.pageflow.book.port.out.jpa.BookPersistencePort;
-//import org.pageflow.book.port.out.jpa.NodePersistencePort;
-//import org.pageflow.common.permission.ResourcePermissionContext;
-//import org.pageflow.test.shared.PageflowTest;
-//import org.pageflow.test.shared.DataCreator;
-//import org.pageflow.user.dto.UserDto;
-//
-//import java.util.UUID;
-//
-/// **
-// * @author : sechan
-// */
-//@PageflowTest
-//@RequiredArgsConstructor
-//public class TocFeatureTest {
-//  private final DataCreator dataCreator;
-//  private final ResourcePermissionContext permissionContext;
-//  private final BookPersistencePort bookPersistencePort;
-//  private final NodePersistencePort nodePersistencePort;
-//
-//  private final TocUseCase tocUseCase;
-//
-//  @Test
-//  @DisplayName("ov 값 할당과 rebalance 검사")
-//  void ovAssignAndRebalanceTest() {
-//    UserDto user1 = dataCreator.createUser("user1");
-//    BookDto book = dataCreator.createBook(user1, "책 1");
-//    UUID bookId = book.getId();
-//    BookPermission permission = _fullPermission(book.getId());
-//    permissionContext.addResourcePermission(permission);
-//
-//    // toc 생성
-//    TocDto.Toc toc = tocUseCase.getToc(book.getId());
-//    TocDto.Folder root = toc.getRoot();
-//    UUID rootFolderId = root.getId();
-//    FolderDto f1 = createFolder(bookId, rootFolderId);
-//    FolderDto f2 = createFolder(bookId, rootFolderId);
-//    SectionDtoWithContent s3 = createSection(bookId, rootFolderId);
-//
-//    // 엔티티 load 및 ov 검증
-//    TocNode en_f1 = nodePersistencePort.findById(f1.getId()).get();
-//    Assertions.assertEquals(0, en_f1.getOv());
-//    TocNode en_f2 = nodePersistencePort.findById(f2.getId()).get();
-//    TocNode en_s3 = nodePersistencePort.findById(s3.getId()).get();
-//    Assertions.assertEquals(en_f2.getOv() << 1, en_s3.getOv());
-//
-//    // ov 강제 할당
-//    en_f2.setOv(100);
-//    en_s3.setOv(101);
-//    nodePersistencePort.flush();
-//    Assertions.assertEquals(
-//      100,
-//      nodePersistencePort.findById(f2.getId()).get().getOv()
-//    );
-//
-//    // rebalance
-//    tocUseCase.relocateNode(
-//      bookId,
-//      RelocateNodeCmd.of(
-//        bookId,
-//        f1.getId(),
-//        rootFolderId,
-//        1
-//      )
-//    );
-//
-//    // 엔티티 load 및 ov 검증
-//    int afterRebalance_f2Ov = nodePersistencePort.findById(f2.getId()).get().getOv();
-//    Assertions.assertEquals(0, afterRebalance_f2Ov);
-//    int afterRebalance_f1Ov = nodePersistencePort.findById(f1.getId()).get().getOv();
-//    int afterRebalance_s3Ov = nodePersistencePort.findById(s3.getId()).get().getOv();
-//    Assertions.assertEquals(afterRebalance_f1Ov << 1, afterRebalance_s3Ov);
-//  }
-//
-//  @Test
-//  @DisplayName("int minimun value에 도달한 경우 rebalance 검사")
-//  void minimumOvRebalanceTest() {
-//    UserDto user1 = dataCreator.createUser("user1");
-//    BookDto book = dataCreator.createBook(user1, "책 1");
-//    UUID bookId = book.getId();
-//    BookPermission permission = _fullPermission(book.getId());
-//    permissionContext.addResourcePermission(permission);
-//
-//    // toc 생성
-//    TocDto.Toc toc = tocUseCase.getToc(book.getId());
-//    TocDto.Folder root = toc.getRoot();
-//    UUID rootFolderId = root.getId();
-//    FolderDto f1 = createFolder(bookId, rootFolderId);
-//    FolderDto f2 = createFolder(bookId, rootFolderId);
-//    SectionDtoWithContent s3 = createSection(bookId, rootFolderId);
-//
-//    // 엔티티 load 및 ov 검증
-//    TocNode en_f1 = nodePersistencePort.findById(f1.getId()).get();
-//    Assertions.assertEquals(0, en_f1.getOv());
-//    TocNode en_f2 = nodePersistencePort.findById(f2.getId()).get();
-//    TocNode en_s3 = nodePersistencePort.findById(s3.getId()).get();
-//    Assertions.assertEquals(en_f2.getOv() << 1, en_s3.getOv());
-//
-//    // ov 강제 할당(min 근처 값)
-//    en_f1.setOv(Integer.MIN_VALUE + 1);
-//    nodePersistencePort.flush();
-//    Assertions.assertEquals(
-//      Integer.MIN_VALUE + 1,
-//      nodePersistencePort.findById(en_f1.getId()).get().getOv()
-//    );
-//
-//    // rebalance
-//    tocUseCase.relocateNode(
-//      bookId,
-//      RelocateNodeCmd.of(
-//        bookId,
-//        f2.getId(),
-//        rootFolderId,
-//        0
-//      )
-//    );
-//
-//    // 엔티티 load 및 ov 검증
-//    int afterRebalance_f2Ov = nodePersistencePort.findById(f2.getId()).get().getOv();
-//    Assertions.assertEquals(0, afterRebalance_f2Ov);
-//    int afterRebalance_f1Ov = nodePersistencePort.findById(f1.getId()).get().getOv();
-//    int afterRebalance_s3Ov = nodePersistencePort.findById(s3.getId()).get().getOv();
-//    Assertions.assertEquals(afterRebalance_f1Ov << 1, afterRebalance_s3Ov);
-//  }
-//
-//  @Test
-//  @DisplayName("int maximun value에 도달한 경우 rebalance 검사")
-//  void maximunOvRebalanceTest() {
-//    UserDto user1 = dataCreator.createUser("user1");
-//    BookDto book = dataCreator.createBook(user1, "책 1");
-//    UUID bookId = book.getId();
-//    BookPermission permission = _fullPermission(book.getId());
-//    permissionContext.addResourcePermission(permission);
-//
-//    // toc 생성
-//    TocDto.Toc toc = tocUseCase.getToc(book.getId());
-//    TocDto.Folder root = toc.getRoot();
-//    UUID rootFolderId = root.getId();
-//    FolderDto f1 = createFolder(bookId, rootFolderId);
-//    FolderDto f2 = createFolder(bookId, rootFolderId);
-//    SectionDtoWithContent s3 = createSection(bookId, rootFolderId);
-//
-//    // 엔티티 load 및 ov 검증
-//    TocNode en_f1 = nodePersistencePort.findById(f1.getId()).get();
-//    Assertions.assertEquals(0, en_f1.getOv());
-//    TocNode en_f2 = nodePersistencePort.findById(f2.getId()).get();
-//    TocNode en_s3 = nodePersistencePort.findById(s3.getId()).get();
-//    Assertions.assertEquals(en_f2.getOv() << 1, en_s3.getOv());
-//
-//    // ov 강제 할당(min 근처 값)
-//    en_s3.setOv(Integer.MAX_VALUE - 1);
-//    nodePersistencePort.flush();
-//    Assertions.assertEquals(
-//      Integer.MAX_VALUE - 1,
-//      nodePersistencePort.findById(en_s3.getId()).get().getOv()
-//    );
-//
-//    // rebalance
-//    tocUseCase.relocateNode(
-//      bookId,
-//      RelocateNodeCmd.of(
-//        bookId,
-//        f2.getId(),
-//        rootFolderId,
-//        2
-//      )
-//    );
-//
-//    // 엔티티 load 및 ov 검증
-//    int afterRebalance_f1Ov = nodePersistencePort.findById(f1.getId()).get().getOv();
-//    Assertions.assertEquals(0, afterRebalance_f1Ov);
-//    int afterRebalance_s3Ov = nodePersistencePort.findById(s3.getId()).get().getOv();
-//    int afterRebalance_f2Ov = nodePersistencePort.findById(f2.getId()).get().getOv();
-//    Assertions.assertEquals(afterRebalance_s3Ov << 1, afterRebalance_f2Ov);
-//  }
-//
-//
-//  private FolderDto createFolder(UUID bookId, UUID parentNodeId) {
-//    return tocUseCase.createFolder(bookId, CreateFolderCmd.withoutTitle(
-//      bookId,
-//      parentNodeId
-//    ));
-//  }
-//
-//  private SectionDtoWithContent createSection(UUID bookId, UUID parentNodeId) {
-//    return tocUseCase.createSection(bookId, CreateSectionCmd.withoutTitle(
-//      bookId,
-//      parentNodeId
-//    ));
-//  }
-//
-//  private BookPermission _fullPermission(UUID bookId) {
-//    Book book = bookPersistencePort.findById(bookId).get();
-//    Book readOnlyBook = Hibernate.unproxy(book, Book.class);
-//    return BookPermission.author(readOnlyBook);
-//  }
-//
-//}
+package org.pageflow.test.module.book;
+
+import lombok.RequiredArgsConstructor;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.pageflow.book.application.dto.BookDto;
+import org.pageflow.book.application.dto.FolderDto;
+import org.pageflow.book.application.dto.SectionDtoWithContent;
+import org.pageflow.book.domain.entity.TocNode;
+import org.pageflow.book.port.in.TocUseCase;
+import org.pageflow.book.port.in.cmd.CreateFolderCmd;
+import org.pageflow.book.port.in.cmd.CreateSectionCmd;
+import org.pageflow.book.port.in.cmd.RelocateNodeCmd;
+import org.pageflow.book.port.out.jpa.NodePersistencePort;
+import org.pageflow.common.result.Result;
+import org.pageflow.test.module.book.utils.BookUtils;
+import org.pageflow.test.module.user.utils.UserUtils;
+import org.pageflow.test.shared.PageflowTest;
+import org.pageflow.user.dto.UserDto;
+
+import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+@PageflowTest
+@RequiredArgsConstructor
+public class TocFeatureTest {
+  private final UserUtils userUtils;
+  private final BookUtils bookUtils;
+  private final TocUseCase tocUseCase;
+  private final NodePersistencePort nodePersistencePort;
+
+  @Test
+  @DisplayName("ov 값 할당과 rebalance 검사")
+  void ovAssignAndRebalanceTest() {
+    // 사용자 생성
+    UserDto user = userUtils.createUser("user1");
+
+    // 책 생성
+    BookDto book = bookUtils.createBook(user, "TOC 테스트 도서");
+
+    // toc 가져오기
+    UUID bookId = book.getId();
+    UUID rootFolderId = tocUseCase.getToc(bookId).getRoot().getId();
+
+    // 폴더 생성
+    Result<FolderDto> folder1Result = tocUseCase.createFolder(
+      CreateFolderCmd.withTitle(user.getUid(), rootFolderId, "폴더1")
+    );
+    assertTrue(folder1Result.isSuccess());
+    FolderDto folder1 = folder1Result.getSuccessData();
+
+    Result<FolderDto> folder2Result = tocUseCase.createFolder(
+      CreateFolderCmd.withTitle(user.getUid(), rootFolderId, "폴더2")
+    );
+    assertTrue(folder2Result.isSuccess());
+    FolderDto folder2 = folder2Result.getSuccessData();
+
+    // 섹션 생성
+    Result<SectionDtoWithContent> section1Result = tocUseCase.createSection(
+      CreateSectionCmd.withTitle(user.getUid(), rootFolderId, "섹션1")
+    );
+    assertTrue(section1Result.isSuccess());
+    SectionDtoWithContent section1 = section1Result.getSuccessData();
+
+    // 엔티티 load 및 ov 검증
+    TocNode en_f1 = nodePersistencePort.findById(folder1.getId()).get();
+    assertEquals(0, en_f1.getOv());
+
+    TocNode en_f2 = nodePersistencePort.findById(folder2.getId()).get();
+    TocNode en_s1 = nodePersistencePort.findById(section1.getId()).get();
+
+    // ov 강제 할당
+    en_f2.setOv(100);
+    en_s1.setOv(101);
+    nodePersistencePort.flush();
+    assertEquals(
+      100,
+      nodePersistencePort.findById(folder2.getId()).get().getOv()
+    );
+
+    // rebalance - 폴더1을 인덱스 1로 이동
+    Result relocateResult = tocUseCase.relocateNode(
+      RelocateNodeCmd.builder()
+        .uid(user.getUid())
+        .nodeId(folder1.getId())
+        .destFolderId(rootFolderId)
+        .destIndex(1)
+        .build()
+    );
+    assertTrue(relocateResult.isSuccess());
+
+    // 엔티티 load 및 ov 재검증
+    int afterRebalance_f2Ov = nodePersistencePort.findById(folder2.getId()).get().getOv();
+    int afterRebalance_f1Ov = nodePersistencePort.findById(folder1.getId()).get().getOv();
+    int afterRebalance_s1Ov = nodePersistencePort.findById(section1.getId()).get().getOv();
+
+    // OV가 rebalance되었는지 확인
+    assertTrue(afterRebalance_f2Ov < afterRebalance_f1Ov);
+    assertTrue(afterRebalance_f1Ov < afterRebalance_s1Ov);
+  }
+
+  @Test
+  @DisplayName("int minimum value에 도달한 경우 rebalance 검사")
+  void minimumOvRebalanceTest() {
+    // 사용자 생성
+    UserDto user = userUtils.createUser("user1");
+
+    // 책 생성
+    BookDto book = bookUtils.createBook(user, "최소값 rebalance 테스트");
+    UUID bookId = book.getId();
+    UUID rootFolderId = tocUseCase.getToc(bookId).getRoot().getId();
+
+    // 노드 생성
+    Result<FolderDto> folder1Result = tocUseCase.createFolder(
+      CreateFolderCmd.withTitle(user.getUid(), rootFolderId, "폴더1")
+    );
+    FolderDto folder1 = folder1Result.getSuccessData();
+
+    Result<FolderDto> folder2Result = tocUseCase.createFolder(
+      CreateFolderCmd.withTitle(user.getUid(), rootFolderId, "폴더2")
+    );
+    FolderDto folder2 = folder2Result.getSuccessData();
+
+    // 최소값 근처에 ov 설정
+    TocNode en_f1 = nodePersistencePort.findById(folder1.getId()).get();
+    en_f1.setOv(Integer.MIN_VALUE + 1);
+    nodePersistencePort.flush();
+
+    // folder2를 맨 앞으로 이동시켜 rebalance 유도
+    Result relocateResult = tocUseCase.relocateNode(
+      RelocateNodeCmd.builder()
+        .uid(user.getUid())
+        .nodeId(folder2.getId())
+        .destFolderId(rootFolderId)
+        .destIndex(0)
+        .build()
+    );
+    assertTrue(relocateResult.isSuccess());
+
+    // rebalance 확인 - 모든 ov가 재조정되었는지 확인
+    int newF1Ov = nodePersistencePort.findById(folder1.getId()).get().getOv();
+    int newF2Ov = nodePersistencePort.findById(folder2.getId()).get().getOv();
+
+    assertTrue(newF2Ov < newF1Ov); // folder2가 folder1 앞에 있어야 함
+    assertTrue(newF2Ov > Integer.MIN_VALUE + 1000); // rebalance 후 최소값에서 충분히 떨어져 있어야 함
+  }
+}

@@ -110,7 +110,7 @@ public class BookStatusUseCase {
   public Result<BookDto> mergeRevision(UID uid, UUID bookId) {
     Book book = bookPersistencePort.findById(bookId).get();
 
-    // 작가 권한 검사
+    // 작가 권한 검사 ====================
     BookAccessGranter accessGranter = new BookAccessGranter(uid, book);
     Result grant = accessGranter.grant(BookAccess.UPDATE);
     if(grant.isFailure()) {
@@ -128,6 +128,14 @@ public class BookStatusUseCase {
    */
   public Result<BookDto> changeVisibility(UID uid, UUID bookId, BookVisibility visibility) {
     Book book = bookPersistencePort.findById(bookId).get();
+
+    // 작가 권한 검사 ====================
+    BookAccessGranter accessGranter = new BookAccessGranter(uid, book);
+    Result grant = accessGranter.grant(BookAccess.UPDATE);
+    if(grant.isFailure()) {
+      return grant;
+    }
+    
     Result result = book.changeVisibility(visibility);
     if(result.isFailure()) {
       return result;

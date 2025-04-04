@@ -54,13 +54,14 @@ public class BookUseCase {
    */
   public Result<BookDto> createBook(
     UID authorId,
-    BookTitle title,
+    String title,
     @Nullable MultipartFile coverImage
   ) {
     // author
     Author author = loadAuthorPort.loadAuthorProxy(authorId);
     // book
     UUID bookId = UUID.randomUUID();
+    BookTitle bookTitle = BookTitle.create(title);
     String coverImageUrl = applicationProperties.book.defaultCoverImageUrl;
     if(coverImage != null) {
       Result<FilePath> uploadResult = _uploadCoverImage(bookId, coverImage);
@@ -74,7 +75,7 @@ public class BookUseCase {
     Book book = Book.create(
       bookId,
       author,
-      title,
+      bookTitle,
       coverImageUrl
     );
     bookPersistencePort.persist(book);

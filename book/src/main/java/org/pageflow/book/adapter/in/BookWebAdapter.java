@@ -33,8 +33,7 @@ public class BookWebAdapter {
   @Operation(summary = "책 생성")
   public Result<BookDto> createBook(@Valid @RequestBody BookForm.Create form) {
     UID uid = rqcxt.getUid();
-    BookTitle title = BookTitle.create(form.getTitle());
-    Result<BookDto> result = bookUseCase.createBook(uid, title, null);
+    Result<BookDto> result = bookUseCase.createBook(uid, form.getTitle(), null);
     return result;
   }
 

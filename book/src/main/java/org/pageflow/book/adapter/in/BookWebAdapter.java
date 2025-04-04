@@ -7,7 +7,6 @@ import org.pageflow.book.adapter.in.form.BookForm;
 import org.pageflow.book.application.dto.BookDto;
 import org.pageflow.book.application.dto.BookDtoWithAuthor;
 import org.pageflow.book.application.dto.MyBooks;
-import org.pageflow.book.domain.BookTitle;
 import org.pageflow.book.port.in.BookUseCase;
 import org.pageflow.common.api.RequestContext;
 import org.pageflow.common.result.Result;
@@ -58,8 +57,7 @@ public class BookWebAdapter {
     @Valid @RequestBody BookForm.Update form
   ) {
     UID uid = rqcxt.getUid();
-    BookTitle title = BookTitle.create(form.getTitle());
-    Result<BookDto> result = bookUseCase.changeBookTitle(uid, bookId, title);
+    Result<BookDto> result = bookUseCase.changeBookTitle(uid, bookId, form.getTitle());
     return result;
   }
 

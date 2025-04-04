@@ -3,7 +3,6 @@ package org.pageflow.book.port.in;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Hibernate;
-import org.pageflow.book.application.BookCode;
 import org.pageflow.book.application.dto.ReviewDto;
 import org.pageflow.book.domain.Author;
 import org.pageflow.book.domain.BookAccessGranter;
@@ -11,6 +10,7 @@ import org.pageflow.book.domain.ReviewAccessGranter;
 import org.pageflow.book.domain.entity.Book;
 import org.pageflow.book.domain.entity.Review;
 import org.pageflow.book.domain.enums.BookAccess;
+import org.pageflow.book.domain.enums.ReviewAccess;
 import org.pageflow.book.port.out.LoadAuthorPort;
 import org.pageflow.book.port.out.jpa.BookPersistencePort;
 import org.pageflow.book.port.out.jpa.ReviewPersistencePort;
@@ -36,6 +36,7 @@ public class ReviewUseCase {
 
   /**
    * @code BOOK_ACCESS_DENIED: 책 권한이 없는 경우
+   * @code INVALID_BOOK_STATUS: 책이 접근권한을 부여할 수 없는 상태인 경우
    * @code FIELD_VALIDATION_ERROR: score가 1 ~ 5사이의 정수가 아닌 경우
    */
   public Result<ReviewDto> createReview(
@@ -67,7 +68,9 @@ public class ReviewUseCase {
   }
 
   /**
-   * @code REVIEW_PERMISSION_DENIED: 리뷰 작성자가 아닌 경우
+   * @code BOOK_ACCESS_DENIED: 책에 대한접근 권한이 없는 경우
+   * @code INVALID_BOOK_STATUS: 책이 접근권한을 부여할 수 없는 상태인 경우
+   * @code REVIEW_ACCESS_DENIED: 리뷰 작성 권한이 없는 경우
    */
   public Result<ReviewDto> updateReview(
     UID uid,
@@ -77,10 +80,11 @@ public class ReviewUseCase {
   ) {
     Review review = reviewPersistencePort.findById(reviewId).get();
 
-    // 권한 검사
-    ReviewAccessGranter accessDecider = new ReviewAccessGranter(review);
-    if(!accessDecider.isWriter(uid)) {
-      return Result.of(BookCode.REVIEW_ACCESS_DENIED);
+    // 권한 검사 ========================
+    ReviewAccessGranter accessGranter = new ReviewAccessGranter(uid, review);
+    Result access = accessGranter.grant(ReviewAccess.WRITE);
+    if(access.isFailure()) {
+      return access;
     }
 
     // 리뷰 수정
@@ -90,15 +94,18 @@ public class ReviewUseCase {
   }
 
   /**
-   * @code REVIEW_PERMISSION_DENIED: 리뷰 작성자가 아닌 경우
+   * @code BOOK_ACCESS_DENIED: 책에 대한접근 권한이 없는 경우
+   * @code INVALID_BOOK_STATUS: 책이 접근권한을 부여할 수 없는 상태인 경우
+   * @code REVIEW_ACCESS_DENIED: 리뷰 작성 권한이 없는 경우
    */
   public Result deleteReview(UID uid, UUID reviewId) {
     Review review = reviewPersistencePort.findById(reviewId).get();
 
-    // 권한 검사
-    ReviewAccessGranter accessGranter = new ReviewAccessGranter(review);
-    if(!accessGranter.isWriter(uid)) {
-      return Result.of(BookCode.REVIEW_ACCESS_DENIED);
+    // 권한 검사 ========================
+    ReviewAccessGranter accessGranter = new ReviewAccessGranter(uid, review);
+    Result access = accessGranter.grant(ReviewAccess.WRITE);
+    if(access.isFailure()) {
+      return access;
     }
 
     // 삭제

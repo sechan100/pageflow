@@ -114,9 +114,8 @@ public class BookUseCase {
 
   /**
    * @code BOOK_ACCESS_DENIED: 책 권한이 없는 경우
-   * @code BOOK_INVALID_STATUS: 이미 발행된 책인 경우
    */
-  public Result<BookDto> changeBookTitle(UID uid, UUID bookId, BookTitle title) {
+  public Result<BookDto> changeBookTitle(UID uid, UUID bookId, String title) {
     Book book = bookPersistencePort.findById(bookId).get();
 
     // 권한 검사 =====
@@ -127,7 +126,8 @@ public class BookUseCase {
     }
 
     // 책 제목 변경
-    book.changeTitle(title);
+    BookTitle bookTitle = BookTitle.create(title);
+    book.changeTitle(bookTitle);
     return Result.success(BookDto.from(book));
   }
 
@@ -136,7 +136,6 @@ public class BookUseCase {
    * @code FAIL_TO_DELETE_FILE: 기존 CoverImage 삭제에 실패한 경우
    * @code FAIL_TO_UPLOAD_FILE: 새 CoverImage 업로드에 실패한 경우
    * @code BOOK_ACCESS_DENIED: 책 권한이 없는 경우
-   * @code BOOK_INVALID_STATUS: 이미 발행된 책인 경우
    */
   public Result<BookDto> changeBookCoverImage(UID uid, UUID bookId, MultipartFile coverImage) {
     Book book = bookPersistencePort.findById(bookId).get();

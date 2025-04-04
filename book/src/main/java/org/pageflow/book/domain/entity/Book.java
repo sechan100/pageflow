@@ -90,7 +90,7 @@ public class Book extends BaseJpaEntity {
       coverImageUrl,
       BookStatus.DRAFT,
       0,
-      BookVisibility.PRIVATE
+      BookVisibility.PERSONAL
     );
   }
 
@@ -130,6 +130,7 @@ public class Book extends BaseJpaEntity {
 
   /**
    * 책을 출판하고 edition을 1 증가시킨다.
+   * visibility는 GLOBAL로 설정된다.
    *
    * @code BOOK_INVALID_STATUS: 이미 발행된 책인 경우
    */
@@ -142,6 +143,7 @@ public class Book extends BaseJpaEntity {
     }
 
     this.status = BookStatus.PUBLISHED;
+    this.visibility = BookVisibility.GLOBAL;
     this.edition++;
     return Result.success();
   }

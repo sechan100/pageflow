@@ -6,6 +6,7 @@ import org.pageflow.book.application.dto.BookDto;
 import org.pageflow.book.domain.BookAccessGranter;
 import org.pageflow.book.domain.entity.Book;
 import org.pageflow.book.domain.enums.BookAccess;
+import org.pageflow.book.domain.enums.BookVisibility;
 import org.pageflow.book.port.out.jpa.BookPersistencePort;
 import org.pageflow.common.result.Result;
 import org.pageflow.common.user.UID;
@@ -122,4 +123,15 @@ public class BookStatusUseCase {
     return Result.success(BookDto.from(book));
   }
 
+  /**
+   * @code BOOK_INVALID_STATUS: DRAFT 상태인 경우
+   */
+  public Result<BookDto> changeVisibility(UID uid, UUID bookId, BookVisibility visibility) {
+    Book book = bookPersistencePort.findById(bookId).get();
+    Result result = book.changeVisibility(visibility);
+    if(result.isFailure()) {
+      return result;
+    }
+    return Result.success(BookDto.from(book));
+  }
 }

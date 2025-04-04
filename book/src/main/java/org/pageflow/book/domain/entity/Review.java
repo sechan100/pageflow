@@ -7,6 +7,7 @@ import org.pageflow.book.domain.ReviewScore;
 import org.pageflow.common.jpa.BaseJpaEntity;
 import org.pageflow.common.result.Result;
 import org.pageflow.common.result.code.CommonCode;
+import org.pageflow.common.user.UID;
 import org.pageflow.common.validation.FieldReason;
 import org.pageflow.common.validation.FieldValidationResult;
 import org.pageflow.common.validation.InvalidField;
@@ -32,6 +33,7 @@ public class Review extends BaseJpaEntity {
   @JoinColumn(name = "writer_id")
   private Profile writer;
 
+  @Getter
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   @JoinColumn(name = "book_id")
   private Book book;
@@ -75,6 +77,10 @@ public class Review extends BaseJpaEntity {
 
   public Author getWriter() {
     return new Author(writer);
+  }
+
+  public boolean isWriter(UID uid) {
+    return writer.getId().equals(uid.getValue());
   }
 
   public void changeContent(String content) {

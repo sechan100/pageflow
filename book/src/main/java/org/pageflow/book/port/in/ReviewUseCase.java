@@ -37,7 +37,7 @@ public class ReviewUseCase {
 
 
   /**
-   * @code BOOK_PERMISSION_DENIED: 책 권한이 없는 경우
+   * @code BOOK_ACCESS_DENIED: 책 권한이 없는 경우
    * @code FIELD_VALIDATION_ERROR: score가 1 ~ 5사이의 정수가 아닌 경우
    */
   public Result<ReviewDto> createReview(

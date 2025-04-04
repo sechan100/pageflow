@@ -42,9 +42,6 @@ public class Book extends BaseJpaEntity {
   )
   private final List<Review> reviews = new ArrayList<>(5);
 
-  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, mappedBy = "book")
-  private final List<TocNode> nodes = new ArrayList<>(20);
-
   @Getter
   @Column(nullable = false)
   private String title;

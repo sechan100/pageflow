@@ -31,7 +31,6 @@ public abstract class TocNode extends BaseJpaEntity {
   @Getter
   private UUID id;
 
-  @Getter
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   @JoinColumn(name = "book_id", nullable = false)
   private Book book;
@@ -56,7 +55,6 @@ public abstract class TocNode extends BaseJpaEntity {
   private Integer ov;
 
 
-
   protected TocNode(
     UUID id,
     Book book,
@@ -74,31 +72,32 @@ public abstract class TocNode extends BaseJpaEntity {
   /**
    * Folder에서 주로 호출한다. 다른 곳에서는 어지간하면 호출하지 말 것.
    * 호출하는 경우, Folder.children과 일관성이 깨지지 않도록 Folder가 그 자체로만 로드되었거나, 아예 메모리로 올리지 않은 상태에서 사용해야한다.
-   * @see Folder
+   *
    * @param parentNode
+   * @see Folder
    */
-  public void _setParentNode(Folder parentNode){
+  public void _setParentNode(Folder parentNode) {
     Assert.notNull(parentNode, "null을 부모로 설정할 수 없습니다. (root folder만 가능)");
     this.parentNode = parentNode;
   }
 
-  public void setOv(int ov){
+  public void setOv(int ov) {
     this.ov = ov;
   }
 
   @NotNull
-  public Folder ensureParentNode(){
+  public Folder ensureParentNode() {
     Assert.notNull(this.parentNode, "Root Folder는 부모 노드를 가지지 않습니다.");
     return this.parentNode;
   }
 
-  public boolean isRootFolder(){
+  public boolean isRootFolder() {
     return this.parentNode == null;
   }
 
   @PreUpdate
-  private void preventRootFolderUpdate(){
-    if(isRootFolder()){
+  private void preventRootFolderUpdate() {
+    if(isRootFolder()) {
       throw new IllegalStateException("Root Folder cannot be updated");
     }
   }

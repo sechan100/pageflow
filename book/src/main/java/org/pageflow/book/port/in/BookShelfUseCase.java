@@ -37,7 +37,7 @@ public class BookShelfUseCase {
   /**
    * 책장에 책을 추가한다.
    *
-   * @code BOOK_PERMISSION_DENIED: 책에 대한 권한이 없는 경우
+   * @code BOOK_ACCESS_DENIED: 책에 대한 권한이 없는 경우
    */
   public Result<BookDto> addBookToShelf(UID shlefOwnerId, BookId bookId) {
     Book book = bookPersistencePort.findById(bookId.getValue()).get();
@@ -58,7 +58,7 @@ public class BookShelfUseCase {
   /**
    * 책장에서 책을 제거한다.
    *
-   * @code BOOK_PERMISSION_DENIED: 책에 대한 권한이 없는 경우
+   * @code BOOK_ACCESS_DENIED: 책에 대한 권한이 없는 경우
    */
   public Result removeBookFromShelf(UID shlefOwnerId, BookId bookId) {
     UUID bookUUID = bookId.getValue();

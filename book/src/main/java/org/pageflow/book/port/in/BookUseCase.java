@@ -12,10 +12,11 @@ import org.pageflow.book.domain.BookAccessGranter;
 import org.pageflow.book.domain.BookTitle;
 import org.pageflow.book.domain.entity.Book;
 import org.pageflow.book.domain.entity.Folder;
+import org.pageflow.book.domain.entity.TocNode;
 import org.pageflow.book.domain.enums.BookAccess;
 import org.pageflow.book.port.out.LoadAuthorPort;
 import org.pageflow.book.port.out.jpa.BookPersistencePort;
-import org.pageflow.book.port.out.jpa.FolderPersistencePort;
+import org.pageflow.book.port.out.jpa.NodePersistencePort;
 import org.pageflow.common.property.ApplicationProperties;
 import org.pageflow.common.result.Result;
 import org.pageflow.common.user.UID;
@@ -40,11 +41,11 @@ import java.util.UUID;
 @Transactional
 @RequiredArgsConstructor
 public class BookUseCase {
-  private final LoadAuthorPort loadAuthorPort;
   private final ApplicationProperties applicationProperties;
-  private final ImageUrlValidator imageUrlValidator;
+  private final LoadAuthorPort loadAuthorPort;
   private final BookPersistencePort bookPersistencePort;
-  private final FolderPersistencePort folderPersistencePort;
+  private final NodePersistencePort nodePersistencePort;
+  private final ImageUrlValidator imageUrlValidator;
   private final FileService fileService;
 
 
@@ -82,13 +83,13 @@ public class BookUseCase {
 
     // root folder
     Folder rootFolder = Folder.createRootFolder(book);
-    folderPersistencePort.persist(rootFolder);
+    nodePersistencePort.persist(rootFolder);
 
     return Result.success(BookDto.from(book));
   }
 
   /**
-   * @code BOOK_PERMISSION_DENIED: 책 읽기 권한이 없는 경우
+   * @code BOOK_ACCESS_DENIED: 책 읽기 권한이 없는 경우
    */
   public Result<BookDtoWithAuthor> readBook(UID uid, BookId bookId) {
     Book book = bookPersistencePort.findBookWithAuthorById(bookId.getValue()).get();
@@ -113,7 +114,7 @@ public class BookUseCase {
   }
 
   /**
-   * @code BOOK_PERMISSION_DENIED: 책 권한이 없는 경우
+   * @code BOOK_ACCESS_DENIED: 책 권한이 없는 경우
    * @code BOOK_INVALID_STATUS: 이미 발행된 책인 경우
    */
   public Result<BookDto> changeBookTitle(UID uid, BookId bookId, BookTitle title) {
@@ -135,7 +136,7 @@ public class BookUseCase {
    * @code FILED_VALIDATION_ERROR: coverImage file의 데이터가 올바르지 않은 경우
    * @code FAIL_TO_DELETE_FILE: 기존 CoverImage 삭제에 실패한 경우
    * @code FAIL_TO_UPLOAD_FILE: 새 CoverImage 업로드에 실패한 경우
-   * @code BOOK_PERMISSION_DENIED: 책 권한이 없는 경우
+   * @code BOOK_ACCESS_DENIED: 책 권한이 없는 경우
    * @code BOOK_INVALID_STATUS: 이미 발행된 책인 경우
    */
   public Result<BookDto> changeBookCoverImage(UID uid, BookId bookId, MultipartFile coverImage) {
@@ -169,18 +170,23 @@ public class BookUseCase {
 
 
   /**
-   * @code BOOK_PERMISSION_DENIED: 책 권한이 없는 경우
+   * @code BOOK_ACCESS_DENIED: 책 권한이 없는 경우
    */
   public Result deleteBook(UID uid, BookId bookId) {
     Book book = bookPersistencePort.findById(bookId.getValue()).get();
 
-    // 권한 검사 =====
+    // 권한 검사 ===========
     BookAccessGranter accessGranter = new BookAccessGranter(uid, book);
     Result grant = accessGranter.grant(BookAccess.UPDATE);
     if(grant.isFailure()) {
       return grant;
     }
 
+    // 책 삭제 ===========================
+    List<TocNode> nodes = nodePersistencePort.findAllByBookId(bookId.getValue());
+    for(TocNode node : nodes) {
+      nodePersistencePort.delete(node);
+    }
     bookPersistencePort.delete(book);
     return Result.success();
   }

@@ -4,8 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Hibernate;
 import org.pageflow.book.application.BookCode;
-import org.pageflow.book.application.BookId;
-import org.pageflow.book.application.ReviewId;
 import org.pageflow.book.application.dto.ReviewDto;
 import org.pageflow.book.domain.Author;
 import org.pageflow.book.domain.BookAccessGranter;
@@ -42,11 +40,11 @@ public class ReviewUseCase {
    */
   public Result<ReviewDto> createReview(
     UID uid,
-    BookId bookId,
+    UUID bookId,
     String content,
     int score
   ) {
-    Book book = bookPersistencePort.findById(bookId.getValue()).get();
+    Book book = bookPersistencePort.findById(bookId).get();
     BookAccessGranter accessGranter = new BookAccessGranter(uid, book);
     Result grant = accessGranter.grant(BookAccess.READ);
     if(grant.isFailure()) {
@@ -55,7 +53,7 @@ public class ReviewUseCase {
 
     // TODO: 이미 리뷰를 작성한 경우 처리
     Author authorProxy = loadAuthorPort.loadAuthorProxy(uid);
-    Book bookProxy = _loadBookProxy(bookId.getValue());
+    Book bookProxy = _loadBookProxy(bookId);
     Result<Review> reviewRes = Review.create(
       authorProxy,
       bookProxy,
@@ -73,11 +71,11 @@ public class ReviewUseCase {
    */
   public Result<ReviewDto> updateReview(
     UID uid,
-    ReviewId reviewId,
+    UUID reviewId,
     String content,
     int score
   ) {
-    Review review = reviewPersistencePort.findById(reviewId.getValue()).get();
+    Review review = reviewPersistencePort.findById(reviewId).get();
 
     // 권한 검사
     ReviewAccessGranter accessDecider = new ReviewAccessGranter(review);
@@ -94,8 +92,8 @@ public class ReviewUseCase {
   /**
    * @code REVIEW_PERMISSION_DENIED: 리뷰 작성자가 아닌 경우
    */
-  public Result deleteReview(UID uid, ReviewId reviewId) {
-    Review review = reviewPersistencePort.findById(reviewId.getValue()).get();
+  public Result deleteReview(UID uid, UUID reviewId) {
+    Review review = reviewPersistencePort.findById(reviewId).get();
 
     // 권한 검사
     ReviewAccessGranter accessGranter = new ReviewAccessGranter(review);

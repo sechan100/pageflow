@@ -2,7 +2,6 @@ package org.pageflow.book.port.in;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.pageflow.book.application.BookId;
 import org.pageflow.book.application.dto.BookDto;
 import org.pageflow.book.domain.BookAccessGranter;
 import org.pageflow.book.domain.entity.Book;
@@ -12,6 +11,8 @@ import org.pageflow.common.result.Result;
 import org.pageflow.common.user.UID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.UUID;
 
 /**
  * @author : sechan
@@ -32,8 +33,8 @@ public class BookStatusUseCase {
    * @code BOOK_ACCESS_DENIED: 책 권한이 없는 경우
    * @code BOOK_INVALID_STATUS: 이미 발행된 책인 경우
    */
-  public Result<BookDto> publish(UID uid, BookId bookId) {
-    Book book = bookPersistencePort.findById(bookId.getValue()).get();
+  public Result<BookDto> publish(UID uid, UUID bookId) {
+    Book book = bookPersistencePort.findById(bookId).get();
 
     // 작가 권한 검사
     BookAccessGranter accessGranter = new BookAccessGranter(uid, book);
@@ -56,8 +57,8 @@ public class BookStatusUseCase {
    * @code BOOK_ACCESS_DENIED: 책 권한이 없는 경우
    * @code BOOK_INVALID_STATUS: 출판된 책이 아닌 경우
    */
-  public Result<BookDto> startRevision(UID uid, BookId bookId) {
-    Book book = bookPersistencePort.findById(bookId.getValue()).get();
+  public Result<BookDto> startRevision(UID uid, UUID bookId) {
+    Book book = bookPersistencePort.findById(bookId).get();
 
     // 작가 권한 검사
     BookAccessGranter accessGranter = new BookAccessGranter(uid, book);
@@ -79,8 +80,8 @@ public class BookStatusUseCase {
    * @code BOOK_ACCESS_DENIED: 책 권한이 없는 경우
    * @code BOOK_INVALID_STATUS: 개정 중인 책이 아닌 경우
    */
-  public Result<BookDto> cancelRevision(UID uid, BookId bookId) {
-    Book book = bookPersistencePort.findById(bookId.getValue()).get();
+  public Result<BookDto> cancelRevision(UID uid, UUID bookId) {
+    Book book = bookPersistencePort.findById(bookId).get();
 
     // 작가 권한 검사
     BookAccessGranter accessGranter = new BookAccessGranter(uid, book);
@@ -105,8 +106,8 @@ public class BookStatusUseCase {
    * @code BOOK_ACCESS_DENIED: 책 권한이 없는 경우
    * @code BOOK_INVALID_STATUS: 개정 중인 책이 아닌 경우
    */
-  public Result<BookDto> mergeRevision(UID uid, BookId bookId) {
-    Book book = bookPersistencePort.findById(bookId.getValue()).get();
+  public Result<BookDto> mergeRevision(UID uid, UUID bookId) {
+    Book book = bookPersistencePort.findById(bookId).get();
 
     // 작가 권한 검사
     BookAccessGranter accessGranter = new BookAccessGranter(uid, book);

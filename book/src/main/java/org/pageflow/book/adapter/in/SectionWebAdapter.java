@@ -4,15 +4,12 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.pageflow.book.adapter.in.form.SectionForm;
-import org.pageflow.book.application.BookId;
-import org.pageflow.book.application.NodeId;
 import org.pageflow.book.application.dto.SectionAttachmentUrl;
 import org.pageflow.book.application.dto.SectionDto;
 import org.pageflow.book.application.dto.SectionDtoWithContent;
 import org.pageflow.book.port.in.SectionWriteUseCase;
 import org.pageflow.book.port.in.TocUseCase;
 import org.pageflow.book.port.in.cmd.CreateSectionCmd;
-import org.pageflow.book.port.in.cmd.NodeAccessIds;
 import org.pageflow.common.api.RequestContext;
 import org.pageflow.common.result.Result;
 import org.pageflow.common.user.UID;
@@ -41,8 +38,7 @@ public class SectionWebAdapter {
     UID uid = rqcxt.getUid();
     CreateSectionCmd cmd = CreateSectionCmd.withTitle(
       uid,
-      new BookId(bookId),
-      new NodeId(form.getParentNodeId()),
+      form.getParentNodeId(),
       form.getTitle()
     );
     Result<SectionDtoWithContent> result = tocUseCase.createSection(cmd);
@@ -56,12 +52,7 @@ public class SectionWebAdapter {
     @PathVariable UUID sectionId
   ) {
     UID uid = rqcxt.getUid();
-    NodeAccessIds ids = new NodeAccessIds(
-      uid,
-      new BookId(bookId),
-      new NodeId(sectionId)
-    );
-    Result<SectionDto> result = tocUseCase.getSection(ids);
+    Result<SectionDto> result = tocUseCase.getSection(uid, sectionId);
     return result;
   }
 
@@ -72,12 +63,7 @@ public class SectionWebAdapter {
     @PathVariable UUID sectionId
   ) {
     UID uid = rqcxt.getUid();
-    NodeAccessIds ids = new NodeAccessIds(
-      uid,
-      new BookId(bookId),
-      new NodeId(sectionId)
-    );
-    Result<SectionDtoWithContent> result = sectionWriteUseCase.getSectionWithContent(ids);
+    Result<SectionDtoWithContent> result = sectionWriteUseCase.getSectionWithContent(uid, sectionId);
     return result;
   }
 
@@ -89,12 +75,7 @@ public class SectionWebAdapter {
     @Valid @RequestBody SectionForm.Title req
   ) {
     UID uid = rqcxt.getUid();
-    NodeAccessIds ids = new NodeAccessIds(
-      uid,
-      new BookId(bookId),
-      new NodeId(sectionId)
-    );
-    Result<SectionDto> result = tocUseCase.changeSectionTitle(ids, req.getTitle());
+    Result<SectionDto> result = tocUseCase.changeSectionTitle(uid, sectionId, req.getTitle());
     return result;
   }
 
@@ -105,12 +86,7 @@ public class SectionWebAdapter {
     @PathVariable UUID sectionId
   ) {
     UID uid = rqcxt.getUid();
-    NodeAccessIds ids = new NodeAccessIds(
-      uid,
-      new BookId(bookId),
-      new NodeId(sectionId)
-    );
-    return tocUseCase.deleteSection(ids);
+    return tocUseCase.deleteSection(uid, sectionId);
   }
 
   @PostMapping("/{sectionId}/upload-image")
@@ -121,12 +97,7 @@ public class SectionWebAdapter {
     @RequestPart MultipartFile image
   ) {
     UID uid = rqcxt.getUid();
-    NodeAccessIds ids = new NodeAccessIds(
-      uid,
-      new BookId(bookId),
-      new NodeId(sectionId)
-    );
-    return sectionWriteUseCase.uploadAttachmentImage(ids, image);
+    return sectionWriteUseCase.uploadAttachmentImage(uid, sectionId, image);
   }
 
   @PostMapping("/{sectionId}/content")
@@ -137,12 +108,7 @@ public class SectionWebAdapter {
     @Valid @RequestBody SectionForm.Content form
   ) {
     UID uid = rqcxt.getUid();
-    NodeAccessIds ids = new NodeAccessIds(
-      uid,
-      new BookId(bookId),
-      new NodeId(sectionId)
-    );
-    return sectionWriteUseCase.writeContent(ids, form.getContent());
+    return sectionWriteUseCase.writeContent(uid, sectionId, form.getContent());
   }
 
 }

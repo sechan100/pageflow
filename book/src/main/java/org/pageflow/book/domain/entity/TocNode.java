@@ -31,6 +31,7 @@ public abstract class TocNode extends BaseJpaEntity {
   @Getter
   private UUID id;
 
+  @Getter
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   @JoinColumn(name = "book_id", nullable = false)
   private Book book;

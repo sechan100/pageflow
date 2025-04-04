@@ -2,7 +2,6 @@ package org.pageflow.book.port.in;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.pageflow.book.application.BookId;
 import org.pageflow.book.application.dto.BookDto;
 import org.pageflow.book.application.dto.BookDtoWithAuthor;
 import org.pageflow.book.domain.Author;
@@ -39,8 +38,8 @@ public class BookShelfUseCase {
    *
    * @code BOOK_ACCESS_DENIED: 책에 대한 권한이 없는 경우
    */
-  public Result<BookDto> addBookToShelf(UID shlefOwnerId, BookId bookId) {
-    Book book = bookPersistencePort.findById(bookId.getValue()).get();
+  public Result<BookDto> addBookToShelf(UID shlefOwnerId, UUID bookId) {
+    Book book = bookPersistencePort.findById(bookId).get();
     // 권한 검사 =====
     BookAccessGranter accessGranter = new BookAccessGranter(shlefOwnerId, book);
     Result grant = accessGranter.grant(BookAccess.READ);
@@ -60,9 +59,8 @@ public class BookShelfUseCase {
    *
    * @code BOOK_ACCESS_DENIED: 책에 대한 권한이 없는 경우
    */
-  public Result removeBookFromShelf(UID shlefOwnerId, BookId bookId) {
-    UUID bookUUID = bookId.getValue();
-    Book book = bookPersistencePort.findById(bookUUID).get();
+  public Result removeBookFromShelf(UID shlefOwnerId, UUID bookId) {
+    Book book = bookPersistencePort.findById(bookId).get();
     // 권한 검사 =====
     BookAccessGranter accessGranter = new BookAccessGranter(shlefOwnerId, book);
     Result grant = accessGranter.grant(BookAccess.READ);
@@ -71,7 +69,7 @@ public class BookShelfUseCase {
     }
 
     // 책장에 책 제거
-    shelfItemPersistencePort.deleteByBookIdAndShelfOwnerId(bookUUID, shlefOwnerId.getValue());
+    shelfItemPersistencePort.deleteByBookIdAndShelfOwnerId(bookId, shlefOwnerId.getValue());
     return Result.success();
   }
 

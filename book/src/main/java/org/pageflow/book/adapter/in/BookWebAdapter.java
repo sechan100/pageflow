@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.pageflow.book.adapter.in.form.BookForm;
-import org.pageflow.book.application.BookId;
 import org.pageflow.book.application.dto.BookDto;
 import org.pageflow.book.application.dto.BookDtoWithAuthor;
 import org.pageflow.book.application.dto.MyBooks;
@@ -48,10 +47,7 @@ public class BookWebAdapter {
   @Operation(summary = "책 조회")
   public Result<BookDtoWithAuthor> getBook(@PathVariable UUID bookId) {
     UID uid = rqcxt.getUid();
-    Result<BookDtoWithAuthor> result = bookUseCase.readBook(
-      uid,
-      new BookId(bookId)
-    );
+    Result<BookDtoWithAuthor> result = bookUseCase.readBook(uid, bookId);
     return result;
   }
 
@@ -61,10 +57,9 @@ public class BookWebAdapter {
     @PathVariable UUID bookId,
     @Valid @RequestBody BookForm.Update form
   ) {
-    BookId bookId_ = new BookId(bookId);
     UID uid = rqcxt.getUid();
     BookTitle title = BookTitle.create(form.getTitle());
-    Result<BookDto> result = bookUseCase.changeBookTitle(uid, bookId_, title);
+    Result<BookDto> result = bookUseCase.changeBookTitle(uid, bookId, title);
     return result;
   }
 
@@ -74,18 +69,16 @@ public class BookWebAdapter {
     @PathVariable UUID bookId,
     @RequestPart(name = "coverImage") MultipartFile coverImage
   ) {
-    BookId bookId_ = new BookId(bookId);
     UID uid = rqcxt.getUid();
-    Result<BookDto> result = bookUseCase.changeBookCoverImage(uid, bookId_, coverImage);
+    Result<BookDto> result = bookUseCase.changeBookCoverImage(uid, bookId, coverImage);
     return result;
   }
 
   @DeleteMapping("/{bookId}")
   @Operation(summary = "책 삭제")
   public Result deleteBook(@PathVariable UUID bookId) {
-    BookId bookId_ = new BookId(bookId);
     UID uid = rqcxt.getUid();
-    Result result = bookUseCase.deleteBook(uid, bookId_);
+    Result result = bookUseCase.deleteBook(uid, bookId);
     return result;
   }
 

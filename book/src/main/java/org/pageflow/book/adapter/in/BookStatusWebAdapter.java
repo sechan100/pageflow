@@ -2,7 +2,6 @@ package org.pageflow.book.adapter.in;
 
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
-import org.pageflow.book.application.BookId;
 import org.pageflow.book.application.dto.BookDto;
 import org.pageflow.book.port.in.BookStatusUseCase;
 import org.pageflow.common.api.RequestContext;
@@ -32,12 +31,11 @@ public class BookStatusWebAdapter {
     @RequestParam BookStatusCmd cmd
   ) {
     UID uid = rqcxt.getUid();
-    BookId bookId_ = new BookId(bookId);
     Result<BookDto> result = switch(cmd) {
-      case PUBLISH -> bookStatusUseCase.publish(uid, bookId_);
-      case START_REVISION -> bookStatusUseCase.startRevision(uid, bookId_);
-      case MERGE_REVISION -> bookStatusUseCase.mergeRevision(uid, bookId_);
-      case CANCEL_REVISION -> bookStatusUseCase.cancelRevision(uid, bookId_);
+      case PUBLISH -> bookStatusUseCase.publish(uid, bookId);
+      case START_REVISION -> bookStatusUseCase.startRevision(uid, bookId);
+      case MERGE_REVISION -> bookStatusUseCase.mergeRevision(uid, bookId);
+      case CANCEL_REVISION -> bookStatusUseCase.cancelRevision(uid, bookId);
     };
     return result;
   }

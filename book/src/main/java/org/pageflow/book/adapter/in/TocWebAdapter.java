@@ -3,8 +3,6 @@ package org.pageflow.book.adapter.in;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.pageflow.book.adapter.in.form.NodeRelocateForm;
-import org.pageflow.book.application.BookId;
-import org.pageflow.book.application.NodeId;
 import org.pageflow.book.application.dto.TocDto;
 import org.pageflow.book.port.in.TocUseCase;
 import org.pageflow.book.port.in.cmd.RelocateNodeCmd;
@@ -41,13 +39,12 @@ public class TocWebAdapter {
     @RequestBody NodeRelocateForm form
   ) {
     UID uid = rqcxt.getUid();
-    RelocateNodeCmd cmd = new RelocateNodeCmd(
-      uid,
-      new BookId(bookId),
-      new NodeId(form.getTargetNodeId()),
-      new NodeId(form.getDestFolderId()),
-      form.getDestIndex()
-    );
+    RelocateNodeCmd cmd = RelocateNodeCmd.builder()
+      .uid(uid)
+      .nodeId(form.getTargetNodeId())
+      .destFolderId(form.getDestFolderId())
+      .destIndex(form.getDestIndex())
+      .build();
     return tocUseCase.relocateNode(cmd);
   }
 }

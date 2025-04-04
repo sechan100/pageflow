@@ -1,26 +1,28 @@
 package org.pageflow.book.port.in.cmd;
 
-import lombok.Value;
-import org.pageflow.book.application.BookId;
-import org.pageflow.book.application.NodeId;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.pageflow.common.user.UID;
+
+import java.util.UUID;
 
 /**
  * @author : sechan
  */
-@Value
+@Getter
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class CreateFolderCmd {
-  UID uid;
-  BookId bookId;
-  NodeId parentNodeId;
-  String title;
+  private final UID uid;
+  private final UUID parentNodeId;
+  private final String title;
 
-  public static CreateFolderCmd withTitle(UID uid, BookId bookId, NodeId parentNodeId, String title) {
-    return new CreateFolderCmd(uid, bookId, parentNodeId, title);
+  public static CreateFolderCmd withTitle(UID uid, UUID parentNodeId, String title) {
+    return new CreateFolderCmd(uid, parentNodeId, title);
   }
 
-  public static CreateFolderCmd withoutTitle(UID uid, BookId bookId, NodeId parentNodeId) {
-    return new CreateFolderCmd(uid, bookId, parentNodeId, "새 폴더");
+  public static CreateFolderCmd withoutTitle(UID uid, UUID parentNodeId) {
+    return new CreateFolderCmd(uid, parentNodeId, "새 폴더");
   }
 
 }

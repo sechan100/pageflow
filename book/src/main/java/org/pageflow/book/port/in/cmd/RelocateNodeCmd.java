@@ -1,18 +1,22 @@
 package org.pageflow.book.port.in.cmd;
 
-import lombok.Value;
-import org.pageflow.book.application.BookId;
-import org.pageflow.book.application.NodeId;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.pageflow.common.user.UID;
+
+import java.util.UUID;
 
 /**
  * @author : sechan
  */
-@Value
+@Getter
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@Builder
 public class RelocateNodeCmd {
-  UID uid;
-  BookId bookId;
-  NodeId nodeId;
-  NodeId destFolderId;
-  int destIndex;
+  private final UID uid;
+  private final UUID nodeId;
+  private final UUID destFolderId;
+  private final int destIndex;
 }

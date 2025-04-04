@@ -4,8 +4,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.pageflow.book.adapter.in.form.ReviewForm;
-import org.pageflow.book.application.BookId;
-import org.pageflow.book.application.ReviewId;
 import org.pageflow.book.application.dto.ReviewDto;
 import org.pageflow.book.port.in.ReviewUseCase;
 import org.pageflow.common.api.RequestContext;
@@ -35,7 +33,7 @@ public class ReviewWebAdapter {
     UID uid = rqcxt.getUid();
     Result<ReviewDto> result = reviewUseCase.createReview(
       uid,
-      new BookId(bookId),
+      bookId,
       form.getContent(),
       form.getScore()
     );
@@ -53,7 +51,7 @@ public class ReviewWebAdapter {
     UID uid = rqcxt.getUid();
     Result<ReviewDto> result = reviewUseCase.updateReview(
       uid,
-      new ReviewId(reviewId),
+      reviewId,
       form.getContent(),
       form.getScore()
     );
@@ -68,7 +66,7 @@ public class ReviewWebAdapter {
     @PathVariable UUID reviewId
   ) {
     UID uid = rqcxt.getUid();
-    Result result = reviewUseCase.deleteReview(uid, new ReviewId(reviewId));
+    Result result = reviewUseCase.deleteReview(uid, reviewId);
     return result;
   }
 

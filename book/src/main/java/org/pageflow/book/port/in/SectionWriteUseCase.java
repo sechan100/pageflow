@@ -2,7 +2,6 @@ package org.pageflow.book.port.in;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.pageflow.book.application.BookId;
 import org.pageflow.book.application.dto.SectionAttachmentUrl;
 import org.pageflow.book.application.dto.SectionDtoWithContent;
 import org.pageflow.book.domain.BookAccessGranter;
@@ -10,11 +9,8 @@ import org.pageflow.book.domain.SectionHtmlContent;
 import org.pageflow.book.domain.entity.Book;
 import org.pageflow.book.domain.entity.Section;
 import org.pageflow.book.domain.enums.BookAccess;
-import org.pageflow.book.port.in.cmd.NodeAccessIds;
-import org.pageflow.book.port.out.jpa.BookPersistencePort;
 import org.pageflow.book.port.out.jpa.SectionPersistencePort;
 import org.pageflow.common.result.Result;
-import org.pageflow.common.result.code.CommonCode;
 import org.pageflow.common.user.UID;
 import org.pageflow.file.model.FilePath;
 import org.pageflow.file.model.FileUploadCmd;
@@ -24,7 +20,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -35,7 +30,6 @@ import java.util.UUID;
 @Transactional
 @RequiredArgsConstructor
 public class SectionWriteUseCase {
-  private final BookPersistencePort bookPersistencePort;
   private final SectionPersistencePort sectionPersistencePort;
   private final FileService fileService;
 
@@ -46,11 +40,15 @@ public class SectionWriteUseCase {
    * @code BOOK_ACCESS_DENIED: 작가 권한이 없는 경우
    * @code INVALID_BOOK_STATUS: 출판된 책을 수정하려는 경우
    */
-  public Result<SectionDtoWithContent> getSectionWithContent(NodeAccessIds ids) {
-    Result checkWriteAuthorityRes = _grantWriteAccess(ids.getBookId(), ids.getUid());
+  public Result<SectionDtoWithContent> getSectionWithContent(UID uid, UUID sectionId) {
+    Section section = sectionPersistencePort.findById(sectionId).get();
+    Book book = section.getBook();
+
+    // 권한 검사 ======================
+    BookAccessGranter accessGranter = new BookAccessGranter(uid, book);
+    Result checkWriteAuthorityRes = accessGranter.grant(BookAccess.WRITE);
     if(checkWriteAuthorityRes.isFailure()) return checkWriteAuthorityRes;
 
-    Section section = sectionPersistencePort.findById(ids.getNodeId().getValue()).get();
     return Result.success(SectionDtoWithContent.from(section));
   }
 
@@ -60,25 +58,20 @@ public class SectionWriteUseCase {
    * @code SECTION_HTML_CONTENT_PARSE_ERROR: html 파싱에 실패한 경우
    * @code DATA_NOT_FOUND: 섹션을 찾을 수 없는 경우
    */
-  public Result<SectionDtoWithContent> writeContent(NodeAccessIds ids, String content) {
-    Result checkWriteAuthorityRes = _grantWriteAccess(ids.getBookId(), ids.getUid());
-    if(checkWriteAuthorityRes.isFailure()) {
-      return checkWriteAuthorityRes;
-    }
+  public Result<SectionDtoWithContent> writeContent(UID uid, UUID sectionId, String content) {
+    Section section = sectionPersistencePort.findById(sectionId).get();
+    Book book = section.getBook();
 
+    // 권한 검사 ======================
+    BookAccessGranter accessGranter = new BookAccessGranter(uid, book);
+    Result checkWriteAuthorityRes = accessGranter.grant(BookAccess.WRITE);
+    if(checkWriteAuthorityRes.isFailure()) return checkWriteAuthorityRes;
+
+    // 내용 작성 ==========================
     Result<SectionHtmlContent> htmlRes = SectionHtmlContent.of(content);
     if(htmlRes.isFailure()) {
       return (Result) htmlRes;
     }
-
-    UUID sectionId = ids.getNodeId().getValue();
-
-    Optional<Section> sectionOpt = sectionPersistencePort.findById(sectionId);
-    if(sectionOpt.isEmpty()) {
-      return Result.of(CommonCode.DATA_NOT_FOUND, "섹션을 찾을 수 없습니다.");
-    }
-
-    Section section = sectionOpt.get();
     SectionHtmlContent html = htmlRes.getSuccessData();
     if(!html.getIsSanitizationConsistent()) {
       log.warn("Section({})의 content의 html sanitize 결과가 원본과 다릅니다. \n[original]\n{} \n================================================================= \n[sanitized]\n{}", sectionId, content, html.getContent());
@@ -90,24 +83,22 @@ public class SectionWriteUseCase {
   /**
    * @code BOOK_ACCESS_DENIED: 작가 권한이 없는 경우
    * @code INVALID_BOOK_STATUS: 출판된 책을 수정하려는 경우
-   * @code DATA_NOT_FOUND: 섹션을 찾을 수 없는 경우
    * @code FIELD_VALIDATION_ERROR: file 데이터가 올바르지 않은 경우
    * @code FAIL_TO_UPLOAD_FILE: 파일 업로드에 실패한 경우
    * @code 그 외 FileValidator에 따라서 다양한 ResultCode 발생 가능
    */
-  public Result<SectionAttachmentUrl> uploadAttachmentImage(NodeAccessIds ids, MultipartFile file) {
-    Result checkWriteAuthorityRes = _grantWriteAccess(ids.getBookId(), ids.getUid());
+  public Result<SectionAttachmentUrl> uploadAttachmentImage(UID uid, UUID sectionId, MultipartFile file) {
+    Section section = sectionPersistencePort.findById(sectionId).get();
+    Book book = section.getBook();
+
+    // 권한 검사 =======================
+    BookAccessGranter accessGranter = new BookAccessGranter(uid, book);
+    Result checkWriteAuthorityRes = accessGranter.grant(BookAccess.WRITE);
     if(checkWriteAuthorityRes.isFailure()) {
       return checkWriteAuthorityRes;
     }
 
-    UUID sectionId = ids.getNodeId().getValue();
-
-    boolean isSectionExist = sectionPersistencePort.existsById(sectionId);
-    if(!isSectionExist) {
-      return Result.of(CommonCode.DATA_NOT_FOUND, "섹션을 찾을 수 없습니다.");
-    }
-
+    // 파일 업로드 =====================
     Result<FileUploadCmd> cmd = FileUploadCmd.createCmd(
       file,
       sectionId.toString(),
@@ -116,23 +107,12 @@ public class SectionWriteUseCase {
     if(cmd.isFailure()) {
       return (Result) cmd;
     }
-
     Result<FilePath> uploadResult = fileService.upload(cmd.getSuccessData());
     if(uploadResult.isFailure()) {
       return (Result) uploadResult;
     }
-
     SectionAttachmentUrl attachmentUrl = new SectionAttachmentUrl(uploadResult.getSuccessData().getWebUrl());
     return Result.success(attachmentUrl);
   }
 
-  /**
-   * @code BOOK_ACCESS_DENIED: 작가 권한이 없는 경우
-   * @code INVALID_BOOK_STATUS: 출판된 책을 수정하려는 경우
-   */
-  private Result _grantWriteAccess(BookId bookId, UID uid) {
-    Book book = bookPersistencePort.findById(bookId.getValue()).get();
-    BookAccessGranter accessGranter = new BookAccessGranter(uid, book);
-    return accessGranter.grant(BookAccess.WRITE);
-  }
 }

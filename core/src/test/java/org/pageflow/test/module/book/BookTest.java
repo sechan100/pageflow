@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.pageflow.book.application.BookCode;
-import org.pageflow.book.application.BookId;
 import org.pageflow.book.application.dto.BookDto;
 import org.pageflow.book.application.dto.BookDtoWithAuthor;
 import org.pageflow.book.application.dto.MyBooks;

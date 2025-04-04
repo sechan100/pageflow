@@ -2,7 +2,6 @@ package org.pageflow.book.adapter.in;
 
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
-import org.pageflow.book.application.BookId;
 import org.pageflow.book.application.dto.BookDto;
 import org.pageflow.book.port.in.BookShelfUseCase;
 import org.pageflow.common.api.RequestContext;
@@ -29,7 +28,7 @@ public class ShelfWebAdapter {
     @PathVariable UUID bookId
   ) {
     UID uid = rqcxt.getUid();
-    Result<BookDto> result = bookShelfUseCase.addBookToShelf(uid, new BookId(bookId));
+    Result<BookDto> result = bookShelfUseCase.addBookToShelf(uid, bookId);
     return result;
   }
 
@@ -39,7 +38,7 @@ public class ShelfWebAdapter {
     @PathVariable UUID bookId
   ) {
     UID uid = rqcxt.getUid();
-    return bookShelfUseCase.removeBookFromShelf(uid, new BookId(bookId));
+    return bookShelfUseCase.removeBookFromShelf(uid, bookId);
   }
 
 }

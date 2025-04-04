@@ -4,12 +4,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.pageflow.book.adapter.in.form.FolderForm;
-import org.pageflow.book.application.BookId;
-import org.pageflow.book.application.NodeId;
 import org.pageflow.book.application.dto.FolderDto;
 import org.pageflow.book.port.in.TocUseCase;
 import org.pageflow.book.port.in.cmd.CreateFolderCmd;
-import org.pageflow.book.port.in.cmd.NodeAccessIds;
 import org.pageflow.common.api.RequestContext;
 import org.pageflow.common.result.Result;
 import org.pageflow.common.user.UID;
@@ -35,12 +32,9 @@ public class FolderWebAdapter {
     @Valid @RequestBody FolderForm.Create form
   ) {
     UID uid = rqcxt.getUid();
-    BookId bookId_ = new BookId(bookId);
-    NodeId nodeId = new NodeId(form.getParentNodeId());
     CreateFolderCmd cmd = CreateFolderCmd.withTitle(
       uid,
-      bookId_,
-      nodeId,
+      form.getParentNodeId(),
       form.getTitle()
     );
     Result<FolderDto> result = tocUseCase.createFolder(cmd);
@@ -54,12 +48,7 @@ public class FolderWebAdapter {
     @PathVariable UUID folderId
   ) {
     UID uid = rqcxt.getUid();
-    NodeAccessIds ids = new NodeAccessIds(
-      uid,
-      new BookId(bookId),
-      new NodeId(folderId)
-    );
-    Result<FolderDto> result = tocUseCase.getFolder(ids);
+    Result<FolderDto> result = tocUseCase.getFolder(uid, folderId);
     return result;
   }
 
@@ -71,12 +60,7 @@ public class FolderWebAdapter {
     @Valid @RequestBody FolderForm.Update form
   ) {
     UID uid = rqcxt.getUid();
-    NodeAccessIds ids = new NodeAccessIds(
-      uid,
-      new BookId(bookId),
-      new NodeId(folderId)
-    );
-    Result<FolderDto> result = tocUseCase.changeFolderTitle(ids, form.getTitle());
+    Result<FolderDto> result = tocUseCase.changeFolderTitle(uid, folderId, form.getTitle());
     return result;
   }
 
@@ -88,12 +72,7 @@ public class FolderWebAdapter {
     @PathVariable UUID folderId
   ) {
     UID uid = rqcxt.getUid();
-    NodeAccessIds ids = new NodeAccessIds(
-      uid,
-      new BookId(bookId),
-      new NodeId(folderId)
-    );
-    Result result = tocUseCase.deleteFolder(ids);
+    Result result = tocUseCase.deleteFolder(uid, folderId);
     return result;
   }
 }

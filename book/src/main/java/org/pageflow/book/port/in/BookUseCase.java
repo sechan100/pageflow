@@ -2,7 +2,6 @@ package org.pageflow.book.port.in;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.pageflow.book.application.BookId;
 import org.pageflow.book.application.dto.AuthorDto;
 import org.pageflow.book.application.dto.BookDto;
 import org.pageflow.book.application.dto.BookDtoWithAuthor;
@@ -91,8 +90,8 @@ public class BookUseCase {
   /**
    * @code BOOK_ACCESS_DENIED: 책 읽기 권한이 없는 경우
    */
-  public Result<BookDtoWithAuthor> readBook(UID uid, BookId bookId) {
-    Book book = bookPersistencePort.findBookWithAuthorById(bookId.getValue()).get();
+  public Result<BookDtoWithAuthor> readBook(UID uid, UUID bookId) {
+    Book book = bookPersistencePort.findBookWithAuthorById(bookId).get();
     // 권한 검사 =====
     BookAccessGranter accessGranter = new BookAccessGranter(uid, book);
     Result grant = accessGranter.grant(BookAccess.READ);
@@ -117,8 +116,8 @@ public class BookUseCase {
    * @code BOOK_ACCESS_DENIED: 책 권한이 없는 경우
    * @code BOOK_INVALID_STATUS: 이미 발행된 책인 경우
    */
-  public Result<BookDto> changeBookTitle(UID uid, BookId bookId, BookTitle title) {
-    Book book = bookPersistencePort.findById(bookId.getValue()).get();
+  public Result<BookDto> changeBookTitle(UID uid, UUID bookId, BookTitle title) {
+    Book book = bookPersistencePort.findById(bookId).get();
 
     // 권한 검사 =====
     BookAccessGranter accessGranter = new BookAccessGranter(uid, book);
@@ -139,8 +138,8 @@ public class BookUseCase {
    * @code BOOK_ACCESS_DENIED: 책 권한이 없는 경우
    * @code BOOK_INVALID_STATUS: 이미 발행된 책인 경우
    */
-  public Result<BookDto> changeBookCoverImage(UID uid, BookId bookId, MultipartFile coverImage) {
-    Book book = bookPersistencePort.findById(bookId.getValue()).get();
+  public Result<BookDto> changeBookCoverImage(UID uid, UUID bookId, MultipartFile coverImage) {
+    Book book = bookPersistencePort.findById(bookId).get();
 
     // 권한 검사 =====
     BookAccessGranter accessGranter = new BookAccessGranter(uid, book);
@@ -160,7 +159,7 @@ public class BookUseCase {
     }
 
     // 새 이미지 업로드 ================
-    Result<FilePath> uploadResult = _uploadCoverImage(bookId.getValue(), coverImage);
+    Result<FilePath> uploadResult = _uploadCoverImage(bookId, coverImage);
     if(uploadResult.isFailure()) {
       return (Result) uploadResult;
     }
@@ -172,8 +171,8 @@ public class BookUseCase {
   /**
    * @code BOOK_ACCESS_DENIED: 책 권한이 없는 경우
    */
-  public Result deleteBook(UID uid, BookId bookId) {
-    Book book = bookPersistencePort.findById(bookId.getValue()).get();
+  public Result deleteBook(UID uid, UUID bookId) {
+    Book book = bookPersistencePort.findById(bookId).get();
 
     // 권한 검사 ===========
     BookAccessGranter accessGranter = new BookAccessGranter(uid, book);
@@ -183,7 +182,7 @@ public class BookUseCase {
     }
 
     // 책 삭제 ===========================
-    List<TocNode> nodes = nodePersistencePort.findAllByBookId(bookId.getValue());
+    List<TocNode> nodes = nodePersistencePort.findAllByBookId(bookId);
     for(TocNode node : nodes) {
       nodePersistencePort.delete(node);
     }

@@ -1,6 +1,7 @@
 package org.pageflow.book.domain;
 
 
+import org.pageflow.book.domain.config.TocNodeConfig;
 import org.pageflow.common.result.Result;
 import org.pageflow.common.result.code.CommonCode;
 import org.pageflow.common.utility.SingleValueWrapper;
@@ -38,7 +39,8 @@ public class NodeTitle extends SingleValueWrapper<String> {
     FieldValidator<String> validator = FieldValidator
       .of("title", value)
       .minLength(MIN_LENGTH)
-      .maxLength(MAX_LENGTH);
+      .maxLength(MAX_LENGTH)
+      .notSame(TocNodeConfig.ROOT_NODE_TITLE, "해당 제목은 사용할 수 없습니다.");
 
     return validator.validate();
   }

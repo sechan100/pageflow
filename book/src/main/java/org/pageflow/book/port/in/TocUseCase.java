@@ -80,7 +80,7 @@ public class TocUseCase {
     }
     Folder folderWithChildren = folderOpt.get();
     NodeRelocator relocator = new NodeRelocator(folderWithChildren);
-    if(target.ensureParentNode().getId().equals(destFolderId)) {
+    if(target.getParentNode().getId().equals(destFolderId)) {
       // Reorder
       return relocator.reorder(cmd.getDestIndex(), target);
     } else {
@@ -176,21 +176,9 @@ public class TocUseCase {
 
   /**
    * @code BOOK_ACCESS_DENIED: 작가 권한이 없는 경우
-   * @code INVALID_BOOK_STATUS: 출판된 책을 수정하려는 경우
    */
   public Result deleteFolder(UID uid, UUID folderId) {
-    Folder folder = folderPersistencePort.findById(folderId).get();
-    Book book = folder.getBook();
-
-    // 책 쓰기 권한 확인 ==============
-    BookAccessGranter accessGranter = new BookAccessGranter(uid, book);
-    Result grant = accessGranter.grant(BookAccess.WRITE);
-    if(grant.isFailure()) {
-      return grant;
-    }
-
-    folderPersistencePort.delete(folder);
-    return Result.success();
+    return _deleteNode(uid, folderId);
   }
 
   /**
@@ -273,11 +261,17 @@ public class TocUseCase {
 
   /**
    * @code BOOK_ACCESS_DENIED: 작가 권한이 없는 경우
-   * @code INVALID_BOOK_STATUS: 출판된 책을 수정하려는 경우
    */
   public Result deleteSection(UID uid, UUID sectionId) {
-    Section section = sectionPersistencePort.findById(sectionId).get();
-    Book book = section.getBook();
+    return _deleteNode(uid, sectionId);
+  }
+
+  /**
+   * @code BOOK_ACCESS_DENIED: 작가 권한이 없는 경우
+   */
+  private Result _deleteNode(UID uid, UUID nodeId) {
+    TocNode node = nodePersistencePort.findById(nodeId).get();
+    Book book = node.getBook();
 
     // 책 쓰기 권한 확인 ==============
     BookAccessGranter accessGranter = new BookAccessGranter(uid, book);
@@ -286,7 +280,16 @@ public class TocUseCase {
       return grant;
     }
 
-    nodePersistencePort.delete(section);
+    // 노드 삭제 ====================
+    if(node.isRootFolder()) {
+      return Result.of(
+        BookCode.TOC_HIERARCHY_ERROR,
+        "root folder node는 삭제할 수 없습니다."
+      );
+    }
+    Folder parentFolder = node.getParentNode();
+    parentFolder.removeChild(node);
+    nodePersistencePort.delete(node);
     return Result.success();
   }
 

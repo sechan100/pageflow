@@ -1,7 +1,7 @@
 package org.pageflow.book.domain.entity;
 
+import com.google.common.base.Preconditions;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 import org.pageflow.book.domain.config.TocNodeConfig;
 import org.pageflow.common.jpa.BaseJpaEntity;
 import org.springframework.lang.Nullable;
-import org.springframework.util.Assert;
 
 import java.util.UUID;
 
@@ -72,40 +71,44 @@ public abstract class TocNode extends BaseJpaEntity {
   }
 
   /**
-   * Folder에서 주로 호출한다. 다른 곳에서는 어지간하면 호출하지 말 것.
-   * 호출하는 경우, Folder.children과 일관성이 깨지지 않도록 Folder가 그 자체로만 로드되었거나, 아예 메모리로 올리지 않은 상태에서 사용해야한다.
+   * {@link Folder#removeChild(TocNode)}에서 사용되는 연관관계 전용 메서드.
+   * 절대로 다른 곳에서 호출하지 말 것.
    *
-   * @param parentNode
    * @see Folder
    */
-  public void _setParentNode(Folder parentNode) {
-    Assert.notNull(parentNode, "null을 부모로 설정할 수 없습니다. (root folder만 가능)");
+  public void __setParentNode(Folder parentNode) {
     this.parentNode = parentNode;
+  }
+
+  /**
+   * 해당 노드의 부모 노드를 반환한다.
+   *
+   * @throws IllegalStateException RootFolder인 경우
+   */
+  public Folder getParentNode() {
+    Preconditions.checkState(!this.isRootFolder());
+    return this.parentNode;
   }
 
   public void setOv(int ov) {
     this.ov = ov;
   }
 
-  @NotNull
-  public Folder ensureParentNode() {
-    Assert.notNull(this.parentNode, "Root Folder는 부모 노드를 가지지 않습니다.");
-    return this.parentNode;
-  }
-
   public boolean isRootFolder() {
     return this.parentNode == null && this.title.equals(TocNodeConfig.ROOT_NODE_TITLE);
   }
 
+  /**
+   * root folder가 update되는 것을 방지한다.
+   * root folder는 어떤 경우에도 update되면 안된다.
+   */
   @PreUpdate
   private void preventRootFolderUpdate() {
-    // root folder title은 예약
-    if(this.title.equals(TocNodeConfig.ROOT_NODE_TITLE)) {
-      throw new IllegalStateException("root node folder로는 제목을 변경할 수 없습니다.");
-    }
-    // 원래 root folder가 아닌 놈을 나중에 root로 만드는 것 금지.
-    if(this.parentNode == null) {
-      throw new IllegalStateException("노드를 root folder로 만들 수 없습니다.");
+    if(isRootFolder()) {
+      throw new IllegalStateException("""
+        Root Folder(%s)는 업데이트 할 수 없습니다. bookId: %s
+        """.formatted(this.id, this.book.getId())
+      );
     }
   }
 

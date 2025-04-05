@@ -26,8 +26,12 @@ public class NodeRelocator {
    *               만약 children이 초기화되어있지 않다면 lazy loading이 발생할 수 있다.
    */
   public NodeRelocator(Folder folder) {
-    Preconditions.checkState(NodeListAscendingValidator.isAscending(folder),
-      "folder의 자식 TocNode들의 ov가 오름차순으로 정렬되어 있지 않습니다. folderId: " + folder.getId()
+    Preconditions.checkState(
+      NodeListAscendingValidator.isAscending(folder),
+      "folder의 자식 TocNode들의 ov가 오름차순으로 정렬되어 있지 않습니다. children: "
+        + folder.getReadOnlyChildren().stream()
+        .map(TocNode::getOv)
+        .toList()
     );
     this.parentFolder = folder;
   }
@@ -52,9 +56,9 @@ public class NodeRelocator {
     if(!parentFolder.hasChild(target)) {
       return Result.of(BookCode.TOC_HIERARCHY_ERROR, "순서를 변경할 노드가 폴더의 자식이 아닙니다.");
     }
-    // 전체 list에서 target node를 제거하고 relocate를 실행한다.
+
     parentFolder.removeChild(target);
-    return _relocate(destIndex, target);
+    return _insertNode(destIndex, target);
   }
 
   /**
@@ -101,7 +105,9 @@ public class NodeRelocator {
     // destIndex 검사
     Result checkDestIndexResult = _checkDestIndex(parentFolder.childrenSize(), destIndex);
     if(checkDestIndexResult.isFailure()) return checkDestIndexResult;
-    return _relocate(destIndex, target);
+
+    target.getParentNode().removeChild(target);
+    return _insertNode(destIndex, target);
   }
 
   /**
@@ -111,14 +117,15 @@ public class NodeRelocator {
    * @param destIndex 목적지로 갈 index. 함수 호출 당시의 List의 length를 기준으로 0부터 length까지의 값이다.
    * @param target    삽입대상. this.childen에서 빼고나서 호출할 것.
    */
-  private Result _relocate(int destIndex, TocNode target) {
+  private Result _insertNode(int destIndex, TocNode target) {
     assert !parentFolder.hasChild(target) : "target이 parent에 속해있는 경우 relocate 할 수 없습니다.";
 
-    // NODE를 list에 삽입
+    // child 삽입
     parentFolder.addChild(destIndex, target);
-    // 삽입된 node의 앞
+
+    // ==============================================
+    // Rebalancing 검사
     Integer prevOvOrNull = destIndex != 0 ? parentFolder.getChild(destIndex - 1).getOv() : null;
-    // 삽입된 node의 뒤
     Integer nextOvOrNull = destIndex != parentFolder.childrenSize() - 1 ? parentFolder.getChild(destIndex + 1).getOv() : null;
 
     OvRebalancer rebalancer = new OvRebalancer();
@@ -208,8 +215,8 @@ public class NodeRelocator {
     if(descendant.isRootFolder()) {
       return false;
     }
-    assert descendant.ensureParentNode() != null;
-    UUID parentId = descendant.ensureParentNode().getId();
+    assert descendant.getParentNode() != null;
+    UUID parentId = descendant.getParentNode().getId();
     if(parentId.equals(ancestor.getId())) {
       return true;
     } else {

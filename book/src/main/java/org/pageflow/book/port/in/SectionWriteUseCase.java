@@ -55,7 +55,6 @@ public class SectionWriteUseCase {
   /**
    * @code BOOK_ACCESS_DENIED: 작가 권한이 없는 경우
    * @code INVALID_BOOK_STATUS: 출판된 책을 수정하려는 경우
-   * @code SECTION_HTML_CONTENT_PARSE_ERROR: html 파싱에 실패한 경우
    * @code DATA_NOT_FOUND: 섹션을 찾을 수 없는 경우
    */
   public Result<SectionDtoWithContent> writeContent(UID uid, UUID sectionId, String content) {
@@ -68,11 +67,7 @@ public class SectionWriteUseCase {
     if(checkWriteAuthorityRes.isFailure()) return checkWriteAuthorityRes;
 
     // 내용 작성 ==========================
-    Result<SectionHtmlContent> htmlRes = SectionHtmlContent.of(content);
-    if(htmlRes.isFailure()) {
-      return (Result) htmlRes;
-    }
-    SectionHtmlContent html = htmlRes.getSuccessData();
+    SectionHtmlContent html = new SectionHtmlContent(content);
     if(!html.getIsSanitizationConsistent()) {
       log.warn("Section({})의 content의 html sanitize 결과가 원본과 다릅니다. \n[original]\n{} \n================================================================= \n[sanitized]\n{}", sectionId, content, html.getContent());
     }

@@ -54,7 +54,7 @@ public class BookWebAdapter {
   @Operation(summary = "책 제목 수정")
   public Result<BookDto> changeBookTitle(
     @PathVariable UUID bookId,
-    @Valid @RequestBody BookForm.Update form
+    @Valid @RequestBody BookForm.Title form
   ) {
     UID uid = rqcxt.getUid();
     Result<BookDto> result = bookUseCase.changeBookTitle(uid, bookId, form.getTitle());
@@ -69,6 +69,17 @@ public class BookWebAdapter {
   ) {
     UID uid = rqcxt.getUid();
     Result<BookDto> result = bookUseCase.changeBookCoverImage(uid, bookId, coverImage);
+    return result;
+  }
+
+  @PostMapping("/{bookId}/description")
+  @Operation(summary = "책 설명 수정")
+  public Result<BookDto> changeBookDescription(
+    @PathVariable UUID bookId,
+    @Valid @RequestBody BookForm.Description form
+  ) {
+    UID uid = rqcxt.getUid();
+    Result<BookDto> result = bookUseCase.changeBookDescription(uid, bookId, form.getDescription());
     return result;
   }
 

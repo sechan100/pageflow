@@ -1,25 +1,20 @@
 package org.pageflow.book.domain;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.safety.Safelist;
-import org.pageflow.book.application.BookCode;
-import org.pageflow.common.result.Result;
 
 /**
  * @author : sechan
  */
-@Getter
-@RequiredArgsConstructor
 public class SectionHtmlContent {
   private static final String[] BASE_ATTRIBUTES = {"class", "style", "dir"};
   private static final Safelist SAFELIST = new Safelist()
     .addTags(
       // 노드 관련 태그
       "div", "br", "span", "p", "a", "blockquote", "code", "pre",
-      "h1", "h2", "h3", "h4", "h5", "h6", "hr", "img", "li", "ol", "ul",
+      "h1", "h2", "h3", "h4", "h5", "h6", "img", "li", "ol", "ul",
       // 형식 관련 태그
       "b", "strong", "u", "i", "s", "em")
 
@@ -33,16 +28,15 @@ public class SectionHtmlContent {
     .addAttributes("h6", BASE_ATTRIBUTES)
     .addAttributes("p", BASE_ATTRIBUTES)
     .addAttributes("br", BASE_ATTRIBUTES)
-    .addAttributes("span", ArrayMerge.merge(BASE_ATTRIBUTES, "data-tab"))
-    .addAttributes("a", ArrayMerge.merge(BASE_ATTRIBUTES, "href", "title", "target", "rel"))
-    .addAttributes("blockquote", ArrayMerge.merge(BASE_ATTRIBUTES, "cite"))
+    .addAttributes("span", _merge(BASE_ATTRIBUTES, "data-tab"))
+    .addAttributes("a", _merge(BASE_ATTRIBUTES, "href", "title", "target", "rel"))
+    .addAttributes("blockquote", _merge(BASE_ATTRIBUTES, "cite"))
     .addAttributes("code", BASE_ATTRIBUTES)
-    .addAttributes("pre", ArrayMerge.merge(BASE_ATTRIBUTES, "spellcheck", "data-language", "data-highlight-language"))
-    .addAttributes("hr", BASE_ATTRIBUTES)
-    .addAttributes("img", ArrayMerge.merge(BASE_ATTRIBUTES, "alt", "height", "src", "title", "width", "data-position", "data-show-caption"))
-    .addAttributes("li", ArrayMerge.merge(BASE_ATTRIBUTES, "value"))
-    .addAttributes("ol", ArrayMerge.merge(BASE_ATTRIBUTES, "start", "type"))
-    .addAttributes("ul", ArrayMerge.merge(BASE_ATTRIBUTES, "type"))
+    .addAttributes("pre", _merge(BASE_ATTRIBUTES, "spellcheck", "data-language", "data-highlight-language"))
+    .addAttributes("img", _merge(BASE_ATTRIBUTES, "alt", "height", "src", "title", "width", "data-position", "data-show-caption"))
+    .addAttributes("li", _merge(BASE_ATTRIBUTES, "value"))
+    .addAttributes("ol", _merge(BASE_ATTRIBUTES, "start", "type"))
+    .addAttributes("ul", _merge(BASE_ATTRIBUTES, "type"))
     .addAttributes("b", BASE_ATTRIBUTES)
     .addAttributes("strong", BASE_ATTRIBUTES)
     .addAttributes("u", BASE_ATTRIBUTES)
@@ -55,33 +49,32 @@ public class SectionHtmlContent {
     .addProtocols("blockquote", "cite", "http", "https")
     .addProtocols("img", "src", "http", "https");
 
+  @Getter
   private final String content;
-  // clean된 html과 원본 html이 같은지 여부
-  private final boolean isSanitizationConsistent;
 
   /**
-   * @code SECTION_HTML_CONTENT_PARSE_ERROR: html 파싱에 실패한 경우
+   * clean된 html과 원본 html이 같은지 여부
    */
-  public static Result<SectionHtmlContent> of(String html) {
+  @Getter
+  private final boolean isSanitizationConsistent;
+
+  public SectionHtmlContent(String html) {
     try {
       Document document = Jsoup.parse(html);
       Document.OutputSettings outputSettings = new Document.OutputSettings();
       outputSettings.prettyPrint(false);
       String cleanHtml = Jsoup.clean(html, "", SAFELIST, outputSettings);
       boolean isSanitizationConsistent = cleanHtml.equals(html);
-      SectionHtmlContent content = new SectionHtmlContent(cleanHtml, isSanitizationConsistent);
-      return Result.success(content);
+
+      this.content = html;
+      this.isSanitizationConsistent = isSanitizationConsistent;
     } catch(Exception e) {
-      return Result.of(BookCode.SECTION_HTML_CONTENT_PARSE_ERROR, e);
+      throw new IllegalArgumentException("SectionHtmlContent 파싱 실패", e);
     }
   }
 
 
-}
-
-
-abstract class ArrayMerge {
-  public static String[] merge(String[] array1, String... array2) {
+  private static String[] _merge(String[] array1, String... array2) {
     String[] result = new String[array1.length + array2.length];
 
     System.arraycopy(array1, 0, result, 0, array1.length);

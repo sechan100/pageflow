@@ -22,6 +22,9 @@ public class BookAccessGranter {
     this.visibility = book.getVisibility();
   }
 
+  /**
+   * @code BOOK_ACCESS_DENIED: 접근 권한이 없는 경우
+   */
   public Result grant(BookAccess access) {
     return switch(access) {
       case READ -> _grantRead();

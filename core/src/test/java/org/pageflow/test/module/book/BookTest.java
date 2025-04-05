@@ -74,4 +74,31 @@ public class BookTest {
     assertTrue(myBooksAfterDelete.getBooks().isEmpty());
   }
 
+  @Test
+  @DisplayName("책 설명 변경 테스트")
+  void changeBookDescriptionTest() {
+    // 사용자 생성
+    UserDto user1 = userUtils.createUser("user1");
+
+    // 책 생성
+    Result<BookDto> createResult = bookUseCase.createBook(user1.getUid(), "test book 1", null);
+    assertTrue(createResult.isSuccess());
+    BookDto book = createResult.getSuccessData();
+
+    // 책 설명 변경
+    String newDescription = "test book description";
+    Result<BookDto> changeBookDescriptionRes = bookUseCase.changeBookDescription(user1.getUid(), book.getId(), newDescription);
+    assertTrue(changeBookDescriptionRes.isSuccess());
+    assertEquals(newDescription, changeBookDescriptionRes.getSuccessData().getDescription());
+
+    // 다른 사용자가 책 설명 변경 시도
+    UserDto user2 = userUtils.createUser("user2");
+    Result changeBookDescriptionRes2 = bookUseCase.changeBookDescription(user2.getUid(), book.getId(), "new description");
+    assertTrue(changeBookDescriptionRes2.is(BookCode.BOOK_ACCESS_DENIED));
+    // 책 설명이 변경되지 않았는지 확인
+    Result<BookDtoWithAuthor> readResult = bookUseCase.readBook(user1.getUid(), book.getId());
+    assertTrue(readResult.isSuccess());
+    assertEquals(newDescription, readResult.getSuccessData().getDescription());
+  }
+
 }

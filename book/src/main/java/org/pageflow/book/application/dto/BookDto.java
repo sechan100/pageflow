@@ -16,6 +16,7 @@ public class BookDto {
   UUID id;
   String title;
   String coverImageUrl;
+  String description;
   BookStatus status;
   int edition;
   BookVisibility visibility;
@@ -27,6 +28,7 @@ public class BookDto {
       book.getId(),
       book.getTitle(),
       book.getCoverImageUrl(),
+      book.getDescription(),
       book.getStatus(),
       book.getEdition(),
       book.getVisibility(),

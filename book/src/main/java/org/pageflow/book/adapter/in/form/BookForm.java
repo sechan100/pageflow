@@ -16,9 +16,15 @@ public abstract class BookForm {
   }
 
   @Data
-  public static class Update {
+  public static class Title {
     @NotBlank
     private String title;
   }
-  
+
+  @Data
+  public static class Description {
+    @NotBlank
+    private String description;
+  }
+
 }

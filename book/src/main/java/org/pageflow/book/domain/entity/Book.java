@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.pageflow.book.application.BookCode;
 import org.pageflow.book.domain.Author;
+import org.pageflow.book.domain.BookDescriptionHtmlContent;
 import org.pageflow.book.domain.BookTitle;
 import org.pageflow.book.domain.enums.BookStatus;
 import org.pageflow.book.domain.enums.BookVisibility;
@@ -51,6 +52,10 @@ public class Book extends BaseJpaEntity {
   private String coverImageUrl;
 
   @Getter
+  @Column(nullable = false, columnDefinition = "TEXT")
+  private String description;
+
+  @Getter
   @Column(nullable = false)
   @Enumerated(EnumType.STRING)
   private BookStatus status;
@@ -88,6 +93,7 @@ public class Book extends BaseJpaEntity {
       author.getProfileJpaEntity(),
       title.getValue(),
       coverImageUrl,
+      "",
       BookStatus.DRAFT,
       0,
       BookVisibility.PERSONAL
@@ -109,6 +115,10 @@ public class Book extends BaseJpaEntity {
 
   public void changeCoverImageUrl(String url) {
     this.coverImageUrl = url;
+  }
+
+  public void changeDescription(BookDescriptionHtmlContent description) {
+    this.description = description.getContent();
   }
 
   /**

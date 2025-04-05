@@ -8,6 +8,7 @@ import org.pageflow.book.application.dto.BookDtoWithAuthor;
 import org.pageflow.book.application.dto.MyBooks;
 import org.pageflow.book.domain.Author;
 import org.pageflow.book.domain.BookAccessGranter;
+import org.pageflow.book.domain.BookDescriptionHtmlContent;
 import org.pageflow.book.domain.BookTitle;
 import org.pageflow.book.domain.entity.Book;
 import org.pageflow.book.domain.entity.Folder;
@@ -132,10 +133,7 @@ public class BookUseCase {
   }
 
   /**
-   * @code FILED_VALIDATION_ERROR: coverImage file의 데이터가 올바르지 않은 경우
-   * @code FAIL_TO_DELETE_FILE: 기존 CoverImage 삭제에 실패한 경우
-   * @code FAIL_TO_UPLOAD_FILE: 새 CoverImage 업로드에 실패한 경우
-   * @code BOOK_ACCESS_DENIED: 책 권한이 없는 경우
+   * @return {@link org.pageflow.book.application.BookCode}, {@link org.pageflow.file.shared.FileCode}
    */
   public Result<BookDto> changeBookCoverImage(UID uid, UUID bookId, MultipartFile coverImage) {
     Book book = bookPersistencePort.findById(bookId).get();
@@ -166,6 +164,29 @@ public class BookUseCase {
     return Result.success(BookDto.from(book));
   }
 
+  public Result<BookDto> changeBookDescription(UID uid, UUID bookId, String description) {
+    Book book = bookPersistencePort.findById(bookId).get();
+
+    // 권한 검사 =========================
+    BookAccessGranter accessGranter = new BookAccessGranter(uid, book);
+    Result grant = accessGranter.grant(BookAccess.UPDATE);
+    if(grant.isFailure()) {
+      return grant;
+    }
+
+    // 책 설명 변경 =====================
+    BookDescriptionHtmlContent bookDescription = new BookDescriptionHtmlContent(description);
+    if(!bookDescription.getIsSanitizationConsistent()) {
+      log.warn("""
+        Book({})의 description의 html sanitize 결과가 원본과 다릅니다.
+        [original]{}
+        =================================================================
+        [sanitized]{}
+        """, bookId, description, bookDescription.getContent());
+    }
+    book.changeDescription(bookDescription);
+    return Result.success(BookDto.from(book));
+  }
 
   /**
    * @code BOOK_ACCESS_DENIED: 책 권한이 없는 경우

@@ -38,9 +38,9 @@ public class Review extends BaseJpaEntity {
   @JoinColumn(name = "book_id")
   private Book book;
 
-  @Lob
   @Getter
   // TEXT: 64KB, 한글기준 약 21,845자
+  @Lob
   @Column(nullable = false, columnDefinition = "TEXT")
   private String content;
 

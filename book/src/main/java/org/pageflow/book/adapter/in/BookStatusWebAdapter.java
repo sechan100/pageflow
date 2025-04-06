@@ -8,7 +8,6 @@ import org.pageflow.book.port.in.BookStatusUseCase;
 import org.pageflow.common.api.RequestContext;
 import org.pageflow.common.result.Result;
 import org.pageflow.common.user.UID;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -27,12 +26,10 @@ public class BookStatusWebAdapter {
 
 
   @PostMapping("/user/books/{bookId}/status")
-  @Transactional
   @Operation(summary = "책 상태 변경")
   public Result<BookDto> changeBookStatus(
     @PathVariable UUID bookId,
-    @RequestParam BookStatusCmd cmd,
-    @RequestParam(defaultValue = "GLOBAL") BookVisibility visibility
+    @RequestParam BookStatusCmd cmd
   ) {
     UID uid = rqcxt.getUid();
     Result<BookDto> result = switch(cmd) {
@@ -41,16 +38,18 @@ public class BookStatusWebAdapter {
       case MERGE_REVISION -> bookStatusUseCase.mergeRevision(uid, bookId);
       case CANCEL_REVISION -> bookStatusUseCase.cancelRevision(uid, bookId);
     };
-    if(result.isFailure()) {
-      return result;
-    }
+    return result;
+  }
 
-    BookVisibility currentVisibility = result.getSuccessData().getVisibility();
-    if(currentVisibility != visibility) {
-      return bookStatusUseCase.changeVisibility(uid, bookId, visibility);
-    } else {
-      return result;
-    }
+  @PostMapping("/user/books/{bookId}/visibility")
+  @Operation(summary = "책 공개 범위 변경")
+  public Result<BookDto> changeBookVisibility(
+    @PathVariable UUID bookId,
+    @RequestParam BookVisibility visibility
+  ) {
+    UID uid = rqcxt.getUid();
+    Result<BookDto> result = bookStatusUseCase.changeVisibility(uid, bookId, visibility);
+    return result;
   }
 
 }

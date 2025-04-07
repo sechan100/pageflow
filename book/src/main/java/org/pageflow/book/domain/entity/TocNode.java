@@ -51,6 +51,14 @@ public abstract class TocNode extends BaseJpaEntity {
   @JoinColumn(name = "parent_id", nullable = true)
   private Folder parentNode;
 
+  /**
+   * {@link org.pageflow.book.domain.enums.BookStatus#REVISING}인 경우
+   * 기존 toc tree가 복제되고, 해당 tree node들의 isRevisionToc가 true로 설정된다.
+   */
+  @Getter
+  @Column(nullable = false)
+  private boolean isRevisionToc;
+
   @Getter
   @Column(nullable = false)
   private Integer ov;
@@ -67,6 +75,7 @@ public abstract class TocNode extends BaseJpaEntity {
     this.book = book;
     this.title = title;
     this.parentNode = parentNode;
+    this.isRevisionToc = false;
     this.ov = ov;
   }
 

@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.pageflow.book.application.dto.BookDto;
 import org.pageflow.book.domain.enums.BookVisibility;
-import org.pageflow.book.port.in.BookStatusUseCase;
+import org.pageflow.book.port.in.BookSettingsUseCase;
 import org.pageflow.common.api.RequestContext;
 import org.pageflow.common.result.Result;
 import org.pageflow.common.user.UID;
@@ -22,7 +22,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BookStatusWebAdapter {
   private final RequestContext rqcxt;
-  private final BookStatusUseCase bookStatusUseCase;
+  private final BookSettingsUseCase bookSettingsUseCase;
 
 
   @PostMapping("/user/books/{bookId}/status")
@@ -33,10 +33,10 @@ public class BookStatusWebAdapter {
   ) {
     UID uid = rqcxt.getUid();
     Result<BookDto> result = switch(cmd) {
-      case PUBLISH -> bookStatusUseCase.publish(uid, bookId);
-      case START_REVISION -> bookStatusUseCase.startRevision(uid, bookId);
-      case MERGE_REVISION -> bookStatusUseCase.mergeRevision(uid, bookId);
-      case CANCEL_REVISION -> bookStatusUseCase.cancelRevision(uid, bookId);
+      case PUBLISH -> bookSettingsUseCase.publish(uid, bookId);
+      case START_REVISION -> bookSettingsUseCase.startRevision(uid, bookId);
+      case MERGE_REVISION -> bookSettingsUseCase.mergeRevision(uid, bookId);
+      case CANCEL_REVISION -> bookSettingsUseCase.cancelRevision(uid, bookId);
     };
     return result;
   }
@@ -48,7 +48,7 @@ public class BookStatusWebAdapter {
     @RequestParam BookVisibility visibility
   ) {
     UID uid = rqcxt.getUid();
-    Result<BookDto> result = bookStatusUseCase.changeVisibility(uid, bookId, visibility);
+    Result<BookDto> result = bookSettingsUseCase.changeVisibility(uid, bookId, visibility);
     return result;
   }
 

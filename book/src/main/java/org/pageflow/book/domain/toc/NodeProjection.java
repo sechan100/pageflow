@@ -1,5 +1,6 @@
 package org.pageflow.book.domain.toc;
 
+import com.google.common.base.Preconditions;
 import lombok.Getter;
 import org.pageflow.book.domain.entity.Folder;
 import org.pageflow.book.domain.entity.TocNode;
@@ -29,25 +30,39 @@ public class NodeProjection {
     this.type = type;
   }
 
-  /*
-   * 아래부터는 Projection과는 관계없이, 메모리에 올리고나서 tree 구조를 만들기 위한 메소드와 필드들이다.
-   */
+  // ====================================================
+  // 해당 객체로 트리 구조를 만들기 위한 필드와 메서드
+  // ====================================================
 
-  // projection 하지 않는 필드
+  // projection field X
   private List<NodeProjection> children = new ArrayList<>();
 
-  // ov 순서대로 자식 추가
   public void addChildAccordingToOv(NodeProjection node) {
-    if(this.type != Folder.class){
-      throw new IllegalStateException("Section 타입에는 자식을 추가할 수 없습니다.");
-    }
-    for(int i = 0; i < children.size(); i++){
-      if(children.get(i).ov > node.ov){
+    Preconditions.checkState(isFolder());
+
+    for(int i = 0; i < children.size(); i++) {
+      NodeProjection ithChild = children.get(i);
+      if(ithChild.equals(node)) {
+        throw new IllegalArgumentException("해당 자식 노드가 이미 이 folder의 자식입니다.");
+      }
+      if(ithChild.ov > node.ov) {
         children.add(i, node);
         return;
       }
     }
     children.add(node);
+  }
+
+  public boolean isRoot() {
+    return parentId == null;
+  }
+
+  public boolean isFolder() {
+    return type == Folder.class;
+  }
+
+  public boolean isSection() {
+    return type != Folder.class;
   }
 
 

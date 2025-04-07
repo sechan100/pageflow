@@ -7,7 +7,7 @@ import org.pageflow.book.application.BookCode;
 import org.pageflow.book.application.dto.BookDto;
 import org.pageflow.book.application.dto.ReviewDto;
 import org.pageflow.book.domain.enums.BookVisibility;
-import org.pageflow.book.port.in.BookStatusUseCase;
+import org.pageflow.book.port.in.BookSettingsUseCase;
 import org.pageflow.book.port.in.ReviewUseCase;
 import org.pageflow.common.result.Result;
 import org.pageflow.test.module.book.utils.BookUtils;
@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @RequiredArgsConstructor
 public class ReviewTest {
   private final ReviewUseCase reviewUseCase;
-  private final BookStatusUseCase bookStatusUseCase;
+  private final BookSettingsUseCase bookSettingsUseCase;
   private final UserUtils userUtils;
   private final BookUtils bookUtils;
 
@@ -37,7 +37,7 @@ public class ReviewTest {
     BookDto book = bookUtils.createBook(user1, "리뷰 테스트 도서");
 
     // 출판 상태로 변경 (리뷰는 출판된 책에만 작성 가능)
-    Result<BookDto> publishResult = bookStatusUseCase.publish(user1.getUid(), book.getId());
+    Result<BookDto> publishResult = bookSettingsUseCase.publish(user1.getUid(), book.getId());
     assertTrue(publishResult.isSuccess());
 
     // 리뷰 작성
@@ -74,7 +74,7 @@ public class ReviewTest {
     assertTrue(deleteResult2.is(BookCode.REVIEW_ACCESS_DENIED));
 
     // 작가가 책을 PERSONAL visibility로 변경
-    Result<BookDto> changeVisibilityResult = bookStatusUseCase.changeVisibility(
+    Result<BookDto> changeVisibilityResult = bookSettingsUseCase.changeVisibility(
       user1.getUid(),
       book.getId(),
       BookVisibility.PERSONAL
@@ -86,7 +86,7 @@ public class ReviewTest {
     assertTrue(deleteResult3.is(BookCode.BOOK_ACCESS_DENIED));
 
     // 책을 다시 GLOBAL visibility로 변경
-    Result<BookDto> changeVisibilityResult2 = bookStatusUseCase.changeVisibility(
+    Result<BookDto> changeVisibilityResult2 = bookSettingsUseCase.changeVisibility(
       user1.getUid(),
       book.getId(),
       BookVisibility.GLOBAL

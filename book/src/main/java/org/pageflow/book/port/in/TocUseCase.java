@@ -17,6 +17,7 @@ import org.pageflow.book.domain.enums.BookAccess;
 import org.pageflow.book.domain.toc.LastIndexInserter;
 import org.pageflow.book.domain.toc.NodeProjection;
 import org.pageflow.book.domain.toc.NodeRelocator;
+import org.pageflow.book.domain.toc.TocTreeNodesLoader;
 import org.pageflow.book.port.in.cmd.CreateFolderCmd;
 import org.pageflow.book.port.in.cmd.CreateSectionCmd;
 import org.pageflow.book.port.in.cmd.RelocateNodeCmd;
@@ -71,27 +72,30 @@ public class TocUseCase {
       );
     }
     UUID destFolderId = cmd.getDestFolderId();
-    Optional<Folder> folderOpt = folderPersistencePort.findWithChildrenById(destFolderId);
-    if(folderOpt.isEmpty()) {
+    Optional<Folder> destFolderOpt = folderPersistencePort.findWithChildrenById(destFolderId);
+    if(destFolderOpt.isEmpty()) {
       return Result.of(
         CommonCode.DATA_NOT_FOUND,
         "dest folder를 찾을 수 없습니다."
       );
     }
-    Folder folderWithChildren = folderOpt.get();
-    NodeRelocator relocator = new NodeRelocator(folderWithChildren);
+    Folder destFolder = destFolderOpt.get();
+    NodeRelocator relocator = new NodeRelocator(destFolder);
+    // Reorder
     if(target.getParentNode().getId().equals(destFolderId)) {
-      // Reorder
       return relocator.reorder(cmd.getDestIndex(), target);
-    } else {
-      // Reparent
-      List<TocNode> allBookNodes = nodePersistencePort.findAllByBookId(book.getId());
+    }
+    // Reparent
+    else {
+      TocTreeNodesLoader treeLoader = new TocTreeNodesLoader(nodePersistencePort);
+      List<TocNode> allBookNodes = treeLoader.loadTocNodes(book);
       return relocator.reparent(cmd.getDestIndex(), target, allBookNodes);
     }
   }
 
   public TocDto.Toc getToc(UUID bookId) {
     List<NodeProjection> nodeProjections = nodePersistencePort.queryNodesByBookId(bookId);
+    List<TocNode> nodes = nodePersistencePort.findAllByBookIdAndIsRevisionToc(bookId, false);
     TocDto.Folder root = buildTree(bookId, nodeProjections);
     return new TocDto.Toc(bookId, root);
   }

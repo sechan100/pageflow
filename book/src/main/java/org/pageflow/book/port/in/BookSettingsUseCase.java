@@ -22,7 +22,7 @@ import java.util.UUID;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class BookStatusUseCase {
+public class BookSettingsUseCase {
   private final BookPersistencePort bookPersistencePort;
 
   /**
@@ -135,7 +135,7 @@ public class BookStatusUseCase {
     if(grant.isFailure()) {
       return grant;
     }
-    
+
     Result result = book.changeVisibility(visibility);
     if(result.isFailure()) {
       return result;

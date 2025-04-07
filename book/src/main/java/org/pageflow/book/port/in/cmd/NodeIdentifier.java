@@ -9,10 +9,8 @@ import java.util.UUID;
  * @author : sechan
  */
 @Value
-public class RelocateNodeCmd {
+public class NodeIdentifier {
   UID uid;
   UUID bookId;
   UUID nodeId;
-  UUID destFolderId;
-  int destIndex;
 }

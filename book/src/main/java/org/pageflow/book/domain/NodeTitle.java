@@ -40,7 +40,7 @@ public class NodeTitle extends SingleValueWrapper<String> {
       .of("title", value)
       .minLength(MIN_LENGTH)
       .maxLength(MAX_LENGTH)
-      .notSame(TocNodeConfig.ROOT_NODE_TITLE, "해당 제목은 사용할 수 없습니다.");
+      .notSame(TocNodeConfig.EDITABLE_ROOT_NODE_TITLE, "해당 제목은 사용할 수 없습니다.");
 
     return validator.validate();
   }

@@ -5,11 +5,11 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.pageflow.book.adapter.in.form.FolderForm;
 import org.pageflow.book.application.dto.FolderDto;
-import org.pageflow.book.port.in.TocUseCase;
+import org.pageflow.book.port.in.EditTocUseCase;
 import org.pageflow.book.port.in.cmd.CreateFolderCmd;
+import org.pageflow.book.port.in.cmd.NodeIdentifier;
 import org.pageflow.common.api.RequestContext;
 import org.pageflow.common.result.Result;
-import org.pageflow.common.user.UID;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -21,7 +21,7 @@ import java.util.UUID;
 @RequestMapping("/user/books/{bookId}/toc/folders")
 @RequiredArgsConstructor
 public class FolderWebAdapter {
-  private final TocUseCase tocUseCase;
+  private final EditTocUseCase editTocUseCase;
   private final RequestContext rqcxt;
 
 
@@ -31,13 +31,13 @@ public class FolderWebAdapter {
     @PathVariable UUID bookId,
     @Valid @RequestBody FolderForm.Create form
   ) {
-    UID uid = rqcxt.getUid();
-    CreateFolderCmd cmd = CreateFolderCmd.withTitle(
-      uid,
+    CreateFolderCmd cmd = new CreateFolderCmd(
+      rqcxt.getUid(),
+      bookId,
       form.getParentNodeId(),
       form.getTitle()
     );
-    Result<FolderDto> result = tocUseCase.createFolder(cmd);
+    Result<FolderDto> result = editTocUseCase.createFolder(cmd);
     return result;
   }
 
@@ -47,8 +47,12 @@ public class FolderWebAdapter {
     @PathVariable UUID bookId,
     @PathVariable UUID folderId
   ) {
-    UID uid = rqcxt.getUid();
-    Result<FolderDto> result = tocUseCase.getFolder(uid, folderId);
+    NodeIdentifier identifier = new NodeIdentifier(
+      rqcxt.getUid(),
+      bookId,
+      folderId
+    );
+    Result<FolderDto> result = editTocUseCase.getFolder(identifier);
     return result;
   }
 
@@ -59,8 +63,12 @@ public class FolderWebAdapter {
     @PathVariable UUID folderId,
     @Valid @RequestBody FolderForm.Update form
   ) {
-    UID uid = rqcxt.getUid();
-    Result<FolderDto> result = tocUseCase.changeFolderTitle(uid, folderId, form.getTitle());
+    NodeIdentifier identifier = new NodeIdentifier(
+      rqcxt.getUid(),
+      bookId,
+      folderId
+    );
+    Result<FolderDto> result = editTocUseCase.changeFolderTitle(identifier, form.getTitle());
     return result;
   }
 
@@ -71,8 +79,12 @@ public class FolderWebAdapter {
     @PathVariable UUID bookId,
     @PathVariable UUID folderId
   ) {
-    UID uid = rqcxt.getUid();
-    Result result = tocUseCase.deleteFolder(uid, folderId);
+    NodeIdentifier identifier = new NodeIdentifier(
+      rqcxt.getUid(),
+      bookId,
+      folderId
+    );
+    Result result = editTocUseCase.deleteFolder(identifier);
     return result;
   }
 }

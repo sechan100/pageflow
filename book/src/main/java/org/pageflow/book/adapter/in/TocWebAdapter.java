@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.pageflow.book.adapter.in.form.NodeRelocateForm;
 import org.pageflow.book.application.dto.TocDto;
-import org.pageflow.book.port.in.TocUseCase;
+import org.pageflow.book.port.in.EditTocUseCase;
 import org.pageflow.book.port.in.cmd.RelocateNodeCmd;
 import org.pageflow.common.api.RequestContext;
 import org.pageflow.common.result.Result;
@@ -20,7 +20,7 @@ import java.util.UUID;
 @RequestMapping("/user/books/{bookId}/toc")
 @RequiredArgsConstructor
 public class TocWebAdapter {
-  private final TocUseCase tocUseCase;
+  private final EditTocUseCase editTocUseCase;
   private final RequestContext rqcxt;
 
 
@@ -28,7 +28,7 @@ public class TocWebAdapter {
   @Operation(summary = "책 목차 조회")
   public TocDto.Toc getToc(@PathVariable UUID bookId) {
     UID uid = rqcxt.getUid();
-    TocDto.Toc toc = tocUseCase.getToc(bookId);
+    TocDto.Toc toc = editTocUseCase.getToc(bookId);
     return toc;
   }
 
@@ -39,12 +39,13 @@ public class TocWebAdapter {
     @RequestBody NodeRelocateForm form
   ) {
     UID uid = rqcxt.getUid();
-    RelocateNodeCmd cmd = RelocateNodeCmd.builder()
-      .uid(uid)
-      .nodeId(form.getTargetNodeId())
-      .destFolderId(form.getDestFolderId())
-      .destIndex(form.getDestIndex())
-      .build();
-    return tocUseCase.relocateNode(cmd);
+    RelocateNodeCmd cmd = new RelocateNodeCmd(
+      uid,
+      bookId,
+      form.getTargetNodeId(),
+      form.getDestFolderId(),
+      form.getDestIndex()
+    );
+    return editTocUseCase.relocateNode(cmd);
   }
 }

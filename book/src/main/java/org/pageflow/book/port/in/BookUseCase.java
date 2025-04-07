@@ -11,12 +11,11 @@ import org.pageflow.book.domain.BookAccessGranter;
 import org.pageflow.book.domain.BookDescriptionHtmlContent;
 import org.pageflow.book.domain.BookTitle;
 import org.pageflow.book.domain.entity.Book;
-import org.pageflow.book.domain.entity.Folder;
 import org.pageflow.book.domain.entity.TocNode;
 import org.pageflow.book.domain.enums.BookAccess;
+import org.pageflow.book.port.out.EditTocPort;
 import org.pageflow.book.port.out.LoadAuthorPort;
 import org.pageflow.book.port.out.jpa.BookPersistencePort;
-import org.pageflow.book.port.out.jpa.NodePersistencePort;
 import org.pageflow.common.property.ApplicationProperties;
 import org.pageflow.common.result.Result;
 import org.pageflow.common.user.UID;
@@ -44,7 +43,7 @@ public class BookUseCase {
   private final ApplicationProperties applicationProperties;
   private final LoadAuthorPort loadAuthorPort;
   private final BookPersistencePort bookPersistencePort;
-  private final NodePersistencePort nodePersistencePort;
+  private final EditTocPort editTocPort;
   private final ImageUrlValidator imageUrlValidator;
   private final FileService fileService;
 
@@ -82,8 +81,8 @@ public class BookUseCase {
     bookPersistencePort.persist(book);
 
     // root folder
-    Folder rootFolder = Folder.createRootFolder(book);
-    nodePersistencePort.persist(rootFolder);
+    TocNode rootFolder = TocNode.createRootFolder(book);
+    editTocPort.persist(rootFolder);
 
     return Result.success(BookDto.from(book));
   }
@@ -202,10 +201,7 @@ public class BookUseCase {
     }
 
     // 책 삭제 ===========================
-    List<TocNode> nodes = nodePersistencePort.findAllByBookId(bookId);
-    for(TocNode node : nodes) {
-      nodePersistencePort.delete(node);
-    }
+    editTocPort.deleteAllBookNodes(book);
     bookPersistencePort.delete(book);
     return Result.success();
   }

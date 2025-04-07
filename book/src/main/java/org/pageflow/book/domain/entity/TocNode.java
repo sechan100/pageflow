@@ -6,6 +6,8 @@ import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.pageflow.book.application.TocNodeType;
+import org.pageflow.book.domain.NodeTitle;
 import org.pageflow.book.domain.config.TocNodeConfig;
 import org.pageflow.common.jpa.BaseJpaEntity;
 import org.springframework.lang.Nullable;
@@ -16,8 +18,6 @@ import java.util.UUID;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(of = "id", callSuper = false)
-@Inheritance(strategy = InheritanceType.JOINED)
-@DiscriminatorColumn(name = "node_type")
 @Table(
   name = "node",
   uniqueConstraints = {
@@ -25,7 +25,7 @@ import java.util.UUID;
     @UniqueConstraint(name = "siblings_ov_unique", columnNames = {"parent_id", "ov"})
   }
 )
-public abstract class TocNode extends BaseJpaEntity {
+public class TocNode extends BaseJpaEntity {
 
   @Id
   @Getter
@@ -49,75 +49,135 @@ public abstract class TocNode extends BaseJpaEntity {
   @Nullable
   @ManyToOne(fetch = FetchType.LAZY, optional = true)
   @JoinColumn(name = "parent_id", nullable = true)
-  private Folder parentNode;
+  private TocNode parentNode;
 
   /**
-   * {@link org.pageflow.book.domain.enums.BookStatus#REVISING}인 경우
-   * 기존 toc tree가 복제되고, 해당 tree node들의 isRevisionToc가 true로 설정된다.
+   * 하나의 책은 최대 두개까지의 TOC를 가질 수 있다.
+   * 각각 하나는 읽기전용 TOC, 하나는 편집가능한 TOC이다.
+   * 예를 들어, {@link org.pageflow.book.domain.enums.BookStatus#REVISING}인 경우
+   * 기존 출판되어있던 toc는 읽기전용 TOC로 남아있고, 이를 기반으로 새로운 toc가 복제되어 편집가능한 toc가 된다.
    */
   @Getter
   @Column(nullable = false)
-  private boolean isRevisionToc;
+  private boolean isEditable;
 
   @Getter
   @Column(nullable = false)
-  private Integer ov;
+  private int ov;
+
+  @Getter
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false, updatable = false)
+  private TocNodeType type;
+
+  /**
+   * {@link TocNodeType#SECTION}인 경우에 content를 가진다.
+   */
+  @Getter
+  @OneToOne(fetch = FetchType.LAZY, optional = true, cascade = CascadeType.ALL)
+  @JoinColumn(name = "content_id", updatable = false, nullable = true)
+  private NodeContent content;
 
 
-  protected TocNode(
+  private TocNode(
     UUID id,
     Book book,
     String title,
-    Folder parentNode,
-    Integer ov
+    TocNodeType type
   ) {
     this.id = id;
     this.book = book;
     this.title = title;
-    this.parentNode = parentNode;
-    this.isRevisionToc = false;
-    this.ov = ov;
+    this.parentNode = null;
+    this.isEditable = true;
+    this.ov = 0;
+    this.type = type;
   }
 
-  /**
-   * {@link Folder#removeChild(TocNode)}에서 사용되는 연관관계 전용 메서드.
-   * 절대로 다른 곳에서 호출하지 말 것.
-   *
-   * @see Folder
-   */
-  public void __setParentNode(Folder parentNode) {
-    this.parentNode = parentNode;
+  public static TocNode createRootFolder(Book book) {
+    return new TocNode(
+      UUID.randomUUID(),
+      book,
+      TocNodeConfig.EDITABLE_ROOT_NODE_TITLE,
+      TocNodeType.FOLDER
+    );
   }
 
-  /**
-   * 해당 노드의 부모 노드를 반환한다.
-   *
-   * @throws IllegalStateException RootFolder인 경우
-   */
-  public Folder getParentNode() {
-    Preconditions.checkState(!this.isRootFolder());
-    return this.parentNode;
+  public static TocNode createFolder(
+    Book book,
+    NodeTitle title
+  ) {
+    return new TocNode(
+      UUID.randomUUID(),
+      book,
+      title.getValue(),
+      TocNodeType.FOLDER
+    );
+  }
+
+  public static TocNode createSection(
+    Book book,
+    NodeTitle title
+  ) {
+    TocNode node = new TocNode(
+      UUID.randomUUID(),
+      book,
+      title.getValue(),
+      TocNodeType.SECTION
+    );
+    node.content = NodeContent.create();
+    return node;
+  }
+
+  public void changeTitle(NodeTitle title) {
+    Preconditions.checkState(isEditable);
+    this.title = title.getValue();
+  }
+
+  public boolean isSection() {
+    return this.getType() == TocNodeType.SECTION;
+  }
+
+  public boolean isFolder() {
+    return this.getType() == TocNodeType.FOLDER;
   }
 
   public void setOv(int ov) {
+    Preconditions.checkState(isEditable);
     this.ov = ov;
   }
 
   public boolean isRootFolder() {
-    return this.parentNode == null && this.title.equals(TocNodeConfig.ROOT_NODE_TITLE);
+    return this.getType() == TocNodeType.FOLDER && this.parentNode == null && this.title.equals(TocNodeConfig.EDITABLE_ROOT_NODE_TITLE);
+  }
+
+  public void setParentNode(TocNode parentNode) {
+    Preconditions.checkState(parentNode.isFolder());
+    Preconditions.checkState(isEditable);
+    this.parentNode = parentNode;
+  }
+
+  public void makeOrphan() {
+    Preconditions.checkState(isEditable);
+    this.parentNode = null;
   }
 
   /**
-   * root folder가 update되는 것을 방지한다.
-   * root folder는 어떤 경우에도 update되면 안된다.
+   * 해당 노드의 부모 노드를 반환한다.
+   * 도중에 {@link TocNode#makeOrphan()}을 호출하여 부모를 잠시 null로 만든 경우에 null을 반환한다.
+   *
+   * @throws IllegalStateException RootFolder인 경우
    */
+  public TocNode getParentNodeOrNull() {
+    Preconditions.checkState(!this.isRootFolder());
+    return this.parentNode;
+  }
+
   @PreUpdate
-  private void preventRootFolderUpdate() {
-    if(isRootFolder()) {
-      throw new IllegalStateException("""
-        Root Folder(%s)는 업데이트 할 수 없습니다. bookId: %s
-        """.formatted(this.id, this.book.getId())
-      );
+  private void preUpdate() {
+    boolean isRootFolderTitle = this.title.equals(TocNodeConfig.EDITABLE_ROOT_NODE_TITLE);
+    if(!isRootFolderTitle && this.parentNode == null) {
+      throw new IllegalStateException("root folder가 아닌 node는 반드시 부모가 지정되어야 합니다.");
     }
   }
 

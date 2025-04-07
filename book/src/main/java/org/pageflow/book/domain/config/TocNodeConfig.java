@@ -4,7 +4,8 @@ package org.pageflow.book.domain.config;
  * @author : sechan
  */
 public abstract class TocNodeConfig {
-  public static final String ROOT_NODE_TITLE = ":root";
+  public static final String READONLY_ROOT_NODE_TITLE = ":readonly_root";
+  public static final String EDITABLE_ROOT_NODE_TITLE = ":editable_root";
 
   /**
    * ov 값 사이의 차의 최솟값.

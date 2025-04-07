@@ -1,7 +1,7 @@
 package org.pageflow.book.application.dto;
 
 import lombok.Value;
-import org.pageflow.book.domain.entity.Section;
+import org.pageflow.book.domain.toc.TocSection;
 
 import java.util.UUID;
 
@@ -11,11 +11,11 @@ public class SectionDtoWithContent {
   String title;
   String content;
 
-  public static SectionDtoWithContent from(Section section) {
+  public static SectionDtoWithContent from(TocSection section) {
     return new SectionDtoWithContent(
       section.getId(),
       section.getTitle(),
-      section.getContent()
+      section.getContent().getContent()
     );
   }
 }

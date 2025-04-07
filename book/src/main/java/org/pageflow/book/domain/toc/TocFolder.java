@@ -3,37 +3,42 @@ package org.pageflow.book.domain.toc;
 import com.google.common.base.Preconditions;
 import org.pageflow.book.application.BookCode;
 import org.pageflow.book.domain.config.TocNodeConfig;
-import org.pageflow.book.domain.entity.Folder;
 import org.pageflow.book.domain.entity.TocNode;
 import org.pageflow.common.result.Result;
 import org.springframework.lang.Nullable;
 
-import java.util.Collection;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 /**
  * @author : sechan
  */
-public class NodeRelocator {
+public class TocFolder {
   private static final int OV_GAP = TocNodeConfig.OV_GAP;
+  private final int OV_START = TocNodeConfig.OV_START;
 
-  private final Folder parentFolder;
+  private final TocNode folder;
+  private final List<TocNode> children;
 
   /**
-   * @param folder children을 모두 초기화한 folder. children은 ov 기준으로 오름차순 정렬되어야한다.
-   *               만약 children이 초기화되어있지 않다면 lazy loading이 발생할 수 있다.
+   * @param folderNode     폴더 노드
+   * @param folderChildren ov를 기준으로 오름차순 정렬된 folderNode의 모든 자식들
    */
-  public NodeRelocator(Folder folder) {
+  public TocFolder(TocNode folderNode, List<TocNode> folderChildren) {
+    Preconditions.checkState(folderNode.isFolder());
+    Preconditions.checkState(folderNode.getIsEditable());
+    Preconditions.checkState(folderChildren.stream().allMatch(c -> c.getParentNodeOrNull().equals(folderNode)));
     Preconditions.checkState(
-      NodeListAscendingValidator.isAscending(folder),
+      isAscending(folderChildren),
       "folder의 자식 TocNode들의 ov가 오름차순으로 정렬되어 있지 않습니다. children: "
-        + folder.getReadOnlyChildren().stream()
+        + folderChildren.stream()
         .map(TocNode::getOv)
         .toList()
     );
-    this.parentFolder = folder;
+
+    this.folder = folderNode;
+    this.children = folderChildren;
   }
 
   /**
@@ -44,70 +49,91 @@ public class NodeRelocator {
    */
   public Result reorder(int destIndex, TocNode target) {
     // 자기 자신에게 이동 검사
-    Result checkMoveToSelfResult = _checkMoveToSelf(target, parentFolder);
+    Result checkMoveToSelfResult = _checkMoveToSelf(target);
     if(checkMoveToSelfResult.isFailure()) return checkMoveToSelfResult;
     // root folder 이동 검사
     Result checkRootFolderMoveResult = _checkRootFolderMove(target);
     if(checkRootFolderMoveResult.isFailure()) return checkRootFolderMoveResult;
     // destIndex 검사
-    Result checkDestIndexResult = _checkDestIndex(parentFolder.childrenSize(), destIndex);
+    Result checkDestIndexResult = _checkDestIndex(destIndex);
     if(checkDestIndexResult.isFailure()) return checkDestIndexResult;
 
-    if(!parentFolder.hasChild(target)) {
+    if(!children.contains(target)) {
       return Result.of(BookCode.TOC_HIERARCHY_ERROR, "순서를 변경할 노드가 폴더의 자식이 아닙니다.");
     }
 
-    parentFolder.removeChild(target);
+    children.remove(target);
+    target.makeOrphan();
     return _insertNode(destIndex, target);
   }
 
   /**
    * @param destIndex
    * @param target
-   * @param allBookNodes
+   * @param toc
    * @return
    * @code TOC_HIERARCHY_ERROR: 자기 자신에게 이동, root folder 이동, 계층 구조 파괴, destIndex가 올바르지 않은 경우, 이미 parent에 target이 속한 경우 등
    */
-  public Result reparent(int destIndex, TocNode target, Collection<TocNode> allBookNodes) {
-    Map<UUID, TocNode> nodeMap = new HashMap<>();
-    assert allBookNodes != null;
-    Folder rootFolder = null;
-    for(TocNode node : allBookNodes) {
-      nodeMap.put(node.getId(), node);
-      if(node instanceof Folder folderNode && folderNode.isRootFolder()) {
-        assert rootFolder == null;
-        rootFolder = folderNode;
-      }
-    }
-    Preconditions.checkNotNull(rootFolder, "root folder가 존재하지 않습니다.");
-
+  public Result reparent(int destIndex, TocNode target, Toc toc) {
     // 자기 자신에게 이동 검사
-    Result checkMoveToSelfResult = _checkMoveToSelf(target, parentFolder);
+    Result checkMoveToSelfResult = _checkMoveToSelf(target);
     if(checkMoveToSelfResult.isFailure()) return checkMoveToSelfResult;
     // root folder 이동 검사
     Result checkRootFolderMoveResult = _checkRootFolderMove(target);
     if(checkRootFolderMoveResult.isFailure()) return checkRootFolderMoveResult;
 
     // 이미 parent에 속해있는 경우
-    if(parentFolder.hasChild(target)) {
+    if(children.contains(target)) {
       return Result.of(BookCode.TOC_HIERARCHY_ERROR, "targetNode가 이미 parent에 속해있습니다.");
     }
 
     // 계층 구조 파괴 검사
-    if(target instanceof Folder targetFolder) {
-      // parent에서 출발해서 조상중에 targetFolder가 있는지 검증한다.
-      if(_isAncestorOf(targetFolder, this.parentFolder, nodeMap)) {
+    if(target.isFolder()) {
+      // this에서 출발해서 조상중에 targetFolder가 있는지 검증한다.
+      if(_isAncestorOf(target, this.folder, toc.getNodeMap())) {
         return Result.of(BookCode.TOC_HIERARCHY_ERROR, "toc의 계층 구조를 파괴하는 이동입니다.");
       }
     }
 
-
     // destIndex 검사
-    Result checkDestIndexResult = _checkDestIndex(parentFolder.childrenSize(), destIndex);
+    Result checkDestIndexResult = _checkDestIndex(destIndex);
     if(checkDestIndexResult.isFailure()) return checkDestIndexResult;
 
-    target.getParentNode().removeChild(target);
+    target.makeOrphan();
     return _insertNode(destIndex, target);
+  }
+
+  /**
+   * node를 지정된 folderId의 자식들의 마지막 순서로 삽입한다.
+   *
+   * @param node 부모가 지정되지 않은 TocNode
+   * @return node에 할당된 ov값
+   */
+  public int insertLast(TocNode node) {
+    Preconditions.checkState(node.getParentNodeOrNull() == null);
+    boolean isEmpty = children.isEmpty();
+    // folder에 삽입
+    children.add(node);
+    node.setParentNode(folder);
+
+    // folder에 자식이 없는 경우
+    if(isEmpty) {
+      node.setOv(OV_START);
+      return OV_START;
+    }
+
+    int lastIndexNodeOv = children.stream()
+      .map(TocNode::getOv)
+      .max(Integer::compareTo)
+      .get();
+    // Rebalance
+    OvRebalancer rebalancer = new OvRebalancer();
+    if(rebalancer.isRequireRebalance(lastIndexNodeOv, null)) {
+      lastIndexNodeOv = rebalancer.rebalance(children);
+    }
+    int newOv = lastIndexNodeOv + OV_GAP;
+    node.setOv(newOv);
+    return newOv;
   }
 
   /**
@@ -118,21 +144,22 @@ public class NodeRelocator {
    * @param target    삽입대상. this.childen에서 빼고나서 호출할 것.
    */
   private Result _insertNode(int destIndex, TocNode target) {
-    assert !parentFolder.hasChild(target) : "target이 parent에 속해있는 경우 relocate 할 수 없습니다.";
+    assert !children.contains(target) : "target이 parent에 속해있는 경우 relocate 할 수 없습니다.";
 
     // child 삽입
-    parentFolder.addChild(destIndex, target);
+    children.add(destIndex, target);
+    target.setParentNode(folder);
 
     // ==============================================
     // Rebalancing 검사
-    Integer prevOvOrNull = destIndex != 0 ? parentFolder.getChild(destIndex - 1).getOv() : null;
-    Integer nextOvOrNull = destIndex != parentFolder.childrenSize() - 1 ? parentFolder.getChild(destIndex + 1).getOv() : null;
+    Integer prevOvOrNull = destIndex != 0 ? children.get(destIndex - 1).getOv() : null;
+    Integer nextOvOrNull = destIndex != children.size() - 1 ? children.get(destIndex + 1).getOv() : null;
 
     OvRebalancer rebalancer = new OvRebalancer();
     if(rebalancer.isRequireRebalance(prevOvOrNull, nextOvOrNull)) {
-      rebalancer.rebalance(parentFolder.getReadOnlyChildren());
+      rebalancer.rebalance(children);
     } else {
-      int newOv = this._resolveOv(prevOvOrNull, nextOvOrNull);
+      int newOv = _resolveOv(prevOvOrNull, nextOvOrNull);
       target.setOv(newOv);
     }
 
@@ -165,64 +192,75 @@ public class NodeRelocator {
     }
   }
 
-
   private static boolean _isSameNode(TocNode n1, TocNode n2) {
     return n1.getId().equals(n2.getId());
   }
 
   /**
-   * @param target
-   * @param destFolder
-   * @return
+   * target이 this와 동일한 노드인지 검사한다.
+   *
    * @code TOC_HIERARCHY_ERROR: node는 자기 자신의 자식이 될 수 없습니다.
    */
-  private static Result _checkMoveToSelf(TocNode target, Folder destFolder) {
-    if(_isSameNode(target, destFolder)) {
-      return org.pageflow.common.result.Result.of(BookCode.TOC_HIERARCHY_ERROR, "node는 자기 자신의 자식이 될 수 없습니다.");
+  private Result _checkMoveToSelf(TocNode target) {
+    if(_isSameNode(target, folder)) {
+      return Result.of(BookCode.TOC_HIERARCHY_ERROR, "node는 자기 자신의 자식이 될 수 없습니다.");
     }
-
-    return org.pageflow.common.result.Result.success();
+    return Result.success();
   }
 
   /**
-   * @param target
-   * @return
+   * target이 root folder인지 검사한다.
+   *
    * @code TOC_HIERARCHY_ERROR: root folder는 이동할 수 없습니다.
    */
   private static Result _checkRootFolderMove(TocNode target) {
     if(target.isRootFolder()) {
-      return org.pageflow.common.result.Result.of(BookCode.TOC_HIERARCHY_ERROR, "root folder는 이동할 수 없습니다.");
+      return Result.of(BookCode.TOC_HIERARCHY_ERROR, "root folder는 이동할 수 없습니다.");
     }
-
-    return org.pageflow.common.result.Result.success();
+    return Result.success();
   }
 
   /**
-   * @param destFolderChildrenSize
    * @param destIndex
    * @return
    * @code TOC_HIERARCHY_ERROR: destIndex가 0보다 작거나 destFolderChildrenSize보다 큰 경우
    */
-  private static Result _checkDestIndex(int destFolderChildrenSize, int destIndex) {
-    if(destIndex < 0 || destIndex > destFolderChildrenSize) {
+  private Result _checkDestIndex(int destIndex) {
+    if(destIndex < 0 || destIndex > children.size()) {
       return Result.of(BookCode.TOC_HIERARCHY_ERROR, "destIndex가 올바르지 않습니다.");
     }
 
     return Result.success();
   }
 
-  private static boolean _isAncestorOf(Folder ancestor, Folder descendant, Map<UUID, TocNode> nodeMap) {
+  /**
+   * ancestor가 descendant의 조상인지 검사한다.
+   *
+   * @throws IllegalStateException ancestor가 folder가 아닌 경우
+   */
+  private static boolean _isAncestorOf(TocNode ancestor, TocNode descendant, Map<UUID, TocNode> nodeMap) {
+    Preconditions.checkState(ancestor.isFolder());
+
     if(descendant.isRootFolder()) {
       return false;
     }
-    assert descendant.getParentNode() != null;
-    UUID parentId = descendant.getParentNode().getId();
+    assert descendant.getParentNodeOrNull() != null;
+    UUID parentId = descendant.getParentNodeOrNull().getId();
     if(parentId.equals(ancestor.getId())) {
       return true;
     } else {
-      return _isAncestorOf(ancestor, (Folder) nodeMap.get(parentId), nodeMap
+      return _isAncestorOf(ancestor, nodeMap.get(parentId), nodeMap
       );
     }
+  }
+
+  public static boolean isAscending(List<TocNode> children) {
+    for(int i = 0; i < children.size() - 1; i++) {
+      if(!(children.get(i).getOv() < children.get(i + 1).getOv())) {
+        return false;
+      }
+    }
+    return true;
   }
 
 }

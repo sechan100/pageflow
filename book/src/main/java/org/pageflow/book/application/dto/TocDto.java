@@ -1,38 +1,51 @@
 package org.pageflow.book.application.dto;
 
+import com.google.common.base.Preconditions;
+import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.Value;
+import lombok.experimental.FieldDefaults;
 import org.pageflow.book.application.TocNodeType;
+import org.pageflow.book.domain.entity.TocNode;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 public abstract class TocDto {
 
   @Getter
-  @RequiredArgsConstructor
+  @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
   public static class Node {
-    private final UUID id;
-    private final String title;
-    private final TocNodeType type;
+    UUID id;
+    String title;
+    TocNodeType type;
+
+    public Node(TocNode node) {
+      this.id = node.getId();
+      this.title = node.getTitle();
+      this.type = node.getType();
+    }
   }
 
   @Getter
+  @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
   public static class Folder extends Node {
-    private final List<Node> children;
+    List<Node> children;
 
-    public Folder(UUID id, String title, List<Node> children) {
-      super(id, title, TocNodeType.FOLDER);
-      this.children = new ArrayList<>(children);
+    public Folder(TocNode folder, List<Node> children) {
+      super(folder);
+      Preconditions.checkState(folder.isFolder());
+      this.children = children;
     }
 
   }
 
+  @Getter
+  @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
   public static class Section extends Node {
-    public Section(UUID id, String title) {
-      super(id, title, TocNodeType.SECTION);
+    public Section(TocNode section) {
+      super(section);
+      Preconditions.checkState(section.isSection());
     }
   }
 

@@ -18,7 +18,7 @@ public class OvRebalancer {
   private static final int OV_START = TocNodeConfig.OV_START;
 
   /**
-   * 전체 리스트의 ov값 재조정이 필요한지 판단한다.
+   * 전체 리스트의 ov 재조정이 필요한지 판단한다.
    * prevOrNull과 nextOrNull의 경우의 수에 따라서 rebalancing이 필요한지 판단한다.
    * <ul>
    *   <li>1. prev, next: prev와 next 사이에 삽입되는 경우다. next - prev가 MIN_OV_GAP보다 작은지 확인한다.</li>
@@ -27,8 +27,8 @@ public class OvRebalancer {
    *   <li>4. null, null: EXCEPTION.</li>
    * </ul>
    *
-   * @param prevOvOrNull
-   * @param nextOvOrNull
+   * @param prevOvOrNull 삽입할 위치를 기준으로 앞에있는 노드의 ov
+   * @param nextOvOrNull 삽입할 위치를 기준으로 뒤에있는 노드의 ov
    */
   public boolean isRequireRebalance(
     @Nullable Integer prevOvOrNull,
@@ -61,16 +61,16 @@ public class OvRebalancer {
   /**
    * Rebalancing을 실행한다.
    *
-   * @param readOnlyNodes 순서대로 새로운 ov를 할당한다. nodes가 비어있는 경우, 아무것도 하지않고 OV_START를 반환한다.
+   * @param children 순서대로 새로운 ov를 할당한다. nodes가 비어있는 경우, 아무것도 하지않고 OV_START를 반환한다.
    * @return rebalancing이 끝난 후의 가장 큰 ov값, 즉 list 마지막 인덱스의 node.ov를 반환한다.
    */
-  public int rebalance(List<TocNode> readOnlyNodes) {
-    if(readOnlyNodes.isEmpty()) {
+  public int rebalance(List<TocNode> children) {
+    if(children.isEmpty()) {
       return OV_START;
     }
 
     int ov = OV_START;
-    for(TocNode node : readOnlyNodes) {
+    for(TocNode node : children) {
       node.setOv(ov);
       if(ov > Integer.MAX_VALUE - OV_GAP) {
         throw new IllegalStateException("OV values exceed Integer.MAX_VALUE during rebalance");

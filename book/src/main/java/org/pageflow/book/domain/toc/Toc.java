@@ -43,7 +43,7 @@ public class Toc {
     this.isEditableToc = isEditableToc;
   }
 
-  public TocDto.Toc buildTree() {
+  public TreeNode buildTree() {
     Map<UUID, TreeNode> treeNodeMap = allNodes.stream().collect(Collectors.toMap(
       node -> node.getId(),
       node -> new TreeNode(node)
@@ -57,8 +57,12 @@ public class Toc {
       parent.addChildAccordingToOv(n);
     }
 
+    return treeNodeMap.get(rootFolderId);
+  }
+
+  public TocDto.Toc buildTreeDto() {
     // TreeNode -> Dto로 변환
-    TreeNode rootTreeNode = treeNodeMap.get(rootFolderId);
+    TreeNode rootTreeNode = buildTree();
     List<TocDto.Node> rootChildren = rootTreeNode.getChildren().stream()
       .map(this::_projectRecursive)
       .toList();
@@ -75,17 +79,25 @@ public class Toc {
     return node;
   }
 
+  public boolean isEditableToc() {
+    return isEditableToc;
+  }
+
+  public boolean isReadOnlyToc() {
+    return !isEditableToc;
+  }
+
   private TocDto.Node _projectRecursive(TreeNode p) {
     // Folder
     if(p.isFolder()) {
       List<TocDto.Node> children = p.getChildren().stream()
         .map(c -> _projectRecursive(c))
         .toList();
-      return new TocDto.Folder(nodeMap.get(p.getId()), children);
+      return new TocDto.Folder(p.getTocNode(), children);
     }
     // Section
     else {
-      return new TocDto.Section(nodeMap.get(p.getId()));
+      return new TocDto.Section(p.getTocNode());
     }
   }
 }

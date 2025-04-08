@@ -85,7 +85,7 @@ public class EditTocUseCase {
   public TocDto.Toc getToc(UUID bookId) {
     Book book = bookPersistencePort.findById(bookId).get();
     Toc toc = editTocPort.loadEditableToc(book);
-    return toc.buildTree();
+    return toc.buildTreeDto();
   }
 
   // ==================================================
@@ -164,7 +164,8 @@ public class EditTocUseCase {
         "root folder node는 삭제할 수 없습니다."
       );
     }
-    editTocPort.deleteFolder(book, folder.getId());
+    Toc toc = editTocPort.loadEditableToc(book);
+    editTocPort.deleteFolder(toc, folder.getId());
     return Result.success();
   }
 
@@ -249,7 +250,7 @@ public class EditTocUseCase {
         "root folder node는 삭제할 수 없습니다."
       );
     }
-    editTocPort.deleteNode(node);
+    editTocPort.deleteSection(node);
     return Result.success();
   }
 

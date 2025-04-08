@@ -1,5 +1,6 @@
 package org.pageflow.book.port.in;
 
+import com.google.common.base.Preconditions;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pageflow.book.application.dto.BookDto;
@@ -7,6 +8,10 @@ import org.pageflow.book.domain.BookAccessGranter;
 import org.pageflow.book.domain.entity.Book;
 import org.pageflow.book.domain.enums.BookAccess;
 import org.pageflow.book.domain.enums.BookVisibility;
+import org.pageflow.book.domain.toc.Toc;
+import org.pageflow.book.port.out.EditTocPort;
+import org.pageflow.book.port.out.ReadTocPort;
+import org.pageflow.book.port.out.TocTreePersistencePort;
 import org.pageflow.book.port.out.jpa.BookPersistencePort;
 import org.pageflow.common.result.Result;
 import org.pageflow.common.user.UID;
@@ -24,6 +29,9 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BookSettingsUseCase {
   private final BookPersistencePort bookPersistencePort;
+  private final ReadTocPort readTocPort;
+  private final EditTocPort editTocPort;
+  private final TocTreePersistencePort tocTreePersistencePort;
 
   /**
    * 책을 출판한다.
@@ -46,7 +54,11 @@ public class BookSettingsUseCase {
 
     // 상태 변경
     Result publishRes = book.publish();
-    if(publishRes.isFailure()) return publishRes;
+    if(publishRes.isFailure()) {
+      return publishRes;
+    }
+    // Toc 병합
+    _mergeToReadonly(book);
     return Result.success(BookDto.from(book));
   }
 
@@ -60,17 +72,23 @@ public class BookSettingsUseCase {
    */
   public Result<BookDto> startRevision(UID uid, UUID bookId) {
     Book book = bookPersistencePort.findById(bookId).get();
-
-    // 작가 권한 검사
+    // 작가 권한 검사 ================================
     BookAccessGranter accessGranter = new BookAccessGranter(uid, book);
     Result grant = accessGranter.grant(BookAccess.UPDATE);
     if(grant.isFailure()) {
       return grant;
     }
-
-    // 상태 변경
+    // 상태 변경 ====================================
     Result startRevisionRes = book.startRevision();
-    if(startRevisionRes.isFailure()) return startRevisionRes;
+    if(startRevisionRes.isFailure()) {
+      return startRevisionRes;
+    }
+    // Toc 복제 ====================================
+    Preconditions.checkState(tocTreePersistencePort.existsReadonlyToc(book), "readonly toc가 존재해야합니다.");
+    Preconditions.checkState(!tocTreePersistencePort.existsEditableToc(book), "editable toc가 존재하면 안됩니다.");
+
+    Toc readonlyToc = readTocPort.loadReadonlyToc(book);
+    Toc copiedToc = tocTreePersistencePort.copyReadonlyTocToEditableToc(readonlyToc);
     return Result.success(BookDto.from(book));
   }
 
@@ -93,7 +111,22 @@ public class BookSettingsUseCase {
 
     // 상태 변경
     Result cancelRevisionRes = book.cancelRevision();
-    if(cancelRevisionRes.isFailure()) return cancelRevisionRes;
+    if(cancelRevisionRes.isFailure()) {
+      return cancelRevisionRes;
+    }
+
+    // editableToc 삭제
+    Preconditions.checkState(
+      tocTreePersistencePort.existsEditableToc(book),
+      "editableToc를 삭제하고 readonlyToc를 남기려면 editableToc가 필요합니다."
+    );
+    Preconditions.checkState(
+      tocTreePersistencePort.existsReadonlyToc(book),
+      "editableToc를 삭제하고 readonlyToc를 남기려면 readonlyToc가 존재해야합니다."
+    );
+    Toc editableToc = editTocPort.loadEditableToc(book);
+    tocTreePersistencePort.deleteToc(editableToc);
+
     return Result.success(BookDto.from(book));
   }
 
@@ -119,7 +152,12 @@ public class BookSettingsUseCase {
 
     // 상태 변경
     Result mergeRevisionRes = book.mergeRevision();
-    if(mergeRevisionRes.isFailure()) return mergeRevisionRes;
+    if(mergeRevisionRes.isFailure()) {
+      return mergeRevisionRes;
+    }
+
+    // toc 병합
+    _mergeToReadonly(book);
     return Result.success(BookDto.from(book));
   }
 
@@ -141,5 +179,24 @@ public class BookSettingsUseCase {
       return result;
     }
     return Result.success(BookDto.from(book));
+  }
+
+  /**
+   * book의 toc를 readonly로 병합한다.
+   * editable을 readonly로 변경하고 기존 readonly가 존재한다면 삭제.
+   */
+  private Result<Toc> _mergeToReadonly(Book book) {
+    Preconditions.checkState(
+      tocTreePersistencePort.existsEditableToc(book),
+      "toc를 병합하려면 editableToc는 반드시 필요합니다. readonlyToc는 optional"
+    );
+    // readonlyToc가 존재한다면 삭제
+    if(tocTreePersistencePort.existsReadonlyToc(book)) {
+      Toc readonlyToc = readTocPort.loadReadonlyToc(book);
+      tocTreePersistencePort.deleteToc(readonlyToc);
+    }
+    Toc editableToc = editTocPort.loadEditableToc(book);
+    Toc resultReadonlyToc = tocTreePersistencePort.makeTocReadonly(editableToc);
+    return Result.success(resultReadonlyToc);
   }
 }

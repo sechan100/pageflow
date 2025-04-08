@@ -94,11 +94,31 @@ public class TocNode extends BaseJpaEntity {
     this.type = type;
   }
 
+  /**
+   * readonly node를 복사하기 위한 생성자
+   */
+  public TocNode(TocNode node, TocNode parentNode) {
+    Preconditions.checkArgument(!node.isEditable);
+    Preconditions.checkArgument(
+      parentNode == null ? true : parentNode.isFolder(),
+      "parentNode는 null(rootFolder를 위한 null 참조)거나 Folder여야 합니다."
+    );
+
+    this.id = UUID.randomUUID();
+    this.book = node.book;
+    this.title = node.title;
+    this.parentNode = parentNode;
+    this.isEditable = true;
+    this.ov = node.ov;
+    this.type = node.type;
+    this.content = node.content != null ? new NodeContent(node.content) : null;
+  }
+
   public static TocNode createRootFolder(Book book) {
     return new TocNode(
       UUID.randomUUID(),
       book,
-      TocNodeConfig.EDITABLE_ROOT_NODE_TITLE,
+      TocNodeConfig.ROOT_FOLDER_TITLE,
       TocNodeType.FOLDER
     );
   }
@@ -147,8 +167,12 @@ public class TocNode extends BaseJpaEntity {
     this.ov = ov;
   }
 
+  public void setEditable(boolean editable) {
+    this.isEditable = editable;
+  }
+
   public boolean isRootFolder() {
-    return this.getType() == TocNodeType.FOLDER && this.parentNode == null && this.title.equals(TocNodeConfig.EDITABLE_ROOT_NODE_TITLE);
+    return isFolder() && this.parentNode == null && this.title.equals(TocNodeConfig.ROOT_FOLDER_TITLE);
   }
 
   public void setParentNode(TocNode parentNode) {
@@ -165,17 +189,14 @@ public class TocNode extends BaseJpaEntity {
   /**
    * 해당 노드의 부모 노드를 반환한다.
    * 도중에 {@link TocNode#makeOrphan()}을 호출하여 부모를 잠시 null로 만든 경우에 null을 반환한다.
-   *
-   * @throws IllegalStateException RootFolder인 경우
    */
   public TocNode getParentNodeOrNull() {
-    Preconditions.checkState(!this.isRootFolder());
     return this.parentNode;
   }
 
   @PreUpdate
   private void preUpdate() {
-    boolean isRootFolderTitle = this.title.equals(TocNodeConfig.EDITABLE_ROOT_NODE_TITLE);
+    boolean isRootFolderTitle = this.title.equals(TocNodeConfig.ROOT_FOLDER_TITLE);
     if(!isRootFolderTitle && this.parentNode == null) {
       throw new IllegalStateException("root folder가 아닌 node는 반드시 부모가 지정되어야 합니다.");
     }

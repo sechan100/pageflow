@@ -39,6 +39,14 @@ public class NodeContent extends BaseJpaEntity {
     this.content = content;
   }
 
+  /**
+   * section 복사를 위한 생성자
+   */
+  public NodeContent(NodeContent nodeContent) {
+    this.id = UUID.randomUUID();
+    this.content = nodeContent.getContent();
+  }
+
   public static NodeContent create() {
     return new NodeContent(
       UUID.randomUUID(),

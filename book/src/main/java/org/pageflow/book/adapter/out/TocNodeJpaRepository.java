@@ -21,4 +21,6 @@ public interface TocNodeJpaRepository extends BaseJpaRepository<TocNode, UUID> {
   List<TocNode> findAllByBookIdAndIsEditable(UUID bookId, boolean isEditable);
 
   List<TocNode> findAllByBookId(UUID bookId);
+
+  int countByBookIdAndParentNodeIdAndIsEditable(UUID bookId, UUID parentNodeId, boolean isEditable);
 }

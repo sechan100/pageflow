@@ -9,6 +9,7 @@ import org.pageflow.book.domain.toc.Toc;
 import org.pageflow.book.domain.toc.TocFolder;
 import org.pageflow.book.domain.toc.TocSection;
 import org.pageflow.book.port.out.EditTocPort;
+import org.pageflow.book.port.out.ReadTocPort;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,7 +25,7 @@ import java.util.UUID;
 @Repository
 @Transactional
 @RequiredArgsConstructor
-public class TocPersistenceAdapter implements EditTocPort {
+public class TocNodePersistenceAdapter implements EditTocPort, ReadTocPort {
   private final TocNodeJpaRepository repository;
 
   @Override
@@ -57,10 +58,10 @@ public class TocPersistenceAdapter implements EditTocPort {
   }
 
   @Override
-  public void deleteFolder(Book book, UUID folderId) {
-    Toc toc = loadEditableToc(book);
+  public void deleteFolder(Toc toc, UUID folderId) {
     Collection<TocNode> allNodes = toc.getAllNodes();
     TocNode folder = toc.get(folderId);
+    Preconditions.checkState(folder.isFolder());
     _deleteFolderRecursively(folder, allNodes);
   }
 
@@ -78,8 +79,9 @@ public class TocPersistenceAdapter implements EditTocPort {
   }
 
   @Override
-  public void deleteNode(TocNode node) {
-    repository.delete(node);
+  public void deleteSection(TocNode section) {
+    Preconditions.checkState(section.isSection());
+    repository.delete(section);
   }
 
   private void _deleteFolderRecursively(TocNode folder, Collection<TocNode> allNodes) {
@@ -98,5 +100,11 @@ public class TocPersistenceAdapter implements EditTocPort {
       repository.delete(child);
     }
     repository.delete(folder);
+  }
+
+  @Override
+  public Toc loadReadonlyToc(Book book) {
+    List<TocNode> allNode = repository.findAllByBookIdAndIsEditable(book.getId(), false);
+    return new Toc(book, allNode, false);
   }
 }

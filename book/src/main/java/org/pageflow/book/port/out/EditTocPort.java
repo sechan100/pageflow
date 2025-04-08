@@ -23,7 +23,7 @@ public interface EditTocPort {
 
   Optional<TocFolder> loadEditableFolder(Book book, UUID folderId);
 
-  void deleteFolder(Book book, UUID folderId);
+  void deleteFolder(Toc toc, UUID folderId);
 
   TocNode persist(TocNode node);
 
@@ -33,5 +33,5 @@ public interface EditTocPort {
    */
   void deleteAllBookNodes(Book book);
 
-  void deleteNode(TocNode node);
+  void deleteSection(TocNode node);
 }

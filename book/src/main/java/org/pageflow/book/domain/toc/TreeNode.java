@@ -16,29 +16,26 @@ import java.util.UUID;
  */
 @Getter
 public class TreeNode {
-  private final UUID id;
-  private final UUID parentId; // root 노드인 경우 null
-  private final int ov;
-  private final TocNodeType type;
+  private final TocNode tocNode;
+  private TreeNode parent;
   private final List<TreeNode> children = new ArrayList<>();
 
-  public TreeNode(TocNode node) {
-    this.id = node.getId();
-    this.parentId = node.isRootFolder() ? null : node.getParentNodeOrNull().getId();
-    this.ov = node.getOv();
-    this.type = node.getType();
+  public TreeNode(TocNode tocNode) {
+    this.tocNode = tocNode;
+    this.parent = null;
   }
 
   public void addChildAccordingToOv(TreeNode node) {
     Preconditions.checkState(isFolder());
     Preconditions.checkState(!node.isRoot());
 
+    node.parent = this;
     for(int i = 0; i < children.size(); i++) {
       TreeNode ithChild = children.get(i);
       if(ithChild.equals(node)) {
         throw new IllegalArgumentException("해당 자식 노드가 이미 이 folder의 자식입니다.");
       }
-      if(ithChild.ov > node.ov) {
+      if(ithChild._getOv() > node._getOv()) {
         children.add(i, node);
         return;
       }
@@ -46,15 +43,27 @@ public class TreeNode {
     children.add(node);
   }
 
+  public UUID getParentId() {
+    return tocNode.isRootFolder() ? null : tocNode.getParentNodeOrNull().getId();
+  }
+
   public boolean isRoot() {
-    return parentId == null;
+    return tocNode.isRootFolder();
   }
 
   public boolean isFolder() {
-    return type == TocNodeType.FOLDER;
+    return tocNode.isFolder();
   }
 
   public boolean isSection() {
-    return type == TocNodeType.SECTION;
+    return tocNode.isSection();
+  }
+
+  public TocNodeType getType() {
+    return tocNode.getType();
+  }
+
+  private int _getOv() {
+    return tocNode.getOv();
   }
 }

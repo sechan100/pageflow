@@ -20,7 +20,7 @@ import java.util.UUID;
  */
 @RestController
 @RequiredArgsConstructor
-public class BookStatusWebAdapter {
+public class BookSettingsWebAdapter {
   private final RequestContext rqcxt;
   private final BookSettingsUseCase bookSettingsUseCase;
 

@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @PageflowTest
 @RequiredArgsConstructor
-public class StatusTest {
+public class StatusFlowTest {
   private final BookSettingsUseCase bookSettingsUseCase;
   private final UserUtils userUtils;
   private final BookUtils bookUtils;

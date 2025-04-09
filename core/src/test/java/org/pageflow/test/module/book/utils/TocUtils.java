@@ -7,9 +7,11 @@ import org.pageflow.book.application.dto.TocDto;
 import org.pageflow.book.domain.entity.TocNode;
 import org.pageflow.book.domain.toc.TreeNode;
 import org.pageflow.book.port.in.EditTocUseCase;
+import org.pageflow.common.user.UID;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
 import java.util.function.BiConsumer;
 
 /**
@@ -27,7 +29,9 @@ public class TocUtils {
       bookDto.getId(),
       editTocUseCase
     );
-    TocDto.Toc toc = editTocUseCase.getToc(bookDto.getId());
+    UID uid = bookDto.getAuthorId();
+    UUID bookId = bookDto.getId();
+    TocDto toc = editTocUseCase.getToc(uid, bookId).getSuccessData();
     TocTreeBuilderFolderImpl rootFolderBuilder = new TocTreeBuilderFolderImpl(context, toc.getRoot().getId());
     return rootFolderBuilder;
   }

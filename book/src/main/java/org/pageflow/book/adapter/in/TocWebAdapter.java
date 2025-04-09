@@ -26,10 +26,10 @@ public class TocWebAdapter {
 
   @GetMapping("")
   @Operation(summary = "책 목차 조회")
-  public TocDto.Toc getToc(@PathVariable UUID bookId) {
+  public Result<TocDto> getToc(@PathVariable UUID bookId) {
     UID uid = rqcxt.getUid();
-    TocDto.Toc toc = editTocUseCase.getToc(bookId);
-    return toc;
+    Result<TocDto> result = editTocUseCase.getToc(uid, bookId);
+    return result;
   }
 
   @PostMapping("/relocate-node")

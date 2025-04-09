@@ -60,7 +60,7 @@ public class Toc {
     return treeNodeMap.get(rootFolderId);
   }
 
-  public TocDto.Toc buildTreeDto() {
+  public TocDto buildTreeDto() {
     // TreeNode -> Dto로 변환
     TreeNode rootTreeNode = buildTree();
     List<TocDto.Node> rootChildren = rootTreeNode.getChildren().stream()
@@ -68,7 +68,7 @@ public class Toc {
       .toList();
 
     TocDto.Folder rootDto = new TocDto.Folder(nodeMap.get(rootFolderId), rootChildren);
-    return new TocDto.Toc(book.getId(), rootDto);
+    return new TocDto(book.getId(), rootDto);
   }
 
   public TocNode get(UUID nodeId) {

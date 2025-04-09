@@ -90,11 +90,11 @@ public class BookUseCase {
   /**
    * @code BOOK_ACCESS_DENIED: 책 읽기 권한이 없는 경우
    */
-  public Result<BookDtoWithAuthor> readBook(UID uid, UUID bookId) {
+  public Result<BookDtoWithAuthor> getBook(UID uid, UUID bookId) {
     Book book = bookPersistencePort.findBookWithAuthorById(bookId).get();
     // 권한 검사 =====
     BookAccessGranter accessGranter = new BookAccessGranter(uid, book);
-    Result grant = accessGranter.grant(BookAccess.READ);
+    Result grant = accessGranter.grant(BookAccess.WRITE);
     if(grant.isFailure()) {
       return grant;
     }

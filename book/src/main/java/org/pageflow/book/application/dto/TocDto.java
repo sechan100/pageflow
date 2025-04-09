@@ -11,7 +11,10 @@ import org.pageflow.book.domain.entity.TocNode;
 import java.util.List;
 import java.util.UUID;
 
-public abstract class TocDto {
+@Value
+public class TocDto {
+  UUID bookId;
+  Folder root;
 
   @Getter
   @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
@@ -49,9 +52,4 @@ public abstract class TocDto {
     }
   }
 
-  @Value
-  public static class Toc {
-    UUID bookId;
-    Folder root;
-  }
 }

@@ -42,7 +42,7 @@ public class TocFeatureTest {
 
     // toc 가져오기
     UUID bookId = book.getId();
-    UUID rootFolderId = editTocUseCase.getToc(bookId).getRoot().getId();
+    UUID rootFolderId = editTocUseCase.getToc(user.getUid(), bookId).getSuccessData().getRoot().getId();
 
     // 폴더 생성
     Result<FolderDto> folder1Result = editTocUseCase.createFolder(
@@ -126,7 +126,7 @@ public class TocFeatureTest {
     // 책 생성
     BookDto book = bookUtils.createBook(user, "최소값 rebalance 테스트");
     UUID bookId = book.getId();
-    UUID rootFolderId = editTocUseCase.getToc(bookId).getRoot().getId();
+    UUID rootFolderId = editTocUseCase.getToc(user.getUid(), bookId).getSuccessData().getRoot().getId();
 
     // 노드 생성
     Result<FolderDto> folder1Result = editTocUseCase.createFolder(

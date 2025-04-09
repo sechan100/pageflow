@@ -34,7 +34,7 @@ public class BookTest {
     BookDto book = createResult.getSuccessData();
 
     // 책 조회
-    Result<BookDtoWithAuthor> readResult = bookUseCase.readBook(user1.getUid(), book.getId());
+    Result<BookDtoWithAuthor> readResult = bookUseCase.getBook(user1.getUid(), book.getId());
     assertTrue(readResult.isSuccess());
     assertEquals(book.getId(), readResult.getSuccessData().getId());
 
@@ -96,7 +96,7 @@ public class BookTest {
     Result changeBookDescriptionRes2 = bookUseCase.changeBookDescription(user2.getUid(), book.getId(), "new description");
     assertTrue(changeBookDescriptionRes2.is(BookCode.BOOK_ACCESS_DENIED));
     // 책 설명이 변경되지 않았는지 확인
-    Result<BookDtoWithAuthor> readResult = bookUseCase.readBook(user1.getUid(), book.getId());
+    Result<BookDtoWithAuthor> readResult = bookUseCase.getBook(user1.getUid(), book.getId());
     assertTrue(readResult.isSuccess());
     assertEquals(newDescription, readResult.getSuccessData().getDescription());
   }

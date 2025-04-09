@@ -82,10 +82,16 @@ public class EditTocUseCase {
     }
   }
 
-  public TocDto.Toc getToc(UUID bookId) {
+  public Result<TocDto> getToc(UID uid, UUID bookId) {
     Book book = bookPersistencePort.findById(bookId).get();
+    // 책에 대한 쓰기 권한 확인 ==================
+    BookAccessGranter accessGranter = new BookAccessGranter(uid, book);
+    Result grant = accessGranter.grant(BookAccess.WRITE);
+    if(grant.isFailure()) {
+      return grant;
+    }
     Toc toc = editTocPort.loadEditableToc(book);
-    return toc.buildTreeDto();
+    return Result.success(toc.buildTreeDto());
   }
 
   // ==================================================

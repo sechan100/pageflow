@@ -48,7 +48,7 @@ public class TocStructureTest {
     UUID bookId = book.getId();
 
     // 2. 기본 루트 폴더 확인
-    TocDto.Toc toc = editTocUseCase.getToc(bookId);
+    TocDto toc = editTocUseCase.getToc(user1.getUid(), bookId).getSuccessData();
     UUID rootFolderId = toc.getRoot().getId();
     assertTocStructure(toc, 1); // 루트만 있으므로 깊이 1
 
@@ -88,7 +88,7 @@ public class TocStructureTest {
     UUID folder3Id = folder3Result.getSuccessData().getId();
 
     // 현재 구조 확인
-    toc = editTocUseCase.getToc(bookId);
+    toc = editTocUseCase.getToc(user1.getUid(), bookId).getSuccessData();
     assertTocStructure(toc, 2); // 루트 아래 3개 폴더, 깊이 2
     assertChildCount(toc.getRoot(), 3);
 
@@ -152,7 +152,7 @@ public class TocStructureTest {
     UUID section5Id = section5Result.getSuccessData().getId();
 
     // 현재 구조 확인
-    toc = editTocUseCase.getToc(bookId);
+    toc = editTocUseCase.getToc(user1.getUid(), bookId).getSuccessData();
     assertTocStructure(toc, 3); // 루트(1) > 폴더(2) > 섹션(3) 구조이므로 깊이 3
     assertNodeChildrenCount(toc, folder1Id, 1);
     assertNodeChildrenCount(toc, folder2Id, 3);
@@ -195,7 +195,7 @@ public class TocStructureTest {
     UUID section7Id = section7Result.getSuccessData().getId();
 
     // 현재 구조 확인 - 루트 > 2장 > 2.A 상세분석 > 섹션
-    toc = editTocUseCase.getToc(bookId);
+    toc = editTocUseCase.getToc(user1.getUid(), bookId).getSuccessData();
     assertTocStructure(toc, 4); // 루트(1) > 2장(2) > 2.A(3) > 섹션(4) 이므로 깊이 4
     assertNodeChildrenCount(toc, subFolder1Id, 2);
 
@@ -223,7 +223,7 @@ public class TocStructureTest {
     UUID section8Id = section8Result.getSuccessData().getId();
 
     // 현재 구조 확인 - 루트 > 2장 > 2.A > 2.A.X > 섹션
-    toc = editTocUseCase.getToc(bookId);
+    toc = editTocUseCase.getToc(user1.getUid(), bookId).getSuccessData();
     assertTocStructure(toc, 5); // 루트(1) > 2장(2) > 2.A(3) > 2.A.X(4) > 섹션(5) 이므로 깊이 5
     assertNodeChildrenCount(toc, subSubFolderId, 1);
 
@@ -241,7 +241,7 @@ public class TocStructureTest {
     Assertions.assertTrue(moveSection2Result.isSuccess());
 
     // 순서 확인
-    toc = editTocUseCase.getToc(bookId);
+    toc = editTocUseCase.getToc(user1.getUid(), bookId).getSuccessData();
     assertNodeOrder(toc, folder2Id, Arrays.asList(section3Id, section4Id, section2Id, subFolder1Id));
     assertTocStructure(toc, 5); // 구조 깊이는 여전히 5
 
@@ -259,7 +259,7 @@ public class TocStructureTest {
     Assertions.assertTrue(moveSection8Result.isSuccess());
 
     // 이동 확인
-    toc = editTocUseCase.getToc(bookId);
+    toc = editTocUseCase.getToc(user1.getUid(), bookId).getSuccessData();
     assertNodeParent(toc, section8Id, folder1Id);
     assertNodeChildrenCount(toc, folder1Id, 2);
     assertNodeChildrenCount(toc, subSubFolderId, 0);
@@ -278,7 +278,7 @@ public class TocStructureTest {
     );
     Assertions.assertTrue(moveSubFolder1Result.isSuccess());
 
-    toc = editTocUseCase.getToc(bookId);
+    toc = editTocUseCase.getToc(user1.getUid(), bookId).getSuccessData();
     assertNodeParent(toc, subFolder1Id, rootFolderId);
     assertNodeChildrenCount(toc, folder2Id, 3); // 섹션 3개만 남음
     assertTocStructure(toc, 3); // 이제 최대 깊이는 3; 루트(1) > 2.A(2) > 2.A.X(3, 비어있음)
@@ -296,7 +296,7 @@ public class TocStructureTest {
     );
     Assertions.assertTrue(moveFolder3Result.isSuccess());
 
-    toc = editTocUseCase.getToc(bookId);
+    toc = editTocUseCase.getToc(user1.getUid(), bookId).getSuccessData();
     assertNodeParent(toc, folder3Id, subFolder1Id);
     assertChildCount(toc.getRoot(), 3); // 루트 아래 1장, 2장, 2.A
     assertTocStructure(toc, 4); // 최대 깊이는 4; root > 2.A > 3장 > 3.1
@@ -351,7 +351,7 @@ public class TocStructureTest {
     Assertions.assertTrue(deleteSubFolder1Result.isSuccess());
 
     // 삭제 후 구조 확인
-    toc = editTocUseCase.getToc(bookId);
+    toc = editTocUseCase.getToc(user1.getUid(), bookId).getSuccessData();
     assertNodeExists(toc, subFolder1Id, false); // 삭제된 폴더
     assertNodeExists(toc, folder3Id, false); // 삭제된 폴더의 하위 폴더도 삭제됨
     assertNodeExists(toc, subSubFolderId, false); // 2.A.X 폴더도 삭제됨
@@ -368,7 +368,7 @@ public class TocStructureTest {
     Assertions.assertTrue(deleteSection2Result.isSuccess());
 
     // 섹션 삭제 확인
-    toc = editTocUseCase.getToc(bookId);
+    toc = editTocUseCase.getToc(user1.getUid(), bookId).getSuccessData();
     assertNodeExists(toc, section2Id, false);
     assertNodeChildrenCount(toc, folder2Id, 2); // 남은 섹션 2개
 
@@ -393,7 +393,7 @@ public class TocStructureTest {
     }
 
     // 모든 노드가 루트 아래로 이동되었는지 확인
-    toc = editTocUseCase.getToc(bookId);
+    toc = editTocUseCase.getToc(user1.getUid(), bookId).getSuccessData();
     for(UUID sectionId : remainingSections) {
       assertNodeParent(toc, sectionId, rootFolderId);
     }
@@ -419,7 +419,7 @@ public class TocStructureTest {
     Assertions.assertTrue(deleteFolder2Result.isSuccess());
 
     // 최종 구조 확인
-    toc = editTocUseCase.getToc(bookId);
+    toc = editTocUseCase.getToc(user1.getUid(), bookId).getSuccessData();
     assertNodeExists(toc, folder1Id, false);
     assertNodeExists(toc, folder2Id, false);
     assertTocStructure(toc, 2); // 루트(1) > 섹션(2)이므로 깊이 2
@@ -449,7 +449,7 @@ public class TocStructureTest {
     UUID bookId = book.getId();
 
     // 2. 기본 루트 폴더 확인
-    TocDto.Toc toc = editTocUseCase.getToc(bookId);
+    TocDto toc = editTocUseCase.getToc(user.getUid(), bookId).getSuccessData();
     UUID rootFolderId = toc.getRoot().getId();
 
     // 3. 폴더 계층 구조 생성: 루트 > 부모 > 자식
@@ -499,7 +499,7 @@ public class TocStructureTest {
     UUID bookId = book.getId();
 
     // 2. 기본 루트 폴더 확인
-    TocDto.Toc toc = editTocUseCase.getToc(bookId);
+    TocDto toc = editTocUseCase.getToc(user.getUid(), bookId).getSuccessData();
     UUID rootFolderId = toc.getRoot().getId();
 
     // 3. 3단계 폴더 계층 구조 생성: 루트 > 부모 > 자식 > 손자
@@ -561,7 +561,7 @@ public class TocStructureTest {
     UUID bookId = book.getId();
 
     // 2. 기본 루트 폴더 확인
-    TocDto.Toc toc = editTocUseCase.getToc(bookId);
+    TocDto toc = editTocUseCase.getToc(user.getUid(), bookId).getSuccessData();
     UUID rootFolderId = toc.getRoot().getId();
 
     // 3. 일반 폴더 생성
@@ -600,7 +600,7 @@ public class TocStructureTest {
     UUID bookId = book.getId();
 
     // 2. 기본 루트 폴더 확인
-    TocDto.Toc toc = editTocUseCase.getToc(bookId);
+    TocDto toc = editTocUseCase.getToc(user.getUid(), bookId).getSuccessData();
     UUID rootFolderId = toc.getRoot().getId();
 
     // 3. 일반 폴더 생성
@@ -640,7 +640,7 @@ public class TocStructureTest {
     UUID bookId = book.getId();
 
     // 2. 기본 루트 폴더 확인
-    TocDto.Toc toc = editTocUseCase.getToc(bookId);
+    TocDto toc = editTocUseCase.getToc(user.getUid(), bookId).getSuccessData();
     UUID rootFolderId = toc.getRoot().getId();
 
     // 3. 여러 계층의 폴더 구조 생성
@@ -750,7 +750,7 @@ public class TocStructureTest {
     Assertions.assertTrue(validMove.isSuccess());
 
     // 구조 확인: 루트 > A > B > C > F, D
-    toc = editTocUseCase.getToc(bookId);
+    toc = editTocUseCase.getToc(user.getUid(), bookId).getSuccessData();
     assertNodeParent(toc, folderFId, folderCId);
   }
 
@@ -759,7 +759,7 @@ public class TocStructureTest {
   /**
    * 목차 구조의 최대 깊이 검증
    */
-  private void assertTocStructure(TocDto.Toc toc, int expectedDepth) {
+  private void assertTocStructure(TocDto toc, int expectedDepth) {
     int actualDepth = calculateMaxDepth(toc.getRoot());
     Assertions.assertEquals(expectedDepth, actualDepth, "목차 구조의 최대 깊이가 예상과 다릅니다");
   }
@@ -793,7 +793,7 @@ public class TocStructureTest {
   /**
    * 노드의 자식 수 검증
    */
-  private void assertNodeChildrenCount(TocDto.Toc toc, UUID nodeId, int expectedCount) {
+  private void assertNodeChildrenCount(TocDto toc, UUID nodeId, int expectedCount) {
     TocDto.Node node = findNodeById(toc.getRoot(), nodeId);
     Assertions.assertNotNull(node, "ID가 " + nodeId + "인 노드를 찾을 수 없습니다");
 
@@ -817,7 +817,7 @@ public class TocStructureTest {
   /**
    * 노드의 부모 검증
    */
-  private void assertNodeParent(TocDto.Toc toc, UUID nodeId, UUID expectedParentId) {
+  private void assertNodeParent(TocDto toc, UUID nodeId, UUID expectedParentId) {
     String actualParentId = getParentId(toc.getRoot(), nodeId);
     Assertions.assertEquals(expectedParentId.toString(), actualParentId,
       "ID가 " + nodeId + "인 노드의 부모가 예상과 다릅니다");
@@ -826,7 +826,7 @@ public class TocStructureTest {
   /**
    * 노드의 존재 여부 검증
    */
-  private void assertNodeExists(TocDto.Toc toc, UUID nodeId, boolean shouldExist) {
+  private void assertNodeExists(TocDto toc, UUID nodeId, boolean shouldExist) {
     TocDto.Node node = findNodeById(toc.getRoot(), nodeId);
     if(shouldExist) {
       Assertions.assertNotNull(node, "ID가 " + nodeId + "인 노드가 존재해야 합니다");
@@ -838,7 +838,7 @@ public class TocStructureTest {
   /**
    * 노드의 순서 검증
    */
-  private void assertNodeOrder(TocDto.Toc toc, UUID parentId, List<UUID> expectedOrder) {
+  private void assertNodeOrder(TocDto toc, UUID parentId, List<UUID> expectedOrder) {
     TocDto.Node parentNode = findNodeById(toc.getRoot(), parentId);
     Assertions.assertNotNull(parentNode, "ID가 " + parentId + "인 부모 노드를 찾을 수 없습니다");
     Assertions.assertInstanceOf(TocDto.Folder.class, parentNode, "노드는 폴더여야 합니다");

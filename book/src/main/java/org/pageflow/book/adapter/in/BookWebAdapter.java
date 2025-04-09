@@ -46,7 +46,7 @@ public class BookWebAdapter {
   @Operation(summary = "책 조회")
   public Result<BookDtoWithAuthor> getBook(@PathVariable UUID bookId) {
     UID uid = rqcxt.getUid();
-    Result<BookDtoWithAuthor> result = bookUseCase.readBook(uid, bookId);
+    Result<BookDtoWithAuthor> result = bookUseCase.getBook(uid, bookId);
     return result;
   }
 

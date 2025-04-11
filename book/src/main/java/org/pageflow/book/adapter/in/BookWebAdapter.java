@@ -5,7 +5,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.pageflow.book.adapter.in.form.BookForm;
 import org.pageflow.book.adapter.in.res.book.AuthorPrivateBookRes;
-import org.pageflow.book.adapter.in.res.book.MyBooksRes;
+import org.pageflow.book.adapter.in.res.book.MyBookListRes;
+import org.pageflow.book.adapter.in.res.book.MyBookRes;
 import org.pageflow.book.adapter.in.res.book.SimpleBookRes;
 import org.pageflow.book.application.dto.book.BookDto;
 import org.pageflow.book.application.dto.book.MyBooksDto;
@@ -45,12 +46,12 @@ public class BookWebAdapter {
 
   @GetMapping("")
   @Operation(summary = "내 책장 조회")
-  public Result<MyBooksRes> getMyBooks() {
+  public Result<MyBookListRes> getMyBookList() {
     MyBooksDto myBooks = bookUseCase.queryMyBooks(rqcxt.getUid());
-    List<SimpleBookRes> bookList = myBooks.getBooks().stream()
-      .map(SimpleBookRes::new)
+    List<MyBookRes> bookList = myBooks.getBooks().stream()
+      .map(MyBookRes::new)
       .toList();
-    MyBooksRes res = new MyBooksRes(bookList);
+    MyBookListRes res = new MyBookListRes(bookList);
     return Result.success(res);
   }
 

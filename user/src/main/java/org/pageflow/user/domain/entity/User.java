@@ -1,6 +1,5 @@
 package org.pageflow.user.domain.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.pageflow.common.jpa.BaseJpaEntity;
@@ -14,40 +13,54 @@ import org.pageflow.user.domain.Password;
 
 import java.util.UUID;
 
-@Getter
 @Entity
-@Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(of = "id", callSuper = false)
 @Table(
-  name = "account",
+  name = "users",
   indexes = {
     @Index(name = "idx_account_username", columnList = "username")
   }
 )
-public class Account extends BaseJpaEntity {
+public class User extends BaseJpaEntity {
 
   @Id
   @Column(updatable = false, nullable = false)
   private UUID id;
 
+  @Getter
   @Column(unique = true, nullable = false, updatable = false)
   private String username;
 
   @Column(nullable = false)
   private String password;
 
+  @Getter
   @Column(name = "email", nullable = false)
   private String email;
 
+  @Getter
   @Column(name = "is_email_verified", nullable = false)
   private Boolean isEmailVerified;
+
+  @Getter
+  @Column(nullable = false)
+  private String penname;
+
+  @Getter
+  @Column(nullable = false, columnDefinition = "VARCHAR(255)")
+  private String profileImageUrl;
+
+  @Getter
+  @Column(nullable = false, columnDefinition = "TEXT")
+  private String bio;
 
   /**
    * NATIVE, GOOGLE, KAKAO, NAVER, GITHUB
    * 영속화시 null이라면 NATIVE로 초기화한다.
    */
+  @Getter
   @Enumerated(EnumType.STRING)
   @Column(nullable = false, updatable = false)
   private ProviderType provider;
@@ -55,42 +68,50 @@ public class Account extends BaseJpaEntity {
   /**
    * ROLE_ADMIN, ROLE_MANAGER, ROLE_USER, ROLE_ANONYMOUS
    */
+  @Getter
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
   private RoleType role;
 
-  @JsonIgnore
-  @OneToOne(optional = false, fetch = FetchType.LAZY, mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
-  private Profile profile;
-
-
-  /**
-   * 아직 Profile이 할당되지 않은 Account에 대하여, 해당 Profile을 연결한다.
-   * @param profile
-   */
-  public void associateProfile(Profile profile) {
-
-    if(profile.getAccount() != null){
-      throw new IllegalStateException(String.format(
-        "Profile is already associated with another account. (username: %s)", this.username
-      ));
-    }
-    if(this.profile != null){
-      throw new IllegalStateException(String.format(
-        "Account is already associated with another profile. (username: %s)", this.username
-      ));
-    }
-    this.profile = profile;
-    profile.setAccount(this);
+  public static User create(
+    UUID id,
+    String username,
+    Password password,
+    String email,
+    String penname,
+    String profileImageUrl,
+    ProviderType provider,
+    RoleType role
+  ) {
+    return new User(
+      id,
+      username,
+      password.getValue(),
+      email,
+      false,
+      penname,
+      profileImageUrl,
+      "",
+      provider,
+      role
+    );
   }
+
 
   public UID getUid() {
     return new UID(id);
   }
 
+  /**
+   * password를 노출시키지 않도록 주의해서 사용
+   *
+   * @return
+   */
+  public String _getPassword() {
+    return password;
+  }
 
   /**
-   *
    * @param currentPassword
    * @param password
    * @return Result
@@ -98,14 +119,18 @@ public class Account extends BaseJpaEntity {
    * - PASSWORD_SAME_AS_BEFORE: 새로운 비밀번호가 기존 비밀번호와 동일한 경우
    */
   public Result<NullData> changePassword(String currentPassword, Password password) {
-    if(!passwordMatches(currentPassword)){
+    if(!passwordMatches(currentPassword)) {
       return Result.of(UserCode.BAD_CREDENTIALS);
     }
-    if(currentPassword.equals(password.getValue())){
+    if(currentPassword.equals(password.getValue())) {
       return Result.of(UserCode.PASSWORD_SAME_AS_BEFORE);
     }
     this.password = password.getValue();
     return Result.success();
+  }
+
+  public boolean passwordMatches(String rawPassword) {
+    return Password.matches(rawPassword, this.password);
   }
 
   /**
@@ -116,7 +141,11 @@ public class Account extends BaseJpaEntity {
     this.isEmailVerified = true;
   }
 
-  public boolean passwordMatches(String rawPassword) {
-    return Password.matches(rawPassword, this.password);
+  public void changePenname(String penname) {
+    this.penname = penname;
+  }
+
+  public void changeProfileImageUrl(String profileImageUrl) {
+    this.profileImageUrl = profileImageUrl;
   }
 }

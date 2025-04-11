@@ -17,8 +17,8 @@ import org.pageflow.user.adapter.in.auth.LoginTokenEndpointForward;
 import org.pageflow.user.adapter.in.auth.form.LoginUri;
 import org.pageflow.user.adapter.in.res.AccessTokenRes;
 import org.pageflow.user.adapter.in.res.SessionInfoRes;
-import org.pageflow.user.dto.AccountDto;
 import org.pageflow.user.dto.SessionUserDto;
+import org.pageflow.user.dto.UserDto;
 import org.pageflow.user.dto.token.AccessTokenDto;
 import org.pageflow.user.dto.token.AuthTokens;
 import org.pageflow.user.dto.token.RefreshTokenDto;
@@ -36,8 +36,8 @@ import java.util.UUID;
 
 
 /**
- * @see org.pageflow.user.application.config.SecurityConfig
  * @author : sechan
+ * @see org.pageflow.user.application.config.SecurityConfig
  */
 @Validated
 @RestController
@@ -71,9 +71,9 @@ public class AuthWebAdapter {
   @Hidden
   @RequestMapping(LoginTokenEndpointForward.LOGIN_TOKEN_URI)
   public AccessTokenRes login() {
-    AccountDto account = LoginTokenEndpointForward.getForwardedAccount(rqrxt.getRequest());
+    UserDto user = LoginTokenEndpointForward.getForwardedAccount(rqrxt.getRequest());
     // LOGIN
-    IssueSessionCmd cmd = new IssueSessionCmd(account.getUid());
+    IssueSessionCmd cmd = new IssueSessionCmd(user.getUid());
     AuthTokens authTokens = sessionUseCase.issueSession(cmd);
     RefreshTokenDto rt = authTokens.getRefreshToken();
     AccessTokenDto at = authTokens.getAccessToken();
@@ -134,7 +134,7 @@ public class AuthWebAdapter {
 
   private UUID _getSessionIdFromCookie() {
     Optional<Cookie> cookieOpt = rqrxt.getCookie(SESSION_ID_COOKIE_NAME);
-    if(cookieOpt.isEmpty()){
+    if(cookieOpt.isEmpty()) {
       Result<InvalidField> cookieInvalidResult = Result.of(CommonCode.INVALID_COOKIE,
         InvalidField.builder()
           .field(SESSION_ID_COOKIE_NAME)

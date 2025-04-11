@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.pageflow.book.domain.Author;
 import org.pageflow.common.jpa.BaseJpaEntity;
-import org.pageflow.user.domain.entity.Profile;
+import org.pageflow.user.domain.entity.User;
 
 /**
  * @author : sechan
@@ -16,7 +16,7 @@ import org.pageflow.user.domain.entity.Profile;
 @Table(
   name = "shelf_item",
   uniqueConstraints = {
-    @UniqueConstraint(columnNames = { "shelf_owner_id", "book_id" })
+    @UniqueConstraint(columnNames = {"shelf_owner_id", "book_id"})
   }
 )
 public class ShelfItem extends BaseJpaEntity {
@@ -28,14 +28,14 @@ public class ShelfItem extends BaseJpaEntity {
 
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   @JoinColumn(name = "shelf_owner_id")
-  private Profile shelfOwner;
+  private User shelfOwner;
 
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   @JoinColumn(name = "book_id")
   private Book book;
 
   public static ShelfItem create(Book book, Author shelfOwner) {
-    return new ShelfItem(null, shelfOwner.getProfileJpaEntity(), book);
+    return new ShelfItem(null, shelfOwner.getUserEntity(), book);
   }
 
   public Book getBook() {

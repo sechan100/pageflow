@@ -1,32 +1,32 @@
 package org.pageflow.book.domain;
 
 import org.pageflow.common.user.UID;
-import org.pageflow.user.domain.entity.Profile;
+import org.pageflow.user.domain.entity.User;
 
 /**
  * @author : sechan
  */
 public class Author {
-  private final Profile profile;
+  private final User user;
 
-  public Author(Profile profile) {
-    this.profile = profile;
+  public Author(User user) {
+    this.user = user;
   }
 
   public UID getUid() {
-    return profile.getUid();
+    return user.getUid();
   }
 
   public String getPenname() {
-    return profile.getPenname();
+    return user.getPenname();
   }
 
   public String getProfileImageUrl() {
-    return profile.getProfileImageUrl();
+    return user.getProfileImageUrl();
   }
 
-  public Profile getProfileJpaEntity() {
-    return profile;
+  public User getUserEntity() {
+    return user;
   }
 
 }

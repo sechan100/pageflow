@@ -2,7 +2,7 @@ package org.pageflow.test.module.user;
 
 import lombok.RequiredArgsConstructor;
 import org.pageflow.common.property.ApplicationProperties;
-import org.pageflow.user.domain.entity.Account;
+import org.pageflow.user.domain.entity.User;
 import org.pageflow.user.dto.token.AuthTokens;
 import org.pageflow.user.port.in.IssueSessionCmd;
 import org.pageflow.user.port.in.SessionUseCase;
@@ -26,8 +26,8 @@ public class TestAccessTokenIssuer {
    * 해당 세션은 유지되지 않습니다.(즉시 로그아웃)
    */
   public String issueImmediatelyExpireToken(String username) {
-    Account account = loadAccountPort.load(username).get();
-    var cmd = new IssueSessionCmd(account.getUid());
+    User user = loadAccountPort.load(username).get();
+    var cmd = new IssueSessionCmd(user.getUid());
     try {
       int originalExpireMinutes = applicationProperties.auth.accessTokenExpireMinutes;
       // reflection으로 application properties 일시적으로 조작

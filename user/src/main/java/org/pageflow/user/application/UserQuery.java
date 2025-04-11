@@ -3,11 +3,10 @@ package org.pageflow.user.application;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pageflow.common.user.UID;
-import org.pageflow.user.domain.entity.Account;
-import org.pageflow.user.domain.entity.Profile;
+import org.pageflow.user.domain.entity.User;
 import org.pageflow.user.dto.SessionUserDto;
 import org.pageflow.user.port.out.LoadSessionUserPort;
-import org.pageflow.user.port.out.entity.AccountPersistencePort;
+import org.pageflow.user.port.out.entity.UserPersistencePort;
 import org.springframework.stereotype.Service;
 
 /**
@@ -17,21 +16,19 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class UserQuery implements LoadSessionUserPort {
-  private final AccountPersistencePort accountPersistencePort;
+  private final UserPersistencePort userPersistencePort;
 
   @Override
   public SessionUserDto load(UID uid) {
-    Account account = accountPersistencePort.findWithProfileById(uid.getValue()).get();
-    Profile profile = account.getProfile();
-
+    User user = userPersistencePort.findById(uid.getValue()).get();
     SessionUserDto dto = SessionUserDto.builder()
-      .uid(account.getUid())
-      .username(account.getUsername())
-      .email(account.getEmail())
-      .isEmailVerified(account.getIsEmailVerified())
-      .role(account.getRole())
-      .penname(profile.getPenname())
-      .profileImageUrl(profile.getProfileImageUrl())
+      .uid(user.getUid())
+      .username(user.getUsername())
+      .email(user.getEmail())
+      .isEmailVerified(user.getIsEmailVerified())
+      .role(user.getRole())
+      .penname(user.getPenname())
+      .profileImageUrl(user.getProfileImageUrl())
       .build();
 
     return dto;

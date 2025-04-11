@@ -5,8 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.pageflow.common.result.ProcessResultException;
 import org.pageflow.common.user.UID;
 import org.pageflow.user.application.UserCode;
-import org.pageflow.user.domain.entity.Account;
 import org.pageflow.user.domain.entity.Session;
+import org.pageflow.user.domain.entity.User;
 import org.pageflow.user.domain.token.AccessToken;
 import org.pageflow.user.dto.token.AccessTokenDto;
 import org.pageflow.user.dto.token.AuthTokens;
@@ -38,8 +38,8 @@ public class AuthService implements SessionUseCase {
   @Override
   public AuthTokens issueSession(IssueSessionCmd cmd) {
     UID accountId = cmd.getAuthenticatedAccountId();
-    Account account = loadAccountPort.load(accountId).orElseThrow();
-    Session session = Session.issue(account);
+    User user = loadAccountPort.load(accountId).orElseThrow();
+    Session session = Session.issue(user);
     sessionPersistencePort.persist(session);
     // 세션을 사용하여 최초의 accessToken을 발급
     AccessToken accessToken = tokenProvider.issueAccessToken(session);

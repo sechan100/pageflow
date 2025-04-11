@@ -13,7 +13,7 @@ import org.pageflow.book.domain.enums.BookVisibility;
 import org.pageflow.common.jpa.BaseJpaEntity;
 import org.pageflow.common.property.PropsAware;
 import org.pageflow.common.user.UID;
-import org.pageflow.user.domain.entity.Profile;
+import org.pageflow.user.domain.entity.User;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,8 +35,8 @@ public class Book extends BaseJpaEntity {
   private UUID id;
 
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "author_id")
-  private Profile author;
+  @JoinColumn(name = "author_id", nullable = false, updatable = false)
+  private User author;
 
   @Getter
   @Column(nullable = false)
@@ -77,7 +77,7 @@ public class Book extends BaseJpaEntity {
     BookTitle title
   ) {
     this.id = UUID.randomUUID();
-    this.author = author.getProfileJpaEntity();
+    this.author = author.getUserEntity();
     this.title = title.getValue();
     this.coverImageUrl = PropsAware.use().book.defaultCoverImageUrl;
     this.description = "";

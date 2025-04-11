@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.pageflow.common.validation.FieldReason;
 import org.pageflow.common.validation.FieldValidationResult;
 import org.pageflow.common.validation.FieldValidator;
-import org.pageflow.user.port.out.entity.AccountPersistencePort;
+import org.pageflow.user.port.out.entity.UserPersistencePort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,7 +28,7 @@ public class UsernameValidator {
     "admin", "administrator", "anonymous", "pageflow", "guest"
   );
 
-  private final AccountPersistencePort accountPersistencePort;
+  private final UserPersistencePort userPersistencePort;
 
   public FieldValidationResult validate(String username) {
     FieldValidator<String> validator = new FieldValidator<>("username", username)
@@ -36,7 +36,7 @@ public class UsernameValidator {
       .maxLength(MAX_LENGTH, "아이디는 최대 " + MAX_LENGTH + "자 이하여야 합니다.")
       .regex(REGEX, REGEX_MESSAGE)
       .notSame(INVALID_USERNAME, w -> String.format("'%s'은(는) 사용할 수 없는 아이디입니다.", w))
-      .rule(u -> !accountPersistencePort.existsByUsername(u), FieldReason.DUPLICATED, "이미 사용중인 아이디입니다.");
+      .rule(u -> !userPersistencePort.existsByUsername(u), FieldReason.DUPLICATED, "이미 사용중인 아이디입니다.");
 
     return validator.validate();
   }

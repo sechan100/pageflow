@@ -1,7 +1,7 @@
 package org.pageflow.book.adapter.in.res.review;
 
 import lombok.Value;
-import org.pageflow.book.adapter.in.res.AuthorRes;
+import org.pageflow.book.adapter.in.res.author.AuthorRes;
 import org.pageflow.book.application.dto.ReviewDto;
 
 import java.util.UUID;

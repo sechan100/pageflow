@@ -13,23 +13,23 @@ import java.time.Instant;
  * @author : sechan
  */
 @Embeddable
-@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class RefreshToken {
 
   /**
    * epoch milliseconds
    */
+  @Getter
   private Long exp;
 
   /**
    * epoch milliseconds
    */
+  @Getter
   private Long iat;
 
 
-
-  public RefreshToken(Instant iat, Instant exp) {
+  private RefreshToken(Instant iat, Instant exp) {
     this.iat = iat.toEpochMilli();
     this.exp = exp.toEpochMilli();
   }

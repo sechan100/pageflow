@@ -53,7 +53,7 @@ public class TokenProvider implements TokenUseCase {
       result = Result.success(accessToken);
 
       // 만료된 토큰인 경우
-    } catch(ExpiredJwtException expiredJwtException){
+    } catch(ExpiredJwtException expiredJwtException) {
       result = Result.of(UserCode.ACCESS_TOKEN_EXPIRED);
     }
 
@@ -62,6 +62,7 @@ public class TokenProvider implements TokenUseCase {
 
   /**
    * Session에서 AccessToken을 발급할 때 사용한다.
+   *
    * @param session
    * @return AccessToken 객체
    */
@@ -70,7 +71,7 @@ public class TokenProvider implements TokenUseCase {
     Instant exp = iat.plus(Duration.ofMinutes(properties.auth.accessTokenExpireMinutes));
     return new AccessToken(
       session.getId(),
-      new UID(session.getAccount().getId()),
+      session.getUser().getUid(),
       session.getRole(),
       iat,
       exp,

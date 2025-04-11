@@ -36,7 +36,8 @@ public class ReadBookUseCase {
     if(grant.isFailure()) {
       return grant;
     }
-    AuthorProfileDto authorProfileDto = loadAuthorPort.loadAuthorProfile(uid);
+    UID authorId = book.getAuthor().getUid();
+    AuthorProfileDto authorProfileDto = loadAuthorPort.loadAuthorProfile(authorId);
     return Result.success(new PublishedBookDto(book, authorProfileDto));
   }
 

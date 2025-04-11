@@ -10,7 +10,7 @@ import org.pageflow.common.user.UID;
  */
 @Value
 @Builder
-public class SessionUserDto implements IdentifiableUser {
+public class SessionUserDto {
   UID uid;
   String username;
   String email;

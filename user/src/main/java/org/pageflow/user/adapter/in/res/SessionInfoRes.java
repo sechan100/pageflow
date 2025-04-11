@@ -5,7 +5,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.pageflow.common.user.RoleType;
 import org.pageflow.common.user.UID;
-import org.pageflow.user.dto.IdentifiableUser;
 import org.pageflow.user.dto.SessionUserDto;
 
 /**
@@ -20,7 +19,7 @@ public class SessionInfoRes {
   @Data
   @NoArgsConstructor
   @AllArgsConstructor
-  public static class SessionUser implements IdentifiableUser {
+  public static class SessionUser {
     private UID uid;
     private String username;
     private String email;
@@ -29,7 +28,7 @@ public class SessionInfoRes {
     private String penname;
     private String profileImageUrl;
 
-    public static SessionUser from(SessionUserDto dto){
+    public static SessionUser from(SessionUserDto dto) {
       return new SessionUser(
         dto.getUid(),
         dto.getUsername(),

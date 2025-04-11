@@ -13,8 +13,7 @@ import java.util.UUID;
 
 
 @Value
-public final class AccessToken {
-
+public class AccessToken {
   public static final String ROLE_CLAIM_KEY = "rol";
   public static final String SESSION_ID_CLAIM_KEY = "sid";
 
@@ -28,6 +27,7 @@ public final class AccessToken {
 
   /**
    * 토큰을 compact하여 반환한다.
+   *
    * @return
    */
   public String compact() {

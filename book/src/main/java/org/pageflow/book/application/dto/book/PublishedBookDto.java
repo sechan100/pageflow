@@ -17,14 +17,14 @@ public class PublishedBookDto {
   String coverImageUrl;
   String description;
   List<PublishedRecordDto> publishedRecords;
-  AuthorProfileDto author;
+  AuthorProfileDto authorProfile;
 
-  public PublishedBookDto(Book book, AuthorProfileDto author) {
+  public PublishedBookDto(Book book, AuthorProfileDto authorProfile) {
     this.id = book.getId();
     this.title = book.getTitle();
     this.coverImageUrl = book.getCoverImageUrl();
     this.description = book.getDescription();
     this.publishedRecords = book.getPublishedRecords().stream().map(PublishedRecordDto::new).toList();
-    this.author = author;
+    this.authorProfile = authorProfile;
   }
 }

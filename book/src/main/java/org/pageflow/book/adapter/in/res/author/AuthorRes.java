@@ -1,4 +1,4 @@
-package org.pageflow.book.adapter.in.res;
+package org.pageflow.book.adapter.in.res.author;
 
 import lombok.Value;
 import org.pageflow.book.application.dto.author.AuthorDto;

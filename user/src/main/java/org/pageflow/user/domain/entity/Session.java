@@ -1,7 +1,10 @@
 package org.pageflow.user.domain.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.pageflow.common.jpa.JpaEntity;
 import org.pageflow.common.user.RoleType;
 
@@ -11,46 +14,48 @@ import java.util.UUID;
 /**
  * @author : sechan
  */
-@Getter
 @Entity
-@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(of = "id", callSuper = false)
 @Table(name = "session")
 public class Session implements JpaEntity {
 
   @Id
+  @Getter
   private UUID id;
 
-  @ManyToOne(fetch = FetchType.LAZY, optional = false, cascade = CascadeType.MERGE)
-  @JoinColumn(name = "account_id", updatable = false)
-  private Account account;
+  @Getter
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @JoinColumn(name = "user_id", updatable = false, nullable = false)
+  private User user;
 
+  @Getter
   @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
   private RoleType role;
 
+  @Getter
   @Embedded
   private RefreshToken refreshToken;
 
 
-
   public Session(
     UUID id,
-    Account account,
+    User user,
     RoleType role,
     RefreshToken refreshToken
   ) {
     this.id = id;
-    this.account = account;
+    this.user = user;
     this.role = role;
     this.refreshToken = refreshToken;
   }
 
-  public static Session issue(Account account) {
+  public static Session issue(User user) {
     return new Session(
       UUID.randomUUID(),
-      account,
-      account.getRole(),
+      user,
+      user.getRole(),
       RefreshToken.issue()
     );
   }

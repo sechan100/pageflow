@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pageflow.user.adapter.in.auth.form.AuthenticationTokenPrivder;
 import org.pageflow.user.adapter.in.web.JwtSessionFixer;
-import org.pageflow.user.domain.entity.Account;
+import org.pageflow.user.domain.entity.User;
 import org.pageflow.user.domain.token.AccessToken;
 import org.pageflow.user.port.in.IssueSessionCmd;
 import org.pageflow.user.port.in.SessionUseCase;
@@ -21,7 +21,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 /**
- *
  * @author : sechan
  */
 @Slf4j
@@ -39,7 +38,7 @@ public class DevOnlyJwtSessionFixFilter extends OncePerRequestFilter implements 
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-    if(this.fixedAccessToken==null){
+    if(this.fixedAccessToken == null) {
       filterChain.doFilter(request, response);
       return;
     }
@@ -52,8 +51,8 @@ public class DevOnlyJwtSessionFixFilter extends OncePerRequestFilter implements 
 
   @Override
   public void fixSession(String username) {
-    Account account = loadAccountPort.load(username).orElseThrow();
-    IssueSessionCmd cmd = new IssueSessionCmd(account.getUid());
+    User user = loadAccountPort.load(username).orElseThrow();
+    IssueSessionCmd cmd = new IssueSessionCmd(user.getUid());
     var tokens = sessionUseCase.issueSession(cmd);
     String compact = tokens.getAccessToken().getCompact();
     AccessToken accessToken = tokenUseCase.parseAccessToken(compact).getSuccessData();

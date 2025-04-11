@@ -6,13 +6,12 @@ import org.pageflow.common.result.NullData;
 import org.pageflow.common.result.Result;
 import org.pageflow.common.user.UID;
 import org.pageflow.user.domain.Password;
-import org.pageflow.user.domain.entity.Account;
-import org.pageflow.user.dto.AccountDto;
+import org.pageflow.user.domain.entity.User;
 import org.pageflow.user.dto.UserDto;
 import org.pageflow.user.port.in.AccountUseCase;
 import org.pageflow.user.port.in.EmailVerificationCmd;
 import org.pageflow.user.port.in.UserUseCase;
-import org.pageflow.user.port.out.entity.AccountPersistencePort;
+import org.pageflow.user.port.out.entity.UserPersistencePort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,13 +23,12 @@ import java.util.Optional;
 @Transactional
 @RequiredArgsConstructor
 public class AccountService implements AccountUseCase, UserUseCase {
-  private final AccountPersistencePort accountPersistencePort;
+  private final UserPersistencePort userPersistencePort;
   private final UsernameValidator usernameValidator;
   private final AccountEmailService accountEmailService;
 
 
   /**
-   *
    * @param uid
    * @param verificationUri
    * @return
@@ -57,12 +55,11 @@ public class AccountService implements AccountUseCase, UserUseCase {
 
   @Override
   public Optional<UserDto> queryUser(UID uid) {
-    Optional<Account> accountOptional = accountPersistencePort.findWithProfileById(uid.getValue());
-    return accountOptional.map(UserDto::from);
+    Optional<User> accountOptional = userPersistencePort.findById(uid.getValue());
+    return accountOptional.map(UserDto::new);
   }
 
   /**
-   *
    * @param uid
    * @param currentPassword
    * @param newPassword
@@ -72,21 +69,21 @@ public class AccountService implements AccountUseCase, UserUseCase {
    * @code PASSWORD_SAME_AS_BEFORE: 새로운 비밀번호가 기존 비밀번호와 동일한 경우
    */
   @Override
-  public Result<AccountDto> changePassword(UID uid, String currentPassword, String newPassword) {
-    Account account = _ensureAccount(uid);
+  public Result<UserDto> changePassword(UID uid, String currentPassword, String newPassword) {
+    User user = _ensureAccount(uid);
     Result<Password> encryptResult = Password.encrypt(newPassword);
-    if(encryptResult.isFailure()){
+    if(encryptResult.isFailure()) {
       return (Result) encryptResult;
     }
-    Result<NullData> changeResult = account.changePassword(currentPassword, encryptResult.getSuccessData());
-    if(changeResult.isFailure()){
+    Result<NullData> changeResult = user.changePassword(currentPassword, encryptResult.getSuccessData());
+    if(changeResult.isFailure()) {
       return (Result) changeResult;
     }
-    AccountDto accountDto = AccountDto.from(account);
-    return Result.success(accountDto);
+    UserDto userDto = new UserDto(user);
+    return Result.success(userDto);
   }
 
-  private Account _ensureAccount(UID uid) {
-    return accountPersistencePort.findById(uid.getValue()).orElseThrow();
+  private User _ensureAccount(UID uid) {
+    return userPersistencePort.findById(uid.getValue()).orElseThrow();
   }
 }

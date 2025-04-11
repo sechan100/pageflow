@@ -13,7 +13,8 @@ import org.pageflow.user.adapter.in.auth.oauth2.presignup.OAuth2PreSignupForward
 import org.pageflow.user.adapter.in.auth.oauth2.presignup.OAuth2PreSignupService;
 import org.pageflow.user.adapter.in.auth.oauth2.presignup.PreSignupDto;
 import org.pageflow.user.adapter.in.req.SignupForm;
-import org.pageflow.user.adapter.in.res.PreSignupedUser;
+import org.pageflow.user.adapter.in.res.PreSignupedUserRes;
+import org.pageflow.user.adapter.in.res.UserRes;
 import org.pageflow.user.application.UserCode;
 import org.pageflow.user.dto.UserDto;
 import org.pageflow.user.port.in.SignupCmd;
@@ -38,12 +39,12 @@ public class SignupWebAdapter {
 
   @PostMapping("/signup")
   @Operation(summary = "회원가입", description = "새로운 사용자의 회원가입을 요청")
-  public Result<UserDto> signup(@RequestBody SignupForm form) {
+  public Result<UserRes> signup(@RequestBody SignupForm form) {
     Optional<PreSignupDto> preSignupOptional = preSignupService.loadAndRemove(form.getUsername());
 
     Result<SignupCmd> cmdResult = null;
     // OAuth
-    if(preSignupOptional.isPresent()){
+    if(preSignupOptional.isPresent()) {
       PreSignupDto preSignup = preSignupOptional.get();
       cmdResult = SignupCmd.oAuthSignup(
         form.getUsername(),
@@ -54,7 +55,7 @@ public class SignupWebAdapter {
         preSignup.getProvider(),
         preSignup.getProfileImageUrl()
       );
-    // Native
+      // Native
     } else {
       cmdResult = SignupCmd.nativeSignup(
         form.getUsername(),
@@ -65,18 +66,18 @@ public class SignupWebAdapter {
       );
     }
 
-    if(cmdResult.isFailure()){
+    if(cmdResult.isFailure()) {
       return (Result) cmdResult;
     }
 
     UserDto userDto = signupUseCase.signup(cmdResult.getSuccessData());
-    return Result.success(userDto);
+    return Result.success(new UserRes(userDto));
   }
 
 
   /**
    * OAuth2 회원가입 전처리 로직
-   *
+   * <p>
    * SpringSecurityFilter에서 OAuth2를 통해서 인증할 때, 아직 회원이 아닌 사용자라면 해당 endpoint로 forward한다.
    * OAuth2 Provider에게 받아온 데이터를 임시로 저장하고 반환한다.
    * 사용자는 이 데이터를 기반으로 다시한번 회원가입을 요청해야한다.
@@ -84,7 +85,7 @@ public class SignupWebAdapter {
   @PostMapping(OAuth2PreSignupForward.OAUTH2_PRE_SIGNUP_PATH)
   @Hidden
   @Operation(summary = "OAuth2 회원가입 전처리", description = "OAuth2를 통해 받아온 사용자 정보를 회원가입을 위해 서버에 임시 저장")
-  public Result<PreSignupedUser> oAuth2PreSignup() {
+  public Result<PreSignupedUserRes> oAuth2PreSignup() {
     OAuth2ResourceOwner owner = OAuth2PreSignupForward.getForwardedResourceOwner(requestContext.getRequest());
     PreSignupDto preSignuped = preSignupService.preSignup(owner);
 

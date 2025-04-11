@@ -8,6 +8,6 @@ import java.util.List;
  * @author : sechan
  */
 @Value
-public class MyBooksRes {
-  List<SimpleBookRes> books;
+public class MyBookListRes {
+  List<MyBookRes> books;
 }

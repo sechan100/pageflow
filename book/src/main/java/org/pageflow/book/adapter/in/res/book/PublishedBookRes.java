@@ -1,7 +1,7 @@
 package org.pageflow.book.adapter.in.res.book;
 
 import lombok.Value;
-import org.pageflow.book.adapter.in.res.AuthorRes;
+import org.pageflow.book.adapter.in.res.author.AuthorProfileRes;
 import org.pageflow.book.application.dto.book.PublishedBookDto;
 
 import java.util.List;
@@ -17,7 +17,7 @@ public class PublishedBookRes {
   String coverImageUrl;
   String description;
   List<PublishedRecordRes> publishedRecords;
-  AuthorRes author;
+  AuthorProfileRes author;
 
   public PublishedBookRes(PublishedBookDto dto) {
     this.id = dto.getId();
@@ -27,6 +27,6 @@ public class PublishedBookRes {
     this.publishedRecords = dto.getPublishedRecords().stream()
       .map(PublishedRecordRes::new)
       .toList();
-    this.author = new AuthorRes(dto.getAuthor());
+    this.author = new AuthorProfileRes(dto.getAuthorProfile());
   }
 }

@@ -5,13 +5,11 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.pageflow.common.api.RequestContext;
-import org.pageflow.common.result.NullData;
 import org.pageflow.common.result.Result;
 import org.pageflow.common.user.UID;
 import org.pageflow.user.adapter.in.req.ChangePasswordReq;
 import org.pageflow.user.adapter.in.req.ProfileUpdateReq;
-import org.pageflow.user.dto.AccountDto;
-import org.pageflow.user.dto.ProfileDto;
+import org.pageflow.user.adapter.in.res.UserRes;
 import org.pageflow.user.dto.UserDto;
 import org.pageflow.user.port.in.AccountUseCase;
 import org.pageflow.user.port.in.ProfileUseCase;
@@ -41,7 +39,7 @@ public class UserUpdateWebAdapter {
   @PostMapping("/profile")
   @Transactional
   @Operation(summary = "프로필 설정 변경")
-  public Result<UserDto> changeProfile(
+  public Result<UserRes> changeProfile(
     @RequestPart("form")
     ProfileUpdateReq req,
 
@@ -54,13 +52,13 @@ public class UserUpdateWebAdapter {
   ) {
     UID uid = rqrxt.getUid();
     if(req.getPenname() != null) {
-      Result<ProfileDto> changePennameResult = profileUseCase.changePenname(uid, req.getPenname());
+      Result<UserDto> changePennameResult = profileUseCase.changePenname(uid, req.getPenname());
       if(changePennameResult.isFailure()) {
         return (Result) changePennameResult;
       }
     }
     if(profileImage != null) {
-      Result<ProfileDto> changeProfileImageResult = profileUseCase.changeProfileImage(uid, profileImage);
+      Result<UserDto> changeProfileImageResult = profileUseCase.changeProfileImage(uid, profileImage);
       if(changeProfileImageResult.isFailure()) {
         return (Result) changeProfileImageResult;
       }
@@ -73,15 +71,15 @@ public class UserUpdateWebAdapter {
     }
     Optional<UserDto> userDtoOpt = userUseCase.queryUser(uid);
     assert userDtoOpt.isPresent();
-    return Result.success(userDtoOpt.get());
+    return Result.success(new UserRes(userDtoOpt.get()));
   }
 
 
   @PostMapping("/password")
   @Operation(summary = "비밀번호 변경")
-  public Result<NullData> changePassword(@RequestBody ChangePasswordReq req) {
+  public Result changePassword(@RequestBody ChangePasswordReq req) {
     UID uid = rqrxt.getUid();
-    Result<AccountDto> result = accountUsecase.changePassword(uid, req.getCurrentPassword(), req.getNewPassword());
+    Result<UserDto> result = accountUsecase.changePassword(uid, req.getCurrentPassword(), req.getNewPassword());
     if(result.isFailure()) return (Result) result;
     return Result.success();
   }

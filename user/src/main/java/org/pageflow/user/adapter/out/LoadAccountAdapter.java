@@ -4,9 +4,9 @@ import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pageflow.common.user.UID;
-import org.pageflow.user.domain.entity.Account;
+import org.pageflow.user.domain.entity.User;
 import org.pageflow.user.port.out.LoadAccountPort;
-import org.pageflow.user.port.out.entity.AccountPersistencePort;
+import org.pageflow.user.port.out.entity.UserPersistencePort;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -18,16 +18,16 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class LoadAccountAdapter implements LoadAccountPort {
-  private final AccountPersistencePort delegate;
+  private final UserPersistencePort delegate;
   private final EntityManager entityManager;
 
   @Override
-  public Optional<Account> load(String username) {
+  public Optional<User> load(String username) {
     return delegate.findByUsername(username);
   }
 
   @Override
-  public Optional<Account> load(UID uid) {
+  public Optional<User> load(UID uid) {
     return delegate.findById(uid.getValue());
   }
 }

@@ -2,14 +2,14 @@ package org.pageflow.user.application;
 
 import lombok.Getter;
 import org.pageflow.common.result.code.ResultCode;
-import org.pageflow.user.adapter.in.res.PreSignupedUser;
+import org.pageflow.user.adapter.in.res.PreSignupedUserRes;
 
 /**
  * @author : sechan
  */
 @Getter
 public enum UserCode implements ResultCode {
-  OAUTH2_SIGNUP_REQUIRED("OAuth2 회원가입이 필요", PreSignupedUser.class),
+  OAUTH2_SIGNUP_REQUIRED("OAuth2 회원가입이 필요", PreSignupedUserRes.class),
 
   // 세션
   SESSION_EXPIRED("세션(refreshToken) 만료"),

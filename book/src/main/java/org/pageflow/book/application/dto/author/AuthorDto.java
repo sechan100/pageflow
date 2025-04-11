@@ -1,4 +1,4 @@
-package org.pageflow.book.application.dto;
+package org.pageflow.book.application.dto.author;
 
 import lombok.Value;
 import org.pageflow.book.domain.Author;

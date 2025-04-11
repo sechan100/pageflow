@@ -1,7 +1,7 @@
 package org.pageflow.book.application.dto.book;
 
 import lombok.Value;
-import org.pageflow.book.application.dto.AuthorDto;
+import org.pageflow.book.application.dto.author.AuthorDto;
 import org.pageflow.book.domain.entity.Book;
 import org.pageflow.book.domain.enums.BookStatus;
 import org.pageflow.book.domain.enums.BookVisibility;

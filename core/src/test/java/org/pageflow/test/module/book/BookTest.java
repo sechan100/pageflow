@@ -5,7 +5,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.pageflow.book.application.BookCode;
 import org.pageflow.book.application.dto.book.BookDto;
-import org.pageflow.book.application.dto.book.MyBooks;
+import org.pageflow.book.application.dto.book.MyBooksDto;
 import org.pageflow.book.application.dto.book.WithAuthorBookDto;
 import org.pageflow.book.port.in.BookUseCase;
 import org.pageflow.common.result.Result;
@@ -39,7 +39,7 @@ public class BookTest {
     assertEquals(book.getId(), readResult.getSuccessData().getId());
 
     // 내 책장 조회
-    MyBooks myBooks = bookUseCase.queryMyBooks(user1.getUid());
+    MyBooksDto myBooks = bookUseCase.queryMyBooks(user1.getUid());
     assertEquals(1, myBooks.getBooks().size());
     assertEquals(book.getId(), myBooks.getBooks().get(0).getId());
 
@@ -61,7 +61,7 @@ public class BookTest {
     assertTrue(deleteResultUnauthorized.is(BookCode.BOOK_ACCESS_DENIED));
 
     // 삭제 시도 후에도 책이 여전히 존재하는지 확인
-    MyBooks myBooksAfterUnauthorizedDelete = bookUseCase.queryMyBooks(user1.getUid());
+    MyBooksDto myBooksAfterUnauthorizedDelete = bookUseCase.queryMyBooks(user1.getUid());
     assertEquals(1, myBooksAfterUnauthorizedDelete.getBooks().size());
     assertEquals(book.getId(), myBooksAfterUnauthorizedDelete.getBooks().get(0).getId());
 
@@ -70,7 +70,7 @@ public class BookTest {
     assertTrue(deleteResult.isSuccess());
 
     // 삭제 확인
-    MyBooks myBooksAfterDelete = bookUseCase.queryMyBooks(user1.getUid());
+    MyBooksDto myBooksAfterDelete = bookUseCase.queryMyBooks(user1.getUid());
     assertTrue(myBooksAfterDelete.getBooks().isEmpty());
   }
 

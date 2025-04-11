@@ -48,7 +48,7 @@ public class PublishedRecord extends BaseJpaEntity {
   }
 
   public LocalDateTime getPublishedAt() {
-    return book.getCreatedDatetime();
+    return getCreatedDatetime();
   }
 
   /**

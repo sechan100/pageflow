@@ -61,7 +61,7 @@ public class ChangeBookStatusUseCase {
     }
     // Toc 병합
     _mergeToReadonly(book);
-    return Result.success(BookDto.from(book));
+    return Result.success(new BookDto(book));
   }
 
   /**
@@ -92,7 +92,7 @@ public class ChangeBookStatusUseCase {
 
     Toc readonlyToc = readTocPort.loadReadonlyToc(book);
     Toc copiedToc = tocTreePersistencePort.copyReadonlyTocToEditableToc(readonlyToc);
-    return Result.success(BookDto.from(book));
+    return Result.success(new BookDto(book));
   }
 
   /**
@@ -131,7 +131,7 @@ public class ChangeBookStatusUseCase {
     Toc editableToc = editTocPort.loadEditableToc(book);
     tocTreePersistencePort.deleteToc(editableToc);
 
-    return Result.success(BookDto.from(book));
+    return Result.success(new BookDto(book));
   }
 
   /**
@@ -163,7 +163,7 @@ public class ChangeBookStatusUseCase {
 
     // toc 병합
     _mergeToReadonly(book);
-    return Result.success(BookDto.from(book));
+    return Result.success(new BookDto(book));
   }
 
   /**
@@ -184,7 +184,7 @@ public class ChangeBookStatusUseCase {
     if(result.isFailure()) {
       return result;
     }
-    return Result.success(BookDto.from(book));
+    return Result.success(new BookDto(book));
   }
 
   /**

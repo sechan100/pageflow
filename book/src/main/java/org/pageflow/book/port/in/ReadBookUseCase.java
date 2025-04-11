@@ -2,6 +2,7 @@ package org.pageflow.book.port.in;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.pageflow.book.application.dto.author.AuthorProfileDto;
 import org.pageflow.book.application.dto.book.PublishedBookDto;
 import org.pageflow.book.domain.BookAccessGranter;
 import org.pageflow.book.domain.entity.Book;
@@ -35,7 +36,8 @@ public class ReadBookUseCase {
     if(grant.isFailure()) {
       return grant;
     }
-    return Result.success(PublishedBookDto.from(book));
+    AuthorProfileDto authorProfileDto = loadAuthorPort.loadAuthorProfile(uid);
+    return Result.success(new PublishedBookDto(book, authorProfileDto));
   }
 
 

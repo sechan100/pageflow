@@ -47,10 +47,10 @@ public class BookShelfUseCase {
       return grant;
     }
     // 책장에 책 넣기
-    Author shelfOwner = loadAuthorPort.loadAuthorProxy(shlefOwnerId);
+    Author shelfOwner = book.getAuthor();
     ShelfItem shelfItem = ShelfItem.create(book, shelfOwner);
     shelfItemPersistencePort.persist(shelfItem);
-    BookDto dto = BookDto.from(book);
+    BookDto dto = new BookDto(book);
     return Result.success(dto);
   }
 

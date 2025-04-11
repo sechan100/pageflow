@@ -1,7 +1,7 @@
 package org.pageflow.book.application.dto.book;
 
 import lombok.Value;
-import org.pageflow.book.application.dto.AuthorDto;
+import org.pageflow.book.application.dto.author.AuthorProfileDto;
 import org.pageflow.book.domain.entity.Book;
 
 import java.util.List;
@@ -17,17 +17,14 @@ public class PublishedBookDto {
   String coverImageUrl;
   String description;
   List<PublishedRecordDto> publishedRecords;
-  AuthorDto author;
+  AuthorProfileDto author;
 
-
-  public static PublishedBookDto from(Book book) {
-    return new PublishedBookDto(
-      book.getId(),
-      book.getTitle(),
-      book.getCoverImageUrl(),
-      book.getDescription(),
-      book.getPublishedRecords().stream().map(PublishedRecordDto::new).toList(),
-      AuthorDto.from(book.getAuthor())
-    );
+  public PublishedBookDto(Book book, AuthorProfileDto author) {
+    this.id = book.getId();
+    this.title = book.getTitle();
+    this.coverImageUrl = book.getCoverImageUrl();
+    this.description = book.getDescription();
+    this.publishedRecords = book.getPublishedRecords().stream().map(PublishedRecordDto::new).toList();
+    this.author = author;
   }
 }

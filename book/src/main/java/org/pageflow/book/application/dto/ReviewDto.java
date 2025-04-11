@@ -1,6 +1,7 @@
 package org.pageflow.book.application.dto;
 
 import lombok.Value;
+import org.pageflow.book.application.dto.author.AuthorDto;
 import org.pageflow.book.domain.entity.Review;
 
 import java.util.UUID;

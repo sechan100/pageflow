@@ -1,7 +1,7 @@
 package org.pageflow.book.adapter.in.res;
 
 import lombok.Value;
-import org.pageflow.book.application.dto.AuthorDto;
+import org.pageflow.book.application.dto.author.AuthorDto;
 import org.pageflow.common.user.UID;
 
 /**

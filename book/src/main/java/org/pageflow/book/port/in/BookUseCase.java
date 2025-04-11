@@ -2,9 +2,8 @@ package org.pageflow.book.port.in;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.pageflow.book.application.dto.AuthorDto;
 import org.pageflow.book.application.dto.book.BookDto;
-import org.pageflow.book.application.dto.book.MyBooks;
+import org.pageflow.book.application.dto.book.MyBooksDto;
 import org.pageflow.book.application.dto.book.WithAuthorBookDto;
 import org.pageflow.book.domain.Author;
 import org.pageflow.book.domain.BookAccessGranter;
@@ -76,7 +75,7 @@ public class BookUseCase {
     TocNode rootFolder = TocNode.createRootFolder(book);
     editTocPort.persist(rootFolder);
 
-    return Result.success(BookDto.from(book));
+    return Result.success(new BookDto(book));
   }
 
   /**
@@ -95,14 +94,12 @@ public class BookUseCase {
     return Result.success(WithAuthorBookDto.from(book));
   }
 
-  public MyBooks queryMyBooks(UID uid) {
+  public MyBooksDto queryMyBooks(UID uid) {
     // books
-    Author author = loadAuthorPort.loadAuthor(uid).get();
     List<Book> books = bookPersistencePort.findBooksByAuthorId(uid.getValue());
 
-    return new MyBooks(
-      AuthorDto.from(author),
-      books.stream().map(BookDto::from).toList()
+    return new MyBooksDto(
+      books.stream().map(BookDto::new).toList()
     );
   }
 
@@ -122,7 +119,7 @@ public class BookUseCase {
     // 책 제목 변경
     BookTitle bookTitle = BookTitle.create(title);
     book.changeTitle(bookTitle);
-    return Result.success(BookDto.from(book));
+    return Result.success(new BookDto(book));
   }
 
   /**
@@ -154,7 +151,7 @@ public class BookUseCase {
       return (Result) uploadResult;
     }
     book.changeCoverImageUrl(uploadResult.getSuccessData().getWebUrl());
-    return Result.success(BookDto.from(book));
+    return Result.success(new BookDto(book));
   }
 
   public Result<BookDto> changeBookDescription(UID uid, UUID bookId, String description) {
@@ -178,7 +175,7 @@ public class BookUseCase {
         """, bookId, description, bookDescription.getContent());
     }
     book.changeDescription(bookDescription);
-    return Result.success(BookDto.from(book));
+    return Result.success(new BookDto(book));
   }
 
   /**

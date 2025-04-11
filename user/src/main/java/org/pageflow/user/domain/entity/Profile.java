@@ -24,7 +24,7 @@ public class Profile extends BaseJpaEntity {
   @Column(nullable = false)
   private String penname;
 
-  @Column(nullable = false, columnDefinition = "TEXT")
+  @Column(nullable = false, columnDefinition = "VARCHAR(255)")
   private String profileImageUrl;
 
   @JsonIgnore
@@ -34,6 +34,10 @@ public class Profile extends BaseJpaEntity {
   @Setter(AccessLevel.PACKAGE)
   @OneToOne(optional = false, fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
   private Account account;
+
+  @Getter
+  @Column(nullable = false, columnDefinition = "TEXT")
+  private String bio;
 
 
   public Profile(

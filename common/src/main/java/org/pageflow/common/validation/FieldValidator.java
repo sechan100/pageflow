@@ -18,7 +18,7 @@ public class FieldValidator<T> {
   public FieldValidator(String fieldName, T value) {
     this.fieldName = fieldName;
     this.value = value;
-    this.validators = new ArrayList<>();
+    this.validators = new ArrayList<>(5);
   }
 
   public static <T> FieldValidator<T> of(String fieldName, T value) {

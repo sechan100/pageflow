@@ -3,9 +3,9 @@ package org.pageflow.book.port.in;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pageflow.book.application.dto.AuthorDto;
-import org.pageflow.book.application.dto.BookDto;
-import org.pageflow.book.application.dto.BookDtoWithAuthor;
-import org.pageflow.book.application.dto.MyBooks;
+import org.pageflow.book.application.dto.book.BookDto;
+import org.pageflow.book.application.dto.book.MyBooks;
+import org.pageflow.book.application.dto.book.WithAuthorBookDto;
 import org.pageflow.book.domain.Author;
 import org.pageflow.book.domain.BookAccessGranter;
 import org.pageflow.book.domain.BookDescriptionHtmlContent;
@@ -60,26 +60,18 @@ public class BookUseCase {
     // author
     Author author = loadAuthorPort.loadAuthorProxy(authorId);
     // book
-    UUID bookId = UUID.randomUUID();
     BookTitle bookTitle = BookTitle.create(title);
-    String coverImageUrl = applicationProperties.book.defaultCoverImageUrl;
+    Book book = new Book(author, bookTitle);
     if(coverImage != null) {
-      Result<FilePath> uploadResult = _uploadCoverImage(bookId, coverImage);
+      Result<FilePath> uploadResult = _uploadCoverImage(book.getId(), coverImage);
       if(uploadResult.isSuccess()) {
-        coverImageUrl = uploadResult.getSuccessData().getWebUrl();
+        String coverImageUrl = uploadResult.getSuccessData().getWebUrl();
+        book.changeCoverImageUrl(coverImageUrl);
       } else {
         return (Result) uploadResult;
       }
     }
-
-    Book book = Book.create(
-      bookId,
-      author,
-      bookTitle,
-      coverImageUrl
-    );
     bookPersistencePort.persist(book);
-
     // root folder
     TocNode rootFolder = TocNode.createRootFolder(book);
     editTocPort.persist(rootFolder);
@@ -88,17 +80,19 @@ public class BookUseCase {
   }
 
   /**
+   * {@link BookAccess#AUTHOR} 권한 필요
+   *
    * @code BOOK_ACCESS_DENIED: 책 읽기 권한이 없는 경우
    */
-  public Result<BookDtoWithAuthor> getBook(UID uid, UUID bookId) {
+  public Result<WithAuthorBookDto> getBook(UID uid, UUID bookId) {
     Book book = bookPersistencePort.findBookWithAuthorById(bookId).get();
     // 권한 검사 =====
     BookAccessGranter accessGranter = new BookAccessGranter(uid, book);
-    Result grant = accessGranter.grant(BookAccess.WRITE);
+    Result grant = accessGranter.grant(BookAccess.AUTHOR);
     if(grant.isFailure()) {
       return grant;
     }
-    return Result.success(BookDtoWithAuthor.from(book));
+    return Result.success(WithAuthorBookDto.from(book));
   }
 
   public MyBooks queryMyBooks(UID uid) {
@@ -168,7 +162,7 @@ public class BookUseCase {
 
     // 권한 검사 =========================
     BookAccessGranter accessGranter = new BookAccessGranter(uid, book);
-    Result grant = accessGranter.grant(BookAccess.UPDATE);
+    Result grant = accessGranter.grant(BookAccess.AUTHOR);
     if(grant.isFailure()) {
       return grant;
     }
@@ -195,7 +189,7 @@ public class BookUseCase {
 
     // 권한 검사 ===========
     BookAccessGranter accessGranter = new BookAccessGranter(uid, book);
-    Result grant = accessGranter.grant(BookAccess.UPDATE);
+    Result grant = accessGranter.grant(BookAccess.AUTHOR);
     if(grant.isFailure()) {
       return grant;
     }

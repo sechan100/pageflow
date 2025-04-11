@@ -4,7 +4,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.pageflow.book.adapter.in.form.FolderForm;
-import org.pageflow.book.application.dto.FolderDto;
+import org.pageflow.book.adapter.in.res.node.FolderRes;
+import org.pageflow.book.application.dto.node.FolderDto;
 import org.pageflow.book.port.in.EditTocUseCase;
 import org.pageflow.book.port.in.cmd.CreateFolderCmd;
 import org.pageflow.book.port.in.cmd.NodeIdentifier;
@@ -27,7 +28,7 @@ public class FolderWebAdapter {
 
   @PostMapping("")
   @Operation(summary = "폴더 생성")
-  public Result<FolderDto> createFolder(
+  public Result<FolderRes> createFolder(
     @PathVariable UUID bookId,
     @Valid @RequestBody FolderForm.Create form
   ) {
@@ -38,12 +39,16 @@ public class FolderWebAdapter {
       form.getTitle()
     );
     Result<FolderDto> result = editTocUseCase.createFolder(cmd);
-    return result;
+    if(result.isFailure()) {
+      return (Result) result;
+    }
+    FolderRes res = new FolderRes(result.getSuccessData());
+    return Result.success(res);
   }
 
   @GetMapping("/{folderId}")
   @Operation(summary = "폴더 조회")
-  public Result<FolderDto> getFolder(
+  public Result<FolderRes> getFolder(
     @PathVariable UUID bookId,
     @PathVariable UUID folderId
   ) {
@@ -53,12 +58,16 @@ public class FolderWebAdapter {
       folderId
     );
     Result<FolderDto> result = editTocUseCase.getFolder(identifier);
-    return result;
+    if(result.isFailure()) {
+      return (Result) result;
+    }
+    FolderRes res = new FolderRes(result.getSuccessData());
+    return Result.success(res);
   }
 
   @PostMapping("/{folderId}")
   @Operation(summary = "폴더 업데이트")
-  public Result<FolderDto> updateFolder(
+  public Result<FolderRes> updateFolder(
     @PathVariable UUID bookId,
     @PathVariable UUID folderId,
     @Valid @RequestBody FolderForm.Update form
@@ -69,7 +78,11 @@ public class FolderWebAdapter {
       folderId
     );
     Result<FolderDto> result = editTocUseCase.changeFolderTitle(identifier, form.getTitle());
-    return result;
+    if(result.isFailure()) {
+      return (Result) result;
+    }
+    FolderRes res = new FolderRes(result.getSuccessData());
+    return Result.success(res);
   }
 
 

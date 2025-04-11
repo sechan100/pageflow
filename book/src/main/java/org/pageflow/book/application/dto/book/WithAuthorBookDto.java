@@ -1,10 +1,10 @@
-package org.pageflow.book.application.dto;
+package org.pageflow.book.application.dto.book;
 
 import lombok.Value;
+import org.pageflow.book.application.dto.AuthorDto;
 import org.pageflow.book.domain.entity.Book;
 import org.pageflow.book.domain.enums.BookStatus;
 import org.pageflow.book.domain.enums.BookVisibility;
-import org.pageflow.common.user.UID;
 
 import java.util.UUID;
 
@@ -12,27 +12,24 @@ import java.util.UUID;
  * @author : sechan
  */
 @Value
-public class BookDto {
+public class WithAuthorBookDto {
   UUID id;
   String title;
   String coverImageUrl;
   String description;
   BookStatus status;
-  int edition;
   BookVisibility visibility;
-  UID authorId;
+  AuthorDto author;
 
-
-  public static BookDto from(Book book) {
-    return new BookDto(
+  public static WithAuthorBookDto from(Book book) {
+    return new WithAuthorBookDto(
       book.getId(),
       book.getTitle(),
       book.getCoverImageUrl(),
       book.getDescription(),
       book.getStatus(),
-      book.getEdition(),
       book.getVisibility(),
-      book.getAuthor().getUid()
+      AuthorDto.from(book.getAuthor())
     );
   }
 }

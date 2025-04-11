@@ -74,8 +74,13 @@ public class TocNode extends BaseJpaEntity {
    * {@link TocNodeType#SECTION}인 경우에 content를 가진다.
    */
   @Getter
-  @OneToOne(fetch = FetchType.LAZY, optional = true, cascade = CascadeType.ALL)
-  @JoinColumn(name = "content_id", updatable = false, nullable = true)
+  @OneToOne(
+    fetch = FetchType.LAZY,
+    optional = true,
+    cascade = CascadeType.ALL,
+    orphanRemoval = true
+  )
+  @JoinColumn(name = "content_id", updatable = false)
   private NodeContent content;
 
 

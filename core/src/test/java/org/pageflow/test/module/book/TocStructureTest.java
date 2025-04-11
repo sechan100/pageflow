@@ -7,7 +7,11 @@ import org.junit.jupiter.api.Test;
 import org.pageflow.book.adapter.out.TocNodeJpaRepository;
 import org.pageflow.book.application.BookCode;
 import org.pageflow.book.application.TocNodeType;
-import org.pageflow.book.application.dto.*;
+import org.pageflow.book.application.dto.book.BookDto;
+import org.pageflow.book.application.dto.node.FolderDto;
+import org.pageflow.book.application.dto.node.SectionDto;
+import org.pageflow.book.application.dto.node.TocDto;
+import org.pageflow.book.application.dto.node.WithContentSectionDto;
 import org.pageflow.book.port.in.EditTocUseCase;
 import org.pageflow.book.port.in.SectionWriteUseCase;
 import org.pageflow.book.port.in.cmd.CreateFolderCmd;
@@ -94,7 +98,7 @@ public class TocStructureTest {
 
     // 4. 섹션 추가
     // 1장에 섹션 1개 추가
-    Result<SectionDtoWithContent> section1Result = editTocUseCase.createSection(
+    Result<WithContentSectionDto> section1Result = editTocUseCase.createSection(
       new CreateSectionCmd(
         user1.getUid(),
         bookId,
@@ -106,7 +110,7 @@ public class TocStructureTest {
     UUID section1Id = section1Result.getSuccessData().getId();
 
     // 2장에 섹션 3개 추가
-    Result<SectionDtoWithContent> section2Result = editTocUseCase.createSection(
+    Result<WithContentSectionDto> section2Result = editTocUseCase.createSection(
       new CreateSectionCmd(
         user1.getUid(),
         bookId,
@@ -117,7 +121,7 @@ public class TocStructureTest {
     Assertions.assertTrue(section2Result.isSuccess());
     UUID section2Id = section2Result.getSuccessData().getId();
 
-    Result<SectionDtoWithContent> section3Result = editTocUseCase.createSection(
+    Result<WithContentSectionDto> section3Result = editTocUseCase.createSection(
       new CreateSectionCmd(
         user1.getUid(),
         bookId,
@@ -128,7 +132,7 @@ public class TocStructureTest {
     Assertions.assertTrue(section3Result.isSuccess());
     UUID section3Id = section3Result.getSuccessData().getId();
 
-    Result<SectionDtoWithContent> section4Result = editTocUseCase.createSection(
+    Result<WithContentSectionDto> section4Result = editTocUseCase.createSection(
       new CreateSectionCmd(
         user1.getUid(),
         bookId,
@@ -140,7 +144,7 @@ public class TocStructureTest {
     UUID section4Id = section4Result.getSuccessData().getId();
 
     // 3장에 섹션 1개 추가
-    Result<SectionDtoWithContent> section5Result = editTocUseCase.createSection(
+    Result<WithContentSectionDto> section5Result = editTocUseCase.createSection(
       new CreateSectionCmd(
         user1.getUid(),
         bookId,
@@ -172,7 +176,7 @@ public class TocStructureTest {
     UUID subFolder1Id = subFolder1Result.getSuccessData().getId();
 
     // 하위 폴더에 섹션 추가
-    Result<SectionDtoWithContent> section6Result = editTocUseCase.createSection(
+    Result<WithContentSectionDto> section6Result = editTocUseCase.createSection(
       new CreateSectionCmd(
         user1.getUid(),
         bookId,
@@ -183,7 +187,7 @@ public class TocStructureTest {
     Assertions.assertTrue(section6Result.isSuccess());
     UUID section6Id = section6Result.getSuccessData().getId();
 
-    Result<SectionDtoWithContent> section7Result = editTocUseCase.createSection(
+    Result<WithContentSectionDto> section7Result = editTocUseCase.createSection(
       new CreateSectionCmd(
         user1.getUid(),
         bookId,
@@ -211,7 +215,7 @@ public class TocStructureTest {
     Assertions.assertTrue(subSubFolderResult.isSuccess());
     UUID subSubFolderId = subSubFolderResult.getSuccessData().getId();
 
-    Result<SectionDtoWithContent> section8Result = editTocUseCase.createSection(
+    Result<WithContentSectionDto> section8Result = editTocUseCase.createSection(
       new CreateSectionCmd(
         user1.getUid(),
         bookId,
@@ -315,13 +319,13 @@ public class TocStructureTest {
     Assertions.assertTrue(updateSectionTitleResult.isSuccess());
 
     // 섹션 내용 변경
-    Result<SectionDtoWithContent> updateSectionContentResult = sectionWriteUseCase.writeContent(section1Identifier, updatedContent);
+    Result<WithContentSectionDto> updateSectionContentResult = sectionWriteUseCase.writeContent(section1Identifier, updatedContent);
     Assertions.assertTrue(updateSectionContentResult.isSuccess());
 
     // 섹션 조회하여 확인
-    Result<SectionDtoWithContent> sectionWithContentResult = sectionWriteUseCase.getSectionWithContent(section1Identifier);
+    Result<WithContentSectionDto> sectionWithContentResult = sectionWriteUseCase.getSectionWithContent(section1Identifier);
     Assertions.assertTrue(sectionWithContentResult.isSuccess());
-    SectionDtoWithContent updatedSection = sectionWithContentResult.getSuccessData();
+    WithContentSectionDto updatedSection = sectionWithContentResult.getSuccessData();
     Assertions.assertEquals(updatedTitle, updatedSection.getTitle());
     Assertions.assertEquals(updatedContent, updatedSection.getContent());
 

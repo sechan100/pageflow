@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.pageflow.book.adapter.in.form.ReviewForm;
+import org.pageflow.book.adapter.in.res.review.ReviewRes;
 import org.pageflow.book.application.dto.ReviewDto;
 import org.pageflow.book.port.in.ReviewUseCase;
 import org.pageflow.common.api.RequestContext;
@@ -26,7 +27,7 @@ public class ReviewWebAdapter {
 
   @PostMapping("")
   @Operation(summary = "책에 리뷰를 작성")
-  public Result<ReviewDto> createReview(
+  public Result<ReviewRes> createReview(
     @PathVariable UUID bookId,
     @Valid @RequestBody ReviewForm.Create form
   ) {
@@ -37,13 +38,17 @@ public class ReviewWebAdapter {
       form.getContent(),
       form.getScore()
     );
-    return result;
+    if(result.isFailure()) {
+      return (Result) result;
+    }
+    ReviewRes res = new ReviewRes(result.getSuccessData());
+    return Result.success(res);
   }
 
 
   @PostMapping("/{reviewId}")
   @Operation(summary = "리뷰 수정")
-  public Result<ReviewDto> updateReview(
+  public Result<ReviewRes> updateReview(
     @PathVariable UUID bookId,
     @PathVariable UUID reviewId,
     @Valid @RequestBody ReviewForm.Update form
@@ -55,7 +60,11 @@ public class ReviewWebAdapter {
       form.getContent(),
       form.getScore()
     );
-    return result;
+    if(result.isFailure()) {
+      return (Result) result;
+    }
+    ReviewRes res = new ReviewRes(result.getSuccessData());
+    return Result.success(res);
   }
 
 

@@ -1,7 +1,7 @@
 package org.pageflow.test.module.book.utils;
 
-import org.pageflow.book.application.dto.FolderDto;
-import org.pageflow.book.application.dto.SectionDtoWithContent;
+import org.pageflow.book.application.dto.node.FolderDto;
+import org.pageflow.book.application.dto.node.WithContentSectionDto;
 import org.pageflow.book.port.in.cmd.CreateFolderCmd;
 import org.pageflow.book.port.in.cmd.CreateSectionCmd;
 
@@ -45,7 +45,7 @@ public class TocTreeBuilderFolderImpl implements TocTreeBuilderFolder {
 
   @Override
   public TocTreeBuilderFolder section(String title) {
-    SectionDtoWithContent sectionDto = context.create(
+    WithContentSectionDto sectionDto = context.create(
       new CreateSectionCmd(
         context.getUid(),
         context.getBookId(),

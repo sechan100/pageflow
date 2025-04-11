@@ -10,7 +10,7 @@ public class FieldValidationResult {
   private final List<InvalidField> invalidFields;
 
   public FieldValidationResult() {
-    this.invalidFields = new ArrayList<>();
+    this.invalidFields = new ArrayList<>(5);
   }
 
   public static FieldValidationResult of(InvalidField... invalidField) {
@@ -34,7 +34,7 @@ public class FieldValidationResult {
   }
 
   public void throwIfInvalid() {
-    if(!this.isValid()){
+    if(!this.isValid()) {
       throw new FieldValidationException(this);
     }
   }

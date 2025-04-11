@@ -48,7 +48,7 @@ public class TocTreePersistenceAdapter implements TocTreePersistencePort {
     Preconditions.checkArgument(sourceToc.isReadOnlyToc());
 
     TreeNode rootTreeNode = sourceToc.buildTree();
-    Collection<TocNode> copiedNodes = new ArrayList<>();
+    Collection<TocNode> copiedNodes = new ArrayList<>(30);
     TocNode copiedRoot = repository.persist(
       new TocNode(rootTreeNode.getTocNode(), null)
     );

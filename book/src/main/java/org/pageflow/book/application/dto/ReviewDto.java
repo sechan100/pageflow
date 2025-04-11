@@ -11,7 +11,7 @@ import java.util.UUID;
 @Value
 public class ReviewDto {
   UUID id;
-  AuthorDto author;
+  AuthorDto writer;
   String content;
   int score;
 

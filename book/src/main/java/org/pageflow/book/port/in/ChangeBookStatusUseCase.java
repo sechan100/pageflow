@@ -3,8 +3,9 @@ package org.pageflow.book.port.in;
 import com.google.common.base.Preconditions;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.pageflow.book.application.dto.BookDto;
+import org.pageflow.book.application.dto.book.BookDto;
 import org.pageflow.book.domain.BookAccessGranter;
+import org.pageflow.book.domain.StatusChangeableBook;
 import org.pageflow.book.domain.entity.Book;
 import org.pageflow.book.domain.enums.BookAccess;
 import org.pageflow.book.domain.enums.BookVisibility;
@@ -27,7 +28,7 @@ import java.util.UUID;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class BookSettingsUseCase {
+public class ChangeBookStatusUseCase {
   private final BookPersistencePort bookPersistencePort;
   private final ReadTocPort readTocPort;
   private final EditTocPort editTocPort;
@@ -47,13 +48,14 @@ public class BookSettingsUseCase {
 
     // 작가 권한 검사
     BookAccessGranter accessGranter = new BookAccessGranter(uid, book);
-    Result grant = accessGranter.grant(BookAccess.UPDATE);
+    Result grant = accessGranter.grant(BookAccess.AUTHOR);
     if(grant.isFailure()) {
       return grant;
     }
 
     // 상태 변경
-    Result publishRes = book.publish();
+    StatusChangeableBook statusChangeableBook = new StatusChangeableBook(book);
+    Result publishRes = statusChangeableBook.publish();
     if(publishRes.isFailure()) {
       return publishRes;
     }
@@ -74,12 +76,13 @@ public class BookSettingsUseCase {
     Book book = bookPersistencePort.findById(bookId).get();
     // 작가 권한 검사 ================================
     BookAccessGranter accessGranter = new BookAccessGranter(uid, book);
-    Result grant = accessGranter.grant(BookAccess.UPDATE);
+    Result grant = accessGranter.grant(BookAccess.AUTHOR);
     if(grant.isFailure()) {
       return grant;
     }
     // 상태 변경 ====================================
-    Result startRevisionRes = book.startRevision();
+    StatusChangeableBook statusChangeableBook = new StatusChangeableBook(book);
+    Result startRevisionRes = statusChangeableBook.startRevision();
     if(startRevisionRes.isFailure()) {
       return startRevisionRes;
     }
@@ -104,13 +107,14 @@ public class BookSettingsUseCase {
 
     // 작가 권한 검사
     BookAccessGranter accessGranter = new BookAccessGranter(uid, book);
-    Result grant = accessGranter.grant(BookAccess.UPDATE);
+    Result grant = accessGranter.grant(BookAccess.AUTHOR);
     if(grant.isFailure()) {
       return grant;
     }
 
     // 상태 변경
-    Result cancelRevisionRes = book.cancelRevision();
+    StatusChangeableBook statusChangeableBook = new StatusChangeableBook(book);
+    Result cancelRevisionRes = statusChangeableBook.cancelRevision();
     if(cancelRevisionRes.isFailure()) {
       return cancelRevisionRes;
     }
@@ -145,13 +149,14 @@ public class BookSettingsUseCase {
 
     // 작가 권한 검사 ====================
     BookAccessGranter accessGranter = new BookAccessGranter(uid, book);
-    Result grant = accessGranter.grant(BookAccess.UPDATE);
+    Result grant = accessGranter.grant(BookAccess.AUTHOR);
     if(grant.isFailure()) {
       return grant;
     }
 
     // 상태 변경
-    Result mergeRevisionRes = book.mergeRevision();
+    StatusChangeableBook statusChangeableBook = new StatusChangeableBook(book);
+    Result mergeRevisionRes = statusChangeableBook.mergeRevision();
     if(mergeRevisionRes.isFailure()) {
       return mergeRevisionRes;
     }
@@ -169,12 +174,13 @@ public class BookSettingsUseCase {
 
     // 작가 권한 검사 ====================
     BookAccessGranter accessGranter = new BookAccessGranter(uid, book);
-    Result grant = accessGranter.grant(BookAccess.UPDATE);
+    Result grant = accessGranter.grant(BookAccess.AUTHOR);
     if(grant.isFailure()) {
       return grant;
     }
 
-    Result result = book.changeVisibility(visibility);
+    StatusChangeableBook statusChangeableBook = new StatusChangeableBook(book);
+    Result result = statusChangeableBook.changeVisibility(visibility);
     if(result.isFailure()) {
       return result;
     }

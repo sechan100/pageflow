@@ -2,8 +2,8 @@ package org.pageflow.book.port.in;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.pageflow.book.application.dto.BookDto;
-import org.pageflow.book.application.dto.BookDtoWithAuthor;
+import org.pageflow.book.application.dto.book.BookDto;
+import org.pageflow.book.application.dto.book.WithAuthorBookDto;
 import org.pageflow.book.domain.Author;
 import org.pageflow.book.domain.BookAccessGranter;
 import org.pageflow.book.domain.entity.Book;
@@ -76,10 +76,10 @@ public class BookShelfUseCase {
   /**
    * 책장에 있는 책들을 조회한다.
    */
-  public List<BookDtoWithAuthor> getShelfBooks(UID shlefOwnerId) {
+  public List<WithAuthorBookDto> getShelfBooks(UID shlefOwnerId) {
     List<ShelfItem> shelfItems = shelfItemPersistencePort.findBooksByShelfOwnerId(shlefOwnerId.getValue());
     return shelfItems.stream()
-      .map(shelfItem -> BookDtoWithAuthor.from(shelfItem.getBook()))
+      .map(shelfItem -> WithAuthorBookDto.from(shelfItem.getBook()))
       .toList();
   }
 }

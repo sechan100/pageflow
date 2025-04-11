@@ -2,8 +2,8 @@ package org.pageflow.book.port.in;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.pageflow.book.application.dto.SectionAttachmentUrl;
-import org.pageflow.book.application.dto.SectionDtoWithContent;
+import org.pageflow.book.application.dto.node.SectionAttachmentUrl;
+import org.pageflow.book.application.dto.node.WithContentSectionDto;
 import org.pageflow.book.domain.BookAccessGranter;
 import org.pageflow.book.domain.SectionHtmlContent;
 import org.pageflow.book.domain.entity.Book;
@@ -41,7 +41,7 @@ public class SectionWriteUseCase {
    * @code BOOK_ACCESS_DENIED: 작가 권한이 없는 경우
    * @code INVALID_BOOK_STATUS: 출판된 책을 수정하려는 경우
    */
-  public Result<SectionDtoWithContent> getSectionWithContent(NodeIdentifier identifier) {
+  public Result<WithContentSectionDto> getSectionWithContent(NodeIdentifier identifier) {
     Book book = bookPersistencePort.findById(identifier.getBookId()).get();
     TocSection section = editTocPort.loadEditableSection(book, identifier.getNodeId()).get();
     // 권한 검사 =========================================
@@ -50,7 +50,7 @@ public class SectionWriteUseCase {
     if(checkWriteAuthorityRes.isFailure()) {
       return checkWriteAuthorityRes;
     }
-    return Result.success(SectionDtoWithContent.from(section));
+    return Result.success(WithContentSectionDto.from(section));
   }
 
   /**
@@ -58,7 +58,7 @@ public class SectionWriteUseCase {
    * @code INVALID_BOOK_STATUS: 출판된 책을 수정하려는 경우
    * @code DATA_NOT_FOUND: 섹션을 찾을 수 없는 경우
    */
-  public Result<SectionDtoWithContent> writeContent(NodeIdentifier identifier, String content) {
+  public Result<WithContentSectionDto> writeContent(NodeIdentifier identifier, String content) {
     Book book = bookPersistencePort.findById(identifier.getBookId()).get();
     TocSection section = editTocPort.loadEditableSection(book, identifier.getNodeId()).get();
     // 권한 검사 ==================================================
@@ -79,7 +79,7 @@ public class SectionWriteUseCase {
     }
     NodeContent nodeContent = section.getContent();
     nodeContent.updateContent(html);
-    return Result.success(SectionDtoWithContent.from(section));
+    return Result.success(WithContentSectionDto.from(section));
   }
 
   /**
@@ -102,8 +102,8 @@ public class SectionWriteUseCase {
     // 파일 업로드 ============================================
     Result<FileUploadCmd> cmd = FileUploadCmd.createCmd(
       file,
-      section.getId().toString(),
-      FileType.BOOK_SECTION_ATTACHMENT_IMAGE
+      section.getContent().getId().toString(),
+      FileType.BOOK_NODE_CONTENT_ATTACHMENT_IMAGE
     );
     if(cmd.isFailure()) {
       return (Result) cmd;

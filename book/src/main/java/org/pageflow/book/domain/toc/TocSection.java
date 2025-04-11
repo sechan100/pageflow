@@ -28,4 +28,8 @@ public class TocSection {
   public NodeContent getContent() {
     return section.getContent();
   }
+
+  public TocNode getTocNodeEntity() {
+    return section;
+  }
 }

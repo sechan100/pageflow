@@ -29,7 +29,7 @@ public class BookAccessGranter {
     return switch(access) {
       case READ -> _grantRead();
       case WRITE -> _grantWrite();
-      case UPDATE -> _grantUpdate();
+      case AUTHOR -> _grantAuthor();
     };
   }
 
@@ -68,7 +68,7 @@ public class BookAccessGranter {
    *
    * @code BOOK_ACCESS_DENIED: 접근 권한이 없는 경우
    */
-  private Result _grantUpdate() {
+  private Result _grantAuthor() {
     if(isAuthor) {
       return Result.success();
     } else {

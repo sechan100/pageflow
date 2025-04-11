@@ -4,10 +4,10 @@ import com.google.common.base.Preconditions;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pageflow.book.application.BookCode;
-import org.pageflow.book.application.dto.FolderDto;
-import org.pageflow.book.application.dto.SectionDto;
-import org.pageflow.book.application.dto.SectionDtoWithContent;
-import org.pageflow.book.application.dto.TocDto;
+import org.pageflow.book.application.dto.node.FolderDto;
+import org.pageflow.book.application.dto.node.SectionDto;
+import org.pageflow.book.application.dto.node.TocDto;
+import org.pageflow.book.application.dto.node.WithContentSectionDto;
 import org.pageflow.book.domain.BookAccessGranter;
 import org.pageflow.book.domain.NodeTitle;
 import org.pageflow.book.domain.entity.Book;
@@ -25,6 +25,8 @@ import org.pageflow.book.port.out.jpa.BookPersistencePort;
 import org.pageflow.common.result.Result;
 import org.pageflow.common.result.code.CommonCode;
 import org.pageflow.common.user.UID;
+import org.pageflow.file.service.FileService;
+import org.pageflow.file.shared.FileType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,6 +43,7 @@ import java.util.UUID;
 public class EditTocUseCase {
   private final BookPersistencePort bookPersistencePort;
   private final EditTocPort editTocPort;
+  private final FileService fileService;
 
 
   /**
@@ -184,7 +187,7 @@ public class EditTocUseCase {
    * @code BOOK_ACCESS_DENIED: 작가 권한이 없는 경우
    * @code FIELD_VALIDATION_ERROR: title이 유효하지 않은 경우
    */
-  public Result<SectionDtoWithContent> createSection(CreateSectionCmd cmd) {
+  public Result<WithContentSectionDto> createSection(CreateSectionCmd cmd) {
     UID uid = cmd.getUid();
     Book book = bookPersistencePort.findById(cmd.getBookId()).get();
     TocFolder parentFolder = editTocPort.loadEditableFolder(book, cmd.getParentNodeId()).get();
@@ -208,7 +211,7 @@ public class EditTocUseCase {
     parentFolder.insertLast(section);
     editTocPort.persist(section);
     TocSection tocSection = editTocPort.loadEditableSection(book, section.getId()).get();
-    return Result.success(SectionDtoWithContent.from(tocSection));
+    return Result.success(WithContentSectionDto.from(tocSection));
   }
 
   /**
@@ -242,21 +245,29 @@ public class EditTocUseCase {
   public Result deleteSection(NodeIdentifier identifier) {
     Book book = bookPersistencePort.findById(identifier.getBookId()).get();
     // 조회해서 section이 book에 속하는지 확인
-    TocNode node = editTocPort.loadEditableNode(book, identifier.getNodeId()).get();
+    TocSection found = editTocPort.loadEditableSection(book, identifier.getNodeId()).get();
+    TocNode section = found.getTocNodeEntity();
     // 책 쓰기 권한 확인 ===============================================
     BookAccessGranter accessGranter = new BookAccessGranter(identifier.getUid(), book);
     Result grant = accessGranter.grant(BookAccess.WRITE);
     if(grant.isFailure()) {
       return grant;
     }
-    // 노드 삭제 ==================================================
-    if(node.isRootFolder()) {
+
+    if(section.isRootFolder()) {
       return Result.of(
         BookCode.TOC_HIERARCHY_ERROR,
         "root folder node는 삭제할 수 없습니다."
       );
     }
-    editTocPort.deleteSection(node);
+    // 첨부파일 삭제
+    String contentId = section.getContent().getId().toString();
+    Result contentAttachedFileDeletionResult = fileService.deleteAll(contentId, FileType.BOOK_NODE_CONTENT_ATTACHMENT_IMAGE);
+    if(contentAttachedFileDeletionResult.isFailure()) {
+      return contentAttachedFileDeletionResult;
+    }
+    // 노드 삭제
+    editTocPort.deleteSection(section);
     return Result.success();
   }
 

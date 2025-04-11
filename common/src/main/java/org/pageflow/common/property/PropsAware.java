@@ -1,7 +1,7 @@
 package org.pageflow.common.property;
 
+import com.google.common.base.Preconditions;
 import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
 
 /**
  * @author : sechan
@@ -17,7 +17,7 @@ public class PropsAware {
 
   @SuppressWarnings("StaticVariableUsedBeforeInitialization")
   public static ApplicationProperties use() {
-    Assert.notNull(props, "AppProps가 초기화되지 않았습니다.");
+    Preconditions.checkNotNull(props, "ApplicationProperties가 초기화되지 않았습니다.");
     return props;
   }
 }

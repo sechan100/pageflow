@@ -1,7 +1,7 @@
 package org.pageflow.book.domain.toc;
 
 import lombok.Getter;
-import org.pageflow.book.application.dto.TocDto;
+import org.pageflow.book.application.dto.node.TocDto;
 import org.pageflow.book.domain.entity.Book;
 import org.pageflow.book.domain.entity.TocNode;
 

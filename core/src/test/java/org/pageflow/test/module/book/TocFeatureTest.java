@@ -4,9 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.pageflow.book.adapter.out.TocNodeJpaRepository;
-import org.pageflow.book.application.dto.BookDto;
-import org.pageflow.book.application.dto.FolderDto;
-import org.pageflow.book.application.dto.SectionDtoWithContent;
+import org.pageflow.book.application.dto.book.BookDto;
+import org.pageflow.book.application.dto.node.FolderDto;
+import org.pageflow.book.application.dto.node.WithContentSectionDto;
 import org.pageflow.book.domain.entity.TocNode;
 import org.pageflow.book.port.in.EditTocUseCase;
 import org.pageflow.book.port.in.cmd.CreateFolderCmd;
@@ -68,7 +68,7 @@ public class TocFeatureTest {
     FolderDto folder2 = folder2Result.getSuccessData();
 
     // 섹션 생성
-    Result<SectionDtoWithContent> section1Result = editTocUseCase.createSection(
+    Result<WithContentSectionDto> section1Result = editTocUseCase.createSection(
       new CreateSectionCmd(
         user.getUid(),
         bookId,
@@ -77,7 +77,7 @@ public class TocFeatureTest {
       )
     );
     assertTrue(section1Result.isSuccess());
-    SectionDtoWithContent section1 = section1Result.getSuccessData();
+    WithContentSectionDto section1 = section1Result.getSuccessData();
 
     // 엔티티 load 및 ov 검증
     TocNode en_f1 = nodePersistencePort.findById(folder1.getId()).get();

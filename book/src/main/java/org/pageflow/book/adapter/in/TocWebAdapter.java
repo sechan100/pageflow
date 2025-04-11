@@ -3,7 +3,7 @@ package org.pageflow.book.adapter.in;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.pageflow.book.adapter.in.form.NodeRelocateForm;
-import org.pageflow.book.application.dto.TocDto;
+import org.pageflow.book.application.dto.node.TocDto;
 import org.pageflow.book.port.in.EditTocUseCase;
 import org.pageflow.book.port.in.cmd.RelocateNodeCmd;
 import org.pageflow.common.api.RequestContext;

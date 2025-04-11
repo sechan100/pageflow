@@ -11,5 +11,5 @@ public enum BookAccess {
   WRITE,
 
   // 책의 상태, 설명을 변경하거나 삭제 등을 가능하게하는 권한
-  UPDATE,
+  AUTHOR,
 }

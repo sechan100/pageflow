@@ -4,9 +4,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.pageflow.book.adapter.in.form.BookForm;
-import org.pageflow.book.application.dto.BookDto;
-import org.pageflow.book.application.dto.BookDtoWithAuthor;
-import org.pageflow.book.application.dto.MyBooks;
+import org.pageflow.book.adapter.in.res.book.AuthorPrivateBookRes;
+import org.pageflow.book.adapter.in.res.book.SimpleBookRes;
+import org.pageflow.book.application.dto.book.BookDto;
+import org.pageflow.book.application.dto.book.MyBooks;
+import org.pageflow.book.application.dto.book.WithAuthorBookDto;
 import org.pageflow.book.port.in.BookUseCase;
 import org.pageflow.common.api.RequestContext;
 import org.pageflow.common.result.Result;
@@ -14,6 +16,7 @@ import org.pageflow.common.user.UID;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -29,58 +32,81 @@ public class BookWebAdapter {
 
   @PostMapping("")
   @Operation(summary = "책 생성")
-  public Result<BookDto> createBook(@Valid @RequestBody BookForm.Create form) {
+  public Result<SimpleBookRes> createBook(@Valid @RequestBody BookForm.Create form) {
     UID uid = rqcxt.getUid();
     Result<BookDto> result = bookUseCase.createBook(uid, form.getTitle(), null);
-    return result;
+    if(result.isFailure()) {
+      return (Result) result;
+    }
+    SimpleBookRes res = new SimpleBookRes(result.getSuccessData());
+    return Result.success(res);
   }
 
   @GetMapping("")
   @Operation(summary = "내 책장 조회")
-  public MyBooks getMyBooks() {
+  public Result<List<SimpleBookRes>> getMyBooks() {
     MyBooks myBooks = bookUseCase.queryMyBooks(rqcxt.getUid());
-    return myBooks;
+    List<SimpleBookRes> res = myBooks.getBooks().stream()
+      .map(SimpleBookRes::new)
+      .toList();
+    return Result.success(res);
   }
 
   @GetMapping("/{bookId}")
   @Operation(summary = "책 조회")
-  public Result<BookDtoWithAuthor> getBook(@PathVariable UUID bookId) {
+  public Result<AuthorPrivateBookRes> getBook(@PathVariable UUID bookId) {
     UID uid = rqcxt.getUid();
-    Result<BookDtoWithAuthor> result = bookUseCase.getBook(uid, bookId);
-    return result;
+    Result<WithAuthorBookDto> result = bookUseCase.getBook(uid, bookId);
+    if(result.isFailure()) {
+      return (Result) result;
+    }
+    AuthorPrivateBookRes res = new AuthorPrivateBookRes(result.getSuccessData());
+    return Result.success(res);
   }
 
   @PostMapping("/{bookId}/title")
   @Operation(summary = "책 제목 수정")
-  public Result<BookDto> changeBookTitle(
+  public Result<SimpleBookRes> changeBookTitle(
     @PathVariable UUID bookId,
     @Valid @RequestBody BookForm.Title form
   ) {
     UID uid = rqcxt.getUid();
     Result<BookDto> result = bookUseCase.changeBookTitle(uid, bookId, form.getTitle());
-    return result;
+    if(result.isFailure()) {
+      return (Result) result;
+    }
+    SimpleBookRes res = new SimpleBookRes(result.getSuccessData());
+    return Result.success(res);
   }
 
   @PostMapping("/{bookId}/cover-image")
   @Operation(summary = "책 표지 이미지 수정")
-  public Result<BookDto> changeBookCoverImage(
+  public Result<SimpleBookRes> changeBookCoverImage(
     @PathVariable UUID bookId,
     @RequestPart(name = "coverImage") MultipartFile coverImage
   ) {
     UID uid = rqcxt.getUid();
     Result<BookDto> result = bookUseCase.changeBookCoverImage(uid, bookId, coverImage);
-    return result;
+    if(result.isFailure()) {
+      return (Result) result;
+    }
+    SimpleBookRes res = new SimpleBookRes(result.getSuccessData());
+    return Result.success(res);
   }
 
   @PostMapping("/{bookId}/description")
   @Operation(summary = "책 설명 수정")
-  public Result<BookDto> changeBookDescription(
+  public Result<SimpleBookRes> changeBookDescription(
     @PathVariable UUID bookId,
     @Valid @RequestBody BookForm.Description form
   ) {
     UID uid = rqcxt.getUid();
     Result<BookDto> result = bookUseCase.changeBookDescription(uid, bookId, form.getDescription());
-    return result;
+    if(result.isFailure()) {
+      return (Result) result;
+    }
+    SimpleBookRes res = new SimpleBookRes(result.getSuccessData());
+    return Result.success(res);
   }
 
   @DeleteMapping("/{bookId}")

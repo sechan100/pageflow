@@ -24,5 +24,7 @@ public interface FileDataJpaRepository extends BaseJpaRepository<FileData, UUID>
         and f.fileType = :fileType
     """)
   void deleteAll(@Param("ownerId") String ownerId, @Param("fileType") FileType fileType);
+  
+  List<FileData> findAllByOwnerIdAndFileType(@Param("ownerId") String ownerId, @Param("fileType") FileType fileType);
 }
 

@@ -1,4 +1,4 @@
-package org.pageflow.book.application.dto;
+package org.pageflow.book.application.dto.node;
 
 import com.google.common.base.Preconditions;
 import lombok.AccessLevel;

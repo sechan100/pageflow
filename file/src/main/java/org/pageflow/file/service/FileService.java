@@ -102,8 +102,13 @@ public class FileService {
     return _deleteByFilePath(path);
   }
 
-  public void deleteAll(String ownerId, FileType ownerType) {
-    repository.deleteAll(ownerId, ownerType);
+  public Result deleteAll(String ownerId, FileType ownerType) {
+    List<FileData> fileDatas = repository.findAllByOwnerIdAndFileType(ownerId, ownerType);
+    for(FileData fileData : fileDatas) {
+      Result result = _deleteByFilePath(fileData.getFilePath());
+      if(result.isFailure()) return result;
+    }
+    return Result.success();
   }
 
   /**

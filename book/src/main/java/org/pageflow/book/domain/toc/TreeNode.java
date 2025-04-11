@@ -18,7 +18,7 @@ import java.util.UUID;
 public class TreeNode {
   private final TocNode tocNode;
   private TreeNode parent;
-  private final List<TreeNode> children = new ArrayList<>();
+  private final List<TreeNode> children = new ArrayList<>(10);
 
   public TreeNode(TocNode tocNode) {
     this.tocNode = tocNode;

@@ -1,7 +1,7 @@
 package org.pageflow.test.module.book.utils;
 
 import lombok.RequiredArgsConstructor;
-import org.pageflow.book.application.dto.BookDto;
+import org.pageflow.book.application.dto.book.BookDto;
 import org.pageflow.book.port.in.BookUseCase;
 import org.pageflow.user.dto.UserDto;
 import org.springframework.stereotype.Component;

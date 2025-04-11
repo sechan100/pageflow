@@ -2,8 +2,8 @@ package org.pageflow.test.module.book.utils;
 
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Assertions;
-import org.pageflow.book.application.dto.BookDto;
-import org.pageflow.book.application.dto.TocDto;
+import org.pageflow.book.application.dto.book.BookDto;
+import org.pageflow.book.application.dto.node.TocDto;
 import org.pageflow.book.domain.entity.TocNode;
 import org.pageflow.book.domain.toc.TreeNode;
 import org.pageflow.book.port.in.EditTocUseCase;

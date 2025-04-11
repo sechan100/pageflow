@@ -5,13 +5,13 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.pageflow.book.application.BookCode;
-import org.pageflow.book.application.dto.BookDto;
-import org.pageflow.book.application.dto.SectionDto;
+import org.pageflow.book.application.dto.book.BookDto;
+import org.pageflow.book.application.dto.node.SectionDto;
 import org.pageflow.book.domain.entity.Book;
 import org.pageflow.book.domain.entity.TocNode;
 import org.pageflow.book.domain.toc.Toc;
 import org.pageflow.book.domain.toc.TreeNode;
-import org.pageflow.book.port.in.BookSettingsUseCase;
+import org.pageflow.book.port.in.ChangeBookStatusUseCase;
 import org.pageflow.book.port.in.EditTocUseCase;
 import org.pageflow.book.port.in.cmd.NodeIdentifier;
 import org.pageflow.book.port.out.EditTocPort;
@@ -36,7 +36,7 @@ public class BookStatusTest {
   private final UserUtils userUtils;
   private final BookUtils bookUtils;
   private final TocUtils tocUtils;
-  private final BookSettingsUseCase bookSettingsUseCase;
+  private final ChangeBookStatusUseCase changeBookStatusUseCase;
   private final EditTocUseCase editTocUseCase;
 
   private final BookPersistencePort bookPersistencePort;
@@ -77,7 +77,7 @@ public class BookStatusTest {
     Assertions.assertTrue(changeSectionTitleRes.isSuccess());
 
     // 책 출판
-    Result publishRes = bookSettingsUseCase.publish(uid, bookId);
+    Result publishRes = changeBookStatusUseCase.publish(uid, bookId);
     Assertions.assertTrue(publishRes.isSuccess());
 
     // 출판 후 모든 node가 readonlyToc로 변경되었는지 확인
@@ -113,11 +113,11 @@ public class BookStatusTest {
       );
 
     // 책 출판
-    Result publishRes = bookSettingsUseCase.publish(uid, bookId);
+    Result publishRes = changeBookStatusUseCase.publish(uid, bookId);
     Assertions.assertTrue(publishRes.isSuccess());
 
     // 출판 후 개정 시작
-    Result reviseRes = bookSettingsUseCase.startRevision(uid, bookId);
+    Result reviseRes = changeBookStatusUseCase.startRevision(uid, bookId);
     Assertions.assertTrue(reviseRes.isSuccess());
 
     // 출판 후 editableToc가 복제되었는지 확인
@@ -153,15 +153,15 @@ public class BookStatusTest {
       );
 
     // 책 출판
-    Result publishRes = bookSettingsUseCase.publish(uid, bookId);
+    Result publishRes = changeBookStatusUseCase.publish(uid, bookId);
     Assertions.assertTrue(publishRes.isSuccess());
 
     // 출판 후 개정 시작
-    Result reviseRes = bookSettingsUseCase.startRevision(uid, bookId);
+    Result reviseRes = changeBookStatusUseCase.startRevision(uid, bookId);
     Assertions.assertTrue(reviseRes.isSuccess());
 
     // 개정 후 책 출판
-    Result rePublishRes = bookSettingsUseCase.publish(uid, bookId);
+    Result rePublishRes = changeBookStatusUseCase.publish(uid, bookId);
     Assertions.assertTrue(rePublishRes.isSuccess());
 
     // 개정 후 모든 node가 readonlyToc로 변경되었는지 확인
@@ -194,15 +194,15 @@ public class BookStatusTest {
       );
 
     // 책 출판
-    Result publishRes = bookSettingsUseCase.publish(uid, bookId);
+    Result publishRes = changeBookStatusUseCase.publish(uid, bookId);
     Assertions.assertTrue(publishRes.isSuccess());
 
     // 출판 후 개정 시작
-    Result reviseRes = bookSettingsUseCase.startRevision(uid, bookId);
+    Result reviseRes = changeBookStatusUseCase.startRevision(uid, bookId);
     Assertions.assertTrue(reviseRes.isSuccess());
 
     // 개정 후 책 병합
-    Result mergeRevisionRes = bookSettingsUseCase.mergeRevision(uid, bookId);
+    Result mergeRevisionRes = changeBookStatusUseCase.mergeRevision(uid, bookId);
     Assertions.assertTrue(mergeRevisionRes.isSuccess());
 
     // 병합 후 모든 node가 readonlyToc로 변경되었는지 확인
@@ -239,15 +239,15 @@ public class BookStatusTest {
     Toc originalToc = editTocPort.loadEditableToc(bookEntity);
 
     // 책 출판
-    Result publishRes = bookSettingsUseCase.publish(uid, bookId);
+    Result publishRes = changeBookStatusUseCase.publish(uid, bookId);
     Assertions.assertTrue(publishRes.isSuccess());
 
     // 출판 후 개정 시작
-    Result reviseRes = bookSettingsUseCase.startRevision(uid, bookId);
+    Result reviseRes = changeBookStatusUseCase.startRevision(uid, bookId);
     Assertions.assertTrue(reviseRes.isSuccess());
 
     // 개정 후 책 개정 취소
-    Result cancelRevisionRes = bookSettingsUseCase.cancelRevision(uid, bookId);
+    Result cancelRevisionRes = changeBookStatusUseCase.cancelRevision(uid, bookId);
     Assertions.assertTrue(cancelRevisionRes.isSuccess());
 
     // 병합 후 모든 node가 readonlyToc로 변경되었는지 확인 + 맨 처음 만든 node들과 일치하는지

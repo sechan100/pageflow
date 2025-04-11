@@ -4,9 +4,12 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.pageflow.book.adapter.in.form.SectionForm;
-import org.pageflow.book.application.dto.SectionAttachmentUrl;
-import org.pageflow.book.application.dto.SectionDto;
-import org.pageflow.book.application.dto.SectionDtoWithContent;
+import org.pageflow.book.adapter.in.res.UrlRes;
+import org.pageflow.book.adapter.in.res.node.SectionRes;
+import org.pageflow.book.adapter.in.res.node.WithContentSectionRes;
+import org.pageflow.book.application.dto.node.SectionAttachmentUrl;
+import org.pageflow.book.application.dto.node.SectionDto;
+import org.pageflow.book.application.dto.node.WithContentSectionDto;
 import org.pageflow.book.port.in.EditTocUseCase;
 import org.pageflow.book.port.in.SectionWriteUseCase;
 import org.pageflow.book.port.in.cmd.CreateSectionCmd;
@@ -32,7 +35,7 @@ public class SectionWebAdapter {
 
   @PostMapping("")
   @Operation(summary = "섹션 생성")
-  public Result<SectionDtoWithContent> createSection(
+  public Result<WithContentSectionRes> createSection(
     @PathVariable UUID bookId,
     @Valid @RequestBody SectionForm.Create form
   ) {
@@ -43,13 +46,17 @@ public class SectionWebAdapter {
       form.getParentNodeId(),
       form.getTitle()
     );
-    Result<SectionDtoWithContent> result = editTocUseCase.createSection(cmd);
-    return result;
+    Result<WithContentSectionDto> result = editTocUseCase.createSection(cmd);
+    if(result.isFailure()) {
+      return (Result) result;
+    }
+    WithContentSectionRes res = new WithContentSectionRes(result.getSuccessData());
+    return Result.success(res);
   }
 
   @GetMapping("/{sectionId}")
   @Operation(summary = "섹션 조회")
-  public Result<SectionDto> getSection(
+  public Result<SectionRes> getSection(
     @PathVariable UUID bookId,
     @PathVariable UUID sectionId
   ) {
@@ -59,12 +66,16 @@ public class SectionWebAdapter {
       sectionId
     );
     Result<SectionDto> result = editTocUseCase.getSection(identifier);
-    return result;
+    if(result.isFailure()) {
+      return (Result) result;
+    }
+    SectionRes res = new SectionRes(result.getSuccessData());
+    return Result.success(res);
   }
 
   @GetMapping("/{sectionId}/content")
   @Operation(summary = "섹션을 내용과 함께 조회")
-  public Result<SectionDtoWithContent> getSectionWithContent(
+  public Result<WithContentSectionRes> getSectionWithContent(
     @PathVariable UUID bookId,
     @PathVariable UUID sectionId
   ) {
@@ -73,13 +84,17 @@ public class SectionWebAdapter {
       bookId,
       sectionId
     );
-    Result<SectionDtoWithContent> result = sectionWriteUseCase.getSectionWithContent(identifier);
-    return result;
+    Result<WithContentSectionDto> result = sectionWriteUseCase.getSectionWithContent(identifier);
+    if(result.isFailure()) {
+      return (Result) result;
+    }
+    WithContentSectionRes res = new WithContentSectionRes(result.getSuccessData());
+    return Result.success(res);
   }
 
   @PostMapping("/{sectionId}")
   @Operation(summary = "섹션 업데이트")
-  public Result<SectionDto> updateSection(
+  public Result<SectionRes> updateSection(
     @PathVariable UUID bookId,
     @PathVariable UUID sectionId,
     @Valid @RequestBody SectionForm.Title req
@@ -90,7 +105,11 @@ public class SectionWebAdapter {
       sectionId
     );
     Result<SectionDto> result = editTocUseCase.changeSectionTitle(identifier, req.getTitle());
-    return result;
+    if(result.isFailure()) {
+      return (Result) result;
+    }
+    SectionRes res = new SectionRes(result.getSuccessData());
+    return Result.success(res);
   }
 
   @DeleteMapping("/{sectionId}")
@@ -109,7 +128,7 @@ public class SectionWebAdapter {
 
   @PostMapping("/{sectionId}/upload-image")
   @Operation(summary = "섹션 이미지 업로드")
-  public Result<SectionAttachmentUrl> uploadSectionAttachmentImage(
+  public Result<UrlRes> uploadSectionAttachmentImage(
     @PathVariable UUID bookId,
     @PathVariable UUID sectionId,
     @RequestPart MultipartFile image
@@ -119,12 +138,17 @@ public class SectionWebAdapter {
       bookId,
       sectionId
     );
-    return sectionWriteUseCase.uploadAttachmentImage(identifier, image);
+    Result<SectionAttachmentUrl> result = sectionWriteUseCase.uploadAttachmentImage(identifier, image);
+    if(result.isFailure()) {
+      return (Result) result;
+    }
+    UrlRes res = new UrlRes(result.getSuccessData().getUrl());
+    return Result.success(res);
   }
 
   @PostMapping("/{sectionId}/content")
   @Operation(summary = "섹션 내용 작성")
-  public Result<SectionDtoWithContent> writeContent(
+  public Result<WithContentSectionRes> writeContent(
     @PathVariable UUID bookId,
     @PathVariable UUID sectionId,
     @Valid @RequestBody SectionForm.Content form
@@ -134,7 +158,12 @@ public class SectionWebAdapter {
       bookId,
       sectionId
     );
-    return sectionWriteUseCase.writeContent(identifier, form.getContent());
+    Result<WithContentSectionDto> result = sectionWriteUseCase.writeContent(identifier, form.getContent());
+    if(result.isFailure()) {
+      return (Result) result;
+    }
+    WithContentSectionRes res = new WithContentSectionRes(result.getSuccessData());
+    return Result.success(res);
   }
 
 }

@@ -55,7 +55,6 @@ public class TocNode extends BaseJpaEntity {
    * 예를 들어, {@link org.pageflow.book.domain.enums.BookStatus#REVISING}인 경우
    * 기존 출판되어있던 toc는 읽기전용 TOC로 남아있고, 이를 기반으로 새로운 toc가 복제되어 편집가능한 toc가 된다.
    */
-  @Getter
   @Column(nullable = false)
   private boolean isEditable;
 
@@ -80,24 +79,26 @@ public class TocNode extends BaseJpaEntity {
   @JoinColumn(name = "content_id", updatable = false)
   private NodeContent content;
 
-  /**
-   * readOnly node를 복사하여 editable node를 만드는 경우에 사용하는 복사 팩토리 메서드
-   */
-  public TocNode(TocNode node, TocNode parentNode) {
-    Preconditions.checkArgument(!node.isEditable);
-    Preconditions.checkArgument(
-      parentNode == null ? true : parentNode.isFolder(),
-      "parentNode는 null(rootFolder를 위한 null 참조)거나 Folder여야 합니다."
-    );
 
-    this.id = UUID.randomUUID();
-    this.book = node.book;
-    this.title = node.title;
-    this.parentNode = parentNode;
-    this.isEditable = true;
-    this.ov = node.ov;
-    this.type = node.type;
-    this.content = node.content != null ? NodeContent.copy(node.content) : null;
+  public static TocNode copyFromReadOnlyToEditable(TocNode node, @Nullable TocNode parentNode) {
+    Preconditions.checkArgument(node.isReadOnly());
+    if(parentNode != null) {
+      Preconditions.checkArgument(
+        parentNode.isParentableNode(),
+        "복사하려는 node의 parentNode는 'FOLDER' type이어야 합니다."
+      );
+    }
+
+    return new TocNode(
+      UUID.randomUUID(),
+      node.book,
+      node.title,
+      parentNode,
+      true,
+      node.ov,
+      node.type,
+      node.content != null ? NodeContent.copy(node.content) : null
+    );
   }
 
   public static TocNode createRootFolder(Book book) {
@@ -108,7 +109,7 @@ public class TocNode extends BaseJpaEntity {
       null,
       true,
       0,
-      TocNodeType.FOLDER,
+      TocNodeType.ROOT_FOLDER,
       null
     );
   }
@@ -151,12 +152,33 @@ public class TocNode extends BaseJpaEntity {
     this.title = title.getValue();
   }
 
-  public boolean isSection() {
+  public boolean isRootFolder() {
+    return this.type == TocNodeType.ROOT_FOLDER;
+  }
+
+  public boolean isFolderType() {
+    return this.getType() == TocNodeType.FOLDER;
+  }
+
+  public boolean isSectionType() {
     return this.getType() == TocNodeType.SECTION;
   }
 
-  public boolean isFolder() {
-    return this.getType() == TocNodeType.FOLDER;
+  public boolean isEditable() {
+    return this.isEditable;
+  }
+
+  public boolean isReadOnly() {
+    return !this.isEditable;
+  }
+
+  /**
+   * {@link TocNodeType#FOLDER}, 또는 {@link TocNodeType#ROOT_FOLDER}인 경우 true를 반환한다.
+   *
+   * @return
+   */
+  public boolean isParentableNode() {
+    return this.getType() == TocNodeType.FOLDER || this.getType() == TocNodeType.ROOT_FOLDER;
   }
 
   public void setOv(int ov) {
@@ -169,7 +191,7 @@ public class TocNode extends BaseJpaEntity {
    * @throws IllegalStateException this가 {@link TocNodeType#SECTION}이 아닌 경우
    */
   public NodeContent getContent() {
-    Preconditions.checkState(isSection());
+    Preconditions.checkState(isSectionType());
     return this.content;
   }
 
@@ -177,12 +199,8 @@ public class TocNode extends BaseJpaEntity {
     this.isEditable = editable;
   }
 
-  public boolean isRootFolder() {
-    return isFolder() && this.parentNode == null && this.title.equals(TocNodeConfig.ROOT_FOLDER_TITLE);
-  }
-
   public void setParentNode(TocNode parentNode) {
-    Preconditions.checkState(parentNode.isFolder());
+    Preconditions.checkState(parentNode.isParentableNode());
     Preconditions.checkState(isEditable);
     this.parentNode = parentNode;
   }
@@ -198,14 +216,6 @@ public class TocNode extends BaseJpaEntity {
    */
   public TocNode getParentNodeOrNull() {
     return this.parentNode;
-  }
-
-  @PreUpdate
-  private void preUpdate() {
-    boolean isRootFolderTitle = this.title.equals(TocNodeConfig.ROOT_FOLDER_TITLE);
-    if(!isRootFolderTitle && this.parentNode == null) {
-      throw new IllegalStateException("root folder가 아닌 node는 반드시 부모가 지정되어야 합니다.");
-    }
   }
 
 }

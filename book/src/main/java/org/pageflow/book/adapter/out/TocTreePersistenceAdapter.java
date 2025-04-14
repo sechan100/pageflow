@@ -50,7 +50,7 @@ public class TocTreePersistenceAdapter implements TocTreePersistencePort {
     TreeNode rootTreeNode = sourceToc.buildTree();
     Collection<TocNode> copiedNodes = new ArrayList<>(30);
     TocNode copiedRoot = repository.persist(
-      new TocNode(rootTreeNode.getTocNode(), null)
+      TocNode.copyFromReadOnlyToEditable(rootTreeNode.getTocNode(), null)
     );
     copiedNodes.add(copiedRoot);
     for(TreeNode child : rootTreeNode.getChildren()) {
@@ -98,14 +98,14 @@ public class TocTreePersistenceAdapter implements TocTreePersistencePort {
   }
 
   private void copyNodeRecursive(TreeNode node, TocNode parentNode, Collection<TocNode> copiedNodes) {
-    Preconditions.checkArgument(parentNode.isFolder());
+    Preconditions.checkArgument(parentNode.isParentableNode());
 
     TocNode copied = repository.persist(
-      new TocNode(node.getTocNode(), parentNode)
+      TocNode.copyFromReadOnlyToEditable(node.getTocNode(), parentNode)
     );
     copiedNodes.add(copied);
 
-    if(copied.isFolder()) {
+    if(copied.isParentableNode()) {
       for(TreeNode child : node.getChildren()) {
         copyNodeRecursive(child, copied, copiedNodes);
       }

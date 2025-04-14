@@ -15,7 +15,7 @@ public class SectionDto {
   String title;
 
   public static SectionDto from(TocNode section) {
-    Preconditions.checkState(section.isSection());
+    Preconditions.checkState(section.isSectionType());
     return new SectionDto(
       section.getId(),
       section.getTitle()

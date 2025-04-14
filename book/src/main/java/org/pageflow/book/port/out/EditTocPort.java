@@ -10,7 +10,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 /**
- * 해당 port에서는 {@link TocNode#getIsEditable()}가 false인, 즉 편집 가능한 node들만을 취급한다.
+ * 해당 port에서는 {@link TocNode#isEditable()}인, 편집 가능한 node들만을 취급한다.
  *
  * @author : sechan
  */

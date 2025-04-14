@@ -37,7 +37,7 @@ public class TocDto {
 
     public Folder(TocNode folder, List<Node> children) {
       super(folder);
-      Preconditions.checkState(folder.isFolder());
+      Preconditions.checkState(folder.isParentableNode());
       this.children = children;
     }
 
@@ -48,7 +48,7 @@ public class TocDto {
   public static class Section extends Node {
     public Section(TocNode section) {
       super(section);
-      Preconditions.checkState(section.isSection());
+      Preconditions.checkState(section.isSectionType());
     }
   }
 

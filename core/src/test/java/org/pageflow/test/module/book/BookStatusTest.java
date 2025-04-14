@@ -64,7 +64,7 @@ public class BookStatusTest {
     // 모든 노드들이 editable인지 확인
     Toc originalToc = editTocPort.loadEditableToc(bookEn);
     for(TocNode n : originalToc.getAllNodes()) {
-      Assertions.assertTrue(n.getIsEditable());
+      Assertions.assertTrue(n.isEditable());
     }
 
     // 섹션 4.1의 제목을 변경하여 editable node일 때 수정이 가능한지 확인
@@ -83,7 +83,7 @@ public class BookStatusTest {
     // 출판 후 모든 node가 readOnlyToc로 변경되었는지 확인
     Toc publishedToc = readTocPort.loadReadonlyToc(bookEn);
     for(TocNode n : publishedToc.getAllNodes()) {
-      Assertions.assertFalse(n.getIsEditable());
+      Assertions.assertFalse(n.isEditable());
     }
 
     // 출판 후 섹션 4.1의 제목을 변경하여 readOnly node일 때 수정이 불가능한지 확인
@@ -129,8 +129,8 @@ public class BookStatusTest {
       Assertions.assertNotEquals(readOnly.getId(), editable.getId());
       Assertions.assertEquals(readOnly.getTitle(), editable.getTitle());
       // 복제된 node는 editable, 기존 노드는 readOnly
-      Assertions.assertFalse(readOnly.getIsEditable());
-      Assertions.assertTrue(editable.getIsEditable());
+      Assertions.assertFalse(readOnly.isEditable());
+      Assertions.assertTrue(editable.isEditable());
     });
   }
 
@@ -168,7 +168,7 @@ public class BookStatusTest {
     Book bookEntity = bookPersistencePort.findById(bookId).get();
     Toc publishedToc = readTocPort.loadReadonlyToc(bookEntity);
     for(TocNode n : publishedToc.getAllNodes()) {
-      Assertions.assertFalse(n.getIsEditable());
+      Assertions.assertFalse(n.isEditable());
     }
 
     // editable toc를 조회하면 예외발생
@@ -209,7 +209,7 @@ public class BookStatusTest {
     Book bookEntity = bookPersistencePort.findById(bookId).get();
     Toc publishedToc = readTocPort.loadReadonlyToc(bookEntity);
     for(TocNode n : publishedToc.getAllNodes()) {
-      Assertions.assertFalse(n.getIsEditable());
+      Assertions.assertFalse(n.isEditable());
     }
 
     // editable toc를 조회하면 예외발생
@@ -253,7 +253,7 @@ public class BookStatusTest {
     // 병합 후 모든 node가 readOnlyToc로 변경되었는지 확인 + 맨 처음 만든 node들과 일치하는지
     Toc publishedToc = readTocPort.loadReadonlyToc(bookEntity);
     for(TocNode n : publishedToc.getAllNodes()) {
-      Assertions.assertFalse(n.getIsEditable());
+      Assertions.assertFalse(n.isEditable());
       Assertions.assertEquals(n, originalToc.get(n.getId()));
     }
 

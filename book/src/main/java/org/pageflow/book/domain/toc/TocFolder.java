@@ -26,8 +26,8 @@ public class TocFolder {
    * @param folderChildren ov를 기준으로 오름차순 정렬된 folderNode의 모든 자식들
    */
   public TocFolder(TocNode folderNode, List<TocNode> folderChildren) {
-    Preconditions.checkState(folderNode.isFolder());
-    Preconditions.checkState(folderNode.getIsEditable());
+    Preconditions.checkState(folderNode.isParentableNode());
+    Preconditions.checkState(folderNode.isEditable());
     Preconditions.checkState(folderChildren.stream().allMatch(c -> c.getParentNodeOrNull().equals(folderNode)));
     Preconditions.checkState(
       isAscending(folderChildren),
@@ -88,7 +88,7 @@ public class TocFolder {
     }
 
     // 계층 구조 파괴 검사
-    if(target.isFolder()) {
+    if(target.isParentableNode()) {
       // this에서 출발해서 조상중에 targetFolder가 있는지 검증한다.
       if(_isAncestorOf(target, this.folder, toc.getNodeMap())) {
         return Result.of(BookCode.TOC_HIERARCHY_ERROR, "toc의 계층 구조를 파괴하는 이동입니다.");
@@ -239,7 +239,7 @@ public class TocFolder {
    * @throws IllegalStateException ancestor가 folder가 아닌 경우
    */
   private static boolean _isAncestorOf(TocNode ancestor, TocNode descendant, Map<UUID, TocNode> nodeMap) {
-    Preconditions.checkState(ancestor.isFolder());
+    Preconditions.checkState(ancestor.isParentableNode());
 
     if(descendant.isRootFolder()) {
       return false;

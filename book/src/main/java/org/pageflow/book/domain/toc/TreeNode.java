@@ -26,7 +26,7 @@ public class TreeNode {
   }
 
   public void addChildAccordingToOv(TreeNode node) {
-    Preconditions.checkState(isFolder());
+    Preconditions.checkState(isParentableNode());
     Preconditions.checkState(!node.isRoot());
 
     node.parent = this;
@@ -51,12 +51,12 @@ public class TreeNode {
     return tocNode.isRootFolder();
   }
 
-  public boolean isFolder() {
-    return tocNode.isFolder();
+  public boolean isParentableNode() {
+    return tocNode.isParentableNode();
   }
 
   public boolean isSection() {
-    return tocNode.isSection();
+    return tocNode.isSectionType();
   }
 
   public TocNodeType getType() {

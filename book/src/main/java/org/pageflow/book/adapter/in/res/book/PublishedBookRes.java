@@ -32,7 +32,7 @@ public class PublishedBookRes {
         .map(PublishedRecordRes::new)
         .toList(),
       new AuthorProfileRes(dto.getAuthorProfile()),
-      new TocRes(dto.getToc()),
+      TocRes.from(dto.getToc()),
       dto.getTotalCharCount()
     );
   }

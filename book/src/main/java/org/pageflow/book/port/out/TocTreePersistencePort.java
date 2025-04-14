@@ -19,7 +19,7 @@ public interface TocTreePersistencePort {
    * sourceToc는 readOnly toc여야하며, 복제된 toc는 editable toc다.
    * <p>
    * 복사된 toc의 node은 동일한 내용으로 그대로 복사된다.(node 자체, 그리고 연관된 엔티티의 id는 달라진다.)
-   * 단, {@link TocNode#getIsEditable()}은 true로 설정된다.
+   * 단, {@link TocNode}의 isEditable 필드는 true로 설정된다.
    *
    * @param sourceToc
    * @return

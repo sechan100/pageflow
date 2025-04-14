@@ -4,7 +4,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Value;
 import lombok.experimental.FieldDefaults;
-import org.pageflow.book.application.TocNodeType;
 import org.pageflow.book.application.dto.node.TocDto;
 
 import java.util.List;
@@ -14,8 +13,10 @@ import java.util.UUID;
 public class TocRes {
   Folder root;
 
-  public TocRes(TocDto toc) {
-    this.root = new Folder(toc.getRoot());
+  public static TocRes from(TocDto toc) {
+    return new TocRes(
+      new Folder(toc.getRoot())
+    );
   }
 
   @Getter
@@ -23,12 +24,12 @@ public class TocRes {
   public static abstract class Node {
     UUID id;
     String title;
-    TocNodeType type;
+    ResponseTocNodeType type;
 
     public Node(TocDto.Node node) {
       this.id = node.getId();
       this.title = node.getTitle();
-      this.type = node.getType();
+      this.type = ResponseTocNodeType.from(node.getType());
     }
   }
 

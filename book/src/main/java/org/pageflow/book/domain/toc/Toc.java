@@ -89,7 +89,7 @@ public class Toc {
 
   private TocDto.Node _projectRecursive(TreeNode p) {
     // Folder
-    if(p.isFolder()) {
+    if(p.isParentableNode()) {
       List<TocDto.Node> children = p.getChildren().stream()
         .map(c -> _projectRecursive(c))
         .toList();

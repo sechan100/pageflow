@@ -13,7 +13,7 @@ public class TocSection {
   private final TocNode section;
 
   public TocSection(TocNode section) {
-    Preconditions.checkState(section.isSection());
+    Preconditions.checkState(section.isSectionType());
     this.section = section;
   }
 

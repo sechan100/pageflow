@@ -3,6 +3,7 @@ package org.pageflow.book.adapter.in;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.pageflow.book.adapter.in.form.NodeRelocateForm;
+import org.pageflow.book.adapter.in.res.node.TocRes;
 import org.pageflow.book.application.dto.node.TocDto;
 import org.pageflow.book.port.in.EditTocUseCase;
 import org.pageflow.book.port.in.cmd.RelocateNodeCmd;
@@ -26,10 +27,13 @@ public class TocWebAdapter {
 
   @GetMapping("")
   @Operation(summary = "책 목차 조회")
-  public Result<TocDto> getToc(@PathVariable UUID bookId) {
+  public Result<TocRes> getToc(@PathVariable UUID bookId) {
     UID uid = rqcxt.getUid();
     Result<TocDto> result = editTocUseCase.getToc(uid, bookId);
-    return result;
+    if(result.isFailure()) {
+      return (Result) result;
+    }
+    return Result.success(TocRes.from(result.getSuccessData()));
   }
 
   @PostMapping("/relocate-node")

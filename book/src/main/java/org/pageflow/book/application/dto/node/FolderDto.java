@@ -15,7 +15,7 @@ public class FolderDto {
   String title;
 
   public static FolderDto from(TocNode folder) {
-    Preconditions.checkState(folder.isFolder());
+    Preconditions.checkState(folder.isParentableNode());
     return new FolderDto(
       folder.getId(),
       folder.getTitle()

@@ -64,7 +64,7 @@ public class TocNodePersistenceAdapter implements EditTocPort, ReadTocPort {
   public void deleteFolder(Toc toc, UUID folderId) {
     Collection<TocNode> allNodes = toc.getAllNodes();
     TocNode folder = toc.get(folderId);
-    Preconditions.checkState(folder.isFolder());
+    Preconditions.checkState(folder.isFolderType());
     _deleteFolderRecursively(folder, allNodes);
   }
 
@@ -83,12 +83,12 @@ public class TocNodePersistenceAdapter implements EditTocPort, ReadTocPort {
 
   @Override
   public void deleteSection(TocNode section) {
-    Preconditions.checkState(section.isSection());
+    Preconditions.checkState(section.isSectionType());
     repository.delete(section);
   }
 
   private void _deleteFolderRecursively(TocNode folder, Collection<TocNode> allNodes) {
-    Preconditions.checkState(folder.isFolder());
+    Preconditions.checkState(folder.isFolderType());
     List<TocNode> children = allNodes.stream()
       .filter(node -> {
         if(node.isRootFolder()) return false;
@@ -97,7 +97,7 @@ public class TocNodePersistenceAdapter implements EditTocPort, ReadTocPort {
       .toList();
 
     for(TocNode child : children) {
-      if(child.isFolder()) {
+      if(child.isParentableNode()) {
         _deleteFolderRecursively(child, allNodes);
       }
       repository.delete(child);
@@ -118,7 +118,7 @@ public class TocNodePersistenceAdapter implements EditTocPort, ReadTocPort {
   public Optional<TocNode> readSection(Book book, UUID sectionId) {
     Optional<TocNode> section = repository.findSectionWithContentById(sectionId);
     section.ifPresent(s -> {
-      Preconditions.checkState(s.isSection());
+      Preconditions.checkState(s.isSectionType());
       Preconditions.checkState(s.getBook().equals(book));
     });
 

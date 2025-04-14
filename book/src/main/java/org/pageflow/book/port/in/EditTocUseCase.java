@@ -137,7 +137,7 @@ public class EditTocUseCase {
       return (Result) nodeRes;
     }
     TocNode folder = nodeRes.getSuccessData();
-    Preconditions.checkState(folder.isFolder());
+    Preconditions.checkState(folder.isFolderType());
     return Result.success(FolderDto.from(nodeRes.getSuccessData()));
   }
 
@@ -223,7 +223,7 @@ public class EditTocUseCase {
       return (Result) nodeRes;
     }
     TocNode section = nodeRes.getSuccessData();
-    Preconditions.checkState(section.isSection());
+    Preconditions.checkState(section.isSectionType());
     return Result.success(SectionDto.from(nodeRes.getSuccessData()));
   }
 

@@ -77,6 +77,7 @@ public class SectionWriteUseCase {
             {}
         """, section.getId(), content, html.getContent());
     }
+    int charCount = html.getCharCount();
     NodeContent nodeContent = section.getContent();
     nodeContent.updateContent(html);
     return Result.success(WithContentSectionDto.from(section));

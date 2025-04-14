@@ -109,8 +109,19 @@ public class TocNodePersistenceAdapter implements EditTocPort, ReadTocPort {
   public Toc loadReadonlyToc(Book book) {
     List<TocNode> allNode = repository.findAllByBookIdAndIsEditable(book.getId(), false);
     if(allNode.isEmpty()) {
-      throw new IllegalStateException("책에 readonly toc가 존재하지 않습니다. bookId: " + book.getId());
+      throw new IllegalStateException("책에 readOnly toc가 존재하지 않습니다. bookId: " + book.getId());
     }
     return new Toc(book, allNode, false);
+  }
+
+  @Override
+  public Optional<TocNode> readSection(Book book, UUID sectionId) {
+    Optional<TocNode> section = repository.findSectionWithContentById(sectionId);
+    section.ifPresent(s -> {
+      Preconditions.checkState(s.isSection());
+      Preconditions.checkState(s.getBook().equals(book));
+    });
+
+    return section;
   }
 }

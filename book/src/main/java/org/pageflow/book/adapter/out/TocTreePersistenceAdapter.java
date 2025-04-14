@@ -35,10 +35,10 @@ public class TocTreePersistenceAdapter implements TocTreePersistencePort {
   }
 
   @Override
-  public boolean existsReadonlyToc(Book book) {
+  public boolean existsReadOnlyToc(Book book) {
     int count = repository.countByBookIdAndParentNodeIdAndIsEditable(book.getId(), null, false);
     if(count > 1) {
-      throw new IllegalStateException("readonlyToc root node가 2개 이상 존재합니다. bookId: " + book.getId());
+      throw new IllegalStateException("readOnlyToc root node가 2개 이상 존재합니다. bookId: " + book.getId());
     }
     return count == 1;
   }
@@ -70,8 +70,8 @@ public class TocTreePersistenceAdapter implements TocTreePersistencePort {
   }
 
   @Override
-  public Toc makeTocEditable(Toc readonlyToc) {
-    return _makeTocOf(readonlyToc, true);
+  public Toc makeTocEditable(Toc readOnlyToc) {
+    return _makeTocOf(readOnlyToc, true);
   }
 
   @Override
@@ -84,7 +84,7 @@ public class TocTreePersistenceAdapter implements TocTreePersistencePort {
       toc.isEditableToc() != isEditable,
       """
         Toc의 상태가 이미 %s입니다
-        """.formatted(isEditable ? "editable" : "readonly")
+        """.formatted(isEditable ? "editable" : "readOnly")
     );
     Collection<TocNode> allNodes = toc.getAllNodes();
     for(TocNode node : allNodes) {

@@ -22,7 +22,7 @@ import java.util.UUID;
  */
 @Slf4j
 @Service
-@Transactional
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class AuthorAcl implements LoadAuthorPort {
   private final BookPersistencePort bookPersistencePort;
@@ -38,7 +38,7 @@ public class AuthorAcl implements LoadAuthorPort {
   public AuthorProfileDto loadAuthorProfile(UID authorId) {
     UUID uid = authorId.getValue();
     User user = userPersistencePort.findById(uid).get();
-    List<Book> authorBooks = bookPersistencePort.findBooksByAuthorId(uid);
+    List<Book> authorBooks = bookPersistencePort.findPublishedBooksByAuthorId(uid);
     return new AuthorProfileDto(
       authorId,
       user.getPenname(),

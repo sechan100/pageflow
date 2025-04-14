@@ -17,6 +17,13 @@ public interface BookPersistencePort extends BaseJpaRepository<Book, UUID> {
   @Query("select b from Book b where b.author.id = :authorId")
   List<Book> findBooksByAuthorId(@Param("authorId") UUID authorId);
 
+  @Query("""
+    select b from Book b
+    where b.author.id = :authorId
+      and b.status = 'PUBLISHED'
+    """)
+  List<Book> findPublishedBooksByAuthorId(@Param("authorId") UUID authorId);
+
   @EntityGraph(attributePaths = {"author"})
   Optional<Book> findBookWithAuthorById(UUID bookId);
 }

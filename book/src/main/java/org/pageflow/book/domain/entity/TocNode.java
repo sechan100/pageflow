@@ -2,10 +2,7 @@ package org.pageflow.book.domain.entity;
 
 import com.google.common.base.Preconditions;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.pageflow.book.application.TocNodeType;
 import org.pageflow.book.domain.NodeTitle;
 import org.pageflow.book.domain.config.TocNodeConfig;
@@ -16,6 +13,7 @@ import java.util.UUID;
 
 
 @Entity
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(of = "id", callSuper = false)
 @Table(
@@ -73,7 +71,6 @@ public class TocNode extends BaseJpaEntity {
   /**
    * {@link TocNodeType#SECTION}인 경우에 content를 가진다.
    */
-  @Getter
   @OneToOne(
     fetch = FetchType.LAZY,
     optional = true,
@@ -83,24 +80,8 @@ public class TocNode extends BaseJpaEntity {
   @JoinColumn(name = "content_id", updatable = false)
   private NodeContent content;
 
-
-  private TocNode(
-    UUID id,
-    Book book,
-    String title,
-    TocNodeType type
-  ) {
-    this.id = id;
-    this.book = book;
-    this.title = title;
-    this.parentNode = null;
-    this.isEditable = true;
-    this.ov = 0;
-    this.type = type;
-  }
-
   /**
-   * readonly node를 복사하기 위한 생성자
+   * readOnly node를 복사하여 editable node를 만드는 경우에 사용하는 복사 팩토리 메서드
    */
   public TocNode(TocNode node, TocNode parentNode) {
     Preconditions.checkArgument(!node.isEditable);
@@ -116,7 +97,7 @@ public class TocNode extends BaseJpaEntity {
     this.isEditable = true;
     this.ov = node.ov;
     this.type = node.type;
-    this.content = node.content != null ? new NodeContent(node.content) : null;
+    this.content = node.content != null ? NodeContent.copy(node.content) : null;
   }
 
   public static TocNode createRootFolder(Book book) {
@@ -124,7 +105,11 @@ public class TocNode extends BaseJpaEntity {
       UUID.randomUUID(),
       book,
       TocNodeConfig.ROOT_FOLDER_TITLE,
-      TocNodeType.FOLDER
+      null,
+      true,
+      0,
+      TocNodeType.FOLDER,
+      null
     );
   }
 
@@ -136,7 +121,11 @@ public class TocNode extends BaseJpaEntity {
       UUID.randomUUID(),
       book,
       title.getValue(),
-      TocNodeType.FOLDER
+      null,
+      true,
+      0,
+      TocNodeType.FOLDER,
+      null
     );
   }
 
@@ -148,9 +137,12 @@ public class TocNode extends BaseJpaEntity {
       UUID.randomUUID(),
       book,
       title.getValue(),
-      TocNodeType.SECTION
+      null,
+      true,
+      0,
+      TocNodeType.SECTION,
+      NodeContent.create(book)
     );
-    node.content = NodeContent.create();
     return node;
   }
 
@@ -170,6 +162,15 @@ public class TocNode extends BaseJpaEntity {
   public void setOv(int ov) {
     Preconditions.checkState(isEditable);
     this.ov = ov;
+  }
+
+  /**
+   * @return
+   * @throws IllegalStateException this가 {@link TocNodeType#SECTION}이 아닌 경우
+   */
+  public NodeContent getContent() {
+    Preconditions.checkState(isSection());
+    return this.content;
   }
 
   public void setEditable(boolean editable) {

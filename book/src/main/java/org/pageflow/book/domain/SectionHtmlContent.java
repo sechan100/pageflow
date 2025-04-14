@@ -58,9 +58,17 @@ public class SectionHtmlContent {
   @Getter
   private final boolean isSanitizationConsistent;
 
+  /**
+   * 공백문자는 포함, 개행은 제외한 문자 수
+   */
+  @Getter
+  private final int charCount;
+
   public SectionHtmlContent(String html) {
     try {
       Document document = Jsoup.parse(html);
+      this.charCount = document.wholeText().length();
+
       Document.OutputSettings outputSettings = new Document.OutputSettings();
       outputSettings.prettyPrint(false);
       String cleanHtml = Jsoup.clean(html, "", SAFELIST, outputSettings);
@@ -72,7 +80,6 @@ public class SectionHtmlContent {
       throw new IllegalArgumentException("SectionHtmlContent 파싱 실패", e);
     }
   }
-
 
   private static String[] _merge(String[] array1, String... array2) {
     String[] result = new String[array1.length + array2.length];

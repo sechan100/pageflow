@@ -80,13 +80,13 @@ public class BookStatusTest {
     Result publishRes = changeBookStatusUseCase.publish(uid, bookId);
     Assertions.assertTrue(publishRes.isSuccess());
 
-    // 출판 후 모든 node가 readonlyToc로 변경되었는지 확인
+    // 출판 후 모든 node가 readOnlyToc로 변경되었는지 확인
     Toc publishedToc = readTocPort.loadReadonlyToc(bookEn);
     for(TocNode n : publishedToc.getAllNodes()) {
       Assertions.assertFalse(n.getIsEditable());
     }
 
-    // 출판 후 섹션 4.1의 제목을 변경하여 readonly node일 때 수정이 불가능한지 확인
+    // 출판 후 섹션 4.1의 제목을 변경하여 readOnly node일 때 수정이 불가능한지 확인
     Result<SectionDto> changeSectionTitleRes2 = editTocUseCase.changeSectionTitle(
       section4_1Identifier,
       "섹션 4.1 수정됨2"
@@ -124,12 +124,12 @@ public class BookStatusTest {
     Book bookEntity = bookPersistencePort.findById(bookId).get();
     TreeNode rtRoot = readTocPort.loadReadonlyToc(bookEntity).buildTree();
     TreeNode etRoot = editTocPort.loadEditableToc(bookEntity).buildTree();
-    tocUtils.assertSameHierarchyRecusive(rtRoot, etRoot, (readonly, editable) -> {
+    tocUtils.assertSameHierarchyRecusive(rtRoot, etRoot, (readOnly, editable) -> {
       // 복제된 id는 같으면 안됨.
-      Assertions.assertNotEquals(readonly.getId(), editable.getId());
-      Assertions.assertEquals(readonly.getTitle(), editable.getTitle());
-      // 복제된 node는 editable, 기존 노드는 readonly
-      Assertions.assertFalse(readonly.getIsEditable());
+      Assertions.assertNotEquals(readOnly.getId(), editable.getId());
+      Assertions.assertEquals(readOnly.getTitle(), editable.getTitle());
+      // 복제된 node는 editable, 기존 노드는 readOnly
+      Assertions.assertFalse(readOnly.getIsEditable());
       Assertions.assertTrue(editable.getIsEditable());
     });
   }
@@ -164,7 +164,7 @@ public class BookStatusTest {
     Result rePublishRes = changeBookStatusUseCase.publish(uid, bookId);
     Assertions.assertTrue(rePublishRes.isSuccess());
 
-    // 개정 후 모든 node가 readonlyToc로 변경되었는지 확인
+    // 개정 후 모든 node가 readOnlyToc로 변경되었는지 확인
     Book bookEntity = bookPersistencePort.findById(bookId).get();
     Toc publishedToc = readTocPort.loadReadonlyToc(bookEntity);
     for(TocNode n : publishedToc.getAllNodes()) {
@@ -205,7 +205,7 @@ public class BookStatusTest {
     Result mergeRevisionRes = changeBookStatusUseCase.mergeRevision(uid, bookId);
     Assertions.assertTrue(mergeRevisionRes.isSuccess());
 
-    // 병합 후 모든 node가 readonlyToc로 변경되었는지 확인
+    // 병합 후 모든 node가 readOnlyToc로 변경되었는지 확인
     Book bookEntity = bookPersistencePort.findById(bookId).get();
     Toc publishedToc = readTocPort.loadReadonlyToc(bookEntity);
     for(TocNode n : publishedToc.getAllNodes()) {
@@ -250,7 +250,7 @@ public class BookStatusTest {
     Result cancelRevisionRes = changeBookStatusUseCase.cancelRevision(uid, bookId);
     Assertions.assertTrue(cancelRevisionRes.isSuccess());
 
-    // 병합 후 모든 node가 readonlyToc로 변경되었는지 확인 + 맨 처음 만든 node들과 일치하는지
+    // 병합 후 모든 node가 readOnlyToc로 변경되었는지 확인 + 맨 처음 만든 node들과 일치하는지
     Toc publishedToc = readTocPort.loadReadonlyToc(bookEntity);
     for(TocNode n : publishedToc.getAllNodes()) {
       Assertions.assertFalse(n.getIsEditable());

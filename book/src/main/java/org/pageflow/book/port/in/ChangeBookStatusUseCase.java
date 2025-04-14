@@ -60,7 +60,7 @@ public class ChangeBookStatusUseCase {
       return publishRes;
     }
     // Toc 병합
-    _mergeToReadonly(book);
+    _mergeToReadOnly(book);
     return Result.success(new BookDto(book));
   }
 
@@ -87,11 +87,11 @@ public class ChangeBookStatusUseCase {
       return startRevisionRes;
     }
     // Toc 복제 ====================================
-    Preconditions.checkState(tocTreePersistencePort.existsReadonlyToc(book), "readonly toc가 존재해야합니다.");
+    Preconditions.checkState(tocTreePersistencePort.existsReadOnlyToc(book), "readOnly toc가 존재해야합니다.");
     Preconditions.checkState(!tocTreePersistencePort.existsEditableToc(book), "editable toc가 존재하면 안됩니다.");
 
-    Toc readonlyToc = readTocPort.loadReadonlyToc(book);
-    Toc copiedToc = tocTreePersistencePort.copyReadonlyTocToEditableToc(readonlyToc);
+    Toc readOnlyToc = readTocPort.loadReadonlyToc(book);
+    Toc copiedToc = tocTreePersistencePort.copyReadonlyTocToEditableToc(readOnlyToc);
     return Result.success(new BookDto(book));
   }
 
@@ -122,11 +122,11 @@ public class ChangeBookStatusUseCase {
     // editableToc 삭제
     Preconditions.checkState(
       tocTreePersistencePort.existsEditableToc(book),
-      "editableToc를 삭제하고 readonlyToc를 남기려면 editableToc가 필요합니다."
+      "editableToc를 삭제하고 readOnlyToc를 남기려면 editableToc가 필요합니다."
     );
     Preconditions.checkState(
-      tocTreePersistencePort.existsReadonlyToc(book),
-      "editableToc를 삭제하고 readonlyToc를 남기려면 readonlyToc가 존재해야합니다."
+      tocTreePersistencePort.existsReadOnlyToc(book),
+      "editableToc를 삭제하고 readOnlyToc를 남기려면 readOnlyToc가 존재해야합니다."
     );
     Toc editableToc = editTocPort.loadEditableToc(book);
     tocTreePersistencePort.deleteToc(editableToc);
@@ -162,7 +162,7 @@ public class ChangeBookStatusUseCase {
     }
 
     // toc 병합
-    _mergeToReadonly(book);
+    _mergeToReadOnly(book);
     return Result.success(new BookDto(book));
   }
 
@@ -188,18 +188,18 @@ public class ChangeBookStatusUseCase {
   }
 
   /**
-   * book의 toc를 readonly로 병합한다.
-   * editable을 readonly로 변경하고 기존 readonly가 존재한다면 삭제.
+   * book의 toc를 readOnly로 병합한다.
+   * editable을 readOnly로 변경하고 기존 readOnly가 존재한다면 삭제.
    */
-  private Result<Toc> _mergeToReadonly(Book book) {
+  private Result<Toc> _mergeToReadOnly(Book book) {
     Preconditions.checkState(
       tocTreePersistencePort.existsEditableToc(book),
-      "toc를 병합하려면 editableToc는 반드시 필요합니다. readonlyToc는 optional"
+      "toc를 병합하려면 editableToc는 반드시 필요합니다. readOnlyToc는 optional"
     );
-    // readonlyToc가 존재한다면 삭제
-    if(tocTreePersistencePort.existsReadonlyToc(book)) {
-      Toc readonlyToc = readTocPort.loadReadonlyToc(book);
-      tocTreePersistencePort.deleteToc(readonlyToc);
+    // readOnlyToc가 존재한다면 삭제
+    if(tocTreePersistencePort.existsReadOnlyToc(book)) {
+      Toc readOnlyToc = readTocPort.loadReadonlyToc(book);
+      tocTreePersistencePort.deleteToc(readOnlyToc);
     }
     Toc editableToc = editTocPort.loadEditableToc(book);
     Toc resultReadonlyToc = tocTreePersistencePort.makeTocReadonly(editableToc);

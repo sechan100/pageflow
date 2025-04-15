@@ -2,8 +2,8 @@ package org.pageflow.test.module.book.utils;
 
 import org.pageflow.book.application.dto.node.FolderDto;
 import org.pageflow.book.application.dto.node.WithContentSectionDto;
-import org.pageflow.book.port.in.cmd.CreateFolderCmd;
-import org.pageflow.book.port.in.cmd.CreateSectionCmd;
+import org.pageflow.book.usecase.cmd.CreateFolderCmd;
+import org.pageflow.book.usecase.cmd.CreateSectionCmd;
 
 import java.util.UUID;
 import java.util.function.Consumer;

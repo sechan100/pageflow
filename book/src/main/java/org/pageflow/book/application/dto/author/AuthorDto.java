@@ -1,7 +1,7 @@
 package org.pageflow.book.application.dto.author;
 
 import lombok.Value;
-import org.pageflow.book.domain.Author;
+import org.pageflow.book.domain.book.Author;
 import org.pageflow.common.user.UID;
 
 

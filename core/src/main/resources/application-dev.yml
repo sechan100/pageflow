@@ -43,6 +43,7 @@ spring:
       ddl-auto: update
     properties:
       hibernate:
+        default_batch_fetch_size: 10
         type:
           preferred_uuid_jdbc_type: VARCHAR
         show_sql: true

@@ -1,8 +1,7 @@
 package org.pageflow.book.application.dto.node;
 
-import com.google.common.base.Preconditions;
 import lombok.Value;
-import org.pageflow.book.domain.entity.TocNode;
+import org.pageflow.book.domain.toc.entity.TocSection;
 
 import java.util.UUID;
 
@@ -14,8 +13,7 @@ public class SectionDto {
   UUID id;
   String title;
 
-  public static SectionDto from(TocNode section) {
-    Preconditions.checkState(section.isSectionType());
+  public static SectionDto from(TocSection section) {
     return new SectionDto(
       section.getId(),
       section.getTitle()

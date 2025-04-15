@@ -4,9 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Assertions;
 import org.pageflow.book.application.dto.book.BookDto;
 import org.pageflow.book.application.dto.node.TocDto;
-import org.pageflow.book.domain.entity.TocNode;
 import org.pageflow.book.domain.toc.TreeNode;
-import org.pageflow.book.port.in.EditTocUseCase;
+import org.pageflow.book.domain.toc.entity.TocNode;
+import org.pageflow.book.usecase.EditTocUseCase;
 import org.pageflow.common.user.UID;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,7 +31,7 @@ public class TocUtils {
     );
     UID uid = bookDto.getAuthorId();
     UUID bookId = bookDto.getId();
-    TocDto toc = editTocUseCase.getToc(uid, bookId).getSuccessData();
+    TocDto toc = editTocUseCase.getToc(uid, bookId).get();
     TocTreeBuilderFolderImpl rootFolderBuilder = new TocTreeBuilderFolderImpl(context, toc.getRoot().getId());
     return rootFolderBuilder;
   }

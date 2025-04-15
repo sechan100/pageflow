@@ -1,0 +1,104 @@
+package org.pageflow.book.web.controller;
+
+import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.pageflow.book.application.dto.node.FolderDto;
+import org.pageflow.book.usecase.EditTocUseCase;
+import org.pageflow.book.usecase.cmd.CreateFolderCmd;
+import org.pageflow.book.usecase.cmd.NodeIdentifier;
+import org.pageflow.book.web.form.FolderForm;
+import org.pageflow.book.web.res.node.FolderRes;
+import org.pageflow.common.api.RequestContext;
+import org.pageflow.common.result.Result;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
+
+/**
+ * @author : sechan
+ */
+@RestController
+@RequestMapping("/user/books/{bookId}/toc/folders")
+@RequiredArgsConstructor
+public class FolderWebAdapter {
+  private final EditTocUseCase editTocUseCase;
+  private final RequestContext rqcxt;
+
+
+  @PostMapping("")
+  @Operation(summary = "폴더 생성")
+  public Result<FolderRes> createFolder(
+    @PathVariable UUID bookId,
+    @Valid @RequestBody FolderForm.Create form
+  ) {
+    CreateFolderCmd cmd = new CreateFolderCmd(
+      rqcxt.getUid(),
+      bookId,
+      form.getParentNodeId(),
+      form.getTitle()
+    );
+    Result<FolderDto> result = editTocUseCase.createFolder(cmd);
+    if(result.isFailure()) {
+      return (Result) result;
+    }
+    FolderRes res = new FolderRes(result.get());
+    return Result.SUCCESS(res);
+  }
+
+  @GetMapping("/{folderId}")
+  @Operation(summary = "폴더 조회")
+  public Result<FolderRes> getFolder(
+    @PathVariable UUID bookId,
+    @PathVariable UUID folderId
+  ) {
+    NodeIdentifier identifier = new NodeIdentifier(
+      rqcxt.getUid(),
+      bookId,
+      folderId
+    );
+    Result<FolderDto> result = editTocUseCase.getFolder(identifier);
+    if(result.isFailure()) {
+      return (Result) result;
+    }
+    FolderRes res = new FolderRes(result.get());
+    return Result.SUCCESS(res);
+  }
+
+  @PostMapping("/{folderId}")
+  @Operation(summary = "폴더 업데이트")
+  public Result<FolderRes> updateFolder(
+    @PathVariable UUID bookId,
+    @PathVariable UUID folderId,
+    @Valid @RequestBody FolderForm.Update form
+  ) {
+    NodeIdentifier identifier = new NodeIdentifier(
+      rqcxt.getUid(),
+      bookId,
+      folderId
+    );
+    Result<FolderDto> result = editTocUseCase.changeFolderTitle(identifier, form.getTitle());
+    if(result.isFailure()) {
+      return (Result) result;
+    }
+    FolderRes res = new FolderRes(result.get());
+    return Result.SUCCESS(res);
+  }
+
+
+  @DeleteMapping("/{folderId}")
+  @Operation(summary = "폴더 삭제")
+  public Result deleteFolder(
+    @PathVariable UUID bookId,
+    @PathVariable UUID folderId
+  ) {
+    NodeIdentifier identifier = new NodeIdentifier(
+      rqcxt.getUid(),
+      bookId,
+      folderId
+    );
+    Result result = editTocUseCase.deleteFolder(identifier);
+    return result;
+  }
+}
+

@@ -40,7 +40,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     @NonNull HttpServletResponse response,
     @NonNull FilterChain filterChain
   ) {
-    if(SecurityContextHolder.getContext().getAuthentication() != null){
+    if(SecurityContextHolder.getContext().getAuthentication() != null) {
       filterChain.doFilter(request, response);
       return;
     }
@@ -49,14 +49,14 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     String requestUri = request.getRequestURI();
 
     // 요청에 토큰이 포함된 경우 파싱 후 처리
-    if(accessTokenOpt.isPresent()){
+    if(accessTokenOpt.isPresent()) {
       Result<AccessToken> tokenParseResult = useCase.parseAccessToken(accessTokenOpt.get());
 
       // 만료된 토큰인 경우 처리 중단
-      if(tokenParseResult.is(UserCode.ACCESS_TOKEN_EXPIRED)){
+      if(tokenParseResult.is(UserCode.ACCESS_TOKEN_EXPIRED)) {
         throw new ProcessResultException(tokenParseResult);
       }
-      AccessToken accessToken = tokenParseResult.getSuccessData();
+      AccessToken accessToken = tokenParseResult.get();
       Authentication authentication = authenticationTokenPrivder.create(accessToken, request);
       SecurityContextHolder.getContext().setAuthentication(authentication);
       log.debug("사용자 JWT로 인증됨: UID({}), role({}), session({})", accessToken.getUid(), accessToken.getRole(), accessToken.getSessionId());
@@ -70,7 +70,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
   private Optional<String> resolveToken(HttpServletRequest request) {
     String token = null;
     String bearerToken = request.getHeader(HttpHeaders.AUTHORIZATION);
-    if(StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER)){
+    if(StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER)) {
       token = bearerToken.split(" ")[1].trim();
     }
     return Optional.ofNullable(token);

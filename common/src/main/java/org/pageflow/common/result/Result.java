@@ -7,6 +7,8 @@ import org.pageflow.common.result.code.ResultCode;
 import org.springframework.lang.Nullable;
 
 import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Function;
 
 /**
  * 애플리케이션 전반에 걸쳐서 사용하는 응답객체.
@@ -33,6 +35,7 @@ public class Result<S> {
    * ResultCode와 실제 데이터의 타입이 일치하는지 확인한다.
    * dataType이 Object로 지정된 ResultCode의 경우 null 데이터도 가능하다.
    * (Object > null > 모든 데이터 타입)
+   *
    * @param code
    * @param data
    * @param <T>
@@ -53,12 +56,17 @@ public class Result<S> {
     return new Result(code, data);
   }
 
-  public static <S> Result<S> success(S data) {
+  public static <S> Result<S> SUCCESS(S data) {
     return new Result<>(CommonCode.SUCCESS, data);
   }
 
-  public static <S> Result<S> success() {
+  public static <S> Result<S> SUCCESS() {
     return new Result<>(CommonCode.SUCCESS, null);
+  }
+
+  @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+  public static <S> Result<S> fromOptional(Optional<S> optional) {
+    return optional.map(Result::SUCCESS).orElseGet(() -> of(CommonCode.DATA_NOT_FOUND, ""));
   }
 
   public boolean is(ResultCode code) {
@@ -73,16 +81,24 @@ public class Result<S> {
     return !isSuccess();
   }
 
+  public <T> Result<T> mapSuccess(Function<S, Result<T>> mapper) {
+    if(isSuccess()) {
+      return mapper.apply((S) data);
+    }
+    return (Result<T>) this;
+  }
+
   /**
    * Result에 결과로 예측되는 code에 맞는 데이터를 반환한다.
-   * @throws ResultDataTypeMisMatchException ResultCode의 dataType과 실제 데이터의 타입이 다를 경우 발생
+   *
    * @param expectedCode
    * @return data
    * - null인 경우에도 그대로 반환하므로 NPE에 주의
+   * @throws ResultDataTypeMisMatchException ResultCode의 dataType과 실제 데이터의 타입이 다를 경우 발생
    */
   @Nullable
   public <T> T getData(ResultCode expectedCode) {
-    if(this.code != expectedCode){
+    if(this.code != expectedCode) {
       throw new IllegalArgumentException("Result의 code가 예상되는 code와 다릅니다. expected: " + expectedCode + ", actual: " + this.code);
     }
     matchCodeDataWithActualData(expectedCode, data);
@@ -90,15 +106,16 @@ public class Result<S> {
   }
 
   /**
-   * @throws ResultDataTypeMisMatchException ResultCode의 dataType과 실제 데이터의 타입이 다를 경우 발생
    * @return
+   * @throws ResultDataTypeMisMatchException ResultCode의 dataType과 실제 데이터의 타입이 다를 경우 발생
    */
-  public S getSuccessData() {
+  public S get() {
     return getData(CommonCode.SUCCESS);
   }
 
   /**
    * ResultCode와 관계없이 그냥 담긴 데이터를 뽑아낸다.
+   *
    * @return
    */
   public Object getRawDataWithoutCodeCheck() {

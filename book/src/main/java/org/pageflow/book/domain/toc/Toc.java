@@ -2,8 +2,11 @@ package org.pageflow.book.domain.toc;
 
 import lombok.Getter;
 import org.pageflow.book.application.dto.node.TocDto;
-import org.pageflow.book.domain.entity.Book;
-import org.pageflow.book.domain.entity.TocNode;
+import org.pageflow.book.domain.book.entity.Book;
+import org.pageflow.book.domain.toc.constants.TocNodeType;
+import org.pageflow.book.domain.toc.entity.TocFolder;
+import org.pageflow.book.domain.toc.entity.TocNode;
+import org.pageflow.book.domain.toc.entity.TocSection;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -67,7 +70,8 @@ public class Toc {
       .map(this::_projectRecursive)
       .toList();
 
-    TocDto.Folder rootDto = new TocDto.Folder(nodeMap.get(rootFolderId), rootChildren);
+    TocFolder rootFolder = (TocFolder) nodeMap.get(rootFolderId);
+    TocDto.Folder rootDto = new TocDto.Folder(rootFolder, rootChildren);
     return new TocDto(book.getId(), rootDto);
   }
 
@@ -87,17 +91,21 @@ public class Toc {
     return !isEditableToc;
   }
 
+  public TocFolder getRootFolder() {
+    return (TocFolder) get(rootFolderId);
+  }
+
   private TocDto.Node _projectRecursive(TreeNode p) {
     // Folder
-    if(p.isParentableNode()) {
+    if(p.getType() == TocNodeType.FOLDER) {
       List<TocDto.Node> children = p.getChildren().stream()
         .map(c -> _projectRecursive(c))
         .toList();
-      return new TocDto.Folder(p.getTocNode(), children);
+      return new TocDto.Folder((TocFolder) p.getTocNode(), children);
     }
     // Section
     else {
-      return new TocDto.Section(p.getTocNode());
+      return new TocDto.Section((TocSection) p.getTocNode());
     }
   }
 }

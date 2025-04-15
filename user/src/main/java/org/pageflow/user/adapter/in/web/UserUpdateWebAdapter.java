@@ -71,7 +71,7 @@ public class UserUpdateWebAdapter {
     }
     Optional<UserDto> userDtoOpt = userUseCase.queryUser(uid);
     assert userDtoOpt.isPresent();
-    return Result.success(new UserRes(userDtoOpt.get()));
+    return Result.SUCCESS(new UserRes(userDtoOpt.get()));
   }
 
 
@@ -81,6 +81,6 @@ public class UserUpdateWebAdapter {
     UID uid = rqrxt.getUid();
     Result<UserDto> result = accountUsecase.changePassword(uid, req.getCurrentPassword(), req.getNewPassword());
     if(result.isFailure()) return (Result) result;
-    return Result.success();
+    return Result.SUCCESS();
   }
 }

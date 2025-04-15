@@ -1,7 +1,7 @@
 package org.pageflow.book.application.dto.book;
 
 import lombok.Value;
-import org.pageflow.book.domain.entity.PublishedRecord;
+import org.pageflow.book.domain.book.entity.PublishedRecord;
 
 import java.time.LocalDateTime;
 

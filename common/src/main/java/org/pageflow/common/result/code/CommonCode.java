@@ -38,7 +38,7 @@ public enum CommonCode implements ResultCode {
    * 데이터 접근
    */
   RESOURCE_PERMISSION_DENIED("리소스 접근 권한 없음"),
-  DATA_NOT_FOUND("데이터를 찾을 수 없음", String.class),
+  DATA_NOT_FOUND("데이터를 찾을 수 없음", Object.class), // 주로 String 타입의 메세지 데이터
 
 
   /********************************************************************************

@@ -62,15 +62,15 @@ public class ProfileService implements ProfileUseCase {
     if(cmdResult.isFailure()) {
       return (Result) cmdResult;
     }
-    Result<FilePath> uploadResult = fileService.upload(cmdResult.getSuccessData());
+    Result<FilePath> uploadResult = fileService.upload(cmdResult.get());
     if(uploadResult.isFailure()) {
       return (Result) uploadResult;
     }
 
     // user 엔티티 변경 =============================
-    String newWebUrl = uploadResult.getSuccessData().getWebUrl();
+    String newWebUrl = uploadResult.get().getWebUrl();
     user.changeProfileImageUrl(newWebUrl);
-    return Result.success(new UserDto(user));
+    return Result.SUCCESS(new UserDto(user));
   }
 
   /**
@@ -93,7 +93,7 @@ public class ProfileService implements ProfileUseCase {
 
     // 기본 이미지로 변경 ===========
     user.changeProfileImageUrl(DEFAULT_PROFILE_IMAGE_URL);
-    return Result.success(new UserDto(user));
+    return Result.SUCCESS(new UserDto(user));
   }
 
   /**
@@ -111,7 +111,7 @@ public class ProfileService implements ProfileUseCase {
 
     User user = userPersistencePort.findById(uid.getValue()).get();
     user.changePenname(penname);
-    return Result.success(new UserDto(user));
+    return Result.SUCCESS(new UserDto(user));
   }
 
 }

@@ -75,12 +75,12 @@ public class AccountService implements AccountUseCase, UserUseCase {
     if(encryptResult.isFailure()) {
       return (Result) encryptResult;
     }
-    Result<NullData> changeResult = user.changePassword(currentPassword, encryptResult.getSuccessData());
+    Result<NullData> changeResult = user.changePassword(currentPassword, encryptResult.get());
     if(changeResult.isFailure()) {
       return (Result) changeResult;
     }
     UserDto userDto = new UserDto(user);
-    return Result.success(userDto);
+    return Result.SUCCESS(userDto);
   }
 
   private User _ensureAccount(UID uid) {

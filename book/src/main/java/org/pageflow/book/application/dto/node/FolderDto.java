@@ -1,8 +1,7 @@
 package org.pageflow.book.application.dto.node;
 
-import com.google.common.base.Preconditions;
 import lombok.Value;
-import org.pageflow.book.domain.entity.TocNode;
+import org.pageflow.book.domain.toc.entity.TocFolder;
 
 import java.util.UUID;
 
@@ -14,8 +13,7 @@ public class FolderDto {
   UUID id;
   String title;
 
-  public static FolderDto from(TocNode folder) {
-    Preconditions.checkState(folder.isParentableNode());
+  public static FolderDto from(TocFolder folder) {
     return new FolderDto(
       folder.getId(),
       folder.getTitle()

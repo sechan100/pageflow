@@ -1,7 +1,7 @@
 package org.pageflow.book.domain.toc;
 
-import org.pageflow.book.domain.config.TocNodeConfig;
-import org.pageflow.book.domain.entity.TocNode;
+import org.pageflow.book.domain.toc.constants.TocNodeConfig;
+import org.pageflow.book.domain.toc.entity.TocNode;
 import org.springframework.lang.Nullable;
 
 import java.util.List;

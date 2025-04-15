@@ -3,9 +3,9 @@ package org.pageflow.test.module.book.utils;
 import lombok.Getter;
 import org.pageflow.book.application.dto.node.FolderDto;
 import org.pageflow.book.application.dto.node.WithContentSectionDto;
-import org.pageflow.book.port.in.EditTocUseCase;
-import org.pageflow.book.port.in.cmd.CreateFolderCmd;
-import org.pageflow.book.port.in.cmd.CreateSectionCmd;
+import org.pageflow.book.usecase.EditTocUseCase;
+import org.pageflow.book.usecase.cmd.CreateFolderCmd;
+import org.pageflow.book.usecase.cmd.CreateSectionCmd;
 import org.pageflow.common.user.UID;
 
 import java.util.UUID;
@@ -26,10 +26,10 @@ public class TocTreeBuildContext {
   }
 
   public FolderDto create(CreateFolderCmd cmd) {
-    return editTocUseCase.createFolder(cmd).getSuccessData();
+    return editTocUseCase.createFolder(cmd).get();
   }
 
   public WithContentSectionDto create(CreateSectionCmd cmd) {
-    return editTocUseCase.createSection(cmd).getSuccessData();
+    return editTocUseCase.createSection(cmd).get();
   }
 }

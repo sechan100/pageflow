@@ -100,7 +100,7 @@ public class ImageFileValidatior implements FileValidator {
 
       // 결과 반환 =================
       if(validation.isValid()) {
-        return Result.success();
+        return Result.SUCCESS();
       } else {
         return Result.of(CommonCode.FIELD_VALIDATION_ERROR, validation);
       }

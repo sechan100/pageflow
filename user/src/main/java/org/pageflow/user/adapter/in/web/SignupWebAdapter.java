@@ -70,8 +70,8 @@ public class SignupWebAdapter {
       return (Result) cmdResult;
     }
 
-    UserDto userDto = signupUseCase.signup(cmdResult.getSuccessData());
-    return Result.success(new UserRes(userDto));
+    UserDto userDto = signupUseCase.signup(cmdResult.get());
+    return Result.SUCCESS(new UserRes(userDto));
   }
 
 

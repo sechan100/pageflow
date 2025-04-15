@@ -3,7 +3,7 @@ package org.pageflow.book.application.dto.book;
 import lombok.Value;
 import org.pageflow.book.application.dto.author.AuthorProfileDto;
 import org.pageflow.book.application.dto.node.TocDto;
-import org.pageflow.book.domain.entity.Book;
+import org.pageflow.book.domain.book.entity.Book;
 
 import java.util.List;
 import java.util.UUID;

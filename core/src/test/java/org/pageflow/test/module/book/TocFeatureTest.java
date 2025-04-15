@@ -3,15 +3,15 @@ package org.pageflow.test.module.book;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.pageflow.book.adapter.out.TocNodeJpaRepository;
 import org.pageflow.book.application.dto.book.BookDto;
 import org.pageflow.book.application.dto.node.FolderDto;
 import org.pageflow.book.application.dto.node.WithContentSectionDto;
-import org.pageflow.book.domain.entity.TocNode;
-import org.pageflow.book.port.in.EditTocUseCase;
-import org.pageflow.book.port.in.cmd.CreateFolderCmd;
-import org.pageflow.book.port.in.cmd.CreateSectionCmd;
-import org.pageflow.book.port.in.cmd.RelocateNodeCmd;
+import org.pageflow.book.domain.toc.entity.TocNode;
+import org.pageflow.book.persistence.toc.TocNodePersistencePort;
+import org.pageflow.book.usecase.EditTocUseCase;
+import org.pageflow.book.usecase.cmd.CreateFolderCmd;
+import org.pageflow.book.usecase.cmd.CreateSectionCmd;
+import org.pageflow.book.usecase.cmd.RelocateNodeCmd;
 import org.pageflow.common.result.Result;
 import org.pageflow.test.module.book.utils.BookUtils;
 import org.pageflow.test.module.user.utils.UserUtils;
@@ -29,7 +29,7 @@ public class TocFeatureTest {
   private final UserUtils userUtils;
   private final BookUtils bookUtils;
   private final EditTocUseCase editTocUseCase;
-  private final TocNodeJpaRepository nodePersistencePort;
+  private final TocNodePersistencePort nodePersistencePort;
 
   @Test
   @DisplayName("ov 값 할당과 rebalance 검사")
@@ -42,7 +42,7 @@ public class TocFeatureTest {
 
     // toc 가져오기
     UUID bookId = book.getId();
-    UUID rootFolderId = editTocUseCase.getToc(user.getUid(), bookId).getSuccessData().getRoot().getId();
+    UUID rootFolderId = editTocUseCase.getToc(user.getUid(), bookId).get().getRoot().getId();
 
     // 폴더 생성
     Result<FolderDto> folder1Result = editTocUseCase.createFolder(
@@ -54,7 +54,7 @@ public class TocFeatureTest {
       )
     );
     assertTrue(folder1Result.isSuccess());
-    FolderDto folder1 = folder1Result.getSuccessData();
+    FolderDto folder1 = folder1Result.get();
 
     Result<FolderDto> folder2Result = editTocUseCase.createFolder(
       new CreateFolderCmd(
@@ -65,7 +65,7 @@ public class TocFeatureTest {
       )
     );
     assertTrue(folder2Result.isSuccess());
-    FolderDto folder2 = folder2Result.getSuccessData();
+    FolderDto folder2 = folder2Result.get();
 
     // 섹션 생성
     Result<WithContentSectionDto> section1Result = editTocUseCase.createSection(
@@ -77,7 +77,7 @@ public class TocFeatureTest {
       )
     );
     assertTrue(section1Result.isSuccess());
-    WithContentSectionDto section1 = section1Result.getSuccessData();
+    WithContentSectionDto section1 = section1Result.get();
 
     // 엔티티 load 및 ov 검증
     TocNode en_f1 = nodePersistencePort.findById(folder1.getId()).get();
@@ -126,7 +126,7 @@ public class TocFeatureTest {
     // 책 생성
     BookDto book = bookUtils.createBook(user, "최소값 rebalance 테스트");
     UUID bookId = book.getId();
-    UUID rootFolderId = editTocUseCase.getToc(user.getUid(), bookId).getSuccessData().getRoot().getId();
+    UUID rootFolderId = editTocUseCase.getToc(user.getUid(), bookId).get().getRoot().getId();
 
     // 노드 생성
     Result<FolderDto> folder1Result = editTocUseCase.createFolder(
@@ -137,7 +137,7 @@ public class TocFeatureTest {
         "폴더1"
       )
     );
-    FolderDto folder1 = folder1Result.getSuccessData();
+    FolderDto folder1 = folder1Result.get();
 
     Result<FolderDto> folder2Result = editTocUseCase.createFolder(
       new CreateFolderCmd(
@@ -147,7 +147,7 @@ public class TocFeatureTest {
         "폴더2"
       )
     );
-    FolderDto folder2 = folder2Result.getSuccessData();
+    FolderDto folder2 = folder2Result.get();
 
     // 최소값 근처에 ov 설정
     TocNode en_f1 = nodePersistencePort.findById(folder1.getId()).get();

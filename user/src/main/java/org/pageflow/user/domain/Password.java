@@ -25,15 +25,16 @@ public class Password extends SingleValueWrapper<String> {
 
   /**
    * Password 객체를 암호화하여 반환
+   *
    * @param rawPassword
    * @return Result
    * - FIELD_VALIDATION_ERROR : 비밀번호가 유효하지 않을 때
    */
   public static Result<Password> encrypt(String rawPassword) {
     FieldValidationResult result = validate(rawPassword);
-    if(result.isValid()){
+    if(result.isValid()) {
       String encrypted = ENCODER.encode(rawPassword);
-      return Result.success(new Password(encrypted));
+      return Result.SUCCESS(new Password(encrypted));
     } else {
       return Result.of(CommonCode.FIELD_VALIDATION_ERROR, result);
     }

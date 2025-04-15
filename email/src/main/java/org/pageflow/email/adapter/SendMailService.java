@@ -43,7 +43,7 @@ public class SendMailService implements SendMailPort {
       mimeMessageHelper.setText(request.getEmailContent().getValue(), true);
       // 메일 전송
       javaMailSender.send(mimeMessageHelper.getMimeMessage());
-      return Result.success();
+      return Result.SUCCESS();
 
     } catch(MessagingException | MailException e) {
       log.error("메일 전송 중 오류가 발생했습니다.", e);

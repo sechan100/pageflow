@@ -5,9 +5,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.pageflow.book.application.BookCode;
 import org.pageflow.book.application.dto.book.BookDto;
-import org.pageflow.book.domain.enums.BookVisibility;
-import org.pageflow.book.port.in.ChangeBookStatusUseCase;
-import org.pageflow.book.port.out.jpa.BookPersistencePort;
+import org.pageflow.book.domain.book.entity.BookVisibility;
+import org.pageflow.book.persistence.BookPersistencePort;
+import org.pageflow.book.usecase.ChangeBookStatusUseCase;
 import org.pageflow.common.result.Result;
 import org.pageflow.test.module.book.utils.BookUtils;
 import org.pageflow.test.module.user.utils.UserUtils;
@@ -53,7 +53,7 @@ public class StatusFlowTest {
     assertTrue(reviseAgainRes.isSuccess());
     Result<BookDto> changeVisibilityResult = changeBookStatusUseCase.changeVisibility(user.getUid(), book.getId(), BookVisibility.PERSONAL);
     assertTrue(changeVisibilityResult.isSuccess());
-    assertEquals(BookVisibility.PERSONAL, changeVisibilityResult.getSuccessData().getVisibility());
+    assertEquals(BookVisibility.PERSONAL, changeVisibilityResult.get().getVisibility());
 
     // 5. 책 개정 완료 및 재출판 (REVISING -> PUBLISHED)
     Result<BookDto> publishAgainRes = changeBookStatusUseCase.publish(user.getUid(), book.getId());
@@ -61,7 +61,7 @@ public class StatusFlowTest {
     int afterPublishEdition = bookPersistencePort.findById(book.getId()).get().getLatestPublishedRecord().get().getEdition();
     assertEquals(2, afterPublishEdition);
     // 출판하면 자동으로 GLOBAL로 변경됨
-    assertEquals(BookVisibility.GLOBAL, publishAgainRes.getSuccessData().getVisibility());
+    assertEquals(BookVisibility.GLOBAL, publishAgainRes.get().getVisibility());
 
     // 6. 또 다시 개정 시작 (REVISING -> PUBLISHED)
     Result<BookDto> startReviseRes = changeBookStatusUseCase.startRevision(user.getUid(), book.getId());

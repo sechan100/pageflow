@@ -6,9 +6,9 @@ import org.junit.jupiter.api.Test;
 import org.pageflow.book.application.BookCode;
 import org.pageflow.book.application.dto.ReviewDto;
 import org.pageflow.book.application.dto.book.BookDto;
-import org.pageflow.book.domain.enums.BookVisibility;
-import org.pageflow.book.port.in.ChangeBookStatusUseCase;
-import org.pageflow.book.port.in.ReviewUseCase;
+import org.pageflow.book.domain.book.entity.BookVisibility;
+import org.pageflow.book.usecase.ChangeBookStatusUseCase;
+import org.pageflow.book.usecase.ReviewUseCase;
 import org.pageflow.common.result.Result;
 import org.pageflow.test.module.book.utils.BookUtils;
 import org.pageflow.test.module.user.utils.UserUtils;
@@ -48,7 +48,7 @@ public class ReviewTest {
       5
     );
     assertTrue(reviewResult.isSuccess());
-    ReviewDto review = reviewResult.getSuccessData();
+    ReviewDto review = reviewResult.get();
 
     // 리뷰 수정
     Result<ReviewDto> updateResult = reviewUseCase.updateReview(
@@ -58,8 +58,8 @@ public class ReviewTest {
       2
     );
     assertTrue(updateResult.isSuccess());
-    assertEquals("적당히 좋은 책입니다!", updateResult.getSuccessData().getContent());
-    assertEquals(2, updateResult.getSuccessData().getScore());
+    assertEquals("적당히 좋은 책입니다!", updateResult.get().getContent());
+    assertEquals(2, updateResult.get().getScore());
 
     // 다른 사람이 리뷰 수정 및 삭제 시도
     Result<ReviewDto> updateResult2 = reviewUseCase.updateReview(

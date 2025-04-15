@@ -1,7 +1,7 @@
 package org.pageflow.book.application.dto.node;
 
 import lombok.Value;
-import org.pageflow.book.domain.toc.TocSection;
+import org.pageflow.book.domain.toc.entity.TocSection;
 
 import java.util.UUID;
 

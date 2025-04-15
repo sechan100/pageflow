@@ -28,22 +28,23 @@ public class SignupCmd {
     RoleType role,
     ProviderType provider,
     String profileImageUrl
-  ){
+  ) {
     // password 처리
     Result<Password> encryptedPasswordResult = Password.encrypt(rawPassword);
-    if(encryptedPasswordResult.isFailure()){
+    if(encryptedPasswordResult.isFailure()) {
       return (Result) encryptedPasswordResult;
     }
-    Password encryptedPassword = encryptedPasswordResult.getSuccessData();
+    Password encryptedPassword = encryptedPasswordResult.get();
 
     // signup cmd 생성
     SignupCmd cmd = new SignupCmd(username, encryptedPassword, email, penname, role, provider, profileImageUrl);
-    return Result.success(cmd);
+    return Result.SUCCESS(cmd);
   }
 
 
   /**
    * 회원가입시에 profileImageUrl이 지정될 수 있는 것은 OAUTH2 가입자뿐이다.
+   *
    * @return Result
    * - FIELD_VALIDATION_ERROR : 비밀번호가 유효하지 않을 때
    * - EXTERNAL_PROFILE_IMAGE_URL : OAUTH2 가입자는 profileImageUrl을 지정할 수 없다.
@@ -57,8 +58,8 @@ public class SignupCmd {
     RoleType role,
     ProviderType provider,
     String profileImageUrl
-  ){
-    if(provider == ProviderType.NATIVE){
+  ) {
+    if(provider == ProviderType.NATIVE) {
       throw new IllegalArgumentException("OAUTH2 가입자의 ProvierType이 NATIVE입니다. 정말 NATIVE 가입자라면 다른 함수를 사용해주세요.");
     }
 
@@ -79,7 +80,7 @@ public class SignupCmd {
     String email,
     String penname,
     RoleType role
-  ){
+  ) {
     return _of(
       username,
       rawPassword,

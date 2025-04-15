@@ -2,8 +2,8 @@ package org.pageflow.book.domain.toc;
 
 import com.google.common.base.Preconditions;
 import lombok.Getter;
-import org.pageflow.book.application.TocNodeType;
-import org.pageflow.book.domain.entity.TocNode;
+import org.pageflow.book.domain.toc.constants.TocNodeType;
+import org.pageflow.book.domain.toc.entity.TocNode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +17,7 @@ import java.util.UUID;
 @Getter
 public class TreeNode {
   private final TocNode tocNode;
+
   private TreeNode parent;
   private final List<TreeNode> children = new ArrayList<>(10);
 
@@ -26,7 +27,6 @@ public class TreeNode {
   }
 
   public void addChildAccordingToOv(TreeNode node) {
-    Preconditions.checkState(isParentableNode());
     Preconditions.checkState(!node.isRoot());
 
     node.parent = this;
@@ -51,16 +51,8 @@ public class TreeNode {
     return tocNode.isRootFolder();
   }
 
-  public boolean isParentableNode() {
-    return tocNode.isParentableNode();
-  }
-
-  public boolean isSection() {
-    return tocNode.isSectionType();
-  }
-
   public TocNodeType getType() {
-    return tocNode.getType();
+    return TocNodeType.from(tocNode);
   }
 
   private int _getOv() {

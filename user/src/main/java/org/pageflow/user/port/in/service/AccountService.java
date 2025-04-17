@@ -2,7 +2,6 @@ package org.pageflow.user.port.in.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.pageflow.common.result.NullData;
 import org.pageflow.common.result.Result;
 import org.pageflow.common.user.UID;
 import org.pageflow.user.domain.Password;
@@ -75,7 +74,7 @@ public class AccountService implements AccountUseCase, UserUseCase {
     if(encryptResult.isFailure()) {
       return (Result) encryptResult;
     }
-    Result<NullData> changeResult = user.changePassword(currentPassword, encryptResult.get());
+    Result<Void> changeResult = user.changePassword(currentPassword, encryptResult.get());
     if(changeResult.isFailure()) {
       return (Result) changeResult;
     }

@@ -3,7 +3,6 @@ package org.pageflow.user.domain.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.pageflow.common.jpa.BaseJpaEntity;
-import org.pageflow.common.result.NullData;
 import org.pageflow.common.result.Result;
 import org.pageflow.common.user.ProviderType;
 import org.pageflow.common.user.RoleType;
@@ -118,7 +117,7 @@ public class User extends BaseJpaEntity {
    * - BAD_CREDENTIALS: currentPassword가 일치하지 않는 경우
    * - PASSWORD_SAME_AS_BEFORE: 새로운 비밀번호가 기존 비밀번호와 동일한 경우
    */
-  public Result<NullData> changePassword(String currentPassword, Password password) {
+  public Result<Void> changePassword(String currentPassword, Password password) {
     if(!passwordMatches(currentPassword)) {
       return Result.of(UserCode.BAD_CREDENTIALS);
     }

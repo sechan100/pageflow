@@ -42,7 +42,7 @@ public class FolderWebAdapter {
     if(result.isFailure()) {
       return (Result) result;
     }
-    FolderRes res = new FolderRes(result.get());
+    FolderRes res = FolderRes.from(result.get());
     return Result.SUCCESS(res);
   }
 
@@ -61,7 +61,7 @@ public class FolderWebAdapter {
     if(result.isFailure()) {
       return (Result) result;
     }
-    FolderRes res = new FolderRes(result.get());
+    FolderRes res = FolderRes.from(result.get());
     return Result.SUCCESS(res);
   }
 
@@ -81,7 +81,7 @@ public class FolderWebAdapter {
     if(result.isFailure()) {
       return (Result) result;
     }
-    FolderRes res = new FolderRes(result.get());
+    FolderRes res = FolderRes.from(result.get());
     return Result.SUCCESS(res);
   }
 

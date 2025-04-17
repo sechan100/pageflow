@@ -81,11 +81,22 @@ public class Result<S> {
     return !isSuccess();
   }
 
-  public <T> Result<T> mapSuccess(Function<S, Result<T>> mapper) {
+  public <T> Result<T> flatMap(Function<S, Result<T>> mapper) {
     if(isSuccess()) {
       return mapper.apply((S) data);
     }
     return (Result<T>) this;
+  }
+
+  public <T> Result<T> map(Function<S, T> mapper) {
+    if(isSuccess()) {
+      return new Result<>(code, mapper.apply((S) data));
+    }
+    return (Result<T>) this;
+  }
+
+  public <T> Result<T> map(T data) {
+    return this.map(unused -> data);
   }
 
   /**

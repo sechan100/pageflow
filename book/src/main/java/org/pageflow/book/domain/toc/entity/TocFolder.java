@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import org.pageflow.book.domain.book.entity.Book;
 import org.pageflow.book.domain.toc.NodeTitle;
 import org.pageflow.book.domain.toc.constants.TocNodeConfig;
+import org.pageflow.common.result.Result;
 import org.springframework.lang.Nullable;
 
 import java.util.ArrayList;
@@ -34,15 +35,22 @@ public class TocFolder extends TocNode {
   )
   private final List<TocNode> children = new ArrayList<>(5);
 
+  @Getter
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  private FolderDesign design;
+
   private TocFolder(
     UUID id,
     Book book,
     String title,
     @Nullable TocFolder parentNode,
     boolean isEditable,
-    int ov
+    int ov,
+    FolderDesign design
   ) {
     super(id, book, title, parentNode, isEditable, ov);
+    this.design = design;
   }
 
   public static TocFolder createRootFolder(Book book) {
@@ -52,7 +60,8 @@ public class TocFolder extends TocNode {
       TocNodeConfig.ROOT_FOLDER_TITLE,
       null,
       true,
-      0
+      0,
+      FolderDesign.DEFAULT
     );
   }
 
@@ -63,7 +72,8 @@ public class TocFolder extends TocNode {
       title.getValue(),
       null,
       true,
-      0
+      0,
+      FolderDesign.DEFAULT
     );
   }
 
@@ -75,7 +85,8 @@ public class TocFolder extends TocNode {
       readOnlyFolder.getTitle(),
       null,
       true,
-      readOnlyFolder.getOv()
+      readOnlyFolder.getOv(),
+      readOnlyFolder.getDesign()
     );
   }
 
@@ -99,5 +110,9 @@ public class TocFolder extends TocNode {
     child.setParentNode(null);
   }
 
+  public Result<Void> changeDesign(FolderDesign design) {
+    Preconditions.checkState(this.isEditable());
+    this.design = design;
+  }
 
 }

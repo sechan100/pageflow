@@ -25,7 +25,7 @@ public class BookAccessGranter {
   /**
    * @code BOOK_ACCESS_DENIED: 접근 권한이 없는 경우
    */
-  public Result grant(BookAccess access) {
+  public Result<Void> grant(BookAccess access) {
     return switch(access) {
       case READ -> _grantRead();
       case WRITE -> _grantWrite();
@@ -36,7 +36,7 @@ public class BookAccessGranter {
   /**
    * 책에 대한 읽기 권한을 부여한다.
    */
-  private Result _grantRead() {
+  private Result<Void> _grantRead() {
     if(isAuthor) {
       return Result.SUCCESS();
     } else {
@@ -51,7 +51,7 @@ public class BookAccessGranter {
   /**
    * 책에 대한 쓰기 권한을 부여한다.
    */
-  private Result _grantWrite() {
+  private Result<Void> _grantWrite() {
     if(isAuthor) {
       if(_isPublishedStatus()) {
         return Result.of(BookCode.BOOK_ACCESS_DENIED, "출판된 책은 수정할 수 없습니다. 수정하려면 개정하세요.");
@@ -68,7 +68,7 @@ public class BookAccessGranter {
    *
    * @code BOOK_ACCESS_DENIED: 접근 권한이 없는 경우
    */
-  private Result _grantAuthor() {
+  private Result<Void> _grantAuthor() {
     if(isAuthor) {
       return Result.SUCCESS();
     } else {

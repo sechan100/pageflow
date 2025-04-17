@@ -1,7 +1,5 @@
 package org.pageflow.test.module.book;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -14,10 +12,7 @@ import org.pageflow.book.application.dto.node.TocDto;
 import org.pageflow.book.application.dto.node.WithContentSectionDto;
 import org.pageflow.book.domain.book.entity.Book;
 import org.pageflow.book.domain.toc.Toc;
-import org.pageflow.book.domain.toc.constants.TocNodeType;
 import org.pageflow.book.domain.toc.entity.TocFolder;
-import org.pageflow.book.domain.toc.entity.TocNode;
-import org.pageflow.book.domain.toc.entity.TocSection;
 import org.pageflow.book.persistence.BookPersistencePort;
 import org.pageflow.book.persistence.toc.TocNodePersistencePort;
 import org.pageflow.book.persistence.toc.TocPersistencePort;

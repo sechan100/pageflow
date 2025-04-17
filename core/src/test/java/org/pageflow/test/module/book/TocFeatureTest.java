@@ -12,7 +12,6 @@ import org.pageflow.book.domain.toc.entity.TocFolder;
 import org.pageflow.book.domain.toc.entity.TocNode;
 import org.pageflow.book.domain.toc.entity.TocSection;
 import org.pageflow.book.persistence.BookPersistencePort;
-import org.pageflow.book.persistence.toc.TocNodePersistencePort;
 import org.pageflow.book.persistence.toc.TocPersistencePort;
 import org.pageflow.book.usecase.EditTocUseCase;
 import org.pageflow.book.usecase.cmd.CreateFolderCmd;

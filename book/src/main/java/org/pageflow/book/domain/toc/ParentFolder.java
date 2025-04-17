@@ -9,8 +9,6 @@ import org.pageflow.common.result.Result;
 import org.springframework.lang.Nullable;
 
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 /**
  * @author : sechan
@@ -41,15 +39,12 @@ public class ParentFolder {
    * @code TOC_HIERARCHY_ERROR: 자기 자신에게 이동, root folder 이동, 계층 구조 파괴, destIndex가 올바르지 않은 경우, parent에 target이 없는 경우 등
    */
   public Result reorder(int destIndex, TocNode target) {
-    // 자기 자신에게 이동 검사
-    Result checkMoveToSelfResult = _checkMoveToSelf(target);
-    if(checkMoveToSelfResult.isFailure()) return checkMoveToSelfResult;
-    // root folder 이동 검사
-    Result checkRootFolderMoveResult = _checkRootFolderMove(target);
-    if(checkRootFolderMoveResult.isFailure()) return checkRootFolderMoveResult;
-    // destIndex 검사
-    Result checkDestIndexResult = _checkDestIndex(destIndex);
-    if(checkDestIndexResult.isFailure()) return checkDestIndexResult;
+    Result<Void> validation = _checkMoveToSelf(target)
+      .flatMap(unused -> _checkRootFolderMove(target))
+      .flatMap(unused -> _checkDestIndex(destIndex));
+    if(validation.isFailure()) {
+      return validation;
+    }
 
     if(!folder.getChildren().contains(target)) {
       return Result.of(BookCode.TOC_HIERARCHY_ERROR, "순서를 변경할 노드가 폴더의 자식이 아닙니다.");
@@ -66,12 +61,11 @@ public class ParentFolder {
    * @code TOC_HIERARCHY_ERROR: 자기 자신에게 이동, root folder 이동, 계층 구조 파괴, destIndex가 올바르지 않은 경우, 이미 parent에 target이 속한 경우 등
    */
   public Result reparent(int destIndex, TocNode target) {
-    // 자기 자신에게 이동 검사
-    Result checkMoveToSelfResult = _checkMoveToSelf(target);
-    if(checkMoveToSelfResult.isFailure()) return checkMoveToSelfResult;
-    // root folder 이동 검사
-    Result checkRootFolderMoveResult = _checkRootFolderMove(target);
-    if(checkRootFolderMoveResult.isFailure()) return checkRootFolderMoveResult;
+    Result validation = _checkMoveToSelf(target)
+      .flatMap(unused -> _checkRootFolderMove(target));
+    if(validation.isFailure()) {
+      return validation;
+    }
 
     // 이미 parent에 속해있는 경우
     if(folder.getChildren().contains(target)) {
@@ -195,7 +189,7 @@ public class ParentFolder {
    *
    * @code TOC_HIERARCHY_ERROR: node는 자기 자신의 자식이 될 수 없습니다.
    */
-  private Result _checkMoveToSelf(TocNode target) {
+  private Result<Void> _checkMoveToSelf(TocNode target) {
     if(_isSameNode(target, folder)) {
       return Result.of(BookCode.TOC_HIERARCHY_ERROR, "node는 자기 자신의 자식이 될 수 없습니다.");
     }

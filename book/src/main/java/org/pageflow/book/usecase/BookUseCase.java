@@ -13,11 +13,9 @@ import org.pageflow.book.domain.book.constants.BookAccess;
 import org.pageflow.book.domain.book.entity.Book;
 import org.pageflow.book.domain.toc.constants.TocNodeConfig;
 import org.pageflow.book.domain.toc.entity.TocFolder;
-import org.pageflow.book.domain.toc.entity.TocNode;
 import org.pageflow.book.persistence.BookPersistencePort;
 import org.pageflow.book.persistence.LoadAuthorPort;
 import org.pageflow.book.persistence.toc.TocFolderPersistencePort;
-import org.pageflow.book.persistence.toc.TocNodePersistencePort;
 import org.pageflow.common.property.ApplicationProperties;
 import org.pageflow.common.result.Result;
 import org.pageflow.common.user.UID;
@@ -186,12 +184,12 @@ public class BookUseCase {
   /**
    * @code BOOK_ACCESS_DENIED: 책 권한이 없는 경우
    */
-  public Result deleteBook(UID uid, UUID bookId) {
+  public Result<Void> deleteBook(UID uid, UUID bookId) {
     Book book = bookPersistencePort.findById(bookId).get();
 
     // 권한 검사 ===========
     BookAccessGranter accessGranter = new BookAccessGranter(uid, book);
-    Result grant = accessGranter.grant(BookAccess.AUTHOR);
+    Result<Void> grant = accessGranter.grant(BookAccess.AUTHOR);
     if(grant.isFailure()) {
       return grant;
     }

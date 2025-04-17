@@ -11,8 +11,9 @@ import lombok.NoArgsConstructor;
 /**
  * 일시적으로 저장되는 크게 중요하지 않은 데이터를 저장하는데 사용되는 Entity.
  * 사용하기 위해서, 해당 클래스를 상속받고, data 필드에 저장하고 싶은 데이터를 저장하면 된다.
- * @apiNote 자식 클래스에서는 다른 칼럼을 만들어서는 안된다.
+ *
  * @author : sechan
+ * @apiNote 자식 클래스에서는 다른 칼럼을 만들어서는 안된다.
  */
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -32,13 +33,13 @@ public abstract class TemporaryEntity<D> extends BaseJpaEntity {
    * JSON 형태로 데이터를 저장한다.
    */
   @Lob
-  @Column(columnDefinition = "TEXT")
+  @Column(columnDefinition = "json")
   private String data;
 
   /**
    * 만료시간을 기록하는 UTC 시간.
    * 일정시간마다 만료시간을 검사하여 만료된 데이터는 삭제한다.
-   *
+   * <p>
    * !주의!: 최소 만료시간은 1분 이상이다.
    * 1분 이하로 설정한 데이터는 스케쥴러 실행에 맞춰서 다음 1분위 스케쥴에서 일괄 삭제되므로 원치않은 동작이 발생할 수 있으니 주의.
    */
@@ -46,7 +47,7 @@ public abstract class TemporaryEntity<D> extends BaseJpaEntity {
   private Long expiredAt;
 
 
-  ///////////////////////
+  /// ////////////////////
   @Transient
   private D dataObjectCache;
 
@@ -56,13 +57,13 @@ public abstract class TemporaryEntity<D> extends BaseJpaEntity {
     this.dataObjectCache = data;
     try {
       this.data = objectMapper.writeValueAsString(data);
-    } catch(JsonProcessingException e){
+    } catch(JsonProcessingException e) {
       throw new RuntimeException("Could not serialize data for 'TemporaryEntity'", e);
     }
   }
 
   public D getData() {
-    if(dataObjectCache != null){
+    if(dataObjectCache != null) {
       return dataObjectCache;
     }
     try {
@@ -70,7 +71,7 @@ public abstract class TemporaryEntity<D> extends BaseJpaEntity {
       D dataObject = objectMapper.readValue(this.data, clazz);
       this.dataObjectCache = dataObject;
       return dataObject;
-    } catch (JsonProcessingException e) {
+    } catch(JsonProcessingException e) {
       throw new RuntimeException("'TemporaryEntity'를 직렬화 할 수 없습니다. 자식 클래스의 구현이 잘못되었을 수 있습니다.", e);
     }
   }

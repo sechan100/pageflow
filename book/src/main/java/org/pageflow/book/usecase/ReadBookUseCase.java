@@ -57,7 +57,7 @@ public class ReadBookUseCase {
       new PublishedBookDto(book, authorProfileDto, TocDto.from(toc), totalCharCount)
     );
   }
-  
+
   public Result<SectionContentDto> readSectionContent(UID uid, UUID bookId, UUID sectionId) {
     Book book = bookPersistencePort.findById(bookId).get();
     // 권한 검사 =====

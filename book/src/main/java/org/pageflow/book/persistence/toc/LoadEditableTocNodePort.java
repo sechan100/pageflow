@@ -28,7 +28,7 @@ public class LoadEditableTocNodePort {
 
   public Result<TocNode> loadEditableNode(Book book, UUID nodeId) {
     Result<TocNode> result = Result.fromOptional(nodePort.findById(nodeId));
-    return result.mapSuccess(node -> {
+    return result.flatMap(node -> {
       if(!node.getBook().equals(book)) {
         return Result.of(CommonCode.DATA_NOT_FOUND);
       }
@@ -41,7 +41,7 @@ public class LoadEditableTocNodePort {
 
   public Result<TocSection> loadEditableSection(Book book, UUID sectionId) {
     Result<TocSection> result = Result.fromOptional(sectionPort.findById(sectionId));
-    return result.mapSuccess(node -> {
+    return result.flatMap(node -> {
       if(!node.getBook().equals(book)) {
         return Result.of(CommonCode.DATA_NOT_FOUND);
       }
@@ -54,7 +54,7 @@ public class LoadEditableTocNodePort {
 
   public Result<TocFolder> loadEditableFolder(Book book, UUID folderId) {
     Result<TocFolder> result = Result.fromOptional(folderPort.findWithChildrenById(folderId));
-    return result.mapSuccess(node -> {
+    return result.flatMap(node -> {
       if(!node.getBook().equals(book)) {
         return Result.of(CommonCode.DATA_NOT_FOUND);
       }

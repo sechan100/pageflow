@@ -2,6 +2,7 @@ package org.pageflow.book.web.res.node;
 
 import lombok.Value;
 import org.pageflow.book.application.dto.node.FolderDto;
+import org.pageflow.book.domain.toc.entity.FolderDesign;
 
 import java.util.UUID;
 
@@ -12,9 +13,13 @@ import java.util.UUID;
 public class FolderRes {
   UUID id;
   String title;
+  FolderDesign design;
 
-  public FolderRes(FolderDto dto) {
-    this.id = dto.getId();
-    this.title = dto.getTitle();
+  public static FolderRes from(FolderDto dto) {
+    return new FolderRes(
+      dto.getId(),
+      dto.getTitle(),
+      FolderDesign.DEFAULT
+    );
   }
 }

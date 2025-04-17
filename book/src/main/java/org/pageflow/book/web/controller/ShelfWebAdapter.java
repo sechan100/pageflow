@@ -33,7 +33,7 @@ public class ShelfWebAdapter {
     if(result.isFailure()) {
       return (Result) result;
     }
-    SimpleBookRes res = new SimpleBookRes(result.get());
+    SimpleBookRes res = new SimpleBookRes(result.getSuccessData());
     return Result.ok(res);
   }
 

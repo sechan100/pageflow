@@ -27,13 +27,10 @@ public class TocWebAdapter {
 
   @GetMapping("")
   @Operation(summary = "책 목차 조회")
-  public Result<TocRes> getToc(@PathVariable UUID bookId) {
+  public TocRes getToc(@PathVariable UUID bookId) {
     UID uid = rqcxt.getUid();
-    Result<TocDto> result = editTocUseCase.getToc(uid, bookId);
-    if(result.isFailure()) {
-      return (Result) result;
-    }
-    return Result.ok(TocRes.from(result.get()));
+    TocDto result = editTocUseCase.getToc(uid, bookId);
+    return TocRes.from(result);
   }
 
   @PostMapping("/relocate-node")
@@ -50,6 +47,7 @@ public class TocWebAdapter {
       form.getDestFolderId(),
       form.getDestIndex()
     );
-    return editTocUseCase.relocateNode(cmd);
+    editTocUseCase.relocateNode(cmd);
+    return Result.ok();
   }
 }

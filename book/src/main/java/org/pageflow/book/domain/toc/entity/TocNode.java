@@ -1,11 +1,9 @@
 package org.pageflow.book.domain.toc.entity;
 
-import com.google.common.base.Preconditions;
 import jakarta.persistence.*;
 import lombok.*;
 import org.pageflow.book.domain.book.entity.Book;
 import org.pageflow.book.domain.book.entity.BookStatus;
-import org.pageflow.book.domain.toc.NodeTitle;
 import org.pageflow.book.domain.toc.constants.TocNodeConfig;
 import org.pageflow.common.jpa.BaseJpaEntity;
 import org.springframework.lang.Nullable;
@@ -38,6 +36,7 @@ public abstract class TocNode extends BaseJpaEntity {
   private Book book;
 
   @Getter
+  @Setter
   @Column(name = "title", nullable = false)
   private String title;
 
@@ -57,19 +56,16 @@ public abstract class TocNode extends BaseJpaEntity {
    * 각각 하나는 읽기전용 TOC, 하나는 편집가능한 TOC이다.
    * 예를 들어, {@link BookStatus#REVISING}인 경우
    * 기존 출판되어있던 toc는 읽기전용 TOC로 남아있고, 이를 기반으로 새로운 toc가 복제되어 편집가능한 toc가 된다.
+   * <p>
+   * 변경 불가능
    */
-  @Column(nullable = false)
+  @Column(nullable = false, updatable = false)
   private boolean isEditable;
 
+  @Setter
   @Getter
   @Column(nullable = false)
   private int ov;
-
-
-  public void changeTitle(NodeTitle nodeTitle) {
-    Preconditions.checkState(isEditable);
-    this.title = nodeTitle.getValue();
-  }
 
   public boolean isRootFolder() {
     return this.title.equals(TocNodeConfig.ROOT_FOLDER_TITLE);
@@ -83,23 +79,13 @@ public abstract class TocNode extends BaseJpaEntity {
     return !this.isEditable;
   }
 
-  public void setEditable(boolean editable) {
-    this.isEditable = editable;
-  }
-
   @Nullable
   public TocFolder getParentNodeOrNull() {
     return this.parentNode;
   }
 
-  public void setOv(int ov) {
-    Preconditions.checkState(this.isEditable);
-    this.ov = ov;
-  }
-
   // package-private
   void setParentNode(TocFolder folder) {
-    Preconditions.checkState(this.isEditable);
     this.parentNode = folder;
   }
 }

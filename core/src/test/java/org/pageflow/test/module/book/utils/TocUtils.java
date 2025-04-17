@@ -7,8 +7,8 @@ import org.pageflow.book.domain.toc.constants.TocNodeConfig;
 import org.pageflow.book.domain.toc.constants.TocNodeType;
 import org.pageflow.book.domain.toc.entity.TocFolder;
 import org.pageflow.book.domain.toc.entity.TocNode;
-import org.pageflow.book.persistence.toc.TocFolderPersistencePort;
-import org.pageflow.book.persistence.toc.TocNodePersistencePort;
+import org.pageflow.book.persistence.toc.TocFolderRepository;
+import org.pageflow.book.persistence.toc.TocNodeRepository;
 import org.pageflow.book.usecase.EditTocUseCase;
 import org.pageflow.common.user.UID;
 import org.springframework.stereotype.Component;
@@ -16,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.function.BiConsumer;
 
@@ -27,8 +26,8 @@ import java.util.function.BiConsumer;
 @Transactional
 @RequiredArgsConstructor
 public class TocUtils {
-  private final TocFolderPersistencePort tocFolderPersistencePort;
-  private final TocNodePersistencePort tocNodePersistencePort;
+  private final TocFolderRepository tocFolderRepository;
+  private final TocNodeRepository tocNodeRepository;
   private final EditTocUseCase editTocUseCase;
 
   public TocTreeBuilderFolder buildTree(BookDto dto) {
@@ -41,7 +40,7 @@ public class TocUtils {
       bookId,
       editTocUseCase
     );
-    TocFolder rootFolder = tocFolderPersistencePort.findRootFolder(bookId, true, TocNodeConfig.ROOT_FOLDER_TITLE).get();
+    TocFolder rootFolder = tocFolderRepository.findRootFolder(bookId, true, TocNodeConfig.ROOT_FOLDER_TITLE).get();
     TocTreeBuilderFolderImpl rootFolderBuilder = new TocTreeBuilderFolderImpl(context, rootFolder.getId());
     return rootFolderBuilder;
   }
@@ -72,11 +71,11 @@ public class TocUtils {
    * 노드의 순서 검증
    */
   public void assertChildrenStructure(UUID parentId, UUID... expectedChildrenIds) {
-    tocNodePersistencePort.flush();
-    TocFolder parent = (TocFolder) tocNodePersistencePort.findById(parentId).get();
+    tocNodeRepository.flush();
+    TocFolder parent = (TocFolder) tocNodeRepository.findById(parentId).get();
     List<TocNode> expectedChildren = new ArrayList<>();
     for(UUID childId : expectedChildrenIds) {
-      TocNode byId = tocNodePersistencePort.findById(childId).get();
+      TocNode byId = tocNodeRepository.findById(childId).get();
       expectedChildren.add(byId);
     }
 
@@ -96,8 +95,8 @@ public class TocUtils {
    * 목차 구조의 최대 깊이 검증
    */
   public void assertFolderDepth(UUID folderId, int expectedDepth) {
-    tocNodePersistencePort.flush();
-    TocFolder folder = tocFolderPersistencePort.findById(folderId).get();
+    tocNodeRepository.flush();
+    TocFolder folder = tocFolderRepository.findById(folderId).get();
     int actualDepth = calculateMaxDepthRecursive(folder);
     Assertions.assertEquals(expectedDepth, actualDepth, "목차 구조의 최대 깊이가 예상과 다릅니다");
   }

@@ -24,7 +24,7 @@ public class UserUtils {
       username + "@pageflow.org",
       username,
       RoleType.ROLE_USER
-    ).get();
+    ).getSuccessData();
     return signupUseCase.signup(cmd);
   }
 }

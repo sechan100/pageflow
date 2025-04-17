@@ -11,8 +11,8 @@ import org.pageflow.book.domain.book.entity.Book;
 import org.pageflow.book.domain.review.ReviewAccessGranter;
 import org.pageflow.book.domain.review.constants.ReviewAccess;
 import org.pageflow.book.domain.review.entity.Review;
+import org.pageflow.book.persistence.AuthorRepository;
 import org.pageflow.book.persistence.BookPersistencePort;
-import org.pageflow.book.persistence.LoadAuthorPort;
 import org.pageflow.book.persistence.ReviewPersistencePort;
 import org.pageflow.common.result.Result;
 import org.pageflow.common.user.UID;
@@ -31,7 +31,7 @@ import java.util.UUID;
 public class ReviewUseCase {
   private final ReviewPersistencePort reviewPersistencePort;
   private final BookPersistencePort bookPersistencePort;
-  private final LoadAuthorPort loadAuthorPort;
+  private final AuthorRepository authorRepository;
 
 
   /**
@@ -53,7 +53,7 @@ public class ReviewUseCase {
     }
 
     // TODO: 이미 리뷰를 작성한 경우 처리
-    Author authorProxy = loadAuthorPort.loadAuthorProxy(uid);
+    Author authorProxy = authorRepository.loadAuthorProxy(uid);
     Book bookProxy = _loadBookProxy(bookId);
     Result<Review> reviewRes = Review.create(
       authorProxy,
@@ -63,7 +63,7 @@ public class ReviewUseCase {
     );
     if(reviewRes.isFailure()) return (Result) reviewRes;
 
-    Review review = reviewPersistencePort.persist(reviewRes.get());
+    Review review = reviewPersistencePort.persist(reviewRes.getSuccessData());
     return Result.ok(ReviewDto.from(review));
   }
 

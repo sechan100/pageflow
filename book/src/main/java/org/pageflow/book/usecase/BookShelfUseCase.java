@@ -9,8 +9,8 @@ import org.pageflow.book.domain.book.BookAccessGranter;
 import org.pageflow.book.domain.book.constants.BookAccess;
 import org.pageflow.book.domain.book.entity.Book;
 import org.pageflow.book.domain.book.entity.ShelfItem;
+import org.pageflow.book.persistence.AuthorRepository;
 import org.pageflow.book.persistence.BookPersistencePort;
-import org.pageflow.book.persistence.LoadAuthorPort;
 import org.pageflow.book.persistence.ShelfItemPersistencePort;
 import org.pageflow.common.result.Result;
 import org.pageflow.common.user.UID;
@@ -30,7 +30,7 @@ import java.util.UUID;
 public class BookShelfUseCase {
   private final BookPersistencePort bookPersistencePort;
   private final ShelfItemPersistencePort shelfItemPersistencePort;
-  private final LoadAuthorPort loadAuthorPort;
+  private final AuthorRepository authorRepository;
 
 
   /**

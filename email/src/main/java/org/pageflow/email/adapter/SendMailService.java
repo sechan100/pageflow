@@ -47,10 +47,10 @@ public class SendMailService implements SendMailPort {
 
     } catch(MessagingException | MailException e) {
       log.error("메일 전송 중 오류가 발생했습니다.", e);
-      return Result.of(EmailCode.FAIL_TO_SEND_MAIL);
+      return Result.unit(EmailCode.FAIL_TO_SEND_MAIL);
 
     } catch(UnsupportedEncodingException e) {
-      return Result.of(EmailCode.FAIL_TO_SEND_MAIL);
+      return Result.unit(EmailCode.FAIL_TO_SEND_MAIL);
     }
   }
 }

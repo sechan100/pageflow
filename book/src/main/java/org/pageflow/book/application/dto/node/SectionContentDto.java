@@ -1,7 +1,7 @@
 package org.pageflow.book.application.dto.node;
 
 import lombok.Value;
-import org.pageflow.book.domain.toc.entity.TocSection;
+import org.pageflow.book.domain.toc.entity.SectionContent;
 
 /**
  * @author : sechan
@@ -10,9 +10,9 @@ import org.pageflow.book.domain.toc.entity.TocSection;
 public class SectionContentDto {
   String content;
 
-  public static SectionContentDto from(TocSection section) {
+  public static SectionContentDto from(SectionContent sectionContent) {
     return new SectionContentDto(
-      section.getContent().getContent()
+      sectionContent.getContent()
     );
   }
 }

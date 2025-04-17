@@ -7,8 +7,8 @@ import jakarta.servlet.http.Cookie;
 import lombok.RequiredArgsConstructor;
 import org.pageflow.common.api.RequestContext;
 import org.pageflow.common.property.ApplicationProperties;
-import org.pageflow.common.result.ProcessResultException;
 import org.pageflow.common.result.Result;
+import org.pageflow.common.result.ResultException;
 import org.pageflow.common.result.code.CommonCode;
 import org.pageflow.common.user.UID;
 import org.pageflow.common.validation.FieldReason;
@@ -135,14 +135,14 @@ public class AuthWebAdapter {
   private UUID _getSessionIdFromCookie() {
     Optional<Cookie> cookieOpt = rqrxt.getCookie(SESSION_ID_COOKIE_NAME);
     if(cookieOpt.isEmpty()) {
-      Result<InvalidField> cookieInvalidResult = Result.of(CommonCode.INVALID_COOKIE,
+      Result<InvalidField> cookieInvalidResult = Result.unit(CommonCode.INVALID_COOKIE,
         InvalidField.builder()
           .field(SESSION_ID_COOKIE_NAME)
           .reason(FieldReason.NULL)
           .message(FieldReason.NULL.getDefaultMessage())
           .build()
       );
-      throw new ProcessResultException(cookieInvalidResult);
+      throw new ResultException(cookieInvalidResult);
     }
     return UUID.fromString(cookieOpt.get().getValue());
   }

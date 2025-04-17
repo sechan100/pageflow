@@ -38,7 +38,7 @@ public class ReviewAccessGranter {
    */
   private Result _grantWrite() {
     if(!isReviewWriter) {
-      return Result.of(BookCode.REVIEW_ACCESS_DENIED);
+      return Result.unit(BookCode.REVIEW_ACCESS_DENIED);
     }
 
     Result bookAccess = bookAccessGranter.grant(BookAccess.READ);

@@ -54,21 +54,15 @@ public class ProfileService implements ProfileUseCase {
     }
 
     // 새 이미지 업로드
-    Result<FileUploadCmd> cmdResult = FileUploadCmd.createCmd(
+    FileUploadCmd cmd = FileUploadCmd.createCmd(
       file,
       uid.getValue().toString(),
       FileType.USER_PROFILE_IMAGE
     );
-    if(cmdResult.isFailure()) {
-      return (Result) cmdResult;
-    }
-    Result<FilePath> uploadResult = fileService.upload(cmdResult.get());
-    if(uploadResult.isFailure()) {
-      return (Result) uploadResult;
-    }
+    FilePath newProfileImagePath = fileService.upload(cmd);
 
     // user 엔티티 변경 =============================
-    String newWebUrl = uploadResult.get().getWebUrl();
+    String newWebUrl = newProfileImagePath.getWebUrl();
     user.changeProfileImageUrl(newWebUrl);
     return Result.ok(new UserDto(user));
   }
@@ -85,10 +79,7 @@ public class ProfileService implements ProfileUseCase {
     String oldUrl = user.getProfileImageUrl();
     if(imageUrlValidator.isInternalUrl(oldUrl)) {
       FilePath path = FilePath.fromWebUrl(oldUrl);
-      Result deleteResult = fileService.delete(path);
-      if(deleteResult.isFailure()) {
-        return deleteResult;
-      }
+      fileService.delete(path);
     }
 
     // 기본 이미지로 변경 ===========
@@ -106,7 +97,7 @@ public class ProfileService implements ProfileUseCase {
   public Result<UserDto> changePenname(UID uid, String penname) {
     FieldValidationResult validationResult = pennameValidator.validate(penname);
     if(!validationResult.isValid()) {
-      return Result.of(CommonCode.FIELD_VALIDATION_ERROR, validationResult);
+      return Result.unit(CommonCode.FIELD_VALIDATION_ERROR, validationResult);
     }
 
     User user = userPersistencePort.findById(uid.getValue()).get();

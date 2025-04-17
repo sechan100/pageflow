@@ -70,7 +70,7 @@ public class SignupWebAdapter {
       return (Result) cmdResult;
     }
 
-    UserDto userDto = signupUseCase.signup(cmdResult.get());
+    UserDto userDto = signupUseCase.signup(cmdResult.getSuccessData());
     return Result.ok(new UserRes(userDto));
   }
 
@@ -89,7 +89,7 @@ public class SignupWebAdapter {
     OAuth2ResourceOwner owner = OAuth2PreSignupForward.getForwardedResourceOwner(requestContext.getRequest());
     PreSignupDto preSignuped = preSignupService.preSignup(owner);
 
-    return Result.of(UserCode.OAUTH2_SIGNUP_REQUIRED, preSignuped);
+    return Result.unit(UserCode.OAUTH2_SIGNUP_REQUIRED, preSignuped);
   }
 
 }

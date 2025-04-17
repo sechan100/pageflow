@@ -3,6 +3,7 @@ package org.pageflow.file.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pageflow.common.result.Result;
+import org.pageflow.common.result.ResultException;
 import org.pageflow.file.entity.FileData;
 import org.pageflow.file.model.FilePath;
 import org.pageflow.file.model.FileUploadCmd;
@@ -30,7 +31,7 @@ public class FileService {
    * @code FAIL_TO_UPLOAD_FILE: 파일 업로드에 실패한 경우
    * @code 그 외 FileValidator에 따라서 다양한 ResultCode 발생 가능
    */
-  public Result<FilePath> upload(FileUploadCmd cmd) {
+  public FilePath upload(FileUploadCmd cmd) {
     // 파일 유효성 검사 ===============================
     Result fileValidationResult = fileValidators.stream()
       .filter(v -> v.accept(cmd.getFileType()))
@@ -38,7 +39,7 @@ public class FileService {
       .map(validator -> validator.validateFile(cmd.getFile()))
       .orElse(Result.ok());
     if(fileValidationResult.isFailure()) {
-      return fileValidationResult;
+      throw new ResultException(fileValidationResult);
     }
 
     // 파일 데이터 엔티티 저장 ====================================
@@ -63,23 +64,23 @@ public class FileService {
     repository.persist(fileData);
 
     // 실제 파일 저장 ===========================
-    try {
-      File file = new File(filePath.getFullPath());
-      File parent = file.getParentFile();
-      // 파일을 저장할 디렉토리가 없다면 생성
-      if(!parent.exists()) {
-        boolean mkdirSuccess = parent.mkdirs();
-        if(!mkdirSuccess) {
-          log.error("파일을 저장할 디렉토리를 생성하는데 실패했습니다. parent: {}, fileData: {}", parent, fileData);
-          return Result.of(FileCode.FAIL_TO_UPLOAD_FILE, originalFilename);
-        }
+    File file = new File(filePath.getFullPath());
+    File parent = file.getParentFile();
+    // 파일을 저장할 디렉토리가 없다면 생성
+    if(!parent.exists()) {
+      boolean mkdirSuccess = parent.mkdirs();
+      if(!mkdirSuccess) {
+        log.error("파일을 저장할 디렉토리를 생성하는데 실패했습니다. parent: {}, fileData: {}", parent, fileData);
+        throw new ResultException(FileCode.FAIL_TO_UPLOAD_FILE, originalFilename);
       }
-      // 파일 저장
+    }
+    // 파일 저장
+    try {
       cmd.getFile().transferTo(file);
-      return Result.ok(filePath);
+      return filePath;
     } catch(Exception e) {
       log.error("파일 저장에 실패했습니다. fileData: {}", fileData, e);
-      return Result.of(FileCode.FAIL_TO_UPLOAD_FILE, originalFilename);
+      throw new ResultException(FileCode.FAIL_TO_UPLOAD_FILE, originalFilename);
     }
   }
 
@@ -91,37 +92,34 @@ public class FileService {
   /**
    * @code FAIL_TO_DELETE_FILE: 파일 삭제에 실패시
    */
-  public Result delete(FileData fileData) {
-    return _deleteByFilePath(fileData.getFilePath());
+  public void delete(FileData fileData) {
+    _deleteByFilePath(fileData.getFilePath());
   }
 
   /**
    * @code FAIL_TO_DELETE_FILE: 파일 삭제에 실패시
    */
-  public Result delete(FilePath path) {
-    return _deleteByFilePath(path);
+  public void delete(FilePath path) {
+    _deleteByFilePath(path);
   }
 
-  public Result deleteAll(String ownerId, FileType ownerType) {
+  public void deleteAll(String ownerId, FileType ownerType) {
     List<FileData> fileDatas = repository.findAllByOwnerIdAndFileType(ownerId, ownerType);
     for(FileData fileData : fileDatas) {
-      Result result = _deleteByFilePath(fileData.getFilePath());
-      if(result.isFailure()) return result;
+      _deleteByFilePath(fileData.getFilePath());
     }
-    return Result.ok();
   }
 
   /**
    * @code FAIL_TO_DELETE_FILE: 파일 삭제에 실패시
    */
-  private Result _deleteByFilePath(FilePath filePath) {
+  private void _deleteByFilePath(FilePath filePath) {
     File file = new File(filePath.getFullPath());
     boolean isSuccess = file.delete();
     if(isSuccess) {
       repository.deleteById(filePath.getFilename());
-      return Result.ok();
     } else {
-      return Result.of(FileCode.FAIL_TO_DELETE_FILE, filePath.getStaticPath());
+      throw new ResultException(FileCode.FAIL_TO_DELETE_FILE, filePath.getStaticPath());
     }
   }
 

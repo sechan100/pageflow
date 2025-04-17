@@ -119,10 +119,10 @@ public class User extends BaseJpaEntity {
    */
   public Result<Void> changePassword(String currentPassword, Password password) {
     if(!passwordMatches(currentPassword)) {
-      return Result.of(UserCode.BAD_CREDENTIALS);
+      return Result.unit(UserCode.BAD_CREDENTIALS);
     }
     if(currentPassword.equals(password.getValue())) {
-      return Result.of(UserCode.PASSWORD_SAME_AS_BEFORE);
+      return Result.unit(UserCode.PASSWORD_SAME_AS_BEFORE);
     }
     this.password = password.getValue();
     return Result.ok();

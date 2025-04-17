@@ -8,7 +8,6 @@ import org.pageflow.book.usecase.ChangeBookStatusUseCase;
 import org.pageflow.book.web.form.BookStatusCmd;
 import org.pageflow.book.web.res.book.SimpleBookRes;
 import org.pageflow.common.api.RequestContext;
-import org.pageflow.common.result.Result;
 import org.pageflow.common.user.UID;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,37 +28,29 @@ public class BookSettingsWebAdapter {
 
   @PostMapping("/user/books/{bookId}/status")
   @Operation(summary = "책 상태 변경")
-  public Result<SimpleBookRes> changeBookStatus(
+  public SimpleBookRes changeBookStatus(
     @PathVariable UUID bookId,
     @RequestParam BookStatusCmd cmd
   ) {
     UID uid = rqcxt.getUid();
-    Result<BookDto> result = switch(cmd) {
+    BookDto bookDto = switch(cmd) {
       case PUBLISH -> changeBookStatusUseCase.publish(uid, bookId);
       case START_REVISION -> changeBookStatusUseCase.startRevision(uid, bookId);
       case MERGE_REVISION -> changeBookStatusUseCase.mergeRevision(uid, bookId);
       case CANCEL_REVISION -> changeBookStatusUseCase.cancelRevision(uid, bookId);
     };
-    if(result.isFailure()) {
-      return (Result) result;
-    }
-    SimpleBookRes res = new SimpleBookRes(result.get());
-    return Result.ok(res);
+    return new SimpleBookRes(bookDto);
   }
 
   @PostMapping("/user/books/{bookId}/visibility")
   @Operation(summary = "책 공개 범위 변경")
-  public Result<SimpleBookRes> changeBookVisibility(
+  public SimpleBookRes changeBookVisibility(
     @PathVariable UUID bookId,
     @RequestParam BookVisibility visibility
   ) {
     UID uid = rqcxt.getUid();
-    Result<BookDto> result = changeBookStatusUseCase.changeVisibility(uid, bookId, visibility);
-    if(result.isFailure()) {
-      return (Result) result;
-    }
-    SimpleBookRes res = new SimpleBookRes(result.get());
-    return Result.ok(res);
+    BookDto bookDto = changeBookStatusUseCase.changeVisibility(uid, bookId, visibility);
+    return new SimpleBookRes(bookDto);
   }
 
 }

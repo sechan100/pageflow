@@ -54,7 +54,7 @@ public class TokenProvider implements TokenUseCase {
 
       // 만료된 토큰인 경우
     } catch(ExpiredJwtException expiredJwtException) {
-      result = Result.of(UserCode.ACCESS_TOKEN_EXPIRED);
+      result = Result.unit(UserCode.ACCESS_TOKEN_EXPIRED);
     }
 
     return result;

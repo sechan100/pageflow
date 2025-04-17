@@ -10,10 +10,10 @@ import java.util.UUID;
 /**
  * @author : sechan
  */
-public interface SectionContentPersistencePort extends JpaRepository<SectionContent, UUID> {
+public interface SectionContentRepository extends JpaRepository<SectionContent, UUID> {
   @Query("""
     SELECT SUM(c.charCount) FROM TocSection s
-    JOIN s.content c WHERE s.book.id = :bookId
+    JOIN s.sectionDetails.content c WHERE s.book.id = :bookId
     """)
   int sumCharCountByBookId(@Param("bookId") UUID bookId);
 }

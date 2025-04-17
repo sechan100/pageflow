@@ -70,10 +70,10 @@ public class AccountEmailService {
       if(validation.getInvalidFields().get(0).getReason() == FieldReason.DUPLICATED) {
         User user = userPersistencePort.findById(uid.getValue()).get();
         if(user.getEmail().equals(email) && user.getIsEmailVerified()) {
-          return Result.of(UserCode.EMAIL_ALREADY_VERIFIED);
+          return Result.unit(UserCode.EMAIL_ALREADY_VERIFIED);
         }
       }
-      return Result.of(CommonCode.FIELD_VALIDATION_ERROR, validation);
+      return Result.unit(CommonCode.FIELD_VALIDATION_ERROR, validation);
     }
 
     // 기존 request가 있다면 삭제 후 새로 생성
@@ -116,7 +116,7 @@ public class AccountEmailService {
     Optional<EmailVerificationRequest> evOpt = verificationPersistencePort.findById(id);
 
     if(evOpt.isEmpty()) {
-      return Result.of(UserCode.EMAIL_VERIFICATION_EXPIRED);
+      return Result.unit(UserCode.EMAIL_VERIFICATION_EXPIRED);
     }
 
     EmailVerificationRequest ev = evOpt.get();
@@ -125,11 +125,11 @@ public class AccountEmailService {
 
     // 이메일 일치
     if(!email.equals(cmd.getEmail())) {
-      return Result.of(UserCode.EMAIL_VERIFICATION_ERROR);
+      return Result.unit(UserCode.EMAIL_VERIFICATION_ERROR);
     }
     // 인증코드 일치
     if(!authCode.equals(cmd.getAuthCode())) {
-      return Result.of(UserCode.EMAIL_VERIFICATION_ERROR);
+      return Result.unit(UserCode.EMAIL_VERIFICATION_ERROR);
     }
     // 인증처리 및 ev 삭제
     User user = userPersistencePort.findById(uid.getValue()).orElseThrow();

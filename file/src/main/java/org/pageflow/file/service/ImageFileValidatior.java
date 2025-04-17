@@ -102,10 +102,10 @@ public class ImageFileValidatior implements FileValidator {
       if(validation.isValid()) {
         return Result.ok();
       } else {
-        return Result.of(CommonCode.FIELD_VALIDATION_ERROR, validation);
+        return Result.unit(CommonCode.FIELD_VALIDATION_ERROR, validation);
       }
     } catch(IOException e) {
-      return Result.of(CommonCode.INTERNAL_SERVER_ERROR);
+      return Result.unit(CommonCode.INTERNAL_SERVER_ERROR);
     }
   }
 }

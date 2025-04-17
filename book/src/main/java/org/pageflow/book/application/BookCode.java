@@ -12,7 +12,7 @@ public enum BookCode implements ResultCode {
   TOC_HIERARCHY_ERROR("책 목차의 계층구조를 위반하는 요청입니다.", String.class),
   INVALID_BOOK_STATUS("책이 요청을 처리할 수 있는 상태가 아닙니다.", String.class),
   BOOK_ACCESS_DENIED("해당 책에 접근할 수 없습니다.", String.class),
-  CAN_EDIT_BOOK("책을 편집 할 수 없습니다.", String.class),
+  CANNOT_EDIT_BOOK("책을 편집 할 수 없습니다.", String.class),
   REVIEW_ACCESS_DENIED("해당 리뷰에 접근할 수 없습니다."),
   ;
 

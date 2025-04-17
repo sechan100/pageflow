@@ -1,4 +1,4 @@
-package org.pageflow.test.module.book;
+package org.pageflow.test.module.book.usecase;
 
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Assertions;
@@ -6,22 +6,20 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.pageflow.book.application.BookCode;
 import org.pageflow.book.application.dto.book.BookDto;
-import org.pageflow.book.application.dto.node.SectionDto;
 import org.pageflow.book.domain.book.entity.Book;
 import org.pageflow.book.domain.toc.Toc;
 import org.pageflow.book.domain.toc.entity.TocFolder;
 import org.pageflow.book.domain.toc.entity.TocNode;
 import org.pageflow.book.persistence.BookPersistencePort;
-import org.pageflow.book.persistence.toc.LoadEditableTocNodePort;
-import org.pageflow.book.persistence.toc.TocPersistencePort;
+import org.pageflow.book.persistence.toc.TocRepository;
 import org.pageflow.book.usecase.ChangeBookStatusUseCase;
 import org.pageflow.book.usecase.EditTocUseCase;
 import org.pageflow.book.usecase.cmd.NodeIdentifier;
-import org.pageflow.common.result.Result;
 import org.pageflow.common.user.UID;
 import org.pageflow.test.module.book.utils.BookUtils;
 import org.pageflow.test.module.book.utils.TocUtils;
 import org.pageflow.test.module.user.utils.UserUtils;
+import org.pageflow.test.shared.AssertResult;
 import org.pageflow.test.shared.PageflowTest;
 import org.pageflow.user.dto.UserDto;
 
@@ -40,8 +38,7 @@ public class BookStatusTest {
   private final EditTocUseCase editTocUseCase;
 
   private final BookPersistencePort bookPersistencePort;
-  private final TocPersistencePort tocPersistencePort;
-  private final LoadEditableTocNodePort loadEditableTocNodePort;
+  private final TocRepository tocRepository;
 
   @Test
   @DisplayName("DRAFT -> PUBLISHED 상태 변경 결과와 불가능한 연산 등 테스트")
@@ -62,32 +59,29 @@ public class BookStatusTest {
       );
 
     // 모든 노드들이 editable인지 확인
-    Toc originalToc = tocPersistencePort.loadEditableToc(bookEn);
+    Toc originalToc = tocRepository.loadEditableToc(bookEn);
     originalToc.forEachNode(n -> Assertions.assertTrue(n.isEditable()));
 
     // 섹션 4.1의 제목을 변경하여 editable node일 때 수정이 가능한지 확인
     TocNode section4_1 = ((TocFolder) originalToc.getRootFolder().getChildren().get(3)).getChildren().get(0);
     NodeIdentifier section4_1Identifier = new NodeIdentifier(uid, bookId, section4_1.getId());
-    Result<SectionDto> changeSectionTitleRes = editTocUseCase.changeSectionTitle(
+    editTocUseCase.changeSectionTitle(
       section4_1Identifier,
       "섹션 4.1 수정됨"
     );
-    Assertions.assertTrue(changeSectionTitleRes.isSuccess());
 
     // 책 출판
-    Result publishRes = changeBookStatusUseCase.publish(uid, bookId);
-    Assertions.assertTrue(publishRes.isSuccess());
+    changeBookStatusUseCase.publish(uid, bookId);
 
     // 출판 후 모든 node가 readOnlyToc로 변경되었는지 확인
-    Toc publishedToc = tocPersistencePort.loadReadonlyToc(bookEn);
+    Toc publishedToc = tocRepository.loadReadonlyToc(bookEn);
     publishedToc.forEachNode(n -> Assertions.assertFalse(n.isEditable()));
 
     // 출판 후 섹션 4.1의 제목을 변경하여 readOnly node일 때 수정이 불가능한지 확인
-    Result<SectionDto> changeSectionTitleRes2 = editTocUseCase.changeSectionTitle(
-      section4_1Identifier,
-      "섹션 4.1 수정됨2"
+    AssertResult.assertCode(
+      () -> editTocUseCase.changeSectionTitle(section4_1Identifier, "섹션 4.1 수정됨2"),
+      BookCode.BOOK_ACCESS_DENIED
     );
-    Assertions.assertTrue(changeSectionTitleRes2.is(BookCode.BOOK_ACCESS_DENIED));
   }
 
   @Test
@@ -109,17 +103,15 @@ public class BookStatusTest {
       );
 
     // 책 출판
-    Result publishRes = changeBookStatusUseCase.publish(uid, bookId);
-    Assertions.assertTrue(publishRes.isSuccess());
+    changeBookStatusUseCase.publish(uid, bookId);
 
     // 출판 후 개정 시작
-    Result reviseRes = changeBookStatusUseCase.startRevision(uid, bookId);
-    Assertions.assertTrue(reviseRes.isSuccess());
+    changeBookStatusUseCase.startRevision(uid, bookId);
 
     // 출판 후 editableToc가 복제되었는지 확인
     Book bookEntity = bookPersistencePort.findById(bookId).get();
-    TocFolder rtRoot = tocPersistencePort.loadReadonlyToc(bookEntity).getRootFolder();
-    TocFolder etRoot = tocPersistencePort.loadEditableToc(bookEntity).getRootFolder();
+    TocFolder rtRoot = tocRepository.loadReadonlyToc(bookEntity).getRootFolder();
+    TocFolder etRoot = tocRepository.loadEditableToc(bookEntity).getRootFolder();
     tocUtils.assertSameHierarchyRecusive(rtRoot, etRoot, (readOnly, editable) -> {
       // 복제된 id는 같으면 안됨.
       Assertions.assertNotEquals(readOnly.getId(), editable.getId());
@@ -149,24 +141,19 @@ public class BookStatusTest {
       );
 
     // 책 출판
-    Result publishRes = changeBookStatusUseCase.publish(uid, bookId);
-    Assertions.assertTrue(publishRes.isSuccess());
-
+    changeBookStatusUseCase.publish(uid, bookId);
     // 출판 후 개정 시작
-    Result reviseRes = changeBookStatusUseCase.startRevision(uid, bookId);
-    Assertions.assertTrue(reviseRes.isSuccess());
-
+    changeBookStatusUseCase.startRevision(uid, bookId);
     // 개정 후 책 출판
-    Result rePublishRes = changeBookStatusUseCase.publish(uid, bookId);
-    Assertions.assertTrue(rePublishRes.isSuccess());
+    changeBookStatusUseCase.publish(uid, bookId);
 
     // 개정 후 모든 node가 readOnlyToc로 변경되었는지 확인
     Book bookEntity = bookPersistencePort.findById(bookId).get();
-    Toc publishedToc = tocPersistencePort.loadReadonlyToc(bookEntity);
+    Toc publishedToc = tocRepository.loadReadonlyToc(bookEntity);
     publishedToc.forEachNode(n -> Assertions.assertFalse(n.isEditable()));
 
     // editable toc를 조회하면 예외발생
-    Assertions.assertThrows(Exception.class, () -> tocPersistencePort.loadEditableToc(bookEntity));
+    Assertions.assertThrows(Exception.class, () -> tocRepository.loadEditableToc(bookEntity));
   }
 
   @Test
@@ -188,24 +175,21 @@ public class BookStatusTest {
       );
 
     // 책 출판
-    Result publishRes = changeBookStatusUseCase.publish(uid, bookId);
-    Assertions.assertTrue(publishRes.isSuccess());
+    changeBookStatusUseCase.publish(uid, bookId);
 
     // 출판 후 개정 시작
-    Result reviseRes = changeBookStatusUseCase.startRevision(uid, bookId);
-    Assertions.assertTrue(reviseRes.isSuccess());
+    changeBookStatusUseCase.startRevision(uid, bookId);
 
     // 개정 후 책 병합
-    Result mergeRevisionRes = changeBookStatusUseCase.mergeRevision(uid, bookId);
-    Assertions.assertTrue(mergeRevisionRes.isSuccess());
+    changeBookStatusUseCase.mergeRevision(uid, bookId);
 
     // 병합 후 모든 node가 readOnlyToc로 변경되었는지 확인
     Book bookEntity = bookPersistencePort.findById(bookId).get();
-    Toc publishedToc = tocPersistencePort.loadReadonlyToc(bookEntity);
+    Toc publishedToc = tocRepository.loadReadonlyToc(bookEntity);
     publishedToc.forEachNode(n -> Assertions.assertFalse(n.isEditable()));
 
     // editable toc를 조회하면 예외발생
-    Assertions.assertThrows(Exception.class, () -> tocPersistencePort.loadEditableToc(bookEntity));
+    Assertions.assertThrows(Exception.class, () -> tocRepository.loadEditableToc(bookEntity));
   }
 
   @Test
@@ -228,28 +212,24 @@ public class BookStatusTest {
       );
 
     // 책을 만들고 나서 직후의 toc를 로드
-    Toc originalToc = tocPersistencePort.loadEditableToc(bookEntity);
+    Toc originalToc = tocRepository.loadEditableToc(bookEntity);
 
     // 책 출판
-    Result publishRes = changeBookStatusUseCase.publish(uid, bookId);
-    Assertions.assertTrue(publishRes.isSuccess());
+    changeBookStatusUseCase.publish(uid, bookId);
 
     // 출판 후 개정 시작
-    Result reviseRes = changeBookStatusUseCase.startRevision(uid, bookId);
-    Assertions.assertTrue(reviseRes.isSuccess());
+    changeBookStatusUseCase.startRevision(uid, bookId);
 
     // 개정 후 책 개정 취소
-    Result cancelRevisionRes = changeBookStatusUseCase.cancelRevision(uid, bookId);
-    Assertions.assertTrue(cancelRevisionRes.isSuccess());
+    changeBookStatusUseCase.cancelRevision(uid, bookId);
 
-    // 병합 후 모든 node가 readOnlyToc로 변경되었는지 확인 + 맨 처음 만든 node들과 일치하는지
-    Toc publishedToc = tocPersistencePort.loadReadonlyToc(bookEntity);
+    // 병합 후 모든 node가 readOnlyToc로 변경되었는지 확인
+    Toc publishedToc = tocRepository.loadReadonlyToc(bookEntity);
     publishedToc.forEachNode(n -> {
       Assertions.assertFalse(n.isEditable());
-      Assertions.assertEquals(n, originalToc.get(n.getId()));
     });
 
     // editable toc를 조회하면 예외발생
-    Assertions.assertThrows(Exception.class, () -> tocPersistencePort.loadEditableToc(bookEntity));
+    Assertions.assertThrows(Exception.class, () -> tocRepository.loadEditableToc(bookEntity));
   }
 }

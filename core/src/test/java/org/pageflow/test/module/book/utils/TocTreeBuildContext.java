@@ -26,10 +26,10 @@ public class TocTreeBuildContext {
   }
 
   public FolderDto create(CreateFolderCmd cmd) {
-    return editTocUseCase.createFolder(cmd).get();
+    return editTocUseCase.createFolder(cmd);
   }
 
   public WithContentSectionDto create(CreateSectionCmd cmd) {
-    return editTocUseCase.createSection(cmd).get();
+    return editTocUseCase.createSection(cmd);
   }
 }

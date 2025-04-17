@@ -2,7 +2,7 @@ package org.pageflow.book.domain.toc;
 
 
 import org.pageflow.book.domain.toc.constants.TocNodeConfig;
-import org.pageflow.common.result.Result;
+import org.pageflow.common.result.ResultException;
 import org.pageflow.common.result.code.CommonCode;
 import org.pageflow.common.utility.SingleValueWrapper;
 import org.pageflow.common.validation.FieldValidationResult;
@@ -23,12 +23,12 @@ public class NodeTitle extends SingleValueWrapper<String> {
   /**
    * @code FIELD_VALIDATION_ERROR: title이 유효하지 않은 경우
    */
-  public static Result<NodeTitle> create(String value) {
+  public static NodeTitle create(String value) {
     FieldValidationResult result = _validate(value);
     if(result.isValid()) {
-      return Result.ok(new NodeTitle(value));
+      return new NodeTitle(value);
     } else {
-      return Result.of(CommonCode.FIELD_VALIDATION_ERROR, result);
+      throw new ResultException(CommonCode.FIELD_VALIDATION_ERROR, result);
     }
   }
 

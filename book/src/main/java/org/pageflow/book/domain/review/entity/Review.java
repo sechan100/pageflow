@@ -70,7 +70,7 @@ public class Review extends BaseJpaEntity {
       writer.getUserEntity(),
       book,
       content,
-      scoreValidationRes.get()
+      scoreValidationRes.getSuccessData()
     );
     return Result.ok(review);
   }
@@ -94,7 +94,7 @@ public class Review extends BaseJpaEntity {
   public Result changeScore(int score) {
     Result<Integer> scoreValidationRes = _validateScore(score);
     if(scoreValidationRes.isFailure()) return scoreValidationRes;
-    this.score = scoreValidationRes.get();
+    this.score = scoreValidationRes.getSuccessData();
     return scoreValidationRes;
   }
 
@@ -105,7 +105,7 @@ public class Review extends BaseJpaEntity {
    */
   private static Result<Integer> _validateScore(int score) {
     if(score < ReviewScoreConfig.MIN || score > ReviewScoreConfig.MAX) {
-      return Result.of(CommonCode.FIELD_VALIDATION_ERROR, FieldValidationResult.of(
+      return Result.unit(CommonCode.FIELD_VALIDATION_ERROR, FieldValidationResult.of(
         InvalidField.builder()
           .field("score")
           .value(score)

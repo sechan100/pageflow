@@ -1,5 +1,6 @@
 package org.pageflow.book.domain.toc;
 
+import com.google.common.base.Preconditions;
 import org.pageflow.book.domain.toc.constants.TocNodeConfig;
 import org.pageflow.book.domain.toc.entity.TocNode;
 import org.springframework.lang.Nullable;
@@ -65,6 +66,7 @@ public class OvRebalancer {
    * @return rebalancing이 끝난 후의 가장 큰 ov값, 즉 list 마지막 인덱스의 node.ov를 반환한다.
    */
   public int rebalance(List<TocNode> children) {
+    Preconditions.checkArgument(children.stream().allMatch(c -> c.isEditable()));
     if(children.isEmpty()) {
       return OV_START;
     }

@@ -9,7 +9,7 @@ import java.util.UUID;
 /**
  * @author : sechan
  */
-public interface TocNodePersistencePort extends JpaRepository<TocNode, UUID> {
+public interface TocNodeRepository extends JpaRepository<TocNode, UUID> {
 
   List<TocNode> findAllByBookId(UUID bookId);
 

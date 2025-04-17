@@ -10,7 +10,7 @@ import java.util.UUID;
 /**
  * @author : sechan
  */
-public interface TocSectionPersistencePort extends JpaRepository<TocSection, UUID> {
-  @EntityGraph(attributePaths = {"content"})
-  Optional<TocSection> findWithContentByIdAndIsEditable(UUID sectionId, boolean isEditable);
+public interface TocSectionRepository extends JpaRepository<TocSection, UUID> {
+  @EntityGraph(attributePaths = {"sectionDetails", "sectionDetails.content"})
+  Optional<TocSection> findWithContentById(UUID sectionId);
 }

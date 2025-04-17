@@ -36,7 +36,7 @@ public class Password extends SingleValueWrapper<String> {
       String encrypted = ENCODER.encode(rawPassword);
       return Result.ok(new Password(encrypted));
     } else {
-      return Result.of(CommonCode.FIELD_VALIDATION_ERROR, result);
+      return Result.unit(CommonCode.FIELD_VALIDATION_ERROR, result);
     }
   }
 

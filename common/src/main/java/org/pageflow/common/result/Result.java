@@ -48,11 +48,11 @@ public class Result<S> {
     }
   }
 
-  public static Result of(ResultCode code) {
+  public static Result unit(ResultCode code) {
     return new Result(code, null);
   }
 
-  public static <T> Result of(ResultCode code, T data) {
+  public static <T> Result unit(ResultCode code, T data) {
     return new Result(code, data);
   }
 
@@ -66,7 +66,7 @@ public class Result<S> {
 
   @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
   public static <S> Result<S> fromOptional(Optional<S> optional) {
-    return optional.map(Result::ok).orElseGet(() -> of(CommonCode.DATA_NOT_FOUND, ""));
+    return optional.map(Result::ok).orElseGet(() -> unit(CommonCode.DATA_NOT_FOUND, ""));
   }
 
   public boolean is(ResultCode code) {
@@ -120,7 +120,7 @@ public class Result<S> {
    * @return
    * @throws ResultDataTypeMisMatchException ResultCode의 dataType과 실제 데이터의 타입이 다를 경우 발생
    */
-  public S get() {
+  public S getSuccessData() {
     return getData(CommonCode.SUCCESS);
   }
 

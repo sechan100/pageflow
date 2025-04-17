@@ -3,13 +3,15 @@ package org.pageflow.book.usecase;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pageflow.book.application.dto.node.FolderDto;
-import org.pageflow.book.domain.book.BookAccessGranter;
+import org.pageflow.book.application.service.GrantedBookLoader;
+import org.pageflow.book.application.service.TocNodeLoader;
+import org.pageflow.book.application.service.TocNodeLoaderFactory;
 import org.pageflow.book.domain.book.constants.BookAccess;
+import org.pageflow.book.domain.book.entity.Book;
+import org.pageflow.book.domain.toc.EditableFolder;
 import org.pageflow.book.domain.toc.entity.FolderDesign;
-import org.pageflow.book.persistence.BookPersistencePort;
-import org.pageflow.book.persistence.toc.LoadEditableTocNodePort;
+import org.pageflow.book.domain.toc.entity.TocFolder;
 import org.pageflow.book.usecase.cmd.NodeIdentifier;
-import org.pageflow.common.result.Result;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,21 +23,18 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @RequiredArgsConstructor
 public class TocFolderUseCase {
-  private final BookPersistencePort bookPersistencePort;
-  private final LoadEditableTocNodePort loadNodePort;
+  private final GrantedBookLoader grantedBookLoader;
+  private final TocNodeLoaderFactory tocNodeLoaderFactory;
 
-  public Result<FolderDto> changeFolderDesign(NodeIdentifier identifier, FolderDesign newDesign) {
-    return Result.fromOptional(bookPersistencePort.findById(identifier.getBookId()))
-      .flatMap(book -> new BookAccessGranter(identifier.getUid(), book)
-        .grant(BookAccess.WRITE)
-        .map(book)
-      )
-      .flatMap(book -> loadNodePort.loadEditableFolder(book, identifier.getNodeId()))
-      .flatMap(folder -> folder
-        .changeDesign(newDesign)
-        .map(folder)
-      )
-      .map(FolderDto::from);
+  public FolderDto changeFolderDesign(NodeIdentifier identifier, FolderDesign newDesign) {
+    Book book = grantedBookLoader.loadBookWithGrant(identifier.getUid(), identifier.getBookId(), BookAccess.WRITE);
+
+    TocNodeLoader nodeLoader = tocNodeLoaderFactory.createLoader(book);
+    TocFolder folder = nodeLoader.loadFolder(repo -> repo.findById(identifier.getNodeId()));
+    EditableFolder editableFolder = new EditableFolder(folder);
+
+    editableFolder.changeDesign(newDesign);
+    return FolderDto.from(folder);
   }
 
 }

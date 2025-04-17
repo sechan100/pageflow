@@ -1,4 +1,4 @@
-package org.pageflow.test.module.book;
+package org.pageflow.test.module.book.usecase;
 
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Assertions;
@@ -9,7 +9,6 @@ import org.pageflow.book.domain.toc.entity.FolderDesign;
 import org.pageflow.book.usecase.EditTocUseCase;
 import org.pageflow.book.usecase.TocFolderUseCase;
 import org.pageflow.book.usecase.cmd.NodeIdentifier;
-import org.pageflow.common.result.Result;
 import org.pageflow.test.module.book.utils.BookUtils;
 import org.pageflow.test.module.book.utils.TocUtils;
 import org.pageflow.test.module.user.utils.UserUtils;
@@ -49,11 +48,9 @@ public class TocFolderTest {
       book.getId(),
       folderId
     );
-    Result result = useCase.changeFolderDesign(folderIdenfier, FolderDesign.SIMPLE);
-    Assertions.assertTrue(result.isSuccess());
-    Result<FolderDesign> changedDesign = editTocUseCase.getFolder(folderIdenfier)
-      .map(folder -> folder.getDesign());
-    Assertions.assertSame(FolderDesign.SIMPLE, changedDesign.get());
+    useCase.changeFolderDesign(folderIdenfier, FolderDesign.SIMPLE);
+    FolderDesign changedDesign = editTocUseCase.getFolder(folderIdenfier).getDesign();
+    Assertions.assertSame(FolderDesign.SIMPLE, changedDesign);
   }
 
 }

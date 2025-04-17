@@ -28,7 +28,7 @@ public class FolderWebAdapter {
 
   @PostMapping("")
   @Operation(summary = "폴더 생성")
-  public Result<FolderRes> createFolder(
+  public FolderRes createFolder(
     @PathVariable UUID bookId,
     @Valid @RequestBody FolderForm.Create form
   ) {
@@ -38,17 +38,13 @@ public class FolderWebAdapter {
       form.getParentNodeId(),
       form.getTitle()
     );
-    Result<FolderDto> result = editTocUseCase.createFolder(cmd);
-    if(result.isFailure()) {
-      return (Result) result;
-    }
-    FolderRes res = FolderRes.from(result.get());
-    return Result.ok(res);
+    FolderDto folderDto = editTocUseCase.createFolder(cmd);
+    return FolderRes.from(folderDto);
   }
 
   @GetMapping("/{folderId}")
   @Operation(summary = "폴더 조회")
-  public Result<FolderRes> getFolder(
+  public FolderRes getFolder(
     @PathVariable UUID bookId,
     @PathVariable UUID folderId
   ) {
@@ -57,17 +53,13 @@ public class FolderWebAdapter {
       bookId,
       folderId
     );
-    Result<FolderDto> result = editTocUseCase.getFolder(identifier);
-    if(result.isFailure()) {
-      return (Result) result;
-    }
-    FolderRes res = FolderRes.from(result.get());
-    return Result.ok(res);
+    FolderDto folderDto = editTocUseCase.getFolder(identifier);
+    return FolderRes.from(folderDto);
   }
 
   @PostMapping("/{folderId}")
   @Operation(summary = "폴더 업데이트")
-  public Result<FolderRes> updateFolder(
+  public FolderRes updateFolder(
     @PathVariable UUID bookId,
     @PathVariable UUID folderId,
     @Valid @RequestBody FolderForm.Update form
@@ -77,12 +69,8 @@ public class FolderWebAdapter {
       bookId,
       folderId
     );
-    Result<FolderDto> result = editTocUseCase.changeFolderTitle(identifier, form.getTitle());
-    if(result.isFailure()) {
-      return (Result) result;
-    }
-    FolderRes res = FolderRes.from(result.get());
-    return Result.ok(res);
+    FolderDto folderDto = editTocUseCase.changeFolderTitle(identifier, form.getTitle());
+    return FolderRes.from(folderDto);
   }
 
 
@@ -97,8 +85,8 @@ public class FolderWebAdapter {
       bookId,
       folderId
     );
-    Result result = editTocUseCase.deleteFolder(identifier);
-    return result;
+    editTocUseCase.deleteFolder(identifier);
+    return Result.ok();
   }
 }
 

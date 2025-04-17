@@ -3,7 +3,7 @@ package org.pageflow.file.model;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.pageflow.common.result.Result;
+import org.pageflow.common.result.ResultException;
 import org.pageflow.common.result.code.CommonCode;
 import org.pageflow.common.validation.FieldReason;
 import org.pageflow.common.validation.FieldValidationResult;
@@ -26,7 +26,7 @@ public class FileUploadCmd {
    *
    * @code FIELD_VALIDATION_ERROR: file 데이터가 올바르지 않은 경우
    */
-  public static Result<FileUploadCmd> createCmd(
+  public static FileUploadCmd createCmd(
     MultipartFile file,
     String ownerId,
     FileType fileType
@@ -37,9 +37,9 @@ public class FileUploadCmd {
     FieldValidationResult validation = validator.validate();
     if(validation.isValid()) {
       FileUploadCmd cmd = new FileUploadCmd(file, ownerId, fileType);
-      return Result.ok(cmd);
+      return cmd;
     } else {
-      return Result.of(CommonCode.FIELD_VALIDATION_ERROR, validation);
+      throw new ResultException(CommonCode.FIELD_VALIDATION_ERROR, validation);
     }
   }
 }

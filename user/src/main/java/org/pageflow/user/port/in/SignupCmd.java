@@ -34,7 +34,7 @@ public class SignupCmd {
     if(encryptedPasswordResult.isFailure()) {
       return (Result) encryptedPasswordResult;
     }
-    Password encryptedPassword = encryptedPasswordResult.get();
+    Password encryptedPassword = encryptedPasswordResult.getSuccessData();
 
     // signup cmd 생성
     SignupCmd cmd = new SignupCmd(username, encryptedPassword, email, penname, role, provider, profileImageUrl);

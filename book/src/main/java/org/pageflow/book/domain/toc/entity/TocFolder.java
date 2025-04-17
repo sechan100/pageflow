@@ -2,14 +2,10 @@ package org.pageflow.book.domain.toc.entity;
 
 import com.google.common.base.Preconditions;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.pageflow.book.domain.book.entity.Book;
 import org.pageflow.book.domain.toc.NodeTitle;
 import org.pageflow.book.domain.toc.constants.TocNodeConfig;
-import org.pageflow.common.result.Result;
 import org.springframework.lang.Nullable;
 
 import java.util.ArrayList;
@@ -27,7 +23,6 @@ import java.util.UUID;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(callSuper = true)
 @DiscriminatorValue("FOLDER")
-@Table(name = "toc_folder")
 public class TocFolder extends TocNode {
 
   @Getter
@@ -40,20 +35,25 @@ public class TocFolder extends TocNode {
   private final List<TocNode> children = new ArrayList<>(5);
 
   @Getter
-  @Enumerated(EnumType.STRING)
-  private FolderDesign design;
+  @Setter
+  @OneToOne(
+    fetch = FetchType.LAZY,
+    cascade = CascadeType.ALL
+  )
+  @JoinColumn(name = "folder_details_id")
+  private FolderDetails folderDetails;
 
-  private TocFolder(
+  public TocFolder(
     UUID id,
     Book book,
     String title,
     @Nullable TocFolder parentNode,
     boolean isEditable,
     int ov,
-    FolderDesign design
+    FolderDetails folderDetails
   ) {
     super(id, book, title, parentNode, isEditable, ov);
-    this.design = design;
+    this.folderDetails = folderDetails;
   }
 
   public static TocFolder createRootFolder(Book book) {
@@ -64,7 +64,7 @@ public class TocFolder extends TocNode {
       null,
       true,
       0,
-      FolderDesign.DEFAULT
+      FolderDetails.create()
     );
   }
 
@@ -76,25 +76,11 @@ public class TocFolder extends TocNode {
       null,
       true,
       0,
-      FolderDesign.DEFAULT
-    );
-  }
-
-  public static TocFolder copyFromReadOnlyToEditable(TocFolder readOnlyFolder) {
-    Preconditions.checkArgument(readOnlyFolder.isReadOnly());
-    return new TocFolder(
-      UUID.randomUUID(),
-      readOnlyFolder.getBook(),
-      readOnlyFolder.getTitle(),
-      null,
-      true,
-      readOnlyFolder.getOv(),
-      readOnlyFolder.getDesign()
+      FolderDetails.create()
     );
   }
 
   public void addChild(int index, TocNode child) {
-    Preconditions.checkState(this.isEditable());
     Preconditions.checkState(child.getParentNodeOrNull() == null);
     Preconditions.checkState(!children.contains(child));
 
@@ -107,16 +93,9 @@ public class TocFolder extends TocNode {
   }
 
   public void removeChild(TocNode child) {
-    Preconditions.checkState(this.isEditable());
     Preconditions.checkState(children.contains(child));
     children.remove(child);
     child.setParentNode(null);
-  }
-
-  public Result<Void> changeDesign(FolderDesign design) {
-    Preconditions.checkState(this.isEditable());
-    this.design = design;
-    return Result.ok();
   }
 
 }

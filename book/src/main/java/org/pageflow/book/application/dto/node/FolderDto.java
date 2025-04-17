@@ -19,7 +19,7 @@ public class FolderDto {
     return new FolderDto(
       folder.getId(),
       folder.getTitle(),
-      folder.getDesign()
+      folder.getFolderDetails().getDesign()
     );
   }
 }

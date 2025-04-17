@@ -22,7 +22,7 @@ import java.util.UUID;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class LoadAuthorPort {
+public class AuthorRepository {
   private final BookPersistencePort bookPersistencePort;
   private final UserPersistencePort userPersistencePort;
 

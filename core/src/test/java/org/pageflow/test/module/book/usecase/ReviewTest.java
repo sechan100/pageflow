@@ -1,4 +1,4 @@
-package org.pageflow.test.module.book;
+package org.pageflow.test.module.book.usecase;
 
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.DisplayName;
@@ -37,8 +37,7 @@ public class ReviewTest {
     BookDto book = bookUtils.createBook(user1, "리뷰 테스트 도서");
 
     // 출판 상태로 변경 (리뷰는 출판된 책에만 작성 가능)
-    Result<BookDto> publishResult = changeBookStatusUseCase.publish(user1.getUid(), book.getId());
-    assertTrue(publishResult.isSuccess());
+    changeBookStatusUseCase.publish(user1.getUid(), book.getId());
 
     // 리뷰 작성
     Result<ReviewDto> reviewResult = reviewUseCase.createReview(
@@ -48,7 +47,7 @@ public class ReviewTest {
       5
     );
     assertTrue(reviewResult.isSuccess());
-    ReviewDto review = reviewResult.get();
+    ReviewDto review = reviewResult.getSuccessData();
 
     // 리뷰 수정
     Result<ReviewDto> updateResult = reviewUseCase.updateReview(
@@ -58,8 +57,8 @@ public class ReviewTest {
       2
     );
     assertTrue(updateResult.isSuccess());
-    assertEquals("적당히 좋은 책입니다!", updateResult.get().getContent());
-    assertEquals(2, updateResult.get().getScore());
+    assertEquals("적당히 좋은 책입니다!", updateResult.getSuccessData().getContent());
+    assertEquals(2, updateResult.getSuccessData().getScore());
 
     // 다른 사람이 리뷰 수정 및 삭제 시도
     Result<ReviewDto> updateResult2 = reviewUseCase.updateReview(
@@ -74,24 +73,22 @@ public class ReviewTest {
     assertTrue(deleteResult2.is(BookCode.REVIEW_ACCESS_DENIED));
 
     // 작가가 책을 PERSONAL visibility로 변경
-    Result<BookDto> changeVisibilityResult = changeBookStatusUseCase.changeVisibility(
+    changeBookStatusUseCase.changeVisibility(
       user1.getUid(),
       book.getId(),
       BookVisibility.PERSONAL
     );
-    assertTrue(changeVisibilityResult.isSuccess());
 
     // 리뷰 삭제 시도
     Result deleteResult3 = reviewUseCase.deleteReview(user2.getUid(), review.getId());
     assertTrue(deleteResult3.is(BookCode.BOOK_ACCESS_DENIED));
 
     // 책을 다시 GLOBAL visibility로 변경
-    Result<BookDto> changeVisibilityResult2 = changeBookStatusUseCase.changeVisibility(
+    changeBookStatusUseCase.changeVisibility(
       user1.getUid(),
       book.getId(),
       BookVisibility.GLOBAL
     );
-    assertTrue(changeVisibilityResult2.isSuccess());
 
     // 실제로 리뷰 삭제
     Result deleteResult = reviewUseCase.deleteReview(user2.getUid(), review.getId());

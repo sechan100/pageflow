@@ -12,7 +12,8 @@ import java.util.UUID;
 /**
  * @author : sechan
  */
-public interface TocFolderPersistencePort extends JpaRepository<TocFolder, UUID> {
+public interface TocFolderRepository extends JpaRepository<TocFolder, UUID> {
+
   @EntityGraph(attributePaths = {"children"})
   Optional<TocFolder> findWithChildrenById(UUID id);
 

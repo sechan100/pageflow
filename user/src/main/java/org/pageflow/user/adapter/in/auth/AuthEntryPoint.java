@@ -3,7 +3,7 @@ package org.pageflow.user.adapter.in.auth;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.pageflow.common.result.ProcessResultException;
+import org.pageflow.common.result.ResultException;
 import org.pageflow.common.result.code.CommonCode;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.core.AuthenticationException;
@@ -23,8 +23,8 @@ public class AuthEntryPoint implements AuthenticationEntryPoint {
     HttpServletResponse response,
     AuthenticationException authException
   ) {
-    if(authException instanceof InsufficientAuthenticationException insufficientAuthenticationException){
-      throw new ProcessResultException(CommonCode.LOGIN_REQUIRED);
+    if(authException instanceof InsufficientAuthenticationException insufficientAuthenticationException) {
+      throw new ResultException(CommonCode.LOGIN_REQUIRED);
     }
   }
 }

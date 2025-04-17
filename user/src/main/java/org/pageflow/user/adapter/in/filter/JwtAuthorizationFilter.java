@@ -8,8 +8,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.pageflow.common.result.ProcessResultException;
 import org.pageflow.common.result.Result;
+import org.pageflow.common.result.ResultException;
 import org.pageflow.user.adapter.in.auth.form.AuthenticationTokenPrivder;
 import org.pageflow.user.application.UserCode;
 import org.pageflow.user.domain.token.AccessToken;
@@ -54,9 +54,9 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
       // 만료된 토큰인 경우 처리 중단
       if(tokenParseResult.is(UserCode.ACCESS_TOKEN_EXPIRED)) {
-        throw new ProcessResultException(tokenParseResult);
+        throw new ResultException(tokenParseResult);
       }
-      AccessToken accessToken = tokenParseResult.get();
+      AccessToken accessToken = tokenParseResult.getSuccessData();
       Authentication authentication = authenticationTokenPrivder.create(accessToken, request);
       SecurityContextHolder.getContext().setAuthentication(authentication);
       log.debug("사용자 JWT로 인증됨: UID({}), role({}), session({})", accessToken.getUid(), accessToken.getRole(), accessToken.getSessionId());

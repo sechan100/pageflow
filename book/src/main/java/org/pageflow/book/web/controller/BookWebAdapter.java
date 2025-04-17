@@ -40,7 +40,7 @@ public class BookWebAdapter {
     if(result.isFailure()) {
       return (Result) result;
     }
-    SimpleBookRes res = new SimpleBookRes(result.get());
+    SimpleBookRes res = new SimpleBookRes(result.getSuccessData());
     return Result.ok(res);
   }
 
@@ -63,7 +63,7 @@ public class BookWebAdapter {
     if(result.isFailure()) {
       return (Result) result;
     }
-    AuthorPrivateBookRes res = new AuthorPrivateBookRes(result.get());
+    AuthorPrivateBookRes res = new AuthorPrivateBookRes(result.getSuccessData());
     return Result.ok(res);
   }
 
@@ -78,7 +78,7 @@ public class BookWebAdapter {
     if(result.isFailure()) {
       return (Result) result;
     }
-    SimpleBookRes res = new SimpleBookRes(result.get());
+    SimpleBookRes res = new SimpleBookRes(result.getSuccessData());
     return Result.ok(res);
   }
 
@@ -93,7 +93,7 @@ public class BookWebAdapter {
     if(result.isFailure()) {
       return (Result) result;
     }
-    SimpleBookRes res = new SimpleBookRes(result.get());
+    SimpleBookRes res = new SimpleBookRes(result.getSuccessData());
     return Result.ok(res);
   }
 
@@ -108,7 +108,7 @@ public class BookWebAdapter {
     if(result.isFailure()) {
       return (Result) result;
     }
-    SimpleBookRes res = new SimpleBookRes(result.get());
+    SimpleBookRes res = new SimpleBookRes(result.getSuccessData());
     return Result.ok(res);
   }
 

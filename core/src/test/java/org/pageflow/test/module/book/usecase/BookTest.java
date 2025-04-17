@@ -1,4 +1,4 @@
-package org.pageflow.test.module.book;
+package org.pageflow.test.module.book.usecase;
 
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.DisplayName;
@@ -31,12 +31,12 @@ public class BookTest {
     // 책 생성
     Result<BookDto> createResult = bookUseCase.createBook(user1.getUid(), "test book 1", null);
     assertTrue(createResult.isSuccess());
-    BookDto book = createResult.get();
+    BookDto book = createResult.getSuccessData();
 
     // 책 조회
     Result<WithAuthorBookDto> readResult = bookUseCase.getBook(user1.getUid(), book.getId());
     assertTrue(readResult.isSuccess());
-    assertEquals(book.getId(), readResult.get().getId());
+    assertEquals(book.getId(), readResult.getSuccessData().getId());
 
     // 내 책장 조회
     MyBooksDto myBooks = bookUseCase.queryMyBooks(user1.getUid());
@@ -54,7 +54,7 @@ public class BookTest {
     String newTitle = "test book 3";
     Result<BookDto> changeBookTitleRes2 = bookUseCase.changeBookTitle(user1.getUid(), book.getId(), newTitle);
     assertTrue(changeBookTitleRes2.isSuccess());
-    assertEquals(newTitle, changeBookTitleRes2.get().getTitle());
+    assertEquals(newTitle, changeBookTitleRes2.getSuccessData().getTitle());
 
     // 다른 사용자가 책 삭제 시도 (권한 없음)
     Result deleteResultUnauthorized = bookUseCase.deleteBook(user2.getUid(), book.getId());
@@ -83,13 +83,13 @@ public class BookTest {
     // 책 생성
     Result<BookDto> createResult = bookUseCase.createBook(user1.getUid(), "test book 1", null);
     assertTrue(createResult.isSuccess());
-    BookDto book = createResult.get();
+    BookDto book = createResult.getSuccessData();
 
     // 책 설명 변경
     String newDescription = "test book description";
     Result<BookDto> changeBookDescriptionRes = bookUseCase.changeBookDescription(user1.getUid(), book.getId(), newDescription);
     assertTrue(changeBookDescriptionRes.isSuccess());
-    assertEquals(newDescription, changeBookDescriptionRes.get().getDescription());
+    assertEquals(newDescription, changeBookDescriptionRes.getSuccessData().getDescription());
 
     // 다른 사용자가 책 설명 변경 시도
     UserDto user2 = userUtils.createUser("user2");
@@ -98,7 +98,7 @@ public class BookTest {
     // 책 설명이 변경되지 않았는지 확인
     Result<WithAuthorBookDto> readResult = bookUseCase.getBook(user1.getUid(), book.getId());
     assertTrue(readResult.isSuccess());
-    assertEquals(newDescription, readResult.get().getDescription());
+    assertEquals(newDescription, readResult.getSuccessData().getDescription());
   }
 
 }

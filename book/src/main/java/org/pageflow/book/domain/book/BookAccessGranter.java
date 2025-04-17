@@ -43,7 +43,7 @@ public class BookAccessGranter {
       if(_isGlobalVisibility() && _isPublishedStatus()) {
         return Result.ok();
       } else {
-        return Result.of(BookCode.BOOK_ACCESS_DENIED, "접근 권한이 부족합니다.");
+        return Result.unit(BookCode.BOOK_ACCESS_DENIED, "접근 권한이 부족합니다.");
       }
     }
   }
@@ -54,12 +54,12 @@ public class BookAccessGranter {
   private Result<Void> _grantWrite() {
     if(isAuthor) {
       if(_isPublishedStatus()) {
-        return Result.of(BookCode.BOOK_ACCESS_DENIED, "출판된 책은 수정할 수 없습니다. 수정하려면 개정하세요.");
+        return Result.unit(BookCode.BOOK_ACCESS_DENIED, "출판된 책은 수정할 수 없습니다. 수정하려면 개정하세요.");
       } else {
         return Result.ok();
       }
     } else {
-      return Result.of(BookCode.BOOK_ACCESS_DENIED, "접근 권한이 부족합니다.");
+      return Result.unit(BookCode.BOOK_ACCESS_DENIED, "접근 권한이 부족합니다.");
     }
   }
 
@@ -72,7 +72,7 @@ public class BookAccessGranter {
     if(isAuthor) {
       return Result.ok();
     } else {
-      return Result.of(BookCode.BOOK_ACCESS_DENIED, "접근 권한이 부족합니다.");
+      return Result.unit(BookCode.BOOK_ACCESS_DENIED, "접근 권한이 부족합니다.");
     }
   }
 

@@ -13,9 +13,9 @@ import org.pageflow.book.domain.book.constants.BookAccess;
 import org.pageflow.book.domain.book.entity.Book;
 import org.pageflow.book.domain.toc.constants.TocNodeConfig;
 import org.pageflow.book.domain.toc.entity.TocFolder;
+import org.pageflow.book.persistence.AuthorRepository;
 import org.pageflow.book.persistence.BookPersistencePort;
-import org.pageflow.book.persistence.LoadAuthorPort;
-import org.pageflow.book.persistence.toc.TocFolderPersistencePort;
+import org.pageflow.book.persistence.toc.TocFolderRepository;
 import org.pageflow.common.property.ApplicationProperties;
 import org.pageflow.common.result.Result;
 import org.pageflow.common.user.UID;
@@ -42,12 +42,12 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BookUseCase {
   private final ApplicationProperties applicationProperties;
-  private final LoadAuthorPort loadAuthorPort;
+  private final AuthorRepository authorRepository;
   private final ImageUrlValidator imageUrlValidator;
   private final FileService fileService;
 
   private final BookPersistencePort bookPersistencePort;
-  private final TocFolderPersistencePort tocFolderPersistencePort;
+  private final TocFolderRepository tocFolderRepository;
 
 
   /**
@@ -60,23 +60,19 @@ public class BookUseCase {
     @Nullable MultipartFile coverImage
   ) {
     // author
-    Author author = loadAuthorPort.loadAuthorProxy(authorId);
+    Author author = authorRepository.loadAuthorProxy(authorId);
     // book
     BookTitle bookTitle = BookTitle.create(title);
     Book book = new Book(author, bookTitle);
     if(coverImage != null) {
-      Result<FilePath> uploadResult = _uploadCoverImage(book.getId(), coverImage);
-      if(uploadResult.isSuccess()) {
-        String coverImageUrl = uploadResult.get().getWebUrl();
-        book.changeCoverImageUrl(coverImageUrl);
-      } else {
-        return (Result) uploadResult;
-      }
+      FilePath coverImagePath = uploadCoverImage(book.getId(), coverImage);
+      String coverImageUrl = coverImagePath.getWebUrl();
+      book.changeCoverImageUrl(coverImageUrl);
     }
     Book savedBook = bookPersistencePort.save(book);
     // root folder
     TocFolder rootFolder = TocFolder.createRootFolder(savedBook);
-    tocFolderPersistencePort.save(rootFolder);
+    tocFolderRepository.save(rootFolder);
 
     return Result.ok(new BookDto(book));
   }
@@ -142,18 +138,12 @@ public class BookUseCase {
     String oldUrl = book.getCoverImageUrl();
     if(imageUrlValidator.isInternalUrl(oldUrl)) {
       FilePath path = FilePath.fromWebUrl(oldUrl);
-      Result deleteResult = fileService.delete(path);
-      if(deleteResult.isFailure()) {
-        return (Result) deleteResult;
-      }
+      fileService.delete(path);
     }
 
     // 새 이미지 업로드 ================
-    Result<FilePath> uploadResult = _uploadCoverImage(bookId, coverImage);
-    if(uploadResult.isFailure()) {
-      return (Result) uploadResult;
-    }
-    book.changeCoverImageUrl(uploadResult.get().getWebUrl());
+    FilePath coverImagePath = uploadCoverImage(bookId, coverImage);
+    book.changeCoverImageUrl(coverImagePath.getWebUrl());
     return Result.ok(new BookDto(book));
   }
 
@@ -195,10 +185,10 @@ public class BookUseCase {
     }
 
     // 책 삭제 ===========================
-    Optional<TocFolder> editableFolder = tocFolderPersistencePort.findRootFolder(bookId, true, TocNodeConfig.ROOT_FOLDER_TITLE);
-    editableFolder.ifPresent(tocFolderPersistencePort::delete);
-    Optional<TocFolder> readOnlyFolder = tocFolderPersistencePort.findRootFolder(bookId, false, TocNodeConfig.ROOT_FOLDER_TITLE);
-    readOnlyFolder.ifPresent(tocFolderPersistencePort::delete);
+    Optional<TocFolder> editableFolder = tocFolderRepository.findRootFolder(bookId, true, TocNodeConfig.ROOT_FOLDER_TITLE);
+    editableFolder.ifPresent(tocFolderRepository::delete);
+    Optional<TocFolder> readOnlyFolder = tocFolderRepository.findRootFolder(bookId, false, TocNodeConfig.ROOT_FOLDER_TITLE);
+    readOnlyFolder.ifPresent(tocFolderRepository::delete);
     bookPersistencePort.delete(book);
     return Result.ok();
   }
@@ -208,15 +198,12 @@ public class BookUseCase {
    * @code FILED_VALIDATION_ERROR: coverImage file의 데이터가 올바르지 않은 경우
    * @code FAIL_TO_UPLOAD_FILE: CoverImage 업로드에 실패한 경우
    */
-  private Result<FilePath> _uploadCoverImage(UUID bookId, MultipartFile coverImage) {
-    Result<FileUploadCmd> cmdResult = FileUploadCmd.createCmd(
+  private FilePath uploadCoverImage(UUID bookId, MultipartFile coverImage) {
+    FileUploadCmd cmd = FileUploadCmd.createCmd(
       coverImage,
       bookId.toString(),
       FileType.BOOK_COVER_IMAGE
     );
-    if(cmdResult.isFailure()) {
-      return (Result) cmdResult;
-    }
-    return fileService.upload(cmdResult.get());
+    return fileService.upload(cmd);
   }
 }

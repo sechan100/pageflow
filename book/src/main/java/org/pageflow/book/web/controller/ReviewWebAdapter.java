@@ -41,7 +41,7 @@ public class ReviewWebAdapter {
     if(result.isFailure()) {
       return (Result) result;
     }
-    ReviewRes res = new ReviewRes(result.get());
+    ReviewRes res = new ReviewRes(result.getSuccessData());
     return Result.ok(res);
   }
 
@@ -63,7 +63,7 @@ public class ReviewWebAdapter {
     if(result.isFailure()) {
       return (Result) result;
     }
-    ReviewRes res = new ReviewRes(result.get());
+    ReviewRes res = new ReviewRes(result.getSuccessData());
     return Result.ok(res);
   }
 

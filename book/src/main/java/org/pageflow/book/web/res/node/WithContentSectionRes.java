@@ -17,6 +17,6 @@ public class WithContentSectionRes {
   public WithContentSectionRes(WithContentSectionDto dto) {
     this.id = dto.getId();
     this.title = dto.getTitle();
-    this.content = dto.getContent();
+    this.content = dto.getContent().getContent();
   }
 }

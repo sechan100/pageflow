@@ -17,6 +17,6 @@ public class BookUtils {
   private final BookUseCase bookUseCase;
 
   public BookDto createBook(UserDto user, String title) {
-    return bookUseCase.createBook(user.getUid(), title, null).get();
+    return bookUseCase.createBook(user.getUid(), title, null).getSuccessData();
   }
 }

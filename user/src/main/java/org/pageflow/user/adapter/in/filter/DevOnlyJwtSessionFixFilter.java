@@ -55,7 +55,7 @@ public class DevOnlyJwtSessionFixFilter extends OncePerRequestFilter implements 
     IssueSessionCmd cmd = new IssueSessionCmd(user.getUid());
     var tokens = sessionUseCase.issueSession(cmd);
     String compact = tokens.getAccessToken().getCompact();
-    AccessToken accessToken = tokenUseCase.parseAccessToken(compact).get();
+    AccessToken accessToken = tokenUseCase.parseAccessToken(compact).getSuccessData();
     this.fixedAccessToken = accessToken;
   }
 

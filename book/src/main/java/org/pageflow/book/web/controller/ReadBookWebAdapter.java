@@ -8,7 +8,6 @@ import org.pageflow.book.usecase.ReadBookUseCase;
 import org.pageflow.book.web.res.book.PublishedBookRes;
 import org.pageflow.book.web.res.node.SectionContentRes;
 import org.pageflow.common.api.RequestContext;
-import org.pageflow.common.result.Result;
 import org.pageflow.common.user.UID;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,29 +28,21 @@ public class ReadBookWebAdapter {
 
   @GetMapping("")
   @Operation(summary = "책 조회")
-  public Result<PublishedBookRes> getBook(@PathVariable UUID bookId) {
+  public PublishedBookRes getBook(@PathVariable UUID bookId) {
     UID uid = rqcxt.getUid();
-    Result<PublishedBookDto> result = readBookUseCase.readBook(uid, bookId);
-    if(result.isFailure()) {
-      return (Result) result;
-    }
-    PublishedBookRes res = PublishedBookRes.from(result.get());
-    return Result.ok(res);
+    PublishedBookDto publishedBookDto = readBookUseCase.readBook(uid, bookId);
+    return PublishedBookRes.from(publishedBookDto);
   }
 
   @GetMapping("/sections/{sectionId}")
   @Operation(summary = "책 내용 읽기")
-  public Result<SectionContentRes> getSection(
+  public SectionContentRes getSection(
     @PathVariable UUID bookId,
     @PathVariable UUID sectionId
   ) {
     UID uid = rqcxt.getUid();
-    Result<SectionContentDto> result = readBookUseCase.readSectionContent(uid, bookId, sectionId);
-    if(result.isFailure()) {
-      return (Result) result;
-    }
-    SectionContentRes res = SectionContentRes.from(result.get());
-    return Result.ok(res);
+    SectionContentDto sectionContentDto = readBookUseCase.readSectionContent(uid, bookId, sectionId);
+    return SectionContentRes.from(sectionContentDto);
   }
 
 

@@ -7,24 +7,23 @@ import org.pageflow.book.application.dto.node.FolderDto;
 import org.pageflow.book.application.dto.node.SectionDto;
 import org.pageflow.book.application.dto.node.TocDto;
 import org.pageflow.book.application.dto.node.WithContentSectionDto;
-import org.pageflow.book.domain.book.BookAccessGranter;
+import org.pageflow.book.application.service.GrantedBookLoader;
+import org.pageflow.book.application.service.TocNodeLoader;
+import org.pageflow.book.application.service.TocNodeLoaderFactory;
 import org.pageflow.book.domain.book.constants.BookAccess;
 import org.pageflow.book.domain.book.entity.Book;
-import org.pageflow.book.domain.toc.NodeTitle;
-import org.pageflow.book.domain.toc.ParentFolder;
-import org.pageflow.book.domain.toc.Toc;
+import org.pageflow.book.domain.toc.*;
 import org.pageflow.book.domain.toc.entity.TocFolder;
 import org.pageflow.book.domain.toc.entity.TocNode;
 import org.pageflow.book.domain.toc.entity.TocSection;
-import org.pageflow.book.persistence.BookPersistencePort;
-import org.pageflow.book.persistence.toc.LoadEditableTocNodePort;
-import org.pageflow.book.persistence.toc.TocPersistencePort;
+import org.pageflow.book.persistence.toc.SaveTocFolderPort;
+import org.pageflow.book.persistence.toc.TocRepository;
 import org.pageflow.book.usecase.cmd.CreateFolderCmd;
 import org.pageflow.book.usecase.cmd.CreateSectionCmd;
 import org.pageflow.book.usecase.cmd.NodeIdentifier;
 import org.pageflow.book.usecase.cmd.RelocateNodeCmd;
-import org.pageflow.common.result.Result;
-import org.pageflow.common.result.code.CommonCode;
+import org.pageflow.common.result.Ensure;
+import org.pageflow.common.result.ResultException;
 import org.pageflow.common.user.UID;
 import org.pageflow.file.service.FileService;
 import org.pageflow.file.shared.FileType;
@@ -41,10 +40,11 @@ import java.util.UUID;
 @Transactional
 @RequiredArgsConstructor
 public class EditTocUseCase {
-  private final BookPersistencePort bookPersistencePort;
-  private final TocPersistencePort tocPersistencePort;
-  private final LoadEditableTocNodePort loadEditableTocNodePort;
+  private final GrantedBookLoader grantedBookLoader;
+  private final TocNodeLoaderFactory tocNodeLoaderFactory;
+  private final TocRepository tocRepository;
   private final FileService fileService;
+  private final SaveTocFolderPort saveTocFolderPort;
 
 
   /**
@@ -52,50 +52,30 @@ public class EditTocUseCase {
    * @code DATA_NOT_FOUND: destNode를 찾을 수 없는 경우
    * @code TOC_HIERARCHY_ERROR: 자기 자신에게 이동, root folder 이동, 계층 구조 파괴, destIndex가 올바르지 않은 경우 등
    */
-  public Result relocateNode(RelocateNodeCmd cmd) {
-    UID uid = cmd.getUid();
-    Book book = bookPersistencePort.findById(cmd.getBookId()).get();
-    // 책에 대한 쓰기 권한 확인 ==================
-    BookAccessGranter accessGranter = new BookAccessGranter(uid, book);
-    Result grant = accessGranter.grant(BookAccess.WRITE);
-    if(grant.isFailure()) {
-      return grant;
-    }
-    // 노드 이동 ======================
-    Result<TocNode> loadTargetResult = loadEditableTocNodePort.loadEditableNode(book, cmd.getNodeId());
-    if(loadTargetResult.isFailure()) {
-      return loadTargetResult;
-    }
-    TocNode target = loadTargetResult.get();
+  public void relocateNode(RelocateNodeCmd cmd) {
+    Book book = grantedBookLoader.loadBookWithGrant(cmd.getUid(), cmd.getBookId(), BookAccess.WRITE);
+    TocNodeLoader nodeLoader = tocNodeLoaderFactory.createLoader(book);
+    TocNode target = nodeLoader.loadNode(repo -> repo.findById(cmd.getNodeId()));
+    TocFolder destFolder = nodeLoader.loadFolder(repo -> repo.findWithChildrenById(cmd.getDestFolderId()));
+
+    ParentFolder parent = new ParentFolder(destFolder);
     if(target.isRootFolder()) {
-      return Result.of(BookCode.TOC_HIERARCHY_ERROR, "root folder는 이동할 수 없습니다.");
+      throw new ResultException(BookCode.TOC_HIERARCHY_ERROR, "root folder는 이동할 수 없습니다.");
     }
-    UUID destFolderId = cmd.getDestFolderId();
-    Result<TocFolder> loadFolderResult = loadEditableTocNodePort.loadEditableFolder(book, destFolderId);
-    if(loadFolderResult.isFailure()) {
-      return loadFolderResult;
-    }
-    ParentFolder folder = new ParentFolder(loadFolderResult.get());
     // Reorder
-    if(target.getParentNodeOrNull().getId().equals(destFolderId)) {
-      return folder.reorder(cmd.getDestIndex(), target);
+    if(target.getParentNodeOrNull().equals(destFolder)) {
+      parent.reorder(cmd.getDestIndex(), target);
     }
     // Reparent
     else {
-      return folder.reparent(cmd.getDestIndex(), target);
+      parent.reparent(cmd.getDestIndex(), target);
     }
   }
 
-  public Result<TocDto> getToc(UID uid, UUID bookId) {
-    Book book = bookPersistencePort.findById(bookId).get();
-    // 책에 대한 쓰기 권한 확인 ==================
-    BookAccessGranter accessGranter = new BookAccessGranter(uid, book);
-    Result grant = accessGranter.grant(BookAccess.WRITE);
-    if(grant.isFailure()) {
-      return grant;
-    }
-    Toc toc = tocPersistencePort.loadEditableToc(book);
-    return Result.ok(TocDto.from(toc));
+  public TocDto getToc(UID uid, UUID bookId) {
+    Book book = grantedBookLoader.loadBookWithGrant(uid, bookId, BookAccess.WRITE);
+    Toc toc = tocRepository.loadEditableToc(book);
+    return TocDto.from(toc);
   }
 
   // ==================================================
@@ -106,84 +86,59 @@ public class EditTocUseCase {
    * @code BOOK_ACCESS_DENIED: 작가 권한이 없는 경우
    * @code FIELD_VALIDATION_ERROR: title이 유효하지 않은 경우
    */
-  public Result<FolderDto> createFolder(CreateFolderCmd cmd) {
-    UID uid = cmd.getUid();
-    Book book = bookPersistencePort.findById(cmd.getBookId()).get();
-    // 책 쓰기 권한 확인
-    BookAccessGranter accessGranter = new BookAccessGranter(uid, book);
-    Result grant = accessGranter.grant(BookAccess.WRITE);
-    if(grant.isFailure()) {
-      return grant;
-    }
-    // Folder 생성 ===================
-    Result<NodeTitle> titleRes = NodeTitle.create(cmd.getTitle());
-    if(titleRes.isFailure()) {
-      return (Result) titleRes;
-    }
-    NodeTitle title = titleRes.get();
+  public FolderDto createFolder(CreateFolderCmd cmd) {
+    Book book = grantedBookLoader.loadBookWithGrant(cmd.getUid(), cmd.getBookId(), BookAccess.WRITE);
+    NodeTitle title = NodeTitle.create(cmd.getTitle());
     TocFolder newFolder = TocFolder.create(book, title, cmd.getNodeId());
-    // Toc 삽입
-    Result<TocFolder> loadParentResult = loadEditableTocNodePort.loadEditableFolder(book, cmd.getParentNodeId());
-    if(loadParentResult.isFailure()) {
-      return (Result) loadParentResult;
-    }
-    ParentFolder parent = new ParentFolder(loadParentResult.get());
+
+    TocFolder folder = tocNodeLoaderFactory
+      .createLoader(book)
+      .loadFolder(repo -> repo.findWithChildrenById(cmd.getParentNodeId()));
+    ParentFolder parent = new ParentFolder(folder);
     parent.insertLast(newFolder);
-    return Result.ok(FolderDto.from(newFolder));
+    saveTocFolderPort.save(folder);
+    return FolderDto.from(newFolder);
   }
 
   /**
    * @code BOOK_ACCESS_DENIED: 작가 권한이 없는 경우
    */
-  public Result<FolderDto> getFolder(NodeIdentifier identifier) {
-    Result<TocNode> nodeRes = _loadAfterGrantWriteAccess(identifier);
-    if(nodeRes.isFailure()) {
-      return (Result) nodeRes;
-    }
-    TocNode folder = nodeRes.get();
-    if(folder instanceof TocFolder f) {
-      return Result.ok(FolderDto.from((TocFolder) folder));
-    } else {
-      return Result.of(CommonCode.DATA_NOT_FOUND, "해당 노드는 폴더가 아닙니다.");
-    }
+  public FolderDto getFolder(NodeIdentifier identifier) {
+    Book book = grantedBookLoader.loadBookWithGrant(identifier.getUid(), identifier.getBookId(), BookAccess.WRITE);
+    TocNodeLoader nodeLoader = tocNodeLoaderFactory.createLoader(book);
+    TocFolder folder = nodeLoader.loadFolder(repo -> repo.findById(identifier.getNodeId()));
+    return FolderDto.from(folder);
   }
 
   /**
    * @code BOOK_ACCESS_DENIED: 작가 권한이 없는 경우
    * @code FIELD_VALIDATION_ERROR: title이 유효하지 않은 경우
    */
-  public Result<FolderDto> changeFolderTitle(NodeIdentifier identifier, String title) {
-    Result<TocNode> nodeRes = _changeTitle(identifier, title);
-    if(nodeRes.isFailure()) {
-      return (Result) nodeRes;
-    }
-    TocNode folder = nodeRes.get();
-    if(folder instanceof TocFolder f) {
-      return Result.ok(FolderDto.from((TocFolder) folder));
-    } else {
-      return Result.of(CommonCode.DATA_NOT_FOUND, "해당 노드는 폴더가 아닙니다.");
-    }
+  public FolderDto changeFolderTitle(NodeIdentifier identifier, String title) {
+    Book book = grantedBookLoader.loadBookWithGrant(identifier.getUid(), identifier.getBookId(), BookAccess.WRITE);
+    TocNodeLoader nodeLoader = tocNodeLoaderFactory.createLoader(book);
+    TocFolder folder = nodeLoader.loadFolder(repo -> repo.findById(identifier.getNodeId()));
+    EditableFolder editableFolder = new EditableFolder(folder);
+    NodeTitle newTitle = NodeTitle.create(title);
+    editableFolder.changeTitle(newTitle);
+    return FolderDto.from(folder);
   }
 
   /**
    * @code BOOK_ACCESS_DENIED: 작가 권한이 없는 경우
    */
-  public Result deleteFolder(NodeIdentifier identifier) {
-    Result<TocNode> nodeRes = _loadAfterGrantWriteAccess(identifier);
-    if(nodeRes.isFailure()) {
-      return nodeRes;
-    }
-    TocNode target = nodeRes.get();
-    // 노드 삭제 ==================================================
-    if(target.isRootFolder()) {
-      return Result.of(
-        BookCode.TOC_HIERARCHY_ERROR,
-        "root folder는 삭제할 수 없습니다."
-      );
-    }
+  public void deleteFolder(NodeIdentifier identifier) {
+    Book book = grantedBookLoader.loadBookWithGrant(identifier.getUid(), identifier.getBookId(), BookAccess.WRITE);
+    TocNodeLoader nodeLoader = tocNodeLoaderFactory.createLoader(book);
+    TocFolder target = nodeLoader.loadFolder(repo -> repo.findById(identifier.getNodeId()));
+    Ensure.that(
+      !target.isRootFolder(),
+      BookCode.TOC_HIERARCHY_ERROR,
+      "root folder는 삭제할 수 없습니다."
+    );
     TocFolder parent = target.getParentNodeOrNull();
     parent.removeChild(target);
-    return Result.ok();
+    saveTocFolderPort.save(parent);
   }
 
 
@@ -195,119 +150,62 @@ public class EditTocUseCase {
    * @code BOOK_ACCESS_DENIED: 작가 권한이 없는 경우
    * @code FIELD_VALIDATION_ERROR: title이 유효하지 않은 경우
    */
-  public Result<WithContentSectionDto> createSection(CreateSectionCmd cmd) {
-    UID uid = cmd.getUid();
-    Book book = bookPersistencePort.findById(cmd.getBookId()).get();
-    // 책 쓰기 권한 확인
-    BookAccessGranter accessGranter = new BookAccessGranter(uid, book);
-    Result grant = accessGranter.grant(BookAccess.WRITE);
-    if(grant.isFailure()) {
-      return grant;
-    }
+  public WithContentSectionDto createSection(CreateSectionCmd cmd) {
+    Book book = grantedBookLoader.loadBookWithGrant(cmd.getUid(), cmd.getBookId(), BookAccess.WRITE);
     // Section 생성
-    Result<NodeTitle> newTitleRes = NodeTitle.create(cmd.getTitle());
-    if(newTitleRes.isFailure()) {
-      return (Result) newTitleRes;
-    }
-    NodeTitle title = newTitleRes.get();
+    NodeTitle title = NodeTitle.create(cmd.getTitle());
     TocSection newSection = TocSection.create(book, title, cmd.getNodeId());
-    // Toc 삽입
-    Result<TocFolder> loadFolderResult = loadEditableTocNodePort.loadEditableFolder(book, cmd.getParentNodeId());
-    if(loadFolderResult.isFailure()) {
-      return (Result) loadFolderResult;
-    }
-    ParentFolder parent = new ParentFolder(loadFolderResult.get());
+    // 부모 folder에 삽입
+    TocFolder folder = tocNodeLoaderFactory
+      .createLoader(book)
+      .loadFolder(repo -> repo.findWithChildrenById(cmd.getParentNodeId()));
+    ParentFolder parent = new ParentFolder(folder);
     parent.insertLast(newSection);
-    return Result.ok(WithContentSectionDto.from(newSection));
+    saveTocFolderPort.save(folder);
+    return WithContentSectionDto.from(newSection);
   }
 
   /**
    * @code BOOK_ACCESS_DENIED: 작가 권한이 없는 경우
    */
-  public Result<SectionDto> getSection(NodeIdentifier identifier) {
-    Result<TocNode> nodeRes = _loadAfterGrantWriteAccess(identifier);
-    if(nodeRes.isFailure()) {
-      return (Result) nodeRes;
-    }
-    TocNode section = nodeRes.get();
-    if(section instanceof TocSection s) {
-      return Result.ok(SectionDto.from(s));
-    } else {
-      return Result.of(CommonCode.DATA_NOT_FOUND, "해당 노드는 섹션이 아닙니다.");
-    }
+  public SectionDto getSection(NodeIdentifier identifier) {
+    Book book = grantedBookLoader.loadBookWithGrant(identifier.getUid(), identifier.getBookId(), BookAccess.WRITE);
+    TocNodeLoader nodeLoader = tocNodeLoaderFactory.createLoader(book);
+    TocSection section = nodeLoader.loadSection(repo -> repo.findById(identifier.getNodeId()));
+    return SectionDto.from(section);
   }
 
   /**
    * @code BOOK_ACCESS_DENIED: 작가 권한이 없는 경우
    * @code FIELD_VALIDATION_ERROR: title이 유효하지 않은 경우
    */
-  public Result<SectionDto> changeSectionTitle(NodeIdentifier identifier, String title) {
-    Result<TocNode> changeResult = _changeTitle(identifier, title);
-    if(changeResult.isFailure()) {
-      return (Result) changeResult;
-    }
-    TocNode section = changeResult.get();
-    if(section instanceof TocSection s) {
-      return Result.ok(SectionDto.from(s));
-    } else {
-      return Result.of(CommonCode.DATA_NOT_FOUND, "해당 노드는 섹션이 아닙니다.");
-    }
+  public SectionDto changeSectionTitle(NodeIdentifier identifier, String title) {
+    Book book = grantedBookLoader.loadBookWithGrant(identifier.getUid(), identifier.getBookId(), BookAccess.WRITE);
+    TocNodeLoader nodeLoader = tocNodeLoaderFactory.createLoader(book);
+    TocSection section = nodeLoader.loadSection(repo -> repo.findById(identifier.getNodeId()));
+    EditableSection editableSection = new EditableSection(section);
+    NodeTitle newTitle = NodeTitle.create(title);
+    editableSection.changeTitle(newTitle);
+    return SectionDto.from(section);
   }
 
   /**
    * @code BOOK_ACCESS_DENIED: 작가 권한이 없는 경우
    */
-  public Result deleteSection(NodeIdentifier identifier) {
-    Result<TocNode> nodeRes = _loadAfterGrantWriteAccess(identifier);
-    if(nodeRes.isFailure()) {
-      return nodeRes;
-    }
-    if(!(nodeRes.get() instanceof TocSection)) {
-      throw new IllegalArgumentException("해당 노드는 섹션이 아닙니다.");
-    }
-    TocSection target = (TocSection) nodeRes.get();
-    if(target.isRootFolder()) {
-      return Result.of(
-        BookCode.TOC_HIERARCHY_ERROR,
-        "root folder node는 삭제할 수 없습니다."
-      );
-    }
+  public void deleteSection(NodeIdentifier identifier) {
+    Book book = grantedBookLoader.loadBookWithGrant(identifier.getUid(), identifier.getBookId(), BookAccess.WRITE);
+    TocNodeLoader nodeLoader = tocNodeLoaderFactory.createLoader(book);
+    TocSection target = nodeLoader.loadSection(repo -> repo.findById(identifier.getNodeId()));
     // 첨부파일 삭제
-    String contentId = target.getContent().getId().toString();
-    Result contentAttachedFileDeletionResult = fileService.deleteAll(contentId, FileType.BOOK_NODE_CONTENT_ATTACHMENT_IMAGE);
-    if(contentAttachedFileDeletionResult.isFailure()) {
-      return contentAttachedFileDeletionResult;
-    }
+    fileService.deleteAll(
+      target.getId().toString(),
+      FileType.TOC_SECTION_CONTENT_ATTACHMENT_IMAGE
+    );
     // 노드 삭제
     TocFolder parent = target.getParentNodeOrNull();
     parent.removeChild(target);
-    return Result.ok();
+    saveTocFolderPort.save(parent);
   }
 
-  private Result<TocNode> _loadAfterGrantWriteAccess(NodeIdentifier identifier) {
-    Book book = bookPersistencePort.findById(identifier.getBookId()).get();
-    // 책 쓰기 권한 확인 ==============
-    BookAccessGranter accessGranter = new BookAccessGranter(identifier.getUid(), book);
-    Result grant = accessGranter.grant(BookAccess.WRITE);
-    if(grant.isFailure()) {
-      return grant;
-    }
-    Result<TocNode> loadNodeResult = loadEditableTocNodePort.loadEditableNode(book, identifier.getNodeId());
-    return loadNodeResult;
-  }
-
-  private Result<TocNode> _changeTitle(NodeIdentifier identifier, String title) {
-    Result<TocNode> nodeResult = _loadAfterGrantWriteAccess(identifier);
-    if(nodeResult.isFailure()) {
-      return nodeResult;
-    }
-    TocNode node = nodeResult.get();
-    Result<NodeTitle> newTitleRes = NodeTitle.create(title);
-    if(newTitleRes.isFailure()) {
-      return (Result) newTitleRes;
-    }
-    node.changeTitle(newTitleRes.get());
-    return Result.ok(node);
-  }
 }
 

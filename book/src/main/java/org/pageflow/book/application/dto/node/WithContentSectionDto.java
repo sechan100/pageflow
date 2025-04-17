@@ -9,13 +9,13 @@ import java.util.UUID;
 public class WithContentSectionDto {
   UUID id;
   String title;
-  String content;
+  SectionContentDto content;
 
   public static WithContentSectionDto from(TocSection section) {
     return new WithContentSectionDto(
       section.getId(),
       section.getTitle(),
-      section.getContent().getContent()
+      SectionContentDto.from(section.getSectionDetails().getContent())
     );
   }
 }

@@ -4,18 +4,14 @@ import com.google.common.base.Preconditions;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pageflow.book.application.dto.book.BookDto;
-import org.pageflow.book.domain.book.BookAccessGranter;
+import org.pageflow.book.application.service.GrantedBookLoader;
 import org.pageflow.book.domain.book.StatusChangeableBook;
 import org.pageflow.book.domain.book.constants.BookAccess;
 import org.pageflow.book.domain.book.entity.Book;
 import org.pageflow.book.domain.book.entity.BookStatus;
 import org.pageflow.book.domain.book.entity.BookVisibility;
 import org.pageflow.book.domain.toc.Toc;
-import org.pageflow.book.persistence.BookPersistencePort;
-import org.pageflow.book.persistence.toc.LoadEditableTocNodePort;
-import org.pageflow.book.persistence.toc.ReadTocNodePort;
-import org.pageflow.book.persistence.toc.TocPersistencePort;
-import org.pageflow.common.result.Result;
+import org.pageflow.book.persistence.toc.TocRepository;
 import org.pageflow.common.user.UID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,10 +26,8 @@ import java.util.UUID;
 @Transactional
 @RequiredArgsConstructor
 public class ChangeBookStatusUseCase {
-  private final BookPersistencePort bookPersistencePort;
-  private final ReadTocNodePort readTocNodePort;
-  private final LoadEditableTocNodePort loadEditableTocNodePort;
-  private final TocPersistencePort tocPersistencePort;
+  private final GrantedBookLoader grantedBookLoader;
+  private final TocRepository tocRepository;
 
   /**
    * 책을 출판한다.
@@ -44,25 +38,24 @@ public class ChangeBookStatusUseCase {
    * @code BOOK_ACCESS_DENIED: 책 권한이 없는 경우
    * @code BOOK_INVALID_STATUS: 이미 발행된 책인 경우
    */
-  public Result<BookDto> publish(UID uid, UUID bookId) {
-    Book book = bookPersistencePort.findById(bookId).get();
-
-    // 작가 권한 검사
-    BookAccessGranter accessGranter = new BookAccessGranter(uid, book);
-    Result grant = accessGranter.grant(BookAccess.AUTHOR);
-    if(grant.isFailure()) {
-      return grant;
-    }
-
+  public BookDto publish(UID uid, UUID bookId) {
+    Book book = grantedBookLoader.loadBookWithGrant(uid, bookId, BookAccess.AUTHOR);
     // 상태 변경
     StatusChangeableBook statusChangeableBook = new StatusChangeableBook(book);
-    Result publishRes = statusChangeableBook.publish();
-    if(publishRes.isFailure()) {
-      return publishRes;
-    }
+    statusChangeableBook.publish();
     // Toc 병합
-    _mergeToReadOnly(book);
-    return Result.ok(new BookDto(book));
+    Preconditions.checkState(tocRepository.existsEditableToc(book), "책을 출판하려면 editableToc는 반드시 필요합니다. readOnlyToc는 존재하는 경우 덮어씌워집니다.");
+    // 1. readOnlyToc가 존재하는 경우 삭제
+    if(tocRepository.existsReadOnlyToc(book)) {
+      Toc readOnlyToc = tocRepository.loadReadonlyToc(book);
+      tocRepository.deleteToc(readOnlyToc);
+    }
+    // 2. editableToc를 readOnlyToc로 복사
+    Toc editableToc = tocRepository.loadEditableToc(book);
+    tocRepository.copyFromEditableToReadOnly(editableToc);
+    // 3. 기존 editableToc 삭제
+    tocRepository.deleteToc(editableToc);
+    return new BookDto(book);
   }
 
   /**
@@ -73,27 +66,17 @@ public class ChangeBookStatusUseCase {
    * @code BOOK_ACCESS_DENIED: 책 권한이 없는 경우
    * @code BOOK_INVALID_STATUS: 출판된 책이 아닌 경우
    */
-  public Result<BookDto> startRevision(UID uid, UUID bookId) {
-    Book book = bookPersistencePort.findById(bookId).get();
-    // 작가 권한 검사 ================================
-    BookAccessGranter accessGranter = new BookAccessGranter(uid, book);
-    Result grant = accessGranter.grant(BookAccess.AUTHOR);
-    if(grant.isFailure()) {
-      return grant;
-    }
-    // 상태 변경 ====================================
+  public BookDto startRevision(UID uid, UUID bookId) {
+    Book book = grantedBookLoader.loadBookWithGrant(uid, bookId, BookAccess.AUTHOR);
+    // 상태 변경
     StatusChangeableBook statusChangeableBook = new StatusChangeableBook(book);
-    Result startRevisionRes = statusChangeableBook.startRevision();
-    if(startRevisionRes.isFailure()) {
-      return startRevisionRes;
-    }
-    // Toc 복제 ====================================
-    Preconditions.checkState(tocPersistencePort.existsReadOnlyToc(book), "readOnly toc가 존재해야합니다.");
-    Preconditions.checkState(!tocPersistencePort.existsEditableToc(book), "editable toc가 존재하면 안됩니다.");
-
-    Toc readOnlyToc = tocPersistencePort.loadReadonlyToc(book);
-    Toc copiedToc = tocPersistencePort.copyReadonlyTocToEditableToc(readOnlyToc);
-    return Result.ok(new BookDto(book));
+    statusChangeableBook.startRevision();
+    // Toc 복사
+    Preconditions.checkState(tocRepository.existsReadOnlyToc(book), "readOnly toc가 존재해야합니다.");
+    Preconditions.checkState(!tocRepository.existsEditableToc(book), "editable toc가 존재하면 안됩니다.");
+    Toc readOnlyToc = tocRepository.loadReadonlyToc(book);
+    tocRepository.copyFromReadonlyToEditable(readOnlyToc);
+    return new BookDto(book);
   }
 
   /**
@@ -103,36 +86,18 @@ public class ChangeBookStatusUseCase {
    * @code BOOK_ACCESS_DENIED: 책 권한이 없는 경우
    * @code BOOK_INVALID_STATUS: 개정 중인 책이 아닌 경우
    */
-  public Result<BookDto> cancelRevision(UID uid, UUID bookId) {
-    Book book = bookPersistencePort.findById(bookId).get();
-
-    // 작가 권한 검사
-    BookAccessGranter accessGranter = new BookAccessGranter(uid, book);
-    Result grant = accessGranter.grant(BookAccess.AUTHOR);
-    if(grant.isFailure()) {
-      return grant;
-    }
-
+  public BookDto cancelRevision(UID uid, UUID bookId) {
+    Book book = grantedBookLoader.loadBookWithGrant(uid, bookId, BookAccess.AUTHOR);
     // 상태 변경
     StatusChangeableBook statusChangeableBook = new StatusChangeableBook(book);
-    Result cancelRevisionRes = statusChangeableBook.cancelRevision();
-    if(cancelRevisionRes.isFailure()) {
-      return cancelRevisionRes;
-    }
-
+    statusChangeableBook.cancelRevision();
     // editableToc 삭제
-    Preconditions.checkState(
-      tocPersistencePort.existsEditableToc(book),
-      "editableToc를 삭제하고 readOnlyToc를 남기려면 editableToc가 필요합니다."
-    );
-    Preconditions.checkState(
-      tocPersistencePort.existsReadOnlyToc(book),
-      "editableToc를 삭제하고 readOnlyToc를 남기려면 readOnlyToc가 존재해야합니다."
-    );
-    Toc editableToc = tocPersistencePort.loadEditableToc(book);
-    tocPersistencePort.deleteToc(editableToc);
-
-    return Result.ok(new BookDto(book));
+    String errorMessage = "개정취소를 위해서는 editable, readOnly toc가 모두 존재해야합니다.";
+    Preconditions.checkState(tocRepository.existsEditableToc(book), errorMessage);
+    Preconditions.checkState(tocRepository.existsReadOnlyToc(book), errorMessage);
+    Toc editableToc = tocRepository.loadEditableToc(book);
+    tocRepository.deleteToc(editableToc);
+    return new BookDto(book);
   }
 
   /**
@@ -145,65 +110,32 @@ public class ChangeBookStatusUseCase {
    * @code BOOK_ACCESS_DENIED: 책 권한이 없는 경우
    * @code BOOK_INVALID_STATUS: 개정 중인 책이 아닌 경우
    */
-  public Result<BookDto> mergeRevision(UID uid, UUID bookId) {
-    Book book = bookPersistencePort.findById(bookId).get();
-
-    // 작가 권한 검사 ====================
-    BookAccessGranter accessGranter = new BookAccessGranter(uid, book);
-    Result grant = accessGranter.grant(BookAccess.AUTHOR);
-    if(grant.isFailure()) {
-      return grant;
-    }
-
+  public BookDto mergeRevision(UID uid, UUID bookId) {
+    Book book = grantedBookLoader.loadBookWithGrant(uid, bookId, BookAccess.AUTHOR);
     // 상태 변경
     StatusChangeableBook statusChangeableBook = new StatusChangeableBook(book);
-    Result mergeRevisionRes = statusChangeableBook.mergeRevision();
-    if(mergeRevisionRes.isFailure()) {
-      return mergeRevisionRes;
-    }
-
+    statusChangeableBook.mergeRevision();
     // toc 병합
-    _mergeToReadOnly(book);
-    return Result.ok(new BookDto(book));
+    Preconditions.checkState(tocRepository.existsEditableToc(book), "개정을 병합하기 위해서는 editable toc가 존재해야합니다.");
+    Preconditions.checkState(tocRepository.existsReadOnlyToc(book), "개정을 병합하기 위해서는 readOnly toc가 존재해야합니다.");
+    // 1. 기존 readOnlyToc 삭제
+    Toc readOnlyToc = tocRepository.loadReadonlyToc(book);
+    tocRepository.deleteToc(readOnlyToc);
+    // 2. editableToc를 readOnlyToc로 복사
+    Toc editableToc = tocRepository.loadEditableToc(book);
+    tocRepository.copyFromEditableToReadOnly(editableToc);
+    // 3. 기존 editableToc 삭제
+    tocRepository.deleteToc(editableToc);
+    return new BookDto(book);
   }
 
   /**
    * @code BOOK_INVALID_STATUS: DRAFT 상태인 경우
    */
-  public Result<BookDto> changeVisibility(UID uid, UUID bookId, BookVisibility visibility) {
-    Book book = bookPersistencePort.findById(bookId).get();
-
-    // 작가 권한 검사 ====================
-    BookAccessGranter accessGranter = new BookAccessGranter(uid, book);
-    Result grant = accessGranter.grant(BookAccess.AUTHOR);
-    if(grant.isFailure()) {
-      return grant;
-    }
-
+  public BookDto changeVisibility(UID uid, UUID bookId, BookVisibility visibility) {
+    Book book = grantedBookLoader.loadBookWithGrant(uid, bookId, BookAccess.AUTHOR);
     StatusChangeableBook statusChangeableBook = new StatusChangeableBook(book);
-    Result result = statusChangeableBook.changeVisibility(visibility);
-    if(result.isFailure()) {
-      return result;
-    }
-    return Result.ok(new BookDto(book));
-  }
-
-  /**
-   * book의 toc를 readOnly로 병합한다.
-   * editable을 readOnly로 변경하고 기존 readOnly가 존재한다면 삭제.
-   */
-  private Result<Toc> _mergeToReadOnly(Book book) {
-    Preconditions.checkState(
-      tocPersistencePort.existsEditableToc(book),
-      "toc를 병합하려면 editableToc는 반드시 필요합니다. readOnlyToc는 optional"
-    );
-    // readOnlyToc가 존재한다면 삭제
-    if(tocPersistencePort.existsReadOnlyToc(book)) {
-      Toc readOnlyToc = tocPersistencePort.loadReadonlyToc(book);
-      tocPersistencePort.deleteToc(readOnlyToc);
-    }
-    Toc editableToc = tocPersistencePort.loadEditableToc(book);
-    Toc resultReadonlyToc = tocPersistencePort.makeTocReadonly(editableToc);
-    return Result.ok(resultReadonlyToc);
+    statusChangeableBook.changeVisibility(visibility);
+    return new BookDto(book);
   }
 }

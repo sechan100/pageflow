@@ -2,7 +2,7 @@ package org.pageflow.user.port.in.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.pageflow.common.result.ProcessResultException;
+import org.pageflow.common.result.ResultException;
 import org.pageflow.common.user.UID;
 import org.pageflow.user.application.UserCode;
 import org.pageflow.user.domain.entity.Session;
@@ -53,7 +53,7 @@ public class AuthService implements SessionUseCase {
      * TODO: 세션 삭제 scheduling 구현하기
      */
     Session session = sessionPersistencePort.findById(sessionId)
-      .orElseThrow(() -> new ProcessResultException(UserCode.SESSION_EXPIRED));
+      .orElseThrow(() -> new ResultException(UserCode.SESSION_EXPIRED));
 
     // 새 토큰을 발급
     AccessToken accessToken = tokenProvider.issueAccessToken(session);

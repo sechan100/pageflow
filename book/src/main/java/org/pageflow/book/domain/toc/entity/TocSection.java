@@ -13,6 +13,10 @@ import org.springframework.lang.Nullable;
 import java.util.UUID;
 
 /**
+ * {@link InheritanceType#SINGLE_TABLE} 전략이기 때문에, {@link TocFolder}와 테이블을 공유함.
+ * 때문에 TocSection만이 가지는 속성에 대해서 nullable = false를 설정하면 TocFolder를 생성할 때, 데이터 정합성이 문제가 생겨서 insert가 불가능해진다.
+ * 따라서 필드를 추가할 때는 반드시 optional하게 만들 것
+ *
  * @author : sechan
  */
 @Entity
@@ -27,7 +31,7 @@ public class TocSection extends TocNode {
     fetch = FetchType.LAZY,
     cascade = CascadeType.ALL
   )
-  @JoinColumn(name = "content_id") // SINGLE_TABLE 전략이기 때문에, 'nullable = false'로 하면 안됨
+  @JoinColumn(name = "content_id")
   private SectionContent content;
 
   private TocSection(

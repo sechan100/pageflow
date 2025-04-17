@@ -17,6 +17,10 @@ import java.util.List;
 import java.util.UUID;
 
 /**
+ * {@link InheritanceType#SINGLE_TABLE} 전략이기 때문에, {@link TocSection}과 테이블을 공유함.
+ * 때문에 TocFolder만이 가지는 속성에 대해서 nullable = false를 설정하면 TocSection를 생성할 때, 데이터 정합성이 문제가 생겨서 insert가 불가능해진다.
+ * 따라서 필드를 추가할 때는 반드시 optional하게 만들 것
+ *
  * @author : sechan
  */
 @Entity
@@ -37,7 +41,6 @@ public class TocFolder extends TocNode {
 
   @Getter
   @Enumerated(EnumType.STRING)
-  @Column(nullable = false)
   private FolderDesign design;
 
   private TocFolder(

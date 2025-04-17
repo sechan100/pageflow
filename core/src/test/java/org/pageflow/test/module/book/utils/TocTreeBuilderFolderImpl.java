@@ -56,5 +56,43 @@ public class TocTreeBuilderFolderImpl implements TocTreeBuilderFolder {
     return this;
   }
 
+  @Override
+  public TocTreeBuilderFolder folder(UUID id, Consumer<TocTreeBuilderFolder> folderConsumer) {
+    FolderDto folderDto = context.create(
+      CreateFolderCmd.withId(
+        context.getUid(),
+        context.getBookId(),
+        parentFolderId,
+        id.toString(),
+        id
+      )
+    );
+
+    TocTreeBuilderFolderImpl folder = new TocTreeBuilderFolderImpl(context, folderDto.getId());
+    folderConsumer.accept(folder);
+    return this;
+  }
+
+  @Override
+  public TocTreeBuilderFolder folder(UUID id) {
+    return folder(id, folder -> {
+      // do nothing
+    });
+  }
+
+  @Override
+  public TocTreeBuilderFolder section(UUID id) {
+    WithContentSectionDto sectionDto = context.create(
+      CreateSectionCmd.withId(
+        context.getUid(),
+        context.getBookId(),
+        parentFolderId,
+        id.toString(),
+        id
+      )
+    );
+    return this;
+  }
+
 
 }

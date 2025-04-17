@@ -23,7 +23,7 @@ public class TocTreeBuilderFolderImpl implements TocTreeBuilderFolder {
   @Override
   public TocTreeBuilderFolder folder(String title, Consumer<TocTreeBuilderFolder> folderConsumer) {
     FolderDto folderDto = context.create(
-      new CreateFolderCmd(
+      CreateFolderCmd.of(
         context.getUid(),
         context.getBookId(),
         parentFolderId,
@@ -46,7 +46,7 @@ public class TocTreeBuilderFolderImpl implements TocTreeBuilderFolder {
   @Override
   public TocTreeBuilderFolder section(String title) {
     WithContentSectionDto sectionDto = context.create(
-      new CreateSectionCmd(
+      CreateSectionCmd.of(
         context.getUid(),
         context.getBookId(),
         parentFolderId,

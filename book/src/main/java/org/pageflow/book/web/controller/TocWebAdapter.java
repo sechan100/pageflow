@@ -33,7 +33,7 @@ public class TocWebAdapter {
     if(result.isFailure()) {
       return (Result) result;
     }
-    return Result.SUCCESS(TocRes.from(result.get()));
+    return Result.ok(TocRes.from(result.get()));
   }
 
   @PostMapping("/relocate-node")

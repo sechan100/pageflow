@@ -14,4 +14,13 @@ public class CreateFolderCmd {
   UUID bookId;
   UUID parentNodeId;
   String title;
+  UUID nodeId;
+
+  public static CreateFolderCmd of(UID uid, UUID bookId, UUID parentNodeId, String title) {
+    return new CreateFolderCmd(uid, bookId, parentNodeId, title, UUID.randomUUID());
+  }
+
+  public static CreateFolderCmd withId(UID uid, UUID bookId, UUID parentNodeId, String title, UUID nodeId) {
+    return new CreateFolderCmd(uid, bookId, parentNodeId, title, nodeId);
+  }
 }

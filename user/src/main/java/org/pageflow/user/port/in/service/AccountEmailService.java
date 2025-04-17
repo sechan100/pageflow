@@ -135,7 +135,7 @@ public class AccountEmailService {
     User user = userPersistencePort.findById(uid.getValue()).orElseThrow();
     user.verifyAndChangeEmail(email);
     verificationPersistencePort.delete(ev);
-    return Result.SUCCESS();
+    return Result.ok();
   }
 
 }

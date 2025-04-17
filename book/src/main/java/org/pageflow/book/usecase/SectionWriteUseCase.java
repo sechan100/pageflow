@@ -54,7 +54,7 @@ public class SectionWriteUseCase {
     if(checkWriteAuthorityRes.isFailure()) {
       return checkWriteAuthorityRes;
     }
-    return Result.SUCCESS(WithContentSectionDto.from(section));
+    return Result.ok(WithContentSectionDto.from(section));
   }
 
   /**
@@ -88,7 +88,7 @@ public class SectionWriteUseCase {
     int charCount = html.getCharCount();
     SectionContent content = section.getContent();
     content.updateContent(html);
-    return Result.SUCCESS(WithContentSectionDto.from(section));
+    return Result.ok(WithContentSectionDto.from(section));
   }
 
   /**
@@ -126,7 +126,7 @@ public class SectionWriteUseCase {
       return (Result) uploadResult;
     }
     SectionAttachmentUrl attachmentUrl = new SectionAttachmentUrl(uploadResult.get().getWebUrl());
-    return Result.SUCCESS(attachmentUrl);
+    return Result.ok(attachmentUrl);
   }
 
 }

@@ -26,7 +26,7 @@ public class NodeTitle extends SingleValueWrapper<String> {
   public static Result<NodeTitle> create(String value) {
     FieldValidationResult result = _validate(value);
     if(result.isValid()) {
-      return Result.SUCCESS(new NodeTitle(value));
+      return Result.ok(new NodeTitle(value));
     } else {
       return Result.of(CommonCode.FIELD_VALIDATION_ERROR, result);
     }

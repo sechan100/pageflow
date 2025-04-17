@@ -101,7 +101,7 @@ public class TocFeatureTest {
 
     // 노드 생성
     Result<FolderDto> folder1Result = editTocUseCase.createFolder(
-      new CreateFolderCmd(
+      CreateFolderCmd.of(
         user.getUid(),
         bookId,
         rootFolderId,
@@ -111,7 +111,7 @@ public class TocFeatureTest {
     FolderDto folder1 = folder1Result.get();
 
     Result<FolderDto> folder2Result = editTocUseCase.createFolder(
-      new CreateFolderCmd(
+      CreateFolderCmd.of(
         user.getUid(),
         bookId,
         rootFolderId,

@@ -50,7 +50,7 @@ public class TokenProvider implements TokenUseCase {
       RoleType role = RoleType.valueOf(claims.get(AccessToken.ROLE_CLAIM_KEY, String.class));
 
       AccessToken accessToken = new AccessToken(sessionId, uid, role, iat, exp, jwtSignKey.getSignKey());
-      result = Result.SUCCESS(accessToken);
+      result = Result.ok(accessToken);
 
       // 만료된 토큰인 경우
     } catch(ExpiredJwtException expiredJwtException) {

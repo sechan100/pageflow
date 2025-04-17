@@ -34,7 +34,7 @@ public class ShelfWebAdapter {
       return (Result) result;
     }
     SimpleBookRes res = new SimpleBookRes(result.get());
-    return Result.SUCCESS(res);
+    return Result.ok(res);
   }
 
   @DeleteMapping("")

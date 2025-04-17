@@ -51,7 +51,7 @@ public class BookShelfUseCase {
     ShelfItem shelfItem = ShelfItem.create(book, shelfOwner);
     shelfItemPersistencePort.persist(shelfItem);
     BookDto dto = new BookDto(book);
-    return Result.SUCCESS(dto);
+    return Result.ok(dto);
   }
 
   /**
@@ -70,7 +70,7 @@ public class BookShelfUseCase {
 
     // 책장에 책 제거
     shelfItemPersistencePort.deleteByBookIdAndShelfOwnerId(bookId, shlefOwnerId.getValue());
-    return Result.SUCCESS();
+    return Result.ok();
   }
 
   /**

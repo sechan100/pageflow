@@ -38,10 +38,10 @@ public class BookAccessGranter {
    */
   private Result<Void> _grantRead() {
     if(isAuthor) {
-      return Result.SUCCESS();
+      return Result.ok();
     } else {
       if(_isGlobalVisibility() && _isPublishedStatus()) {
-        return Result.SUCCESS();
+        return Result.ok();
       } else {
         return Result.of(BookCode.BOOK_ACCESS_DENIED, "접근 권한이 부족합니다.");
       }
@@ -56,7 +56,7 @@ public class BookAccessGranter {
       if(_isPublishedStatus()) {
         return Result.of(BookCode.BOOK_ACCESS_DENIED, "출판된 책은 수정할 수 없습니다. 수정하려면 개정하세요.");
       } else {
-        return Result.SUCCESS();
+        return Result.ok();
       }
     } else {
       return Result.of(BookCode.BOOK_ACCESS_DENIED, "접근 권한이 부족합니다.");
@@ -70,7 +70,7 @@ public class BookAccessGranter {
    */
   private Result<Void> _grantAuthor() {
     if(isAuthor) {
-      return Result.SUCCESS();
+      return Result.ok();
     } else {
       return Result.of(BookCode.BOOK_ACCESS_DENIED, "접근 권한이 부족합니다.");
     }

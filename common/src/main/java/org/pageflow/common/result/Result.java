@@ -56,17 +56,17 @@ public class Result<S> {
     return new Result(code, data);
   }
 
-  public static <S> Result<S> SUCCESS(S data) {
+  public static <S> Result<S> ok(S data) {
     return new Result<>(CommonCode.SUCCESS, data);
   }
 
-  public static <S> Result<S> SUCCESS() {
+  public static <S> Result<S> ok() {
     return new Result<>(CommonCode.SUCCESS, null);
   }
 
   @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
   public static <S> Result<S> fromOptional(Optional<S> optional) {
-    return optional.map(Result::SUCCESS).orElseGet(() -> of(CommonCode.DATA_NOT_FOUND, ""));
+    return optional.map(Result::ok).orElseGet(() -> of(CommonCode.DATA_NOT_FOUND, ""));
   }
 
   public boolean is(ResultCode code) {

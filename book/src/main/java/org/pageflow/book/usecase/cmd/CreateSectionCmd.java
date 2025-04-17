@@ -15,4 +15,13 @@ public class CreateSectionCmd {
   UUID bookId;
   UUID parentNodeId;
   String title;
+  UUID nodeId;
+
+  public static CreateSectionCmd of(UID uid, UUID bookId, UUID parentNodeId, String title) {
+    return new CreateSectionCmd(uid, bookId, parentNodeId, title, UUID.randomUUID());
+  }
+  
+  public static CreateSectionCmd withId(UID uid, UUID bookId, UUID parentNodeId, String title, UUID nodeId) {
+    return new CreateSectionCmd(uid, bookId, parentNodeId, title, nodeId);
+  }
 }

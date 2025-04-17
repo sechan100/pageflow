@@ -65,9 +65,9 @@ public class TocFolder extends TocNode {
     );
   }
 
-  public static TocFolder create(Book book, NodeTitle title) {
+  public static TocFolder create(Book book, NodeTitle title, UUID nodeId) {
     return new TocFolder(
-      UUID.randomUUID(),
+      nodeId,
       book,
       title.getValue(),
       null,
@@ -113,6 +113,7 @@ public class TocFolder extends TocNode {
   public Result<Void> changeDesign(FolderDesign design) {
     Preconditions.checkState(this.isEditable());
     this.design = design;
+    return Result.ok();
   }
 
 }

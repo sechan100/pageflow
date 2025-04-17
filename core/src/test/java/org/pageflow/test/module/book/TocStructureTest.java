@@ -280,7 +280,7 @@ public class TocStructureTest {
 
     // 3. 폴더 계층 구조 생성: 루트 > 부모 > 자식
     Result<FolderDto> parentFolderResult = editTocUseCase.createFolder(
-      new CreateFolderCmd(
+      CreateFolderCmd.of(
         user.getUid(),
         bookId,
         rootFolderId,
@@ -291,7 +291,7 @@ public class TocStructureTest {
     UUID parentFolderId = parentFolderResult.get().getId();
 
     Result<FolderDto> childFolderResult = editTocUseCase.createFolder(
-      new CreateFolderCmd(
+      CreateFolderCmd.of(
         user.getUid(),
         bookId,
         parentFolderId,
@@ -331,7 +331,7 @@ public class TocStructureTest {
     // 3. 3단계 폴더 계층 구조 생성: 루트 > 부모 > 자식 > 손자
 
     Result<FolderDto> parentFolderResult = editTocUseCase.createFolder(
-      new CreateFolderCmd(
+      CreateFolderCmd.of(
         user.getUid(),
         bookId,
         rootFolderId,
@@ -342,7 +342,7 @@ public class TocStructureTest {
     UUID parentFolderId = parentFolderResult.get().getId();
 
     Result<FolderDto> childFolderResult = editTocUseCase.createFolder(
-      new CreateFolderCmd(
+      CreateFolderCmd.of(
         user.getUid(),
         bookId,
         parentFolderId,
@@ -353,7 +353,7 @@ public class TocStructureTest {
     UUID childFolderId = childFolderResult.get().getId();
 
     Result<FolderDto> grandchildFolderResult = editTocUseCase.createFolder(
-      new CreateFolderCmd(
+      CreateFolderCmd.of(
         user.getUid(),
         bookId,
         childFolderId,
@@ -392,7 +392,7 @@ public class TocStructureTest {
 
     // 3. 일반 폴더 생성
     Result<FolderDto> normalFolderResult = editTocUseCase.createFolder(
-      new CreateFolderCmd(
+      CreateFolderCmd.of(
         user.getUid(),
         bookId,
         rootFolderId,
@@ -431,7 +431,7 @@ public class TocStructureTest {
 
     // 3. 일반 폴더 생성
     Result<FolderDto> folderResult = editTocUseCase.createFolder(
-      new CreateFolderCmd(
+      CreateFolderCmd.of(
         user.getUid(),
         bookId,
         rootFolderId,

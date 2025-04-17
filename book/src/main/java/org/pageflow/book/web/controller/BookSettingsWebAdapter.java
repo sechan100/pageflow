@@ -44,7 +44,7 @@ public class BookSettingsWebAdapter {
       return (Result) result;
     }
     SimpleBookRes res = new SimpleBookRes(result.get());
-    return Result.SUCCESS(res);
+    return Result.ok(res);
   }
 
   @PostMapping("/user/books/{bookId}/visibility")
@@ -59,7 +59,7 @@ public class BookSettingsWebAdapter {
       return (Result) result;
     }
     SimpleBookRes res = new SimpleBookRes(result.get());
-    return Result.SUCCESS(res);
+    return Result.ok(res);
   }
 
 }

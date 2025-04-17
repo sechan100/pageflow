@@ -33,7 +33,7 @@ public class StatusChangeableBook {
       );
     }
     book.setVisibility(visibility);
-    return Result.SUCCESS();
+    return Result.ok();
   }
 
   /**
@@ -60,7 +60,7 @@ public class StatusChangeableBook {
 
     PublishedRecord newPublishRecord = new PublishedRecord(book, newEdition);
     book.getPublishedRecords().add(newPublishRecord);
-    return Result.SUCCESS();
+    return Result.ok();
   }
 
   /**
@@ -71,7 +71,7 @@ public class StatusChangeableBook {
   public Result startRevision() {
     if(book.getStatus() == BookStatus.PUBLISHED) {
       book.setStatus(BookStatus.REVISING);
-      return Result.SUCCESS();
+      return Result.ok();
     } else {
       return Result.of(
         BookCode.INVALID_BOOK_STATUS,
@@ -88,7 +88,7 @@ public class StatusChangeableBook {
   public Result cancelRevision() {
     if(book.getStatus() == BookStatus.REVISING) {
       book.setStatus(BookStatus.PUBLISHED);
-      return Result.SUCCESS();
+      return Result.ok();
     } else {
       return Result.of(
         BookCode.INVALID_BOOK_STATUS,
@@ -106,7 +106,7 @@ public class StatusChangeableBook {
   public Result mergeRevision() {
     if(book.getStatus() == BookStatus.REVISING) {
       book.setStatus(BookStatus.PUBLISHED);
-      return Result.SUCCESS();
+      return Result.ok();
     } else {
       return Result.of(
         BookCode.INVALID_BOOK_STATUS,

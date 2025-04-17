@@ -32,7 +32,7 @@ public class FolderWebAdapter {
     @PathVariable UUID bookId,
     @Valid @RequestBody FolderForm.Create form
   ) {
-    CreateFolderCmd cmd = new CreateFolderCmd(
+    CreateFolderCmd cmd = CreateFolderCmd.of(
       rqcxt.getUid(),
       bookId,
       form.getParentNodeId(),
@@ -43,7 +43,7 @@ public class FolderWebAdapter {
       return (Result) result;
     }
     FolderRes res = FolderRes.from(result.get());
-    return Result.SUCCESS(res);
+    return Result.ok(res);
   }
 
   @GetMapping("/{folderId}")
@@ -62,7 +62,7 @@ public class FolderWebAdapter {
       return (Result) result;
     }
     FolderRes res = FolderRes.from(result.get());
-    return Result.SUCCESS(res);
+    return Result.ok(res);
   }
 
   @PostMapping("/{folderId}")
@@ -82,7 +82,7 @@ public class FolderWebAdapter {
       return (Result) result;
     }
     FolderRes res = FolderRes.from(result.get());
-    return Result.SUCCESS(res);
+    return Result.ok(res);
   }
 
 

@@ -36,7 +36,7 @@ public class FileService {
       .filter(v -> v.accept(cmd.getFileType()))
       .findFirst()
       .map(validator -> validator.validateFile(cmd.getFile()))
-      .orElse(Result.SUCCESS());
+      .orElse(Result.ok());
     if(fileValidationResult.isFailure()) {
       return fileValidationResult;
     }
@@ -76,7 +76,7 @@ public class FileService {
       }
       // 파일 저장
       cmd.getFile().transferTo(file);
-      return Result.SUCCESS(filePath);
+      return Result.ok(filePath);
     } catch(Exception e) {
       log.error("파일 저장에 실패했습니다. fileData: {}", fileData, e);
       return Result.of(FileCode.FAIL_TO_UPLOAD_FILE, originalFilename);
@@ -108,7 +108,7 @@ public class FileService {
       Result result = _deleteByFilePath(fileData.getFilePath());
       if(result.isFailure()) return result;
     }
-    return Result.SUCCESS();
+    return Result.ok();
   }
 
   /**
@@ -119,7 +119,7 @@ public class FileService {
     boolean isSuccess = file.delete();
     if(isSuccess) {
       repository.deleteById(filePath.getFilename());
-      return Result.SUCCESS();
+      return Result.ok();
     } else {
       return Result.of(FileCode.FAIL_TO_DELETE_FILE, filePath.getStaticPath());
     }

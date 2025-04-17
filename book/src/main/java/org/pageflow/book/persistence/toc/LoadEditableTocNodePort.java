@@ -35,7 +35,7 @@ public class LoadEditableTocNodePort {
       if(!node.isEditable()) {
         return Result.of(BookCode.CAN_EDIT_BOOK, "해당 노드는 편집할 수 없습니다.");
       }
-      return Result.SUCCESS(node);
+      return Result.ok(node);
     });
   }
 
@@ -48,7 +48,7 @@ public class LoadEditableTocNodePort {
       if(!node.isEditable()) {
         return Result.of(BookCode.CAN_EDIT_BOOK, "해당 노드는 편집할 수 없습니다.");
       }
-      return Result.SUCCESS(node);
+      return Result.ok(node);
     });
   }
 
@@ -61,7 +61,7 @@ public class LoadEditableTocNodePort {
       if(!node.isEditable()) {
         return Result.of(BookCode.CAN_EDIT_BOOK, "해당 노드는 편집할 수 없습니다.");
       }
-      return Result.SUCCESS(node);
+      return Result.ok(node);
     });
   }
 

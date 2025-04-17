@@ -53,7 +53,7 @@ public class ReadBookUseCase {
     Toc toc = tocPersistencePort.loadReadonlyToc(book);
     int totalCharCount = sectionContentPersistencePort.sumCharCountByBookId(bookId);
 
-    return Result.SUCCESS(
+    return Result.ok(
       new PublishedBookDto(book, authorProfileDto, TocDto.from(toc), totalCharCount)
     );
   }
@@ -67,7 +67,7 @@ public class ReadBookUseCase {
       return grant;
     }
     TocSection section = readTocPort.readSection(book, sectionId).get();
-    return Result.SUCCESS(SectionContentDto.from(section));
+    return Result.ok(SectionContentDto.from(section));
   }
 
 

@@ -72,7 +72,7 @@ public class Review extends BaseJpaEntity {
       content,
       scoreValidationRes.get()
     );
-    return Result.SUCCESS(review);
+    return Result.ok(review);
   }
 
 
@@ -114,6 +114,6 @@ public class Review extends BaseJpaEntity {
           .build()
       ));
     }
-    return Result.SUCCESS(score);
+    return Result.ok(score);
   }
 }

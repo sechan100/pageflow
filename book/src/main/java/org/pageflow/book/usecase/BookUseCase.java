@@ -78,7 +78,7 @@ public class BookUseCase {
     TocFolder rootFolder = TocFolder.createRootFolder(savedBook);
     tocFolderPersistencePort.save(rootFolder);
 
-    return Result.SUCCESS(new BookDto(book));
+    return Result.ok(new BookDto(book));
   }
 
   /**
@@ -94,7 +94,7 @@ public class BookUseCase {
     if(grant.isFailure()) {
       return grant;
     }
-    return Result.SUCCESS(WithAuthorBookDto.from(book));
+    return Result.ok(WithAuthorBookDto.from(book));
   }
 
   public MyBooksDto queryMyBooks(UID uid) {
@@ -122,7 +122,7 @@ public class BookUseCase {
     // 책 제목 변경
     BookTitle bookTitle = BookTitle.create(title);
     book.changeTitle(bookTitle);
-    return Result.SUCCESS(new BookDto(book));
+    return Result.ok(new BookDto(book));
   }
 
   /**
@@ -154,7 +154,7 @@ public class BookUseCase {
       return (Result) uploadResult;
     }
     book.changeCoverImageUrl(uploadResult.get().getWebUrl());
-    return Result.SUCCESS(new BookDto(book));
+    return Result.ok(new BookDto(book));
   }
 
   public Result<BookDto> changeBookDescription(UID uid, UUID bookId, String description) {
@@ -178,7 +178,7 @@ public class BookUseCase {
         """, bookId, description, bookDescription.getContent());
     }
     book.changeDescription(bookDescription);
-    return Result.SUCCESS(new BookDto(book));
+    return Result.ok(new BookDto(book));
   }
 
   /**
@@ -200,7 +200,7 @@ public class BookUseCase {
     Optional<TocFolder> readOnlyFolder = tocFolderPersistencePort.findRootFolder(bookId, false, TocNodeConfig.ROOT_FOLDER_TITLE);
     readOnlyFolder.ifPresent(tocFolderPersistencePort::delete);
     bookPersistencePort.delete(book);
-    return Result.SUCCESS();
+    return Result.ok();
   }
 
 

@@ -125,7 +125,7 @@ public class User extends BaseJpaEntity {
       return Result.of(UserCode.PASSWORD_SAME_AS_BEFORE);
     }
     this.password = password.getValue();
-    return Result.SUCCESS();
+    return Result.ok();
   }
 
   public boolean passwordMatches(String rawPassword) {

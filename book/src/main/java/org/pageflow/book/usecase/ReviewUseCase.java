@@ -64,7 +64,7 @@ public class ReviewUseCase {
     if(reviewRes.isFailure()) return (Result) reviewRes;
 
     Review review = reviewPersistencePort.persist(reviewRes.get());
-    return Result.SUCCESS(ReviewDto.from(review));
+    return Result.ok(ReviewDto.from(review));
   }
 
   /**
@@ -90,7 +90,7 @@ public class ReviewUseCase {
     // 리뷰 수정
     review.changeContent(content);
     review.changeScore(score);
-    return Result.SUCCESS(ReviewDto.from(review));
+    return Result.ok(ReviewDto.from(review));
   }
 
   /**
@@ -110,7 +110,7 @@ public class ReviewUseCase {
 
     // 삭제
     reviewPersistencePort.delete(review);
-    return Result.SUCCESS();
+    return Result.ok();
   }
 
 

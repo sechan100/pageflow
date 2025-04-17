@@ -40,7 +40,7 @@ public class SectionWebAdapter {
     @Valid @RequestBody SectionForm.Create form
   ) {
     UID uid = rqcxt.getUid();
-    CreateSectionCmd cmd = new CreateSectionCmd(
+    CreateSectionCmd cmd = CreateSectionCmd.of(
       uid,
       bookId,
       form.getParentNodeId(),
@@ -51,7 +51,7 @@ public class SectionWebAdapter {
       return (Result) result;
     }
     WithContentSectionRes res = new WithContentSectionRes(result.get());
-    return Result.SUCCESS(res);
+    return Result.ok(res);
   }
 
   @GetMapping("/{sectionId}")
@@ -70,7 +70,7 @@ public class SectionWebAdapter {
       return (Result) result;
     }
     SectionRes res = new SectionRes(result.get());
-    return Result.SUCCESS(res);
+    return Result.ok(res);
   }
 
   @GetMapping("/{sectionId}/content")
@@ -89,7 +89,7 @@ public class SectionWebAdapter {
       return (Result) result;
     }
     WithContentSectionRes res = new WithContentSectionRes(result.get());
-    return Result.SUCCESS(res);
+    return Result.ok(res);
   }
 
   @PostMapping("/{sectionId}")
@@ -109,7 +109,7 @@ public class SectionWebAdapter {
       return (Result) result;
     }
     SectionRes res = new SectionRes(result.get());
-    return Result.SUCCESS(res);
+    return Result.ok(res);
   }
 
   @DeleteMapping("/{sectionId}")
@@ -143,7 +143,7 @@ public class SectionWebAdapter {
       return (Result) result;
     }
     UrlRes res = new UrlRes(result.get().getUrl());
-    return Result.SUCCESS(res);
+    return Result.ok(res);
   }
 
   @PostMapping("/{sectionId}/content")
@@ -163,7 +163,7 @@ public class SectionWebAdapter {
       return (Result) result;
     }
     WithContentSectionRes res = new WithContentSectionRes(result.get());
-    return Result.SUCCESS(res);
+    return Result.ok(res);
   }
 
 }

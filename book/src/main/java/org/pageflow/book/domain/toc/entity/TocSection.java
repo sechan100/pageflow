@@ -43,9 +43,9 @@ public class TocSection extends TocNode {
     this.content = content;
   }
 
-  public static TocSection create(Book book, NodeTitle title) {
+  public static TocSection create(Book book, NodeTitle title, UUID nodeId) {
     return new TocSection(
-      UUID.randomUUID(),
+      nodeId,
       book,
       title.getValue(),
       null,

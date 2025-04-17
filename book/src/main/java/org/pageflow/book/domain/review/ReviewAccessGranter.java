@@ -45,7 +45,7 @@ public class ReviewAccessGranter {
     if(bookAccess.isFailure()) {
       return bookAccess;
     } else {
-      return Result.SUCCESS();
+      return Result.ok();
     }
   }
 

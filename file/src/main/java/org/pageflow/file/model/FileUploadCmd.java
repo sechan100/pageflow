@@ -37,7 +37,7 @@ public class FileUploadCmd {
     FieldValidationResult validation = validator.validate();
     if(validation.isValid()) {
       FileUploadCmd cmd = new FileUploadCmd(file, ownerId, fileType);
-      return Result.SUCCESS(cmd);
+      return Result.ok(cmd);
     } else {
       return Result.of(CommonCode.FIELD_VALIDATION_ERROR, validation);
     }

@@ -38,7 +38,7 @@ public class SignupCmd {
 
     // signup cmd 생성
     SignupCmd cmd = new SignupCmd(username, encryptedPassword, email, penname, role, provider, profileImageUrl);
-    return Result.SUCCESS(cmd);
+    return Result.ok(cmd);
   }
 
 

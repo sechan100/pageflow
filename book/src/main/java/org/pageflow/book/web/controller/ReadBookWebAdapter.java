@@ -36,7 +36,7 @@ public class ReadBookWebAdapter {
       return (Result) result;
     }
     PublishedBookRes res = PublishedBookRes.from(result.get());
-    return Result.SUCCESS(res);
+    return Result.ok(res);
   }
 
   @GetMapping("/sections/{sectionId}")
@@ -51,7 +51,7 @@ public class ReadBookWebAdapter {
       return (Result) result;
     }
     SectionContentRes res = SectionContentRes.from(result.get());
-    return Result.SUCCESS(res);
+    return Result.ok(res);
   }
 
 

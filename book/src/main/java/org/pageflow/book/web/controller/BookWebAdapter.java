@@ -41,7 +41,7 @@ public class BookWebAdapter {
       return (Result) result;
     }
     SimpleBookRes res = new SimpleBookRes(result.get());
-    return Result.SUCCESS(res);
+    return Result.ok(res);
   }
 
   @GetMapping("")
@@ -52,7 +52,7 @@ public class BookWebAdapter {
       .map(MyBookRes::new)
       .toList();
     MyBookListRes res = new MyBookListRes(bookList);
-    return Result.SUCCESS(res);
+    return Result.ok(res);
   }
 
   @GetMapping("/{bookId}")
@@ -64,7 +64,7 @@ public class BookWebAdapter {
       return (Result) result;
     }
     AuthorPrivateBookRes res = new AuthorPrivateBookRes(result.get());
-    return Result.SUCCESS(res);
+    return Result.ok(res);
   }
 
   @PostMapping("/{bookId}/title")
@@ -79,7 +79,7 @@ public class BookWebAdapter {
       return (Result) result;
     }
     SimpleBookRes res = new SimpleBookRes(result.get());
-    return Result.SUCCESS(res);
+    return Result.ok(res);
   }
 
   @PostMapping("/{bookId}/cover-image")
@@ -94,7 +94,7 @@ public class BookWebAdapter {
       return (Result) result;
     }
     SimpleBookRes res = new SimpleBookRes(result.get());
-    return Result.SUCCESS(res);
+    return Result.ok(res);
   }
 
   @PostMapping("/{bookId}/description")
@@ -109,7 +109,7 @@ public class BookWebAdapter {
       return (Result) result;
     }
     SimpleBookRes res = new SimpleBookRes(result.get());
-    return Result.SUCCESS(res);
+    return Result.ok(res);
   }
 
   @DeleteMapping("/{bookId}")

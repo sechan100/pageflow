@@ -71,7 +71,7 @@ public class SignupWebAdapter {
     }
 
     UserDto userDto = signupUseCase.signup(cmdResult.get());
-    return Result.SUCCESS(new UserRes(userDto));
+    return Result.ok(new UserRes(userDto));
   }
 
 

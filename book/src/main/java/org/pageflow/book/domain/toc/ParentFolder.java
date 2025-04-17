@@ -151,7 +151,7 @@ public class ParentFolder {
       target.setOv(newOv);
     }
 
-    return Result.SUCCESS();
+    return Result.ok();
   }
 
   /**
@@ -193,7 +193,7 @@ public class ParentFolder {
     if(_isSameNode(target, folder)) {
       return Result.of(BookCode.TOC_HIERARCHY_ERROR, "node는 자기 자신의 자식이 될 수 없습니다.");
     }
-    return Result.SUCCESS();
+    return Result.ok();
   }
 
   /**
@@ -205,7 +205,7 @@ public class ParentFolder {
     if(target.isRootFolder()) {
       return Result.of(BookCode.TOC_HIERARCHY_ERROR, "root folder는 이동할 수 없습니다.");
     }
-    return Result.SUCCESS();
+    return Result.ok();
   }
 
   /**
@@ -218,7 +218,7 @@ public class ParentFolder {
       return Result.of(BookCode.TOC_HIERARCHY_ERROR, "destIndex가 올바르지 않습니다.");
     }
 
-    return Result.SUCCESS();
+    return Result.ok();
   }
 
   /**

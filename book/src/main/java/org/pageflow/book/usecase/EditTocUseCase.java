@@ -95,7 +95,7 @@ public class EditTocUseCase {
       return grant;
     }
     Toc toc = tocPersistencePort.loadEditableToc(book);
-    return Result.SUCCESS(TocDto.from(toc));
+    return Result.ok(TocDto.from(toc));
   }
 
   // ==================================================
@@ -121,7 +121,7 @@ public class EditTocUseCase {
       return (Result) titleRes;
     }
     NodeTitle title = titleRes.get();
-    TocFolder newFolder = TocFolder.create(book, title);
+    TocFolder newFolder = TocFolder.create(book, title, cmd.getNodeId());
     // Toc 삽입
     Result<TocFolder> loadParentResult = loadEditableTocNodePort.loadEditableFolder(book, cmd.getParentNodeId());
     if(loadParentResult.isFailure()) {
@@ -129,7 +129,7 @@ public class EditTocUseCase {
     }
     ParentFolder parent = new ParentFolder(loadParentResult.get());
     parent.insertLast(newFolder);
-    return Result.SUCCESS(FolderDto.from(newFolder));
+    return Result.ok(FolderDto.from(newFolder));
   }
 
   /**
@@ -142,7 +142,7 @@ public class EditTocUseCase {
     }
     TocNode folder = nodeRes.get();
     if(folder instanceof TocFolder f) {
-      return Result.SUCCESS(FolderDto.from((TocFolder) folder));
+      return Result.ok(FolderDto.from((TocFolder) folder));
     } else {
       return Result.of(CommonCode.DATA_NOT_FOUND, "해당 노드는 폴더가 아닙니다.");
     }
@@ -159,7 +159,7 @@ public class EditTocUseCase {
     }
     TocNode folder = nodeRes.get();
     if(folder instanceof TocFolder f) {
-      return Result.SUCCESS(FolderDto.from((TocFolder) folder));
+      return Result.ok(FolderDto.from((TocFolder) folder));
     } else {
       return Result.of(CommonCode.DATA_NOT_FOUND, "해당 노드는 폴더가 아닙니다.");
     }
@@ -183,7 +183,7 @@ public class EditTocUseCase {
     }
     TocFolder parent = target.getParentNodeOrNull();
     parent.removeChild(target);
-    return Result.SUCCESS();
+    return Result.ok();
   }
 
 
@@ -210,7 +210,7 @@ public class EditTocUseCase {
       return (Result) newTitleRes;
     }
     NodeTitle title = newTitleRes.get();
-    TocSection newSection = TocSection.create(book, title);
+    TocSection newSection = TocSection.create(book, title, cmd.getNodeId());
     // Toc 삽입
     Result<TocFolder> loadFolderResult = loadEditableTocNodePort.loadEditableFolder(book, cmd.getParentNodeId());
     if(loadFolderResult.isFailure()) {
@@ -218,7 +218,7 @@ public class EditTocUseCase {
     }
     ParentFolder parent = new ParentFolder(loadFolderResult.get());
     parent.insertLast(newSection);
-    return Result.SUCCESS(WithContentSectionDto.from(newSection));
+    return Result.ok(WithContentSectionDto.from(newSection));
   }
 
   /**
@@ -231,7 +231,7 @@ public class EditTocUseCase {
     }
     TocNode section = nodeRes.get();
     if(section instanceof TocSection s) {
-      return Result.SUCCESS(SectionDto.from(s));
+      return Result.ok(SectionDto.from(s));
     } else {
       return Result.of(CommonCode.DATA_NOT_FOUND, "해당 노드는 섹션이 아닙니다.");
     }
@@ -248,7 +248,7 @@ public class EditTocUseCase {
     }
     TocNode section = changeResult.get();
     if(section instanceof TocSection s) {
-      return Result.SUCCESS(SectionDto.from(s));
+      return Result.ok(SectionDto.from(s));
     } else {
       return Result.of(CommonCode.DATA_NOT_FOUND, "해당 노드는 섹션이 아닙니다.");
     }
@@ -281,7 +281,7 @@ public class EditTocUseCase {
     // 노드 삭제
     TocFolder parent = target.getParentNodeOrNull();
     parent.removeChild(target);
-    return Result.SUCCESS();
+    return Result.ok();
   }
 
   private Result<TocNode> _loadAfterGrantWriteAccess(NodeIdentifier identifier) {
@@ -307,7 +307,7 @@ public class EditTocUseCase {
       return (Result) newTitleRes;
     }
     node.changeTitle(newTitleRes.get());
-    return Result.SUCCESS(node);
+    return Result.ok(node);
   }
 }
 

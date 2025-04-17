@@ -79,7 +79,7 @@ public class AccountService implements AccountUseCase, UserUseCase {
       return (Result) changeResult;
     }
     UserDto userDto = new UserDto(user);
-    return Result.SUCCESS(userDto);
+    return Result.ok(userDto);
   }
 
   private User _ensureAccount(UID uid) {

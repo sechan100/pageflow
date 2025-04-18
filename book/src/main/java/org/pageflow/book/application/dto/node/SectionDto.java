@@ -12,11 +12,15 @@ import java.util.UUID;
 public class SectionDto {
   UUID id;
   String title;
+  boolean shouldShowTitle;
+  boolean shouldBreakSection;
 
   public static SectionDto from(TocSection section) {
     return new SectionDto(
       section.getId(),
-      section.getTitle()
+      section.getTitle(),
+      section.getSectionDetails().getShouldShowTitle(),
+      section.getSectionDetails().getShouldBreakSection()
     );
   }
 }

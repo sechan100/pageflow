@@ -3,6 +3,7 @@ package org.pageflow.book.usecase;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pageflow.book.application.dto.node.SectionAttachmentUrl;
+import org.pageflow.book.application.dto.node.SectionDto;
 import org.pageflow.book.application.dto.node.WithContentSectionDto;
 import org.pageflow.book.application.service.GrantedBookLoader;
 import org.pageflow.book.application.service.TocNodeLoader;
@@ -95,13 +96,21 @@ public class TocSectionUseCase {
     return new SectionAttachmentUrl(filePath.getWebUrl());
   }
 
-  public WithContentSectionDto changeShouldShowTitle(NodeIdentifier identifier, boolean shouldShowTitle) {
+  public SectionDto changeShouldShowTitle(NodeIdentifier identifier, boolean shouldShowTitle) {
     Book book = grantedBookLoader.loadBookWithGrant(identifier.getUid(), identifier.getBookId(), BookAccess.WRITE);
     TocNodeLoader nodeLoader = tocNodeLoaderFactory.createLoader(book);
-    TocSection section = nodeLoader.loadSection(repo -> repo.findWithContentById(identifier.getNodeId()));
+    TocSection section = nodeLoader.loadSection(repo -> repo.findWithDetailsById(identifier.getNodeId()));
     EditableSection editableSection = new EditableSection(section);
     editableSection.changeShouldShowTitle(shouldShowTitle);
-    return WithContentSectionDto.from(section);
+    return SectionDto.from(section);
   }
 
+  public SectionDto changeShouldBreakSection(NodeIdentifier identifier, boolean shouldBreakSection) {
+    Book book = grantedBookLoader.loadBookWithGrant(identifier.getUid(), identifier.getBookId(), BookAccess.WRITE);
+    TocNodeLoader nodeLoader = tocNodeLoaderFactory.createLoader(book);
+    TocSection section = nodeLoader.loadSection(repo -> repo.findWithDetailsById(identifier.getNodeId()));
+    EditableSection editableSection = new EditableSection(section);
+    editableSection.changeShouldBreakSection(shouldBreakSection);
+    return SectionDto.from(section);
+  }
 }

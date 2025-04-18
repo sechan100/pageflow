@@ -11,6 +11,10 @@ import java.util.UUID;
  * @author : sechan
  */
 public interface TocSectionRepository extends JpaRepository<TocSection, UUID> {
+  @EntityGraph(attributePaths = {"sectionDetails"})
+  Optional<TocSection> findWithDetailsById(UUID sectionId);
+
   @EntityGraph(attributePaths = {"sectionDetails", "sectionDetails.content"})
   Optional<TocSection> findWithContentById(UUID sectionId);
+
 }

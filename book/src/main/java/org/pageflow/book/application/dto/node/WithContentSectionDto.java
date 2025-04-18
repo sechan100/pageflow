@@ -9,12 +9,16 @@ import java.util.UUID;
 public class WithContentSectionDto {
   UUID id;
   String title;
+  boolean shouldShowTitle;
+  boolean shouldBreakSection;
   SectionContentDto content;
 
   public static WithContentSectionDto from(TocSection section) {
     return new WithContentSectionDto(
       section.getId(),
       section.getTitle(),
+      section.getSectionDetails().getShouldShowTitle(),
+      section.getSectionDetails().getShouldBreakSection(),
       SectionContentDto.from(section.getSectionDetails().getContent())
     );
   }

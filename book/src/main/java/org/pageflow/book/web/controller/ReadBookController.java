@@ -3,10 +3,12 @@ package org.pageflow.book.web.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.pageflow.book.application.dto.book.PublishedBookDto;
-import org.pageflow.book.application.dto.node.SectionContentDto;
+import org.pageflow.book.application.dto.node.FolderDto;
+import org.pageflow.book.application.dto.node.WithContentSectionDto;
 import org.pageflow.book.usecase.ReadBookUseCase;
 import org.pageflow.book.web.res.book.PublishedBookRes;
-import org.pageflow.book.web.res.node.SectionContentRes;
+import org.pageflow.book.web.res.node.FolderRes;
+import org.pageflow.book.web.res.node.WithContentSectionRes;
 import org.pageflow.common.api.RequestContext;
 import org.pageflow.common.user.UID;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,7 +24,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/reader/books/{bookId}")
 @RequiredArgsConstructor
-public class ReadBookWebAdapter {
+public class ReadBookController {
   private final ReadBookUseCase readBookUseCase;
   private final RequestContext rqcxt;
 
@@ -34,15 +36,26 @@ public class ReadBookWebAdapter {
     return PublishedBookRes.from(publishedBookDto);
   }
 
+  @GetMapping("/folders/{folderId}")
+  @Operation(summary = "폴더 읽기")
+  public FolderRes getFolder(
+    @PathVariable UUID bookId,
+    @PathVariable UUID folderId
+  ) {
+    UID uid = rqcxt.getUid();
+    FolderDto folderDto = readBookUseCase.readFolder(uid, bookId, folderId);
+    return FolderRes.from(folderDto);
+  }
+
   @GetMapping("/sections/{sectionId}")
-  @Operation(summary = "책 내용 읽기")
-  public SectionContentRes getSection(
+  @Operation(summary = "섹션 읽기")
+  public WithContentSectionRes getSection(
     @PathVariable UUID bookId,
     @PathVariable UUID sectionId
   ) {
     UID uid = rqcxt.getUid();
-    SectionContentDto sectionContentDto = readBookUseCase.readSectionContent(uid, bookId, sectionId);
-    return SectionContentRes.from(sectionContentDto);
+    WithContentSectionDto withContentSectionDto = readBookUseCase.readSectionContent(uid, bookId, sectionId);
+    return WithContentSectionRes.from(withContentSectionDto);
   }
 
 

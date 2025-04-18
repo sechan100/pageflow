@@ -27,7 +27,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/user/books")
 @RequiredArgsConstructor
-public class BookWebAdapter {
+public class BookController {
   private final BookUseCase bookUseCase;
   private final RequestContext rqcxt;
 

@@ -28,7 +28,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/user/books/{bookId}/toc/sections")
 @RequiredArgsConstructor
-public class SectionWebAdapter {
+public class SectionController {
   private final EditTocUseCase editTocUseCase;
   private final TocSectionUseCase tocSectionUseCase;
   private final RequestContext rqcxt;
@@ -47,7 +47,7 @@ public class SectionWebAdapter {
       form.getTitle()
     );
     WithContentSectionDto withContentSectionDto = editTocUseCase.createSection(cmd);
-    return new WithContentSectionRes(withContentSectionDto);
+    return WithContentSectionRes.from(withContentSectionDto);
   }
 
   @GetMapping("/{sectionId}")
@@ -62,7 +62,7 @@ public class SectionWebAdapter {
       sectionId
     );
     SectionDto result = editTocUseCase.getSection(identifier);
-    return new SectionRes(result);
+    return SectionRes.from(result);
   }
 
   @GetMapping("/{sectionId}/content")
@@ -77,7 +77,7 @@ public class SectionWebAdapter {
       sectionId
     );
     WithContentSectionDto result = tocSectionUseCase.getSectionWithContent(identifier);
-    return new WithContentSectionRes(result);
+    return WithContentSectionRes.from(result);
   }
 
   @PostMapping("/{sectionId}")
@@ -93,7 +93,7 @@ public class SectionWebAdapter {
       sectionId
     );
     SectionDto result = editTocUseCase.changeSectionTitle(identifier, req.getTitle());
-    return new SectionRes(result);
+    return SectionRes.from(result);
   }
 
   @DeleteMapping("/{sectionId}")
@@ -140,7 +140,7 @@ public class SectionWebAdapter {
       sectionId
     );
     WithContentSectionDto result = tocSectionUseCase.writeContent(identifier, form.getContent());
-    return new WithContentSectionRes(result);
+    return WithContentSectionRes.from(result);
   }
 
 }

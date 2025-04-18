@@ -20,7 +20,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/user/books/{bookId}/toc")
 @RequiredArgsConstructor
-public class TocWebAdapter {
+public class TocController {
   private final EditTocUseCase editTocUseCase;
   private final RequestContext rqcxt;
 

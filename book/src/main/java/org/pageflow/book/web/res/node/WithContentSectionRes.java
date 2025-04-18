@@ -12,11 +12,17 @@ import java.util.UUID;
 public class WithContentSectionRes {
   UUID id;
   String title;
+  boolean shouldShowTitle;
+  boolean shouldBreakSection;
   String content;
 
-  public WithContentSectionRes(WithContentSectionDto dto) {
-    this.id = dto.getId();
-    this.title = dto.getTitle();
-    this.content = dto.getContent().getContent();
+  public static WithContentSectionRes from(WithContentSectionDto dto) {
+    return new WithContentSectionRes(
+      dto.getId(),
+      dto.getTitle(),
+      dto.getShouldShowTitle(),
+      dto.getShouldBreakSection(),
+      dto.getContent().getContent()
+    );
   }
 }

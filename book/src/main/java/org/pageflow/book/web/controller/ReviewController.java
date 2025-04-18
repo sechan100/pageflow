@@ -20,7 +20,7 @@ import java.util.UUID;
 @RequestMapping("/user/books/{bookId}/reviews")
 @RestController
 @RequiredArgsConstructor
-public class ReviewWebAdapter {
+public class ReviewController {
   private final ReviewUseCase reviewUseCase;
   private final RequestContext rqcxt;
 

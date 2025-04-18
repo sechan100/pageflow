@@ -1,6 +1,7 @@
 package org.pageflow.core.controller;
 
 import lombok.Value;
+import org.pageflow.book.domain.toc.entity.FolderDesign;
 import org.pageflow.common.property.ApplicationProperties;
 import org.pageflow.user.domain.Password;
 import org.pageflow.user.port.in.service.PennameValidator;
@@ -22,6 +23,7 @@ public class ServerPropertiesRes {
     public User(ApplicationProperties properties) {
       this.refreshTokenExpireDays = properties.auth.refreshTokenExpireDays;
     }
+
     // refresh token 만료 기간
     int refreshTokenExpireDays;
 
@@ -43,6 +45,14 @@ public class ServerPropertiesRes {
     String pennameRegex = PennameValidator.REGEX;
     String pennameRegexMessage = PennameValidator.REGEX_MESSAGE;
 
+  }
+
+  @Value
+  public static class Book {
+    public Book(ApplicationProperties properties) {
+    }
+
+    FolderDesign[] folderDesigns = FolderDesign.values();
   }
 }
 

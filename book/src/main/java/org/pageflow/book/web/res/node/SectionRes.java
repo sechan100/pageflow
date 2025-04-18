@@ -12,9 +12,16 @@ import java.util.UUID;
 public class SectionRes {
   UUID id;
   String title;
+  boolean shouldShowTitle;
+  boolean shouldBreakSection;
 
-  public SectionRes(SectionDto dto) {
-    this.id = dto.getId();
-    this.title = dto.getTitle();
+  public static SectionRes from(SectionDto dto) {
+    return new SectionRes(
+      dto.getId(),
+      dto.getTitle(),
+      dto.getShouldShowTitle(),
+      dto.getShouldBreakSection()
+    );
   }
+
 }

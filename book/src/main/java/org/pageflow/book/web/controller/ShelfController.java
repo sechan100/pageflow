@@ -18,7 +18,7 @@ import java.util.UUID;
 @RequestMapping("/user/books/{bookId}/shelf")
 @RestController
 @RequiredArgsConstructor
-public class ShelfWebAdapter {
+public class ShelfController {
   private final RequestContext rqcxt;
   private final BookShelfUseCase bookShelfUseCase;
 

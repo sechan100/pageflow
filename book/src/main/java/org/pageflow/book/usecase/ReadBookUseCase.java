@@ -4,14 +4,16 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.pageflow.book.application.dto.author.AuthorProfileDto;
 import org.pageflow.book.application.dto.book.PublishedBookDto;
-import org.pageflow.book.application.dto.node.SectionContentDto;
+import org.pageflow.book.application.dto.node.FolderDto;
 import org.pageflow.book.application.dto.node.TocDto;
+import org.pageflow.book.application.dto.node.WithContentSectionDto;
 import org.pageflow.book.application.service.GrantedBookLoader;
 import org.pageflow.book.application.service.TocNodeLoader;
 import org.pageflow.book.application.service.TocNodeLoaderFactory;
 import org.pageflow.book.domain.book.constants.BookAccess;
 import org.pageflow.book.domain.book.entity.Book;
 import org.pageflow.book.domain.toc.Toc;
+import org.pageflow.book.domain.toc.entity.TocFolder;
 import org.pageflow.book.domain.toc.entity.TocSection;
 import org.pageflow.book.persistence.AuthorRepository;
 import org.pageflow.book.persistence.toc.SectionContentRepository;
@@ -49,11 +51,18 @@ public class ReadBookUseCase {
     return new PublishedBookDto(book, authorProfileDto, TocDto.from(toc), totalCharCount);
   }
 
-  public SectionContentDto readSectionContent(UID uid, UUID bookId, UUID sectionId) {
+  public FolderDto readFolder(UID uid, UUID bookId, UUID folderId) {
+    Book book = grantedBookLoader.loadBookWithGrant(uid, bookId, BookAccess.READ);
+    TocNodeLoader nodeLoader = tocNodeLoaderFactory.createLoader(book);
+    TocFolder folder = nodeLoader.loadFolder(repo -> repo.findById(folderId));
+    return FolderDto.from(folder);
+  }
+
+  public WithContentSectionDto readSectionContent(UID uid, UUID bookId, UUID sectionId) {
     Book book = grantedBookLoader.loadBookWithGrant(uid, bookId, BookAccess.READ);
     TocNodeLoader nodeLoader = tocNodeLoaderFactory.createLoader(book);
     TocSection section = nodeLoader.loadSection(repo -> repo.findWithContentById(sectionId));
-    return SectionContentDto.from(section.getSectionDetails().getContent());
+    return WithContentSectionDto.from(section);
   }
 
 

@@ -21,7 +21,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/user/books/{bookId}/toc/folders")
 @RequiredArgsConstructor
-public class FolderWebAdapter {
+public class FolderController {
   private final EditTocUseCase editTocUseCase;
   private final RequestContext rqcxt;
 

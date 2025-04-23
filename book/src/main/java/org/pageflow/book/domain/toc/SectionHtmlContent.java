@@ -13,25 +13,18 @@ public class SectionHtmlContent {
   private static final Safelist SAFELIST = new Safelist()
     .addTags(
       // 노드 관련 태그
-      "div", "br", "span", "p", "a", "blockquote", "code", "pre",
-      "h1", "h2", "h3", "h4", "h5", "h6", "img", "li", "ol", "ul",
+      "div", "br", "span", "p", "blockquote", "pre",
+      "img", "li", "ol", "ul",
       // 형식 관련 태그
       "b", "strong", "u", "i", "s", "em")
 
     // 속성 추가
     .addAttributes("div", BASE_ATTRIBUTES)
-    .addAttributes("h1", BASE_ATTRIBUTES)
-    .addAttributes("h2", BASE_ATTRIBUTES)
-    .addAttributes("h3", BASE_ATTRIBUTES)
-    .addAttributes("h4", BASE_ATTRIBUTES)
-    .addAttributes("h5", BASE_ATTRIBUTES)
-    .addAttributes("h6", BASE_ATTRIBUTES)
     .addAttributes("p", BASE_ATTRIBUTES)
     .addAttributes("br", BASE_ATTRIBUTES)
     .addAttributes("span", _merge(BASE_ATTRIBUTES, "data-tab"))
-    .addAttributes("a", _merge(BASE_ATTRIBUTES, "href", "title", "target", "rel"))
+//    .addAttributes("a", _merge(BASE_ATTRIBUTES, "href", "title", "target", "rel"))
     .addAttributes("blockquote", _merge(BASE_ATTRIBUTES, "cite"))
-    .addAttributes("code", BASE_ATTRIBUTES)
     .addAttributes("pre", _merge(BASE_ATTRIBUTES, "spellcheck", "data-language", "data-highlight-language"))
     .addAttributes("img", _merge(BASE_ATTRIBUTES, "alt", "height", "src", "title", "width", "data-position", "data-show-caption"))
     .addAttributes("li", _merge(BASE_ATTRIBUTES, "value"))
@@ -45,7 +38,7 @@ public class SectionHtmlContent {
     .addAttributes("em", BASE_ATTRIBUTES)
 
     // 프로토콜 추가
-    .addProtocols("a", "href", "ftp", "http", "https", "mailto")
+//    .addProtocols("a", "href", "ftp", "http", "https", "mailto")
     .addProtocols("blockquote", "cite", "http", "https")
     .addProtocols("img", "src", "http", "https");
 

@@ -16,7 +16,7 @@ import org.pageflow.user.domain.entity.User;
 @Table(
   name = "shelf_item",
   uniqueConstraints = {
-    @UniqueConstraint(columnNames = {"shelf_owner_id", "book_id"})
+    @UniqueConstraint(columnNames = {"uid", "book_id"})
   }
 )
 public class ShelfItem extends BaseJpaEntity {
@@ -27,8 +27,8 @@ public class ShelfItem extends BaseJpaEntity {
   private Long id;
 
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "shelf_owner_id")
-  private User shelfOwner;
+  @JoinColumn(name = "uid")
+  private User user;
 
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   @JoinColumn(name = "book_id")

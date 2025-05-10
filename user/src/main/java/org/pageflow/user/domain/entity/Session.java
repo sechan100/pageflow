@@ -26,7 +26,7 @@ public class Session implements JpaEntity {
 
   @Getter
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "user_id", updatable = false, nullable = false)
+  @JoinColumn(name = "uid", updatable = false, nullable = false)
   private User user;
 
   @Getter

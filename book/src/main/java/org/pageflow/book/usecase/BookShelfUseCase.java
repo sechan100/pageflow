@@ -69,7 +69,7 @@ public class BookShelfUseCase {
     }
 
     // 책장에 책 제거
-    shelfItemPersistencePort.deleteByBookIdAndShelfOwnerId(bookId, shlefOwnerId.getValue());
+    shelfItemPersistencePort.deleteByBookIdAndUserId(bookId, shlefOwnerId.getValue());
     return Result.ok();
   }
 
@@ -77,7 +77,7 @@ public class BookShelfUseCase {
    * 책장에 있는 책들을 조회한다.
    */
   public List<WithAuthorBookDto> getShelfBooks(UID shlefOwnerId) {
-    List<ShelfItem> shelfItems = shelfItemPersistencePort.findBooksByShelfOwnerId(shlefOwnerId.getValue());
+    List<ShelfItem> shelfItems = shelfItemPersistencePort.findBooksByUserId(shlefOwnerId.getValue());
     return shelfItems.stream()
       .map(shelfItem -> WithAuthorBookDto.from(shelfItem.getBook()))
       .toList();

@@ -31,8 +31,8 @@ public class Review extends BaseJpaEntity {
   private UUID id;
 
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "writer_id")
-  private User writer;
+  @JoinColumn(name = "uid")
+  private User user;
 
   @Getter
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -76,12 +76,12 @@ public class Review extends BaseJpaEntity {
   }
 
 
-  public Author getWriter() {
-    return new Author(writer);
+  public Author getUser() {
+    return new Author(user);
   }
 
   public boolean isWriter(UID uid) {
-    return writer.getUid().equals(uid);
+    return user.getUid().equals(uid);
   }
 
   public void changeContent(String content) {

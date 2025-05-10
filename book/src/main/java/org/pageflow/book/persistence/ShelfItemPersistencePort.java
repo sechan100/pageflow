@@ -11,10 +11,10 @@ import java.util.UUID;
  * @author : sechan
  */
 public interface ShelfItemPersistencePort extends BaseJpaRepository<ShelfItem, Long> {
-  ShelfItem findByBookIdAndShelfOwnerId(UUID bookId, UUID shelfOwnerId);
+  ShelfItem findByBookIdAndUserId(UUID bookId, UUID uid);
 
-  void deleteByBookIdAndShelfOwnerId(UUID bookId, UUID shelfOwnerId);
+  void deleteByBookIdAndUserId(UUID bookId, UUID uid);
 
   @EntityGraph(attributePaths = {"book", "book.author"})
-  List<ShelfItem> findBooksByShelfOwnerId(UUID shelfOwnerId);
+  List<ShelfItem> findBooksByUserId(UUID uid);
 }

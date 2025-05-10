@@ -12,9 +12,12 @@ import org.pageflow.book.domain.toc.entity.TocFolder;
 import org.pageflow.book.domain.toc.entity.TocNode;
 import org.pageflow.book.domain.toc.entity.TocSection;
 import org.pageflow.book.persistence.BookPersistencePort;
+import org.pageflow.book.persistence.toc.TocNodeRepository;
 import org.pageflow.book.persistence.toc.TocRepository;
 import org.pageflow.book.usecase.EditTocUseCase;
 import org.pageflow.book.usecase.cmd.CreateFolderCmd;
+import org.pageflow.book.usecase.cmd.CreateSectionCmd;
+import org.pageflow.book.usecase.cmd.NodeIdentifier;
 import org.pageflow.book.usecase.cmd.RelocateNodeCmd;
 import org.pageflow.test.module.book.utils.BookUtils;
 import org.pageflow.test.module.book.utils.TocUtils;
@@ -22,6 +25,7 @@ import org.pageflow.test.module.user.utils.UserUtils;
 import org.pageflow.test.shared.PageflowTest;
 import org.pageflow.user.dto.UserDto;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -29,13 +33,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @PageflowTest
 @RequiredArgsConstructor
-public class TocFeatureTest {
+public class TocNodeTest {
   private final UserUtils userUtils;
   private final BookUtils bookUtils;
   private final TocUtils tocUtils;
   private final BookPersistencePort bookPersistencePort;
   private final TocRepository tocRepository;
   private final EditTocUseCase editTocUseCase;
+  private final TocNodeRepository tocNodeRepository;
 
   @Test
   @DisplayName("ov 값 할당과 rebalance 검사")
@@ -139,5 +144,46 @@ public class TocFeatureTest {
 
     assertTrue(newF2Ov < newF1Ov); // folder2가 folder1 앞에 있어야 함
     assertTrue(newF2Ov > Integer.MIN_VALUE + 1000); // rebalance 후 최소값에서 충분히 떨어져 있어야 함
+  }
+
+  @Test
+  @DisplayName("node 생성 및 삭제 테스트")
+  void tocNodeCreateAndDeleteTest() {
+    // 사용자 생성
+    UserDto user = userUtils.createUser("user1");
+    // 책 생성
+    BookDto bookDto = bookUtils.createBook(user, "TOC 테스트 도서");
+    UUID fid1 = UUID.randomUUID();
+    UUID fid2 = UUID.randomUUID();
+    UUID sid3 = UUID.randomUUID();
+    // toc 만들기
+    tocUtils.buildTree(bookDto)
+      .folder(fid1)
+      .folder(fid2)
+      .section(sid3);
+
+    // === 새로운 섹션을 생성 ===
+    UUID sid4 = UUID.randomUUID();
+    editTocUseCase.createSection(CreateSectionCmd.withId(
+      user.getUid(),
+      bookDto.getId(),
+      fid1,
+      "섹션1",
+      sid4
+    ));
+    Optional<TocNode> s4 = tocNodeRepository.findById(sid4);
+    assertTrue(s4.isPresent());
+
+    // === 폴더 삭제 ===
+    editTocUseCase.deleteFolder(new NodeIdentifier(
+      user.getUid(),
+      bookDto.getId(),
+      fid1
+    ));
+    Optional<TocNode> f1 = tocNodeRepository.findById(fid1);
+    assertTrue(f1.isEmpty());
+    // 하위 섹션 삭제획인
+    s4 = tocNodeRepository.findById(sid4);
+    assertTrue(s4.isEmpty());
   }
 }

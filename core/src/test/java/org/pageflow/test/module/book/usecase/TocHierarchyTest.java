@@ -37,7 +37,7 @@ import java.util.UUID;
  */
 @PageflowTest
 @RequiredArgsConstructor
-public class TocStructureTest {
+public class TocHierarchyTest {
   private final UserUtils userUtils;
   private final BookUtils bookUtils;
   private final TocUtils tocUtils;

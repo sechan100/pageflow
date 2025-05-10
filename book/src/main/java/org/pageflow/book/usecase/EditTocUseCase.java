@@ -16,7 +16,7 @@ import org.pageflow.book.domain.toc.*;
 import org.pageflow.book.domain.toc.entity.TocFolder;
 import org.pageflow.book.domain.toc.entity.TocNode;
 import org.pageflow.book.domain.toc.entity.TocSection;
-import org.pageflow.book.persistence.toc.SaveTocFolderPort;
+import org.pageflow.book.persistence.toc.TocNodeRepository;
 import org.pageflow.book.persistence.toc.TocRepository;
 import org.pageflow.book.usecase.cmd.CreateFolderCmd;
 import org.pageflow.book.usecase.cmd.CreateSectionCmd;
@@ -44,7 +44,7 @@ public class EditTocUseCase {
   private final TocNodeLoaderFactory tocNodeLoaderFactory;
   private final TocRepository tocRepository;
   private final FileService fileService;
-  private final SaveTocFolderPort saveTocFolderPort;
+  private final TocNodeRepository tocNodeRepository;
 
 
   /**
@@ -90,13 +90,13 @@ public class EditTocUseCase {
     Book book = grantedBookLoader.loadBookWithGrant(cmd.getUid(), cmd.getBookId(), BookAccess.WRITE);
     NodeTitle title = NodeTitle.create(cmd.getTitle());
     TocFolder newFolder = TocFolder.create(book, title, cmd.getNodeId());
+    newFolder = tocNodeRepository.save(newFolder);
 
     TocFolder folder = tocNodeLoaderFactory
       .createLoader(book)
       .loadFolder(repo -> repo.findWithChildrenById(cmd.getParentNodeId()));
     ParentFolder parent = new ParentFolder(folder);
     parent.insertLast(newFolder);
-    saveTocFolderPort.save(folder);
     return FolderDto.from(newFolder);
   }
 
@@ -138,7 +138,7 @@ public class EditTocUseCase {
     );
     TocFolder parent = target.getParentNodeOrNull();
     parent.removeChild(target);
-    saveTocFolderPort.save(parent);
+    tocNodeRepository.delete(target);
   }
 
 
@@ -155,13 +155,13 @@ public class EditTocUseCase {
     // Section 생성
     NodeTitle title = NodeTitle.create(cmd.getTitle());
     TocSection newSection = TocSection.create(book, title, cmd.getNodeId());
+    newSection = tocNodeRepository.save(newSection);
     // 부모 folder에 삽입
     TocFolder folder = tocNodeLoaderFactory
       .createLoader(book)
       .loadFolder(repo -> repo.findWithChildrenById(cmd.getParentNodeId()));
     ParentFolder parent = new ParentFolder(folder);
     parent.insertLast(newSection);
-    saveTocFolderPort.save(folder);
     return WithContentSectionDto.from(newSection);
   }
 
@@ -204,7 +204,7 @@ public class EditTocUseCase {
     // 노드 삭제
     TocFolder parent = target.getParentNodeOrNull();
     parent.removeChild(target);
-    saveTocFolderPort.save(parent);
+    tocNodeRepository.delete(target);
   }
 
 }

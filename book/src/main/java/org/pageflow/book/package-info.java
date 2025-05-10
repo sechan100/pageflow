@@ -1,8 +1,9 @@
 
-
 @ArchModule(
   name = BOOK,
-  exposedPackages = {},
+  exposedPackages = {
+    "org.pageflow.book.domain.toc.entity..", // FolderDesign Enum 때문
+  },
   exposedClassAnnotation = {
     ApplicationModule.class
   }

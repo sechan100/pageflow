@@ -11,7 +11,7 @@ import org.pageflow.book.domain.toc.constants.TocNodeConfig;
 import org.pageflow.book.domain.toc.entity.TocFolder;
 import org.pageflow.book.domain.toc.entity.TocNode;
 import org.pageflow.book.domain.toc.entity.TocSection;
-import org.pageflow.book.persistence.BookPersistencePort;
+import org.pageflow.book.persistence.BookRepository;
 import org.pageflow.book.persistence.toc.TocNodeRepository;
 import org.pageflow.book.persistence.toc.TocRepository;
 import org.pageflow.book.usecase.EditTocUseCase;
@@ -37,7 +37,7 @@ public class TocNodeTest {
   private final UserUtils userUtils;
   private final BookUtils bookUtils;
   private final TocUtils tocUtils;
-  private final BookPersistencePort bookPersistencePort;
+  private final BookRepository bookRepository;
   private final TocRepository tocRepository;
   private final EditTocUseCase editTocUseCase;
   private final TocNodeRepository tocNodeRepository;
@@ -56,7 +56,7 @@ public class TocNodeTest {
       .section("s3");
 
     // node들 준비
-    Book book = bookPersistencePort.findById(bookDto.getId()).get();
+    Book book = bookRepository.findById(bookDto.getId()).get();
     Toc toc = tocRepository.loadEditableToc(book);
     TocFolder f1 = (TocFolder) toc.getRootFolder().getChildren().get(0);
     TocFolder f2 = (TocFolder) toc.getRootFolder().getChildren().get(1);
@@ -120,7 +120,7 @@ public class TocNodeTest {
       )
     );
 
-    Book book = bookPersistencePort.findById(bookId).get();
+    Book book = bookRepository.findById(bookId).get();
     Toc toc = tocRepository.loadEditableToc(book);
 
     // 최소값 근처에 ov 설정

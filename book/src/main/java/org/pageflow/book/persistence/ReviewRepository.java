@@ -1,12 +1,12 @@
 package org.pageflow.book.persistence;
 
 import org.pageflow.book.domain.review.entity.Review;
-import org.pageflow.common.jpa.repository.BaseJpaRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.UUID;
 
 /**
  * @author : sechan
  */
-public interface ReviewPersistencePort extends BaseJpaRepository<Review, UUID> {
+public interface ReviewRepository extends JpaRepository<Review, UUID> {
 }

@@ -11,7 +11,6 @@ public enum TocNodeType {
   FOLDER,
   SECTION;
 
-
   public static TocNodeType from(TocNode nodeEntity) {
     if(nodeEntity instanceof TocFolder) {
       return FOLDER;

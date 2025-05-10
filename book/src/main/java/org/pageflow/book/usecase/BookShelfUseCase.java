@@ -10,8 +10,8 @@ import org.pageflow.book.domain.book.constants.BookAccess;
 import org.pageflow.book.domain.book.entity.Book;
 import org.pageflow.book.domain.book.entity.ShelfItem;
 import org.pageflow.book.persistence.AuthorRepository;
-import org.pageflow.book.persistence.BookPersistencePort;
-import org.pageflow.book.persistence.ShelfItemPersistencePort;
+import org.pageflow.book.persistence.BookRepository;
+import org.pageflow.book.persistence.ShelfItemRepository;
 import org.pageflow.common.result.Result;
 import org.pageflow.common.user.UID;
 import org.springframework.stereotype.Service;
@@ -28,8 +28,8 @@ import java.util.UUID;
 @Transactional
 @RequiredArgsConstructor
 public class BookShelfUseCase {
-  private final BookPersistencePort bookPersistencePort;
-  private final ShelfItemPersistencePort shelfItemPersistencePort;
+  private final BookRepository bookRepository;
+  private final ShelfItemRepository shelfItemRepository;
   private final AuthorRepository authorRepository;
 
 
@@ -39,7 +39,7 @@ public class BookShelfUseCase {
    * @code BOOK_ACCESS_DENIED: 책에 대한 권한이 없는 경우
    */
   public Result<BookDto> addBookToShelf(UID shlefOwnerId, UUID bookId) {
-    Book book = bookPersistencePort.findById(bookId).get();
+    Book book = bookRepository.findById(bookId).get();
     // 권한 검사 =====
     BookAccessGranter accessGranter = new BookAccessGranter(shlefOwnerId, book);
     Result grant = accessGranter.grant(BookAccess.READ);
@@ -49,7 +49,7 @@ public class BookShelfUseCase {
     // 책장에 책 넣기
     Author shelfOwner = book.getAuthor();
     ShelfItem shelfItem = ShelfItem.create(book, shelfOwner);
-    shelfItemPersistencePort.persist(shelfItem);
+    shelfItemRepository.save(shelfItem);
     BookDto dto = new BookDto(book);
     return Result.ok(dto);
   }
@@ -60,7 +60,7 @@ public class BookShelfUseCase {
    * @code BOOK_ACCESS_DENIED: 책에 대한 권한이 없는 경우
    */
   public Result removeBookFromShelf(UID shlefOwnerId, UUID bookId) {
-    Book book = bookPersistencePort.findById(bookId).get();
+    Book book = bookRepository.findById(bookId).get();
     // 권한 검사 =====
     BookAccessGranter accessGranter = new BookAccessGranter(shlefOwnerId, book);
     Result grant = accessGranter.grant(BookAccess.READ);
@@ -69,7 +69,7 @@ public class BookShelfUseCase {
     }
 
     // 책장에 책 제거
-    shelfItemPersistencePort.deleteByBookIdAndUserId(bookId, shlefOwnerId.getValue());
+    shelfItemRepository.deleteByBookIdAndUserId(bookId, shlefOwnerId.getValue());
     return Result.ok();
   }
 
@@ -77,7 +77,7 @@ public class BookShelfUseCase {
    * 책장에 있는 책들을 조회한다.
    */
   public List<WithAuthorBookDto> getShelfBooks(UID shlefOwnerId) {
-    List<ShelfItem> shelfItems = shelfItemPersistencePort.findBooksByUserId(shlefOwnerId.getValue());
+    List<ShelfItem> shelfItems = shelfItemRepository.findBooksByUserId(shlefOwnerId.getValue());
     return shelfItems.stream()
       .map(shelfItem -> WithAuthorBookDto.from(shelfItem.getBook()))
       .toList();

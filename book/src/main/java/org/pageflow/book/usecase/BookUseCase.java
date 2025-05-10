@@ -14,7 +14,7 @@ import org.pageflow.book.domain.book.entity.Book;
 import org.pageflow.book.domain.toc.constants.TocNodeConfig;
 import org.pageflow.book.domain.toc.entity.TocFolder;
 import org.pageflow.book.persistence.AuthorRepository;
-import org.pageflow.book.persistence.BookPersistencePort;
+import org.pageflow.book.persistence.BookRepository;
 import org.pageflow.book.persistence.toc.TocFolderRepository;
 import org.pageflow.common.property.ApplicationProperties;
 import org.pageflow.common.result.Result;
@@ -46,7 +46,7 @@ public class BookUseCase {
   private final ImageUrlValidator imageUrlValidator;
   private final FileService fileService;
 
-  private final BookPersistencePort bookPersistencePort;
+  private final BookRepository bookRepository;
   private final TocFolderRepository tocFolderRepository;
 
 
@@ -69,7 +69,7 @@ public class BookUseCase {
       String coverImageUrl = coverImagePath.getWebUrl();
       book.changeCoverImageUrl(coverImageUrl);
     }
-    Book savedBook = bookPersistencePort.save(book);
+    Book savedBook = bookRepository.save(book);
     // root folder
     TocFolder rootFolder = TocFolder.createRootFolder(savedBook);
     tocFolderRepository.save(rootFolder);
@@ -83,7 +83,7 @@ public class BookUseCase {
    * @code BOOK_ACCESS_DENIED: 책 읽기 권한이 없는 경우
    */
   public Result<WithAuthorBookDto> getBook(UID uid, UUID bookId) {
-    Book book = bookPersistencePort.findBookWithAuthorById(bookId).get();
+    Book book = bookRepository.findBookWithAuthorById(bookId).get();
     // 권한 검사 =====
     BookAccessGranter accessGranter = new BookAccessGranter(uid, book);
     Result grant = accessGranter.grant(BookAccess.AUTHOR);
@@ -95,7 +95,7 @@ public class BookUseCase {
 
   public MyBooksDto queryMyBooks(UID uid) {
     // books
-    List<Book> books = bookPersistencePort.findBooksByAuthorId(uid.getValue());
+    List<Book> books = bookRepository.findBooksByAuthorId(uid.getValue());
 
     return new MyBooksDto(
       books.stream().map(BookDto::new).toList()
@@ -106,7 +106,7 @@ public class BookUseCase {
    * @code BOOK_ACCESS_DENIED: 책 권한이 없는 경우
    */
   public Result<BookDto> changeBookTitle(UID uid, UUID bookId, String title) {
-    Book book = bookPersistencePort.findById(bookId).get();
+    Book book = bookRepository.findById(bookId).get();
 
     // 권한 검사 =====
     BookAccessGranter accessGranter = new BookAccessGranter(uid, book);
@@ -125,7 +125,7 @@ public class BookUseCase {
    * @return {@link org.pageflow.book.application.BookCode}, {@link org.pageflow.file.shared.FileCode}
    */
   public Result<BookDto> changeBookCoverImage(UID uid, UUID bookId, MultipartFile coverImage) {
-    Book book = bookPersistencePort.findById(bookId).get();
+    Book book = bookRepository.findById(bookId).get();
 
     // 권한 검사 =====
     BookAccessGranter accessGranter = new BookAccessGranter(uid, book);
@@ -148,7 +148,7 @@ public class BookUseCase {
   }
 
   public Result<BookDto> changeBookDescription(UID uid, UUID bookId, String description) {
-    Book book = bookPersistencePort.findById(bookId).get();
+    Book book = bookRepository.findById(bookId).get();
 
     // 권한 검사 =========================
     BookAccessGranter accessGranter = new BookAccessGranter(uid, book);
@@ -175,7 +175,7 @@ public class BookUseCase {
    * @code BOOK_ACCESS_DENIED: 책 권한이 없는 경우
    */
   public Result<Void> deleteBook(UID uid, UUID bookId) {
-    Book book = bookPersistencePort.findById(bookId).get();
+    Book book = bookRepository.findById(bookId).get();
 
     // 권한 검사 ===========
     BookAccessGranter accessGranter = new BookAccessGranter(uid, book);
@@ -189,7 +189,7 @@ public class BookUseCase {
     editableFolder.ifPresent(tocFolderRepository::delete);
     Optional<TocFolder> readOnlyFolder = tocFolderRepository.findRootFolder(bookId, false, TocNodeConfig.ROOT_FOLDER_TITLE);
     readOnlyFolder.ifPresent(tocFolderRepository::delete);
-    bookPersistencePort.delete(book);
+    bookRepository.delete(book);
     return Result.ok();
   }
 

@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.pageflow.book.application.BookCode;
 import org.pageflow.book.application.dto.book.BookDto;
 import org.pageflow.book.domain.book.entity.BookVisibility;
-import org.pageflow.book.persistence.BookPersistencePort;
+import org.pageflow.book.persistence.BookRepository;
 import org.pageflow.book.usecase.ChangeBookStatusUseCase;
 import org.pageflow.test.module.book.utils.BookUtils;
 import org.pageflow.test.module.user.utils.UserUtils;
@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @RequiredArgsConstructor
 public class StatusFlowTest {
   private final ChangeBookStatusUseCase changeBookStatusUseCase;
-  private final BookPersistencePort bookPersistencePort;
+  private final BookRepository bookRepository;
   private final UserUtils userUtils;
   private final BookUtils bookUtils;
 
@@ -41,7 +41,7 @@ public class StatusFlowTest {
 
     // 3. 책 개정 취소 (REVISING -> PUBLISHED)
     changeBookStatusUseCase.cancelRevision(user.getUid(), book.getId());
-    int newEdition = bookPersistencePort.findById(book.getId()).get().getLatestPublishedRecord().get().getEdition();
+    int newEdition = bookRepository.findById(book.getId()).get().getLatestPublishedRecord().get().getEdition();
     assertEquals(1, newEdition);
 
     // 4. 다시 개정을 시작하고 visibility를 숨김 (PUBLISHED -> REVISING)
@@ -51,7 +51,7 @@ public class StatusFlowTest {
 
     // 5. 책 개정 완료 및 재출판 (REVISING -> PUBLISHED)
     BookDto rePublishedBook = changeBookStatusUseCase.publish(user.getUid(), book.getId());
-    int afterPublishEdition = bookPersistencePort.findById(book.getId()).get().getLatestPublishedRecord().get().getEdition();
+    int afterPublishEdition = bookRepository.findById(book.getId()).get().getLatestPublishedRecord().get().getEdition();
     assertEquals(2, afterPublishEdition);
     // 출판하면 자동으로 GLOBAL로 변경됨
     assertEquals(BookVisibility.GLOBAL, rePublishedBook.getVisibility());
@@ -62,7 +62,7 @@ public class StatusFlowTest {
     // 7. 개정본을 병합 (REVISING -> PUBLISHED)
     changeBookStatusUseCase.mergeRevision(user.getUid(), book.getId());
     // 병합은 edition을 올리지 않음
-    int mergeEdition = bookPersistencePort.findById(book.getId()).get().getLatestPublishedRecord().get().getEdition();
+    int mergeEdition = bookRepository.findById(book.getId()).get().getLatestPublishedRecord().get().getEdition();
     assertEquals(2, mergeEdition);
   }
 

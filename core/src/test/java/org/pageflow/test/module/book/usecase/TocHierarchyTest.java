@@ -12,7 +12,7 @@ import org.pageflow.book.application.dto.node.WithContentSectionDto;
 import org.pageflow.book.domain.book.entity.Book;
 import org.pageflow.book.domain.toc.Toc;
 import org.pageflow.book.domain.toc.entity.TocFolder;
-import org.pageflow.book.persistence.BookPersistencePort;
+import org.pageflow.book.persistence.BookRepository;
 import org.pageflow.book.persistence.toc.TocNodeRepository;
 import org.pageflow.book.persistence.toc.TocRepository;
 import org.pageflow.book.usecase.EditTocUseCase;
@@ -43,7 +43,7 @@ public class TocHierarchyTest {
   private final TocUtils tocUtils;
   private final EditTocUseCase editTocUseCase;
   private final TocSectionUseCase tocSectionUseCase;
-  private final BookPersistencePort bookPersistencePort;
+  private final BookRepository bookRepository;
   private final TocRepository tocRepository;
   private final TocNodeRepository nodePersistencePort;
 
@@ -77,7 +77,7 @@ public class TocHierarchyTest {
         .section("s31")
       );
 
-    Book book = bookPersistencePort.findById(bookId).get();
+    Book book = bookRepository.findById(bookId).get();
     Toc toc = tocRepository.loadEditableToc(book);
 
     UUID rootFolderId = toc.getRootFolder().getId();
@@ -439,7 +439,7 @@ public class TocHierarchyTest {
     UUID bookId = bookUtils.createBook(user, "복잡한 계층 구조 순환 참조 테스트").getId();
 
     // 2. 기본 루트 폴더 확인
-    Book book = bookPersistencePort.findById(bookId).get();
+    Book book = bookRepository.findById(bookId).get();
     Toc toc = tocRepository.loadEditableToc(book);
     TocFolder rootFolder = toc.getRootFolder();
     UUID rootFolderId = toc.getRootFolder().getId();

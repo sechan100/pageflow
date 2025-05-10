@@ -23,7 +23,7 @@ import java.util.UUID;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class AuthorRepository {
-  private final BookPersistencePort bookPersistencePort;
+  private final BookRepository bookRepository;
   private final UserPersistencePort userPersistencePort;
 
   public Author loadAuthorProxy(UID authorId) {
@@ -34,7 +34,7 @@ public class AuthorRepository {
   public AuthorProfileDto loadAuthorProfile(UID authorId) {
     UUID uid = authorId.getValue();
     User user = userPersistencePort.findById(uid).get();
-    List<Book> authorBooks = bookPersistencePort.findPublishedBooksByAuthorId(uid);
+    List<Book> authorBooks = bookRepository.findPublishedBooksByAuthorId(uid);
     return new AuthorProfileDto(
       authorId,
       user.getPenname(),

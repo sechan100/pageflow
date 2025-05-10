@@ -10,7 +10,7 @@ import org.pageflow.book.domain.book.entity.Book;
 import org.pageflow.book.domain.toc.Toc;
 import org.pageflow.book.domain.toc.entity.TocFolder;
 import org.pageflow.book.domain.toc.entity.TocNode;
-import org.pageflow.book.persistence.BookPersistencePort;
+import org.pageflow.book.persistence.BookRepository;
 import org.pageflow.book.persistence.toc.TocRepository;
 import org.pageflow.book.usecase.ChangeBookStatusUseCase;
 import org.pageflow.book.usecase.EditTocUseCase;
@@ -37,7 +37,7 @@ public class BookStatusTest {
   private final ChangeBookStatusUseCase changeBookStatusUseCase;
   private final EditTocUseCase editTocUseCase;
 
-  private final BookPersistencePort bookPersistencePort;
+  private final BookRepository bookRepository;
   private final TocRepository tocRepository;
 
   @Test
@@ -47,7 +47,7 @@ public class BookStatusTest {
     UID uid = user1.getUid();
     BookDto book = bookUtils.createBook(user1, "출판 테스트 도서");
     UUID bookId = book.getId();
-    Book bookEn = bookPersistencePort.findById(bookId).get();
+    Book bookEn = bookRepository.findById(bookId).get();
     tocUtils.buildTree(book)
       .folder("폴더 1", f ->
         f.folder("폴더 1.1")
@@ -109,7 +109,7 @@ public class BookStatusTest {
     changeBookStatusUseCase.startRevision(uid, bookId);
 
     // 출판 후 editableToc가 복제되었는지 확인
-    Book bookEntity = bookPersistencePort.findById(bookId).get();
+    Book bookEntity = bookRepository.findById(bookId).get();
     TocFolder rtRoot = tocRepository.loadReadonlyToc(bookEntity).getRootFolder();
     TocFolder etRoot = tocRepository.loadEditableToc(bookEntity).getRootFolder();
     tocUtils.assertSameHierarchyRecusive(rtRoot, etRoot, (readOnly, editable) -> {
@@ -148,7 +148,7 @@ public class BookStatusTest {
     changeBookStatusUseCase.publish(uid, bookId);
 
     // 개정 후 모든 node가 readOnlyToc로 변경되었는지 확인
-    Book bookEntity = bookPersistencePort.findById(bookId).get();
+    Book bookEntity = bookRepository.findById(bookId).get();
     Toc publishedToc = tocRepository.loadReadonlyToc(bookEntity);
     publishedToc.forEachNode(n -> Assertions.assertFalse(n.isEditable()));
 
@@ -184,7 +184,7 @@ public class BookStatusTest {
     changeBookStatusUseCase.mergeRevision(uid, bookId);
 
     // 병합 후 모든 node가 readOnlyToc로 변경되었는지 확인
-    Book bookEntity = bookPersistencePort.findById(bookId).get();
+    Book bookEntity = bookRepository.findById(bookId).get();
     Toc publishedToc = tocRepository.loadReadonlyToc(bookEntity);
     publishedToc.forEachNode(n -> Assertions.assertFalse(n.isEditable()));
 
@@ -199,7 +199,7 @@ public class BookStatusTest {
     UID uid = user1.getUid();
     BookDto book = bookUtils.createBook(user1, "출판 테스트 도서");
     UUID bookId = book.getId();
-    Book bookEntity = bookPersistencePort.findById(bookId).get();
+    Book bookEntity = bookRepository.findById(bookId).get();
 
     tocUtils.buildTree(book)
       .folder("폴더 1", f ->

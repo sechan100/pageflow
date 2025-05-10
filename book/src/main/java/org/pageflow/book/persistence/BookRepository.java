@@ -13,7 +13,7 @@ import java.util.UUID;
 /**
  * @author : sechan
  */
-public interface BookPersistencePort extends JpaRepository<Book, UUID> {
+public interface BookRepository extends JpaRepository<Book, UUID> {
   @Query("select b from Book b where b.author.id = :authorId")
   List<Book> findBooksByAuthorId(@Param("authorId") UUID authorId);
 

@@ -12,8 +12,8 @@ import org.pageflow.book.domain.review.ReviewAccessGranter;
 import org.pageflow.book.domain.review.constants.ReviewAccess;
 import org.pageflow.book.domain.review.entity.Review;
 import org.pageflow.book.persistence.AuthorRepository;
-import org.pageflow.book.persistence.BookPersistencePort;
-import org.pageflow.book.persistence.ReviewPersistencePort;
+import org.pageflow.book.persistence.BookRepository;
+import org.pageflow.book.persistence.ReviewRepository;
 import org.pageflow.common.result.Result;
 import org.pageflow.common.user.UID;
 import org.springframework.stereotype.Service;
@@ -29,8 +29,8 @@ import java.util.UUID;
 @Transactional
 @RequiredArgsConstructor
 public class ReviewUseCase {
-  private final ReviewPersistencePort reviewPersistencePort;
-  private final BookPersistencePort bookPersistencePort;
+  private final ReviewRepository reviewRepository;
+  private final BookRepository bookRepository;
   private final AuthorRepository authorRepository;
 
 
@@ -45,7 +45,7 @@ public class ReviewUseCase {
     String content,
     int score
   ) {
-    Book book = bookPersistencePort.findById(bookId).get();
+    Book book = bookRepository.findById(bookId).get();
     BookAccessGranter accessGranter = new BookAccessGranter(uid, book);
     Result grant = accessGranter.grant(BookAccess.READ);
     if(grant.isFailure()) {
@@ -63,7 +63,7 @@ public class ReviewUseCase {
     );
     if(reviewRes.isFailure()) return (Result) reviewRes;
 
-    Review review = reviewPersistencePort.persist(reviewRes.getSuccessData());
+    Review review = reviewRepository.save(reviewRes.getSuccessData());
     return Result.ok(ReviewDto.from(review));
   }
 
@@ -78,7 +78,7 @@ public class ReviewUseCase {
     String content,
     int score
   ) {
-    Review review = reviewPersistencePort.findById(reviewId).get();
+    Review review = reviewRepository.findById(reviewId).get();
 
     // 권한 검사 ========================
     ReviewAccessGranter accessGranter = new ReviewAccessGranter(uid, review);
@@ -99,7 +99,7 @@ public class ReviewUseCase {
    * @code REVIEW_ACCESS_DENIED: 리뷰 작성 권한이 없는 경우
    */
   public Result deleteReview(UID uid, UUID reviewId) {
-    Review review = reviewPersistencePort.findById(reviewId).get();
+    Review review = reviewRepository.findById(reviewId).get();
 
     // 권한 검사 ========================
     ReviewAccessGranter accessGranter = new ReviewAccessGranter(uid, review);
@@ -109,12 +109,12 @@ public class ReviewUseCase {
     }
 
     // 삭제
-    reviewPersistencePort.delete(review);
+    reviewRepository.delete(review);
     return Result.ok();
   }
 
 
   private Book _loadBookProxy(UUID bookId) {
-    return Hibernate.unproxy(bookPersistencePort.getReferenceById(bookId), Book.class);
+    return Hibernate.unproxy(bookRepository.getReferenceById(bookId), Book.class);
   }
 }
